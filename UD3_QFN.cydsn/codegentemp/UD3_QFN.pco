@@ -1,0 +1,277 @@
+# UD3_QFN
+# 2026-01-13 23:59:13Z
+
+# IO_0@[IOP=(1)][IoId=(0)] is reserved: SWDDebugEnabled
+dont_use_io iocell 1 0
+# IO_1@[IOP=(1)][IoId=(1)] is reserved: SWDDebugEnabled
+dont_use_io iocell 1 1
+# IO_3@[IOP=(1)][IoId=(3)] is reserved: SWDDebugEnabled
+dont_use_io iocell 1 3
+# IO_2@[IOP=(3)][IoId=(2)] is reserved: AnalogTrackJump
+dont_use_io iocell 3 2
+set_location "ClockBlock" clockblockcell -1 -1 0
+set_io "GD2A(0)" iocell 1 6
+set_io "therm2(0)" iocell 0 7
+set_io "UVLO(0)" iocell 12 0
+set_io "TP6(0)" iocell 12 6
+set_io "LED_int(0)" iocell 2 0
+set_io "Fan(0)" iocell 0 6
+set_io "CTout(0)" iocell 2 5
+set_io "\ADC:Bypass(0)\" iocell 0 2
+set_io "therm1(0)" iocell 3 6
+set_io "GD1A(0)" iocell 1 2
+set_io "ZCDB(0)" iocell 2 6
+set_io "LED_sysfault(0)" iocell 2 3
+set_io "LED_com(0)" iocell 2 1
+set_io "Relay2(0)" iocell 15 3
+set_io "Relay1(0)" iocell 15 2
+set_io "LED_OCD(0)" iocell 2 4
+set_io "GD2B(0)" iocell 1 7
+set_io "DEBUG_DA(0)" iocell 3 7
+set_io "Ibus(0)" iocell 0 5
+set_io "Vbus(0)" iocell 0 0
+set_io "GD1B(0)" iocell 1 5
+set_io "Vin(0)" iocell 3 3
+set_io "ZCDA(0)" iocell 2 7
+set_io "DEBUG_ILIM(0)" iocell 15 4
+set_io "\USBUART_1:Dm(0)\" iocell 15 7
+set_location "\USBUART_1:Dp\" logicalport -1 -1 15
+set_io "\USBUART_1:Dp(0)\" iocell 15 6
+set_io "Vdriver(0)" iocell 3 1
+set_io "Rx(0)" iocell 3 4
+set_io "Tx(0)" iocell 3 0
+set_io "Relay3(0)" iocell 12 4
+set_io "Relay4(0)" iocell 0 3
+set_io "\ADC_peak:Bypass(0)\" iocell 0 4
+set_io "Ext_Interrupter(0)" iocell 2 2
+set_io "SDA_1(0)" iocell 15 0
+set_io "SCL_1(0)" iocell 12 3
+set_io "digipot_clk(0)" iocell 1 4
+set_io "digipot_data(0)" iocell 12 5
+set_io "digipot_ncs(0)" iocell 12 7
+set_io "dcdc_ena(0)" iocell 3 5
+set_io "ZCD_Debug(0)" iocell 15 1
+set_io "button_input(0)" iocell 12 2
+set_location "nZCDp" 2 5 0 0
+set_location "Net_16497" 0 1 1 1
+set_location "Net_13080" 2 5 0 3
+set_location "Net_16488" 1 0 0 3
+set_location "Net_16503" 1 0 1 1
+set_location "Net_16500" 0 0 1 2
+set_location "Net_16573__SYNC" 1 0 5 0
+set_location "SCL_1(0)_SYNC" 3 2 5 0
+set_location "NOT_interrupter" 0 5 1 3
+set_location "pwm_reset" 0 4 1 0
+set_location "int1_reset" 0 4 0 1
+set_location "Net_13009" 0 2 0 3
+set_location "Net_13196" 3 1 1 0
+set_location "Net_11931" 0 2 0 2
+set_location "Net_11581" 1 1 0 1
+set_location "Net_12592" 2 1 0 3
+set_location "Net_12206" 1 5 0 0
+set_location "Net_13144" 3 0 0 1
+set_location "SDA_1(0)_SYNC" 3 1 5 1
+set_location "\FB_glitch_detect:PWMUDB:status_2\" 1 3 1 3
+set_location "Net_12220" 0 5 0 1
+set_location "Net_18735" 0 5 0 2
+set_location "Net_13576" 1 2 0 1
+set_location "\ZCD_counter:CounterUDB:status_0\" 2 3 0 1
+set_location "\ZCD_counter:CounterUDB:underflow_status\" 2 4 0 2
+set_location "\ZCD_counter:CounterUDB:count_enable\" 2 3 0 3
+set_location "ST" 3 2 1 2
+set_location "Net_16922" 2 4 0 3
+set_location "Net_18966" 1 1 0 3
+set_location "\UART:BUART:counter_load_not\" 1 2 1 2
+set_location "\UART:BUART:tx_status_0\" 2 2 1 2
+set_location "\UART:BUART:tx_status_2\" 2 2 1 1
+set_location "\UART:BUART:rx_counter_load\" 2 0 1 3
+set_location "\UART:BUART:rx_postpoll\" 3 1 1 2
+set_location "\UART:BUART:rx_status_4\" 2 0 1 2
+set_location "\UART:BUART:rx_status_5\" 2 3 0 2
+set_location "Net_16898" 2 3 1 3
+set_location "Net_16389" 3 2 0 1
+set_location "\interrupterTimebase:CounterUDB:status_0\" 1 2 1 1
+set_location "\interrupterTimebase:CounterUDB:status_2\" 1 3 0 1
+set_location "\interrupterTimebase:CounterUDB:count_enable\" 1 2 0 2
+set_location "Net_18750" 0 5 1 1
+set_location "\OnTimeCounter:TimerUDB:status_tc\" 0 1 0 0
+set_location "Net_16573" 2 5 1 1
+set_location "Rx(0)_SYNC" 3 1 5 0
+set_location "\temp_pwm:PWMUDB:status_2\" 3 5 1 0
+set_location "Net_13720" 0 1 0 2
+set_location "no_fb" 0 5 1 2
+set_location "ZCD_pulse" 3 3 0 3
+set_location "Net_19331" 2 5 0 2
+set_location "fram_to_PWMA_DMA" drqcell -1 -1 10
+set_location "ADC_data_ready" interrupt -1 -1 0
+set_location "ADC_DMA" drqcell -1 -1 0
+set_location "\ADC:IRQ\" interrupt -1 -1 2
+set_location "\ADC:ADC_SAR\" sarcell -1 -1 1
+set_location "filter_to_fram_DMA" drqcell -1 -1 8
+set_location "__ONE__" 2 5 1 3
+set_location "\interrupter1:PWMUDB:genblk1:ctrlreg\" 2 5 6
+set_location "\interrupter1:PWMUDB:sP16:pwmdp:u0\" 1 4 2
+set_location "\interrupter1:PWMUDB:sP16:pwmdp:u1\" 0 4 2
+set_location "\PWMB:PWMHW\" timercell -1 -1 2
+set_location "ram_to_filter_DMA" drqcell -1 -1 12
+set_location "\FB_Filter:DFB\" dfbcell -1 -1 0
+set_location "FBC_to_ram_DMA" drqcell -1 -1 2
+set_location "\ZCD_compB:ctComp\" comparatorcell -1 -1 2
+set_location "\interrupter1_control:Sync:ctrl_reg\" 0 4 6
+set_location "int1_dma" drqcell -1 -1 11
+set_location "\FB_capture:TimerHW\" timercell -1 -1 0
+set_location "\FB_THRSH_DAC:viDAC8\" vidaccell -1 -1 3
+set_location "PWMB_PSB_DMA" drqcell -1 -1 6
+set_location "\QCW_enable:Sync:ctrl_reg\" 0 2 6
+set_location "\FB_glitch_detect:PWMUDB:genblk1:ctrlreg\" 1 5 6
+set_location "\FB_glitch_detect:PWMUDB:genblk8:stsreg\" 1 4 4
+set_location "\FB_glitch_detect:PWMUDB:sP8:pwmdp:u0\" 1 5 2
+set_location "\ZCDref:viDAC8\" vidaccell -1 -1 1
+set_location "ADC_peak_ready" interrupt -1 -1 1
+set_location "QCW_CL_DMA" drqcell -1 -1 7
+set_location "TR1_CL_DMA" drqcell -1 -1 9
+set_location "\system_fault:Sync:ctrl_reg\" 0 5 6
+set_location "MUX_DMA" drqcell -1 -1 3
+set_location "\IDAC_therm:viDAC8\" vidaccell -1 -1 2
+set_location "\ADC_therm:DSM\" dsmodcell -1 -1 0
+set_location "\ADC_therm:DEC\" decimatorcell -1 -1 0
+set_location "PWMA_init_DMA" drqcell -1 -1 5
+set_location "\PWMA:PWMHW\" timercell -1 -1 1
+set_location "\CT1_dac:viDAC8\" vidaccell -1 -1 0
+set_location "\ZCD_counter:CounterUDB:sCTRLReg:ctrlreg\" 3 3 6
+set_location "\ZCD_counter:CounterUDB:sSTSReg:stsreg\" 2 4 4
+set_location "\ZCD_counter:CounterUDB:sC8:counterdp:u0\" 2 5 2
+set_location "\ZCD_compA:ctComp\" comparatorcell -1 -1 0
+set_location "PSBINIT_DMA" drqcell -1 -1 4
+set_location "\UART:TXInternalInterrupt\" interrupt -1 -1 5
+set_location "\UART:RXInternalInterrupt\" interrupt -1 -1 4
+set_location "\UART:BUART:sTX:TxShifter:u0\" 2 2 2
+set_location "\UART:BUART:sTX:sCLOCK:TxBitClkGen\" 2 1 2
+set_location "\UART:BUART:sTX:TxSts\" 2 2 4
+set_location "\UART:BUART:sRX:RxShifter:u0\" 2 0 2
+set_location "\UART:BUART:sRX:RxBitCounter\" 2 0 7
+set_location "\UART:BUART:sRX:RxSts\" 2 3 4
+set_location "\USBUART_1:dp_int\" interrupt -1 -1 12
+set_location "\USBUART_1:USB\" usbcell -1 -1 0
+set_location "\USBUART_1:ep_3\" interrupt -1 -1 8
+set_location "\USBUART_1:ep_2\" interrupt -1 -1 7
+set_location "\USBUART_1:ep_1\" interrupt -1 -1 6
+set_location "\USBUART_1:ep_0\" interrupt -1 -1 24
+set_location "\USBUART_1:bus_reset\" interrupt -1 -1 23
+set_location "\USBUART_1:arb_int\" interrupt -1 -1 22
+set_location "\USBUART_1:sof_int\" interrupt -1 -1 21
+set_location "\Opamp_2:ABuf\" abufcell -1 -1 0
+set_location "\Opamp_1:ABuf\" abufcell -1 -1 3
+set_location "\Amux_Ctrl:Sync:ctrl_reg\" 3 4 6
+set_location "uart_rx" interrupt -1 -1 11
+set_location "uart_tx" interrupt -1 -1 13
+set_location "isr_midi" interrupt -1 -1 10
+set_location "\no_fb_reg:sts:sts_reg\" 0 5 3
+set_location "\IVO:Sync:ctrl_reg\" 2 1 6
+set_location "\interrupterTimebase:CounterUDB:sCTRLReg:ctrlreg\" 1 2 6
+set_location "\interrupterTimebase:CounterUDB:sSTSReg:stsreg\" 1 3 4
+set_location "\interrupterTimebase:CounterUDB:sC32:counterdp:u0\" 1 2 2
+set_location "\interrupterTimebase:CounterUDB:sC32:counterdp:u1\" 0 2 2
+set_location "\interrupterTimebase:CounterUDB:sC32:counterdp:u2\" 0 3 2
+set_location "\interrupterTimebase:CounterUDB:sC32:counterdp:u3\" 1 3 2
+set_location "ADC_DMA_peak" drqcell -1 -1 1
+set_location "\ADC_peak:IRQ\" interrupt -1 -1 3
+set_location "\ADC_peak:ADC_SAR\" sarcell -1 -1 0
+set_location "interrupterIRQ" interrupt -1 -1 9
+set_location "\I2C:I2C_IRQ\" interrupt -1 -1 15
+set_location "\I2C:I2C_FF\" i2ccell -1 -1 0
+set_location "\Sync_1:genblk1[0]:INST\" 1 1 5 1
+set_location "\Sync_2:genblk1[0]:INST\" 0 2 5 1
+set_location "\Sync_3:genblk1[0]:INST\" 0 2 5 0
+set_location "\Sync_4:genblk1[0]:INST\" 1 1 5 0
+set_location "\OnTimeCounter:TimerUDB:sCTRLReg:SyncCtl:ctrlreg\" 0 0 6
+set_location "\OnTimeCounter:TimerUDB:rstSts:stsreg\" 0 1 4
+set_location "\OnTimeCounter:TimerUDB:sT24:timerdp:u0\" 1 1 2
+set_location "\OnTimeCounter:TimerUDB:sT24:timerdp:u1\" 0 1 2
+set_location "\OnTimeCounter:TimerUDB:sT24:timerdp:u2\" 0 0 2
+set_location "\temp_pwm:PWMUDB:genblk1:ctrlreg\" 3 5 6
+set_location "\temp_pwm:PWMUDB:genblk8:stsreg\" 3 5 4
+set_location "\temp_pwm:PWMUDB:sP8:pwmdp:u0\" 3 4 2
+set_location "\CT1_comp:ctComp\" comparatorcell -1 -1 1
+set_location "\Sample_Hold_1:SC\" sccell -1 -1 1
+set_location "\Comp_1:ctComp\" comparatorcell -1 -1 3
+set_location "cydff_11" 0 4 1 3
+set_location "Net_12937" 2 4 1 0
+set_location "Net_4423" 0 2 1 0
+set_location "\interrupter1:PWMUDB:runmode_enable\" 1 4 0 3
+set_location "\interrupter1:PWMUDB:trig_disable\" 1 4 0 2
+set_location "int1" 0 4 0 0
+set_location "Net_7037" 0 3 0 0
+set_location "Net_12930" 1 2 1 0
+set_location "cydff_7" 0 4 1 1
+set_location "interrupter" 0 4 1 2
+set_location "fb_nGlitchFilter" 2 3 0 0
+set_location "cydff_10" 2 1 0 1
+set_location "Net_12965" 2 4 0 0
+set_location "\FB_glitch_detect:PWMUDB:runmode_enable\" 1 5 0 2
+set_location "\FB_glitch_detect:PWMUDB:trig_disable\" 1 5 0 1
+set_location "\FB_glitch_detect:PWMUDB:prevCompare1\" 1 5 1 1
+set_location "\FB_glitch_detect:PWMUDB:prevCompare2\" 1 5 0 3
+set_location "\FB_glitch_detect:PWMUDB:status_0\" 1 5 1 2
+set_location "\FB_glitch_detect:PWMUDB:status_1\" 1 5 1 0
+set_location "Net_12147" 1 3 0 0
+set_location "cydff_17" 0 2 0 1
+set_location "cy_srff_1" 3 3 0 2
+set_location "cydff_3" 2 4 1 1
+set_location "Tselect" 2 4 1 2
+set_location "AMuxHw_1_Decoder_old_id_1" 3 4 1 2
+set_location "AMuxHw_1_Decoder_old_id_0" 3 4 1 1
+set_location "AMuxHw_1_Decoder_one_hot_0" 3 3 1 3
+set_location "AMuxHw_1_Decoder_one_hot_1" 3 4 0 2
+set_location "AMuxHw_1_Decoder_one_hot_2" 3 4 0 0
+set_location "AMuxHw_1_Decoder_one_hot_3" 3 4 1 0
+set_location "cydff_24" 1 3 0 2
+set_location "Net_12256" 2 3 1 2
+set_location "\ZCD_counter:CounterUDB:disable_run_i\" 1 3 0 3
+set_location "\ZCD_counter:CounterUDB:underflow_reg_i\" 1 4 1 0
+set_location "\ZCD_counter:CounterUDB:prevCompare\" 2 3 1 1
+set_location "\ZCD_counter:CounterUDB:count_stored_i\" 3 2 1 0
+set_location "cydff_22" 3 3 0 1
+set_location "Net_13025" 3 3 0 0
+set_location "Net_13092" 1 3 1 0
+set_location "Net_13204" 0 2 0 0
+set_location "\UART:BUART:txn\" 2 2 0 0
+set_location "\UART:BUART:tx_state_1\" 2 2 0 1
+set_location "\UART:BUART:tx_state_0\" 1 0 1 0
+set_location "\UART:BUART:tx_state_2\" 1 0 0 1
+set_location "\UART:BUART:tx_bitclk\" 1 1 0 0
+set_location "\UART:BUART:tx_ctrl_mark_last\" 1 1 0 2
+set_location "\UART:BUART:rx_state_0\" 2 0 1 0
+set_location "\UART:BUART:rx_load_fifo\" 2 0 0 1
+set_location "\UART:BUART:rx_state_3\" 2 0 0 2
+set_location "\UART:BUART:rx_state_2\" 2 0 0 0
+set_location "\UART:BUART:rx_bitclk_enable\" 2 1 1 0
+set_location "\UART:BUART:rx_state_stop1_reg\" 2 1 1 2
+set_location "\UART:BUART:pollcount_1\" 3 1 0 0
+set_location "\UART:BUART:pollcount_0\" 3 1 0 1
+set_location "\UART:BUART:rx_status_3\" 2 1 1 1
+set_location "\UART:BUART:rx_last\" 3 0 1 2
+set_location "cydff_23" 2 4 1 3
+set_location "FB_STABLE" 3 2 0 3
+set_location "cydff_13" 2 5 0 1
+set_location "\interrupterTimebase:CounterUDB:overflow_reg_i\" 3 4 0 3
+set_location "\interrupterTimebase:CounterUDB:prevCompare\" 1 2 0 0
+set_location "\interrupterTimebase:CounterUDB:count_stored_i\" 1 2 0 3
+set_location "Net_16894" 1 1 1 1
+set_location "\temp_pwm:PWMUDB:runmode_enable\" 3 5 0 3
+set_io "Dedicated_Output" iocell 0 1
+set_location "\temp_pwm:PWMUDB:prevCompare1\" 3 5 1 1
+set_location "\temp_pwm:PWMUDB:prevCompare2\" 3 5 0 1
+set_location "\temp_pwm:PWMUDB:status_0\" 3 5 1 2
+set_location "\temp_pwm:PWMUDB:status_1\" 3 5 0 0
+set_location "Net_16816" 2 5 1 0
+set_location "Net_16817" 3 5 0 2
+set_location "Net_16573__SYNC_1" 1 0 5 1
+set_location "cydff_19" 0 1 0 3
+set_location "Net_18729" 0 5 1 0
+set_location "Net_13073" 1 3 1 1
+set_location "cydff_21" 0 0 1 3
+set_location "Net_18873" 2 2 1 0
+set_location "Net_13728" 0 3 1 1
+set_location "cydff_25" 0 0 0 1
+set_location "Net_19641" 2 3 1 0

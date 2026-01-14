@@ -1,0 +1,3663 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"ADC_peak.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.ADC_peak_Enable,"ax",%progbits
+  20              		.align	1
+  21              		.global	ADC_peak_Enable
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	ADC_peak_Enable, %function
+  25              	ADC_peak_Enable:
+  26              	.LFB2:
+  27              		.file 1 "Generated_Source\\PSoC5\\ADC_peak.c"
+   1:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/ADC_peak.c **** * File Name: ADC_peak.c
+   3:Generated_Source\PSoC5/ADC_peak.c **** * Version 3.10
+   4:Generated_Source\PSoC5/ADC_peak.c **** *
+   5:Generated_Source\PSoC5/ADC_peak.c **** * Description:
+   6:Generated_Source\PSoC5/ADC_peak.c **** *  This file provides the source code to the API for the Successive
+   7:Generated_Source\PSoC5/ADC_peak.c **** *  approximation ADC Component.
+   8:Generated_Source\PSoC5/ADC_peak.c **** *
+   9:Generated_Source\PSoC5/ADC_peak.c **** * Note:
+  10:Generated_Source\PSoC5/ADC_peak.c **** *
+  11:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+  12:Generated_Source\PSoC5/ADC_peak.c **** * Copyright 2008-2015, Cypress Semiconductor Corporation.  All rights reserved.
+  13:Generated_Source\PSoC5/ADC_peak.c **** * You may use this file only in accordance with the license, terms, conditions,
+  14:Generated_Source\PSoC5/ADC_peak.c **** * disclaimers, and limitations in the end user license agreement accompanying
+  15:Generated_Source\PSoC5/ADC_peak.c **** * the software package with which this file was provided.
+  16:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+  17:Generated_Source\PSoC5/ADC_peak.c **** 
+  18:Generated_Source\PSoC5/ADC_peak.c **** #include "CyLib.h"
+  19:Generated_Source\PSoC5/ADC_peak.c **** #include "ADC_peak.h"
+  20:Generated_Source\PSoC5/ADC_peak.c **** 
+  21:Generated_Source\PSoC5/ADC_peak.c **** #if(ADC_peak_DEFAULT_INTERNAL_CLK)
+  22:Generated_Source\PSoC5/ADC_peak.c ****     #include "ADC_peak_theACLK.h"
+  23:Generated_Source\PSoC5/ADC_peak.c **** #endif /* End ADC_peak_DEFAULT_INTERNAL_CLK */
+  24:Generated_Source\PSoC5/ADC_peak.c **** 
+  25:Generated_Source\PSoC5/ADC_peak.c **** 
+  26:Generated_Source\PSoC5/ADC_peak.c **** /***************************************
+  27:Generated_Source\PSoC5/ADC_peak.c **** * Forward function references
+  28:Generated_Source\PSoC5/ADC_peak.c **** ***************************************/
+  29:Generated_Source\PSoC5/ADC_peak.c **** static void ADC_peak_CalcGain(uint8 resolution);
+  30:Generated_Source\PSoC5/ADC_peak.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 2
+
+
+  31:Generated_Source\PSoC5/ADC_peak.c **** 
+  32:Generated_Source\PSoC5/ADC_peak.c **** /***************************************
+  33:Generated_Source\PSoC5/ADC_peak.c **** * Global data allocation
+  34:Generated_Source\PSoC5/ADC_peak.c **** ***************************************/
+  35:Generated_Source\PSoC5/ADC_peak.c **** uint8 ADC_peak_initVar = 0u;
+  36:Generated_Source\PSoC5/ADC_peak.c **** volatile int16 ADC_peak_offset;
+  37:Generated_Source\PSoC5/ADC_peak.c **** volatile int16 ADC_peak_countsPerVolt;     /* Obsolete Gain compensation */
+  38:Generated_Source\PSoC5/ADC_peak.c **** volatile int32 ADC_peak_countsPer10Volt;   /* Gain compensation */
+  39:Generated_Source\PSoC5/ADC_peak.c **** volatile int16 ADC_peak_shift;
+  40:Generated_Source\PSoC5/ADC_peak.c **** 
+  41:Generated_Source\PSoC5/ADC_peak.c **** 
+  42:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+  43:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_Start
+  44:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+  45:Generated_Source\PSoC5/ADC_peak.c **** *
+  46:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+  47:Generated_Source\PSoC5/ADC_peak.c **** *  This is the preferred method to begin component operation.
+  48:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_Start() sets the initVar variable, calls the
+  49:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_Init() function, and then calls the
+  50:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_Enable() function.
+  51:Generated_Source\PSoC5/ADC_peak.c **** *
+  52:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+  53:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+  54:Generated_Source\PSoC5/ADC_peak.c **** *
+  55:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+  56:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+  57:Generated_Source\PSoC5/ADC_peak.c **** *
+  58:Generated_Source\PSoC5/ADC_peak.c **** * Global variables:
+  59:Generated_Source\PSoC5/ADC_peak.c **** *  The ADC_peak_initVar variable is used to indicate when/if initial
+  60:Generated_Source\PSoC5/ADC_peak.c **** *  configuration of this component has happened. The variable is initialized to
+  61:Generated_Source\PSoC5/ADC_peak.c **** *  zero and set to 1 the first time ADC_Start() is called. This allows for
+  62:Generated_Source\PSoC5/ADC_peak.c **** *  component Re-Start without re-initialization in all subsequent calls to the
+  63:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_Start() routine.
+  64:Generated_Source\PSoC5/ADC_peak.c **** *  If re-initialization of the component is required the variable should be set
+  65:Generated_Source\PSoC5/ADC_peak.c **** *  to zero before call of ADC_peak_Start() routine, or the user may call
+  66:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_Init() and ADC_peak_Enable() as done in the
+  67:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_Start() routine.
+  68:Generated_Source\PSoC5/ADC_peak.c **** *
+  69:Generated_Source\PSoC5/ADC_peak.c **** * Side Effect:
+  70:Generated_Source\PSoC5/ADC_peak.c **** *  If the initVar variable is already set, this function only calls the
+  71:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_Enable() function.
+  72:Generated_Source\PSoC5/ADC_peak.c **** *
+  73:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+  74:Generated_Source\PSoC5/ADC_peak.c **** void ADC_peak_Start(void)
+  75:Generated_Source\PSoC5/ADC_peak.c **** {
+  76:Generated_Source\PSoC5/ADC_peak.c **** 
+  77:Generated_Source\PSoC5/ADC_peak.c ****     /* If not Initialized then initialize all required hardware and software */
+  78:Generated_Source\PSoC5/ADC_peak.c ****     if(ADC_peak_initVar == 0u)
+  79:Generated_Source\PSoC5/ADC_peak.c ****     {
+  80:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_Init();
+  81:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_initVar = 1u;
+  82:Generated_Source\PSoC5/ADC_peak.c ****     }
+  83:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_Enable();
+  84:Generated_Source\PSoC5/ADC_peak.c **** }
+  85:Generated_Source\PSoC5/ADC_peak.c **** 
+  86:Generated_Source\PSoC5/ADC_peak.c **** 
+  87:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 3
+
+
+  88:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_Init
+  89:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+  90:Generated_Source\PSoC5/ADC_peak.c **** *
+  91:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+  92:Generated_Source\PSoC5/ADC_peak.c **** *  Initialize component's parameters to the parameters set by user in the
+  93:Generated_Source\PSoC5/ADC_peak.c **** *  customizer of the component placed onto schematic. Usually called in
+  94:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_Start().
+  95:Generated_Source\PSoC5/ADC_peak.c **** *
+  96:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+  97:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+  98:Generated_Source\PSoC5/ADC_peak.c **** *
+  99:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 100:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 101:Generated_Source\PSoC5/ADC_peak.c **** *
+ 102:Generated_Source\PSoC5/ADC_peak.c **** * Global variables:
+ 103:Generated_Source\PSoC5/ADC_peak.c **** *  The ADC_peak_offset variable is initialized to 0.
+ 104:Generated_Source\PSoC5/ADC_peak.c **** *
+ 105:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 106:Generated_Source\PSoC5/ADC_peak.c **** void ADC_peak_Init(void)
+ 107:Generated_Source\PSoC5/ADC_peak.c **** {
+ 108:Generated_Source\PSoC5/ADC_peak.c **** 
+ 109:Generated_Source\PSoC5/ADC_peak.c ****     /* This is only valid if there is an internal clock */
+ 110:Generated_Source\PSoC5/ADC_peak.c ****     #if(ADC_peak_DEFAULT_INTERNAL_CLK)
+ 111:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_theACLK_SetMode(CYCLK_DUTY);
+ 112:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* End ADC_peak_DEFAULT_INTERNAL_CLK */
+ 113:Generated_Source\PSoC5/ADC_peak.c **** 
+ 114:Generated_Source\PSoC5/ADC_peak.c ****     #if(ADC_peak_IRQ_REMOVE == 0u)
+ 115:Generated_Source\PSoC5/ADC_peak.c ****         /* Start and set interrupt vector */
+ 116:Generated_Source\PSoC5/ADC_peak.c ****         CyIntSetPriority(ADC_peak_INTC_NUMBER, ADC_peak_INTC_PRIOR_NUMBER);
+ 117:Generated_Source\PSoC5/ADC_peak.c ****         (void)CyIntSetVector(ADC_peak_INTC_NUMBER, &ADC_peak_ISR);
+ 118:Generated_Source\PSoC5/ADC_peak.c ****     #endif   /* End ADC_peak_IRQ_REMOVE */
+ 119:Generated_Source\PSoC5/ADC_peak.c **** 
+ 120:Generated_Source\PSoC5/ADC_peak.c ****     /* Enable IRQ mode*/
+ 121:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_SAR_CSR1_REG |= ADC_peak_SAR_IRQ_MASK_EN | ADC_peak_SAR_IRQ_MODE_EDGE;
+ 122:Generated_Source\PSoC5/ADC_peak.c **** 
+ 123:Generated_Source\PSoC5/ADC_peak.c ****     /*Set SAR ADC resolution ADC */
+ 124:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_SetResolution(ADC_peak_DEFAULT_RESOLUTION);
+ 125:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_offset = 0;
+ 126:Generated_Source\PSoC5/ADC_peak.c **** }
+ 127:Generated_Source\PSoC5/ADC_peak.c **** 
+ 128:Generated_Source\PSoC5/ADC_peak.c **** 
+ 129:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 130:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_Enable
+ 131:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 132:Generated_Source\PSoC5/ADC_peak.c **** *
+ 133:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 134:Generated_Source\PSoC5/ADC_peak.c **** *  Enables the reference, clock and power for SAR ADC.
+ 135:Generated_Source\PSoC5/ADC_peak.c **** *
+ 136:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 137:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 138:Generated_Source\PSoC5/ADC_peak.c **** *
+ 139:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 140:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 141:Generated_Source\PSoC5/ADC_peak.c **** *
+ 142:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 143:Generated_Source\PSoC5/ADC_peak.c **** void ADC_peak_Enable(void)
+ 144:Generated_Source\PSoC5/ADC_peak.c **** {
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 4
+
+
+  28              		.loc 1 144 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 10B5     		push	{r4, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 4, -8
+  35              		.cfi_offset 14, -4
+ 145:Generated_Source\PSoC5/ADC_peak.c ****     uint8 tmpReg;
+ 146:Generated_Source\PSoC5/ADC_peak.c ****     uint8 enableInterrupts;
+ 147:Generated_Source\PSoC5/ADC_peak.c ****     enableInterrupts = CyEnterCriticalSection();
+  36              		.loc 1 147 0
+  37 0002 FFF7FEFF 		bl	CyEnterCriticalSection
+  38              	.LVL0:
+ 148:Generated_Source\PSoC5/ADC_peak.c **** 
+ 149:Generated_Source\PSoC5/ADC_peak.c ****     /* Enable the SAR ADC block in Active Power Mode */
+ 150:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_PWRMGR_SAR_REG |= ADC_peak_ACT_PWR_SAR_EN;
+  39              		.loc 1 150 0
+  40 0006 214A     		ldr	r2, .L2
+ 147:Generated_Source\PSoC5/ADC_peak.c **** 
+  41              		.loc 1 147 0
+  42 0008 0446     		mov	r4, r0
+  43              	.LVL1:
+  44              		.loc 1 150 0
+  45 000a 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 151:Generated_Source\PSoC5/ADC_peak.c **** 
+ 152:Generated_Source\PSoC5/ADC_peak.c ****      /* Enable the SAR ADC in Standby Power Mode*/
+ 153:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_STBY_PWRMGR_SAR_REG |= ADC_peak_STBY_PWR_SAR_EN;
+ 154:Generated_Source\PSoC5/ADC_peak.c **** 
+ 155:Generated_Source\PSoC5/ADC_peak.c ****     /* This is only valid if there is an internal clock */
+ 156:Generated_Source\PSoC5/ADC_peak.c ****     #if(ADC_peak_DEFAULT_INTERNAL_CLK)
+ 157:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_PWRMGR_CLK_REG |= ADC_peak_ACT_PWR_CLK_EN;
+ 158:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_STBY_PWRMGR_CLK_REG |= ADC_peak_STBY_PWR_CLK_EN;
+ 159:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* End ADC_peak_DEFAULT_INTERNAL_CLK */
+ 160:Generated_Source\PSoC5/ADC_peak.c **** 
+ 161:Generated_Source\PSoC5/ADC_peak.c ****     /* Enable VCM buffer and Enable Int Ref Amp */
+ 162:Generated_Source\PSoC5/ADC_peak.c ****     tmpReg = ADC_peak_SAR_CSR3_REG;
+ 163:Generated_Source\PSoC5/ADC_peak.c ****     tmpReg |= ADC_peak_SAR_EN_BUF_VCM_EN;
+ 164:Generated_Source\PSoC5/ADC_peak.c ****     /* PD_BUF_VREF is OFF in External reference or Vdda reference mode */
+ 165:Generated_Source\PSoC5/ADC_peak.c ****     #if((ADC_peak_DEFAULT_REFERENCE == ADC_peak__EXT_REF) || \
+ 166:Generated_Source\PSoC5/ADC_peak.c ****         (ADC_peak_DEFAULT_RANGE == ADC_peak__VNEG_VDDA_DIFF))
+ 167:Generated_Source\PSoC5/ADC_peak.c ****         tmpReg &= (uint8)~ADC_peak_SAR_EN_BUF_VREF_EN;
+ 168:Generated_Source\PSoC5/ADC_peak.c ****     #else /* In INTREF or INTREF Bypassed this buffer is ON */
+ 169:Generated_Source\PSoC5/ADC_peak.c ****         tmpReg |= ADC_peak_SAR_EN_BUF_VREF_EN;
+ 170:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* ADC_peak_DEFAULT_REFERENCE == ADC_peak__EXT_REF */
+ 171:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_SAR_CSR3_REG = tmpReg;
+ 172:Generated_Source\PSoC5/ADC_peak.c **** 
+ 173:Generated_Source\PSoC5/ADC_peak.c ****     /* Set reference for ADC */
+ 174:Generated_Source\PSoC5/ADC_peak.c ****     #if(ADC_peak_DEFAULT_RANGE == ADC_peak__VNEG_VDDA_DIFF)
+ 175:Generated_Source\PSoC5/ADC_peak.c ****         #if(ADC_peak_DEFAULT_REFERENCE == ADC_peak__EXT_REF)
+ 176:Generated_Source\PSoC5/ADC_peak.c ****             ADC_peak_SAR_CSR6_REG = ADC_peak_INT_BYPASS_EXT_VREF; /* S2 */
+ 177:Generated_Source\PSoC5/ADC_peak.c ****         #else /* Internal Vdda reference or obsolete bypass mode */
+ 178:Generated_Source\PSoC5/ADC_peak.c ****             ADC_peak_SAR_CSR6_REG = ADC_peak_VDDA_VREF;           /* S7 */
+ 179:Generated_Source\PSoC5/ADC_peak.c ****         #endif /* ADC_peak_DEFAULT_REFERENCE == ADC_peak__EXT_REF */
+ 180:Generated_Source\PSoC5/ADC_peak.c ****     #else  /* Reference goes through internal buffer */
+ 181:Generated_Source\PSoC5/ADC_peak.c ****         #if(ADC_peak_DEFAULT_REFERENCE == ADC_peak__INT_REF_NOT_BYPASSED)
+ 182:Generated_Source\PSoC5/ADC_peak.c ****             ADC_peak_SAR_CSR6_REG = ADC_peak_INT_VREF;            /* S3 + S4 */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 5
+
+
+ 183:Generated_Source\PSoC5/ADC_peak.c ****         #else /* INTREF Bypassed of External */
+ 184:Generated_Source\PSoC5/ADC_peak.c ****             ADC_peak_SAR_CSR6_REG = ADC_peak_INT_BYPASS_EXT_VREF; /* S2 */
+ 185:Generated_Source\PSoC5/ADC_peak.c ****         #endif /* ADC_peak_DEFAULT_REFERENCE == ADC_peak__INT_REF_NOT_BYPASSED */
+ 186:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* VNEG_VDDA_DIFF */
+ 187:Generated_Source\PSoC5/ADC_peak.c **** 
+ 188:Generated_Source\PSoC5/ADC_peak.c ****     /* Low non-overlap delay for sampling clock signals (for 1MSPS) */
+ 189:Generated_Source\PSoC5/ADC_peak.c ****     #if(ADC_peak_HIGH_POWER_PULSE == 0u) /* MinPulseWidth <= 50 ns */
+ 190:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_SAR_CSR5_REG &= (uint8)~ADC_peak_SAR_DLY_INC;
+ 191:Generated_Source\PSoC5/ADC_peak.c ****     #else /* Set High non-overlap delay for sampling clock signals (for <500KSPS)*/
+ 192:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_SAR_CSR5_REG |= ADC_peak_SAR_DLY_INC;
+ 193:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* ADC_peak_HIGH_POWER_PULSE == 0u */
+ 194:Generated_Source\PSoC5/ADC_peak.c **** 
+ 195:Generated_Source\PSoC5/ADC_peak.c ****     /* Increase comparator latch enable delay by 20%, 
+ 196:Generated_Source\PSoC5/ADC_peak.c ****     *  Increase comparator bias current by 30% without impacting delaysDelay 
+ 197:Generated_Source\PSoC5/ADC_peak.c ****     *  Default for 1MSPS) 
+ 198:Generated_Source\PSoC5/ADC_peak.c ****     */
+ 199:Generated_Source\PSoC5/ADC_peak.c ****     #if(ADC_peak_HIGH_POWER_PULSE == 0u)    /* MinPulseWidth <= 50 ns */
+ 200:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_SAR_CSR5_REG |= ADC_peak_SAR_SEL_CSEL_DFT_CHAR;
+ 201:Generated_Source\PSoC5/ADC_peak.c ****     #else /* for <500ksps */
+ 202:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_SAR_CSR5_REG &= (uint8)~ADC_peak_SAR_SEL_CSEL_DFT_CHAR;
+ 203:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* ADC_peak_HIGH_POWER_PULSE == 0u */
+ 204:Generated_Source\PSoC5/ADC_peak.c **** 
+ 205:Generated_Source\PSoC5/ADC_peak.c ****     /* Set default power and other configurations for control register 0 in multiple lines */
+ 206:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_SAR_CSR0_REG = (uint8)((uint8)ADC_peak_DEFAULT_POWER << ADC_peak_SAR_POWER_SHIFT)
+ 207:Generated_Source\PSoC5/ADC_peak.c ****     /* SAR_HIZ_CLEAR:   Should not be used for LP */
+ 208:Generated_Source\PSoC5/ADC_peak.c ****     #if ((CY_PSOC5LP) || (ADC_peak_DEFAULT_REFERENCE != ADC_peak__EXT_REF))
+ 209:Generated_Source\PSoC5/ADC_peak.c ****         | ADC_peak_SAR_HIZ_CLEAR
+ 210:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* SAR_HIZ_CLEAR */
+ 211:Generated_Source\PSoC5/ADC_peak.c ****     /*Set Convertion mode */
+ 212:Generated_Source\PSoC5/ADC_peak.c ****     #if(ADC_peak_DEFAULT_CONV_MODE != ADC_peak__FREE_RUNNING)      /* If triggered mode */
+ 213:Generated_Source\PSoC5/ADC_peak.c ****         | ADC_peak_SAR_MX_SOF_UDB           /* source: UDB */
+ 214:Generated_Source\PSoC5/ADC_peak.c ****         | ADC_peak_SAR_SOF_MODE_EDGE        /* Set edge-sensitive sof source */
+ 215:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* ADC_peak_DEFAULT_CONV_MODE */
+ 216:Generated_Source\PSoC5/ADC_peak.c ****     ; /* end of multiple line initialization */
+ 217:Generated_Source\PSoC5/ADC_peak.c **** 
+ 218:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_SAR_TR0_REG = ADC_peak_SAR_CAP_TRIM_2;
+ 219:Generated_Source\PSoC5/ADC_peak.c **** 
+ 220:Generated_Source\PSoC5/ADC_peak.c ****     /* Enable clock for SAR ADC*/
+ 221:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_SAR_CLK_REG |= ADC_peak_SAR_MX_CLK_EN;
+ 222:Generated_Source\PSoC5/ADC_peak.c **** 
+ 223:Generated_Source\PSoC5/ADC_peak.c ****     CyDelayUs(10u); /* The block is ready to use 10 us after the enable signal is set high. */
+  46              		.loc 1 223 0
+  47 000c 0A20     		movs	r0, #10
+ 150:Generated_Source\PSoC5/ADC_peak.c **** 
+  48              		.loc 1 150 0
+  49 000e 43F00103 		orr	r3, r3, #1
+  50 0012 1370     		strb	r3, [r2]
+ 153:Generated_Source\PSoC5/ADC_peak.c **** 
+  51              		.loc 1 153 0
+  52 0014 137C     		ldrb	r3, [r2, #16]	@ zero_extendqisi2
+  53 0016 43F00103 		orr	r3, r3, #1
+  54 001a 1374     		strb	r3, [r2, #16]
+ 157:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_STBY_PWRMGR_CLK_REG |= ADC_peak_STBY_PWR_CLK_EN;
+  55              		.loc 1 157 0
+  56 001c 12F80A3C 		ldrb	r3, [r2, #-10]	@ zero_extendqisi2
+  57 0020 43F00203 		orr	r3, r3, #2
+  58 0024 02F80A3C 		strb	r3, [r2, #-10]
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 6
+
+
+ 158:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* End ADC_peak_DEFAULT_INTERNAL_CLK */
+  59              		.loc 1 158 0
+  60 0028 9379     		ldrb	r3, [r2, #6]	@ zero_extendqisi2
+  61 002a 43F00203 		orr	r3, r3, #2
+  62 002e 9371     		strb	r3, [r2, #6]
+ 162:Generated_Source\PSoC5/ADC_peak.c ****     tmpReg |= ADC_peak_SAR_EN_BUF_VCM_EN;
+  63              		.loc 1 162 0
+  64 0030 02F5AA52 		add	r2, r2, #5440
+  65 0034 1832     		adds	r2, r2, #24
+  66 0036 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  67              	.LVL2:
+ 169:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* ADC_peak_DEFAULT_REFERENCE == ADC_peak__EXT_REF */
+  68              		.loc 1 169 0
+  69 0038 43F00303 		orr	r3, r3, #3
+  70              	.LVL3:
+ 171:Generated_Source\PSoC5/ADC_peak.c **** 
+  71              		.loc 1 171 0
+  72 003c 1370     		strb	r3, [r2]
+ 184:Generated_Source\PSoC5/ADC_peak.c ****         #endif /* ADC_peak_DEFAULT_REFERENCE == ADC_peak__INT_REF_NOT_BYPASSED */
+  73              		.loc 1 184 0
+  74 003e 144B     		ldr	r3, .L2+4
+  75              	.LVL4:
+  76 0040 0422     		movs	r2, #4
+  77              	.LVL5:
+  78 0042 1A70     		strb	r2, [r3]
+  79              	.LVL6:
+ 192:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* ADC_peak_HIGH_POWER_PULSE == 0u */
+  80              		.loc 1 192 0
+  81 0044 13F8012C 		ldrb	r2, [r3, #-1]	@ zero_extendqisi2
+  82 0048 42F04002 		orr	r2, r2, #64
+  83 004c 03F8012C 		strb	r2, [r3, #-1]
+ 202:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* ADC_peak_HIGH_POWER_PULSE == 0u */
+  84              		.loc 1 202 0
+  85 0050 13F8012C 		ldrb	r2, [r3, #-1]	@ zero_extendqisi2
+  86 0054 02F0FC02 		and	r2, r2, #252
+  87 0058 03F8012C 		strb	r2, [r3, #-1]
+ 206:Generated_Source\PSoC5/ADC_peak.c ****     /* SAR_HIZ_CLEAR:   Should not be used for LP */
+  88              		.loc 1 206 0
+  89 005c CE22     		movs	r2, #206
+  90 005e 03F8062C 		strb	r2, [r3, #-6]
+ 218:Generated_Source\PSoC5/ADC_peak.c **** 
+  91              		.loc 1 218 0
+  92 0062 A3F59753 		sub	r3, r3, #4832
+  93 0066 0222     		movs	r2, #2
+  94 0068 123B     		subs	r3, r3, #18
+  95 006a 1A70     		strb	r2, [r3]
+ 221:Generated_Source\PSoC5/ADC_peak.c **** 
+  96              		.loc 1 221 0
+  97 006c 094A     		ldr	r2, .L2+8
+  98 006e 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  99 0070 43F00803 		orr	r3, r3, #8
+ 100 0074 1370     		strb	r3, [r2]
+ 101              		.loc 1 223 0
+ 102 0076 FFF7FEFF 		bl	CyDelayUs
+ 103              	.LVL7:
+ 224:Generated_Source\PSoC5/ADC_peak.c **** 
+ 225:Generated_Source\PSoC5/ADC_peak.c ****     #if(ADC_peak_IRQ_REMOVE == 0u)
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 7
+
+
+ 226:Generated_Source\PSoC5/ADC_peak.c ****         /* Clear a pending interrupt */
+ 227:Generated_Source\PSoC5/ADC_peak.c ****         CyIntClearPending(ADC_peak_INTC_NUMBER);
+ 104              		.loc 1 227 0
+ 105 007a 074B     		ldr	r3, .L2+12
+ 106 007c 0822     		movs	r2, #8
+ 228:Generated_Source\PSoC5/ADC_peak.c ****     #endif   /* End ADC_peak_IRQ_REMOVE */
+ 229:Generated_Source\PSoC5/ADC_peak.c **** 
+ 230:Generated_Source\PSoC5/ADC_peak.c ****     CyExitCriticalSection(enableInterrupts);
+ 107              		.loc 1 230 0
+ 108 007e 2046     		mov	r0, r4
+ 231:Generated_Source\PSoC5/ADC_peak.c **** }
+ 109              		.loc 1 231 0
+ 110 0080 BDE81040 		pop	{r4, lr}
+ 111              		.cfi_restore 14
+ 112              		.cfi_restore 4
+ 113              		.cfi_def_cfa_offset 0
+ 114              	.LVL8:
+ 227:Generated_Source\PSoC5/ADC_peak.c ****     #endif   /* End ADC_peak_IRQ_REMOVE */
+ 115              		.loc 1 227 0
+ 116 0084 1A60     		str	r2, [r3]
+ 230:Generated_Source\PSoC5/ADC_peak.c **** }
+ 117              		.loc 1 230 0
+ 118 0086 FFF7FEBF 		b	CyExitCriticalSection
+ 119              	.LVL9:
+ 120              	.L3:
+ 121 008a 00BF     		.align	2
+ 122              	.L2:
+ 123 008c AB430040 		.word	1073759147
+ 124 0090 06590040 		.word	1073764614
+ 125 0094 275B0040 		.word	1073765159
+ 126 0098 80E200E0 		.word	-536812928
+ 127              		.cfi_endproc
+ 128              	.LFE2:
+ 129              		.size	ADC_peak_Enable, .-ADC_peak_Enable
+ 130              		.section	.text.ADC_peak_Stop,"ax",%progbits
+ 131              		.align	1
+ 132              		.global	ADC_peak_Stop
+ 133              		.thumb
+ 134              		.thumb_func
+ 135              		.type	ADC_peak_Stop, %function
+ 136              	ADC_peak_Stop:
+ 137              	.LFB3:
+ 232:Generated_Source\PSoC5/ADC_peak.c **** 
+ 233:Generated_Source\PSoC5/ADC_peak.c **** 
+ 234:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 235:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_Stop
+ 236:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 237:Generated_Source\PSoC5/ADC_peak.c **** *
+ 238:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 239:Generated_Source\PSoC5/ADC_peak.c **** *  Stops ADC conversions and puts the ADC into its lowest power mode.
+ 240:Generated_Source\PSoC5/ADC_peak.c **** *
+ 241:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 242:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 243:Generated_Source\PSoC5/ADC_peak.c **** *
+ 244:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 245:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 246:Generated_Source\PSoC5/ADC_peak.c **** *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 8
+
+
+ 247:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 248:Generated_Source\PSoC5/ADC_peak.c **** void ADC_peak_Stop(void)
+ 249:Generated_Source\PSoC5/ADC_peak.c **** {
+ 138              		.loc 1 249 0
+ 139              		.cfi_startproc
+ 140              		@ args = 0, pretend = 0, frame = 0
+ 141              		@ frame_needed = 0, uses_anonymous_args = 0
+ 142 0000 08B5     		push	{r3, lr}
+ 143              		.cfi_def_cfa_offset 8
+ 144              		.cfi_offset 3, -8
+ 145              		.cfi_offset 14, -4
+ 250:Generated_Source\PSoC5/ADC_peak.c ****     uint8 enableInterrupts;
+ 251:Generated_Source\PSoC5/ADC_peak.c ****     enableInterrupts = CyEnterCriticalSection();
+ 146              		.loc 1 251 0
+ 147 0002 FFF7FEFF 		bl	CyEnterCriticalSection
+ 148              	.LVL10:
+ 252:Generated_Source\PSoC5/ADC_peak.c **** 
+ 253:Generated_Source\PSoC5/ADC_peak.c ****     /* Stop all conversions */
+ 254:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_SAR_CSR0_REG &= (uint8)~ADC_peak_SAR_SOF_START_CONV;
+ 149              		.loc 1 254 0
+ 150 0006 0F4A     		ldr	r2, .L5
+ 151 0008 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 152 000a 03F0FE03 		and	r3, r3, #254
+ 153 000e 1370     		strb	r3, [r2]
+ 255:Generated_Source\PSoC5/ADC_peak.c ****     /* Disable the SAR ADC block in Active Power Mode */
+ 256:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_PWRMGR_SAR_REG &= (uint8)~ADC_peak_ACT_PWR_SAR_EN;
+ 154              		.loc 1 256 0
+ 155 0010 A2F5AA52 		sub	r2, r2, #5440
+ 156 0014 153A     		subs	r2, r2, #21
+ 157 0016 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 158 0018 03F0FE03 		and	r3, r3, #254
+ 159 001c 1370     		strb	r3, [r2]
+ 257:Generated_Source\PSoC5/ADC_peak.c ****     /* Disable the SAR ADC in Standby Power Mode */
+ 258:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_STBY_PWRMGR_SAR_REG &= (uint8)~ADC_peak_STBY_PWR_SAR_EN;
+ 160              		.loc 1 258 0
+ 161 001e 137C     		ldrb	r3, [r2, #16]	@ zero_extendqisi2
+ 162 0020 03F0FE03 		and	r3, r3, #254
+ 163 0024 1374     		strb	r3, [r2, #16]
+ 259:Generated_Source\PSoC5/ADC_peak.c **** 
+ 260:Generated_Source\PSoC5/ADC_peak.c ****     /* This is only valid if there is an internal clock */
+ 261:Generated_Source\PSoC5/ADC_peak.c ****     #if(ADC_peak_DEFAULT_INTERNAL_CLK)
+ 262:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_PWRMGR_CLK_REG &= (uint8)~ADC_peak_ACT_PWR_CLK_EN;
+ 164              		.loc 1 262 0
+ 165 0026 12F80A3C 		ldrb	r3, [r2, #-10]	@ zero_extendqisi2
+ 166 002a 03F0FD03 		and	r3, r3, #253
+ 167 002e 02F80A3C 		strb	r3, [r2, #-10]
+ 263:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_STBY_PWRMGR_CLK_REG &= (uint8)~ADC_peak_STBY_PWR_CLK_EN;
+ 168              		.loc 1 263 0
+ 169 0032 9379     		ldrb	r3, [r2, #6]	@ zero_extendqisi2
+ 170 0034 03F0FD03 		and	r3, r3, #253
+ 171 0038 9371     		strb	r3, [r2, #6]
+ 264:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* End ADC_peak_DEFAULT_INTERNAL_CLK */
+ 265:Generated_Source\PSoC5/ADC_peak.c **** 
+ 266:Generated_Source\PSoC5/ADC_peak.c ****     CyExitCriticalSection(enableInterrupts);
+ 267:Generated_Source\PSoC5/ADC_peak.c **** 
+ 268:Generated_Source\PSoC5/ADC_peak.c **** }
+ 172              		.loc 1 268 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 9
+
+
+ 173 003a BDE80840 		pop	{r3, lr}
+ 174              		.cfi_restore 14
+ 175              		.cfi_restore 3
+ 176              		.cfi_def_cfa_offset 0
+ 266:Generated_Source\PSoC5/ADC_peak.c **** 
+ 177              		.loc 1 266 0
+ 178 003e FFF7FEBF 		b	CyExitCriticalSection
+ 179              	.LVL11:
+ 180              	.L6:
+ 181 0042 00BF     		.align	2
+ 182              	.L5:
+ 183 0044 00590040 		.word	1073764608
+ 184              		.cfi_endproc
+ 185              	.LFE3:
+ 186              		.size	ADC_peak_Stop, .-ADC_peak_Stop
+ 187              		.section	.text.ADC_peak_SetPower,"ax",%progbits
+ 188              		.align	1
+ 189              		.global	ADC_peak_SetPower
+ 190              		.thumb
+ 191              		.thumb_func
+ 192              		.type	ADC_peak_SetPower, %function
+ 193              	ADC_peak_SetPower:
+ 194              	.LFB4:
+ 269:Generated_Source\PSoC5/ADC_peak.c **** 
+ 270:Generated_Source\PSoC5/ADC_peak.c **** 
+ 271:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 272:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_SetPower
+ 273:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 274:Generated_Source\PSoC5/ADC_peak.c **** *
+ 275:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 276:Generated_Source\PSoC5/ADC_peak.c **** *  Sets the operational power of the ADC. You should use the higher power
+ 277:Generated_Source\PSoC5/ADC_peak.c **** *  settings with faster clock speeds.
+ 278:Generated_Source\PSoC5/ADC_peak.c **** *
+ 279:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 280:Generated_Source\PSoC5/ADC_peak.c **** *  power:  Power setting for ADC
+ 281:Generated_Source\PSoC5/ADC_peak.c **** *  0 ->    Normal
+ 282:Generated_Source\PSoC5/ADC_peak.c **** *  1 ->    Medium power
+ 283:Generated_Source\PSoC5/ADC_peak.c **** *  2 ->    1.25 power
+ 284:Generated_Source\PSoC5/ADC_peak.c **** *  3 ->    Minimum power.
+ 285:Generated_Source\PSoC5/ADC_peak.c **** *
+ 286:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 287:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 288:Generated_Source\PSoC5/ADC_peak.c **** *
+ 289:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 290:Generated_Source\PSoC5/ADC_peak.c **** void ADC_peak_SetPower(uint8 power)
+ 291:Generated_Source\PSoC5/ADC_peak.c **** {
+ 195              		.loc 1 291 0
+ 196              		.cfi_startproc
+ 197              		@ args = 0, pretend = 0, frame = 0
+ 198              		@ frame_needed = 0, uses_anonymous_args = 0
+ 199              		@ link register save eliminated.
+ 200              	.LVL12:
+ 292:Generated_Source\PSoC5/ADC_peak.c ****     uint8 tmpReg;
+ 293:Generated_Source\PSoC5/ADC_peak.c **** 
+ 294:Generated_Source\PSoC5/ADC_peak.c ****     /* mask off invalid power settings */
+ 295:Generated_Source\PSoC5/ADC_peak.c ****     power &= ADC_peak_SAR_API_POWER_MASK;
+ 296:Generated_Source\PSoC5/ADC_peak.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 10
+
+
+ 297:Generated_Source\PSoC5/ADC_peak.c ****     /* Set Power parameter  */
+ 298:Generated_Source\PSoC5/ADC_peak.c ****     tmpReg = ADC_peak_SAR_CSR0_REG & (uint8)~ADC_peak_SAR_POWER_MASK;
+ 201              		.loc 1 298 0
+ 202 0000 044A     		ldr	r2, .L8
+ 203 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 204 0004 03F03F03 		and	r3, r3, #63
+ 205              	.LVL13:
+ 299:Generated_Source\PSoC5/ADC_peak.c ****     tmpReg |= (uint8)(power << ADC_peak_SAR_POWER_SHIFT);
+ 206              		.loc 1 299 0
+ 207 0008 43EA8010 		orr	r0, r3, r0, lsl #6
+ 208              	.LVL14:
+ 209 000c C0B2     		uxtb	r0, r0
+ 210              	.LVL15:
+ 300:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_SAR_CSR0_REG = tmpReg;
+ 211              		.loc 1 300 0
+ 212 000e 1070     		strb	r0, [r2]
+ 213 0010 7047     		bx	lr
+ 214              	.L9:
+ 215 0012 00BF     		.align	2
+ 216              	.L8:
+ 217 0014 00590040 		.word	1073764608
+ 218              		.cfi_endproc
+ 219              	.LFE4:
+ 220              		.size	ADC_peak_SetPower, .-ADC_peak_SetPower
+ 221              		.section	.text.ADC_peak_SetResolution,"ax",%progbits
+ 222              		.align	1
+ 223              		.global	ADC_peak_SetResolution
+ 224              		.thumb
+ 225              		.thumb_func
+ 226              		.type	ADC_peak_SetResolution, %function
+ 227              	ADC_peak_SetResolution:
+ 228              	.LFB5:
+ 301:Generated_Source\PSoC5/ADC_peak.c **** }
+ 302:Generated_Source\PSoC5/ADC_peak.c **** 
+ 303:Generated_Source\PSoC5/ADC_peak.c **** 
+ 304:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 305:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_SetResolution
+ 306:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 307:Generated_Source\PSoC5/ADC_peak.c **** *
+ 308:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 309:Generated_Source\PSoC5/ADC_peak.c **** *  Sets the Relution of the SAR.
+ 310:Generated_Source\PSoC5/ADC_peak.c **** *
+ 311:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 312:Generated_Source\PSoC5/ADC_peak.c **** *  resolution:
+ 313:Generated_Source\PSoC5/ADC_peak.c **** *  12 ->    RES12
+ 314:Generated_Source\PSoC5/ADC_peak.c **** *  10 ->    RES10
+ 315:Generated_Source\PSoC5/ADC_peak.c **** *  8  ->    RES8
+ 316:Generated_Source\PSoC5/ADC_peak.c **** *
+ 317:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 318:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 319:Generated_Source\PSoC5/ADC_peak.c **** *
+ 320:Generated_Source\PSoC5/ADC_peak.c **** * Side Effects:
+ 321:Generated_Source\PSoC5/ADC_peak.c **** *  The ADC resolution cannot be changed during a conversion cycle. The
+ 322:Generated_Source\PSoC5/ADC_peak.c **** *  recommended best practice is to stop conversions with
+ 323:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_StopConvert(), change the resolution, then restart the
+ 324:Generated_Source\PSoC5/ADC_peak.c **** *  conversions with ADC_StartConvert().
+ 325:Generated_Source\PSoC5/ADC_peak.c **** *  If you decide not to stop conversions before calling this API, you
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 11
+
+
+ 326:Generated_Source\PSoC5/ADC_peak.c **** *  should use ADC_IsEndConversion() to wait until conversion is complete
+ 327:Generated_Source\PSoC5/ADC_peak.c **** *  before changing the resolution.
+ 328:Generated_Source\PSoC5/ADC_peak.c **** *  If you call ADC_SetResolution() during a conversion, the resolution will
+ 329:Generated_Source\PSoC5/ADC_peak.c **** *  not be changed until the current conversion is complete. Data will not be
+ 330:Generated_Source\PSoC5/ADC_peak.c **** *  available in the new resolution for another 6 + "New Resolution(in bits)"
+ 331:Generated_Source\PSoC5/ADC_peak.c **** *  clock cycles.
+ 332:Generated_Source\PSoC5/ADC_peak.c **** *  You may need add a delay of this number of clock cycles after
+ 333:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_SetResolution() is called before data is valid again.
+ 334:Generated_Source\PSoC5/ADC_peak.c **** *  Affects ADC_CountsTo_Volts(), ADC_CountsTo_mVolts(), and
+ 335:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_CountsTo_uVolts() by calculating the correct conversion between ADC
+ 336:Generated_Source\PSoC5/ADC_peak.c **** *  counts and the applied input voltage. Calculation depends on resolution,
+ 337:Generated_Source\PSoC5/ADC_peak.c **** *  input range, and voltage reference.
+ 338:Generated_Source\PSoC5/ADC_peak.c **** *
+ 339:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 340:Generated_Source\PSoC5/ADC_peak.c **** void ADC_peak_SetResolution(uint8 resolution)
+ 341:Generated_Source\PSoC5/ADC_peak.c **** {
+ 229              		.loc 1 341 0
+ 230              		.cfi_startproc
+ 231              		@ args = 0, pretend = 0, frame = 0
+ 232              		@ frame_needed = 0, uses_anonymous_args = 0
+ 233              		@ link register save eliminated.
+ 234              	.LVL16:
+ 342:Generated_Source\PSoC5/ADC_peak.c ****     uint8 tmpReg;
+ 343:Generated_Source\PSoC5/ADC_peak.c **** 
+ 344:Generated_Source\PSoC5/ADC_peak.c ****     /* Set SAR ADC resolution and sample width: 18 conversion cycles at 12bits + 1 gap */
+ 345:Generated_Source\PSoC5/ADC_peak.c ****     switch (resolution)
+ 235              		.loc 1 345 0
+ 236 0000 0828     		cmp	r0, #8
+ 237 0002 04D0     		beq	.L12
+ 238 0004 0A28     		cmp	r0, #10
+ 346:Generated_Source\PSoC5/ADC_peak.c ****     {
+ 347:Generated_Source\PSoC5/ADC_peak.c ****         case (uint8)ADC_peak__BITS_12:
+ 348:Generated_Source\PSoC5/ADC_peak.c ****             tmpReg = ADC_peak_SAR_RESOLUTION_12BIT | ADC_peak_SAR_SAMPLE_WIDTH;
+ 239              		.loc 1 348 0
+ 240 0006 0CBF     		ite	eq
+ 241 0008 8423     		moveq	r3, #132
+ 242 000a C423     		movne	r3, #196
+ 243 000c 00E0     		b	.L13
+ 244              	.L12:
+ 245              	.LVL17:
+ 349:Generated_Source\PSoC5/ADC_peak.c ****             break;
+ 350:Generated_Source\PSoC5/ADC_peak.c ****         case (uint8)ADC_peak__BITS_10:
+ 351:Generated_Source\PSoC5/ADC_peak.c ****             tmpReg = ADC_peak_SAR_RESOLUTION_10BIT | ADC_peak_SAR_SAMPLE_WIDTH;
+ 352:Generated_Source\PSoC5/ADC_peak.c ****             break;
+ 353:Generated_Source\PSoC5/ADC_peak.c ****         case (uint8)ADC_peak__BITS_8:
+ 354:Generated_Source\PSoC5/ADC_peak.c ****             tmpReg = ADC_peak_SAR_RESOLUTION_8BIT | ADC_peak_SAR_SAMPLE_WIDTH;
+ 246              		.loc 1 354 0
+ 247 000e 4423     		movs	r3, #68
+ 248              	.LVL18:
+ 249              	.L13:
+ 250 0010 0838     		subs	r0, r0, #8
+ 251              	.LVL19:
+ 355:Generated_Source\PSoC5/ADC_peak.c ****             break;
+ 356:Generated_Source\PSoC5/ADC_peak.c ****         default:
+ 357:Generated_Source\PSoC5/ADC_peak.c ****             tmpReg = ADC_peak_SAR_RESOLUTION_12BIT | ADC_peak_SAR_SAMPLE_WIDTH;
+ 358:Generated_Source\PSoC5/ADC_peak.c ****             /* Halt CPU in debug mode if resolution is out of valid range */
+ 359:Generated_Source\PSoC5/ADC_peak.c ****             CYASSERT(0u != 0u);
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 12
+
+
+ 360:Generated_Source\PSoC5/ADC_peak.c ****             break;
+ 361:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 362:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_SAR_CSR2_REG = tmpReg;
+ 252              		.loc 1 362 0
+ 253 0012 0E4A     		ldr	r2, .L18
+ 254 0014 C0B2     		uxtb	r0, r0
+ 255 0016 0428     		cmp	r0, #4
+ 256 0018 1370     		strb	r3, [r2]
+ 257              	.LVL20:
+ 258 001a 98BF     		it	ls
+ 259 001c 0C4B     		ldrls	r3, .L18+4
+ 260 001e 4FF00002 		mov	r2, #0
+ 261 0022 98BF     		it	ls
+ 262 0024 33F91010 		ldrshls	r1, [r3, r0, lsl #1]
+ 263              	.LBB4:
+ 264              	.LBB5:
+ 363:Generated_Source\PSoC5/ADC_peak.c **** 
+ 364:Generated_Source\PSoC5/ADC_peak.c ****      /* Calculate gain for convert counts to volts */
+ 365:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_CalcGain(resolution);
+ 366:Generated_Source\PSoC5/ADC_peak.c **** }
+ 367:Generated_Source\PSoC5/ADC_peak.c **** 
+ 368:Generated_Source\PSoC5/ADC_peak.c **** 
+ 369:Generated_Source\PSoC5/ADC_peak.c **** #if(ADC_peak_DEFAULT_CONV_MODE != ADC_peak__HARDWARE_TRIGGER)
+ 370:Generated_Source\PSoC5/ADC_peak.c **** 
+ 371:Generated_Source\PSoC5/ADC_peak.c **** 
+ 372:Generated_Source\PSoC5/ADC_peak.c ****     /*******************************************************************************
+ 373:Generated_Source\PSoC5/ADC_peak.c ****     * Function Name: ADC_peak_StartConvert
+ 374:Generated_Source\PSoC5/ADC_peak.c ****     ********************************************************************************
+ 375:Generated_Source\PSoC5/ADC_peak.c ****     *
+ 376:Generated_Source\PSoC5/ADC_peak.c ****     * Summary:
+ 377:Generated_Source\PSoC5/ADC_peak.c ****     *  Forces the ADC to initiate a conversion. In free-running mode, the ADC runs
+ 378:Generated_Source\PSoC5/ADC_peak.c ****     *  continuously. In software trigger mode, the function also acts as a software
+ 379:Generated_Source\PSoC5/ADC_peak.c ****     *  version of the SOC and every conversion must be triggered by
+ 380:Generated_Source\PSoC5/ADC_peak.c ****     *  ADC_peak_StartConvert(). This function is not available when the
+ 381:Generated_Source\PSoC5/ADC_peak.c ****     *  Hardware Trigger sample mode is selected.
+ 382:Generated_Source\PSoC5/ADC_peak.c ****     *
+ 383:Generated_Source\PSoC5/ADC_peak.c ****     * Parameters:
+ 384:Generated_Source\PSoC5/ADC_peak.c ****     *  None.
+ 385:Generated_Source\PSoC5/ADC_peak.c ****     *
+ 386:Generated_Source\PSoC5/ADC_peak.c ****     * Return:
+ 387:Generated_Source\PSoC5/ADC_peak.c ****     *  None.
+ 388:Generated_Source\PSoC5/ADC_peak.c ****     *
+ 389:Generated_Source\PSoC5/ADC_peak.c ****     * Theory:
+ 390:Generated_Source\PSoC5/ADC_peak.c ****     *  Forces the ADC to initiate a conversion. In Free Running mode, the ADC will
+ 391:Generated_Source\PSoC5/ADC_peak.c ****     *  run continuously. In a software trigger mode the function also acts as a
+ 392:Generated_Source\PSoC5/ADC_peak.c ****     *  software version of the SOC. Here every conversion has to be triggered by
+ 393:Generated_Source\PSoC5/ADC_peak.c ****     *  the routine. This writes into the SOC bit in SAR_CTRL reg.
+ 394:Generated_Source\PSoC5/ADC_peak.c ****     *
+ 395:Generated_Source\PSoC5/ADC_peak.c ****     * Side Effects:
+ 396:Generated_Source\PSoC5/ADC_peak.c ****     *  In a software trigger mode the function switches source for SOF from the
+ 397:Generated_Source\PSoC5/ADC_peak.c ****     *  external pin to the internal SOF generation. Application should not call
+ 398:Generated_Source\PSoC5/ADC_peak.c ****     *  StartConvert if external source used for SOF.
+ 399:Generated_Source\PSoC5/ADC_peak.c ****     *
+ 400:Generated_Source\PSoC5/ADC_peak.c ****     *******************************************************************************/
+ 401:Generated_Source\PSoC5/ADC_peak.c ****     void ADC_peak_StartConvert(void)
+ 402:Generated_Source\PSoC5/ADC_peak.c ****     {
+ 403:Generated_Source\PSoC5/ADC_peak.c ****         #if(ADC_peak_DEFAULT_CONV_MODE != ADC_peak__FREE_RUNNING)  /* If software triggered mode */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 13
+
+
+ 404:Generated_Source\PSoC5/ADC_peak.c ****             ADC_peak_SAR_CSR0_REG &= (uint8)~ADC_peak_SAR_MX_SOF_UDB;   /* source: SOF bit */
+ 405:Generated_Source\PSoC5/ADC_peak.c ****         #endif /* End ADC_peak_DEFAULT_CONV_MODE */
+ 406:Generated_Source\PSoC5/ADC_peak.c **** 
+ 407:Generated_Source\PSoC5/ADC_peak.c ****         /* Start the conversion */
+ 408:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_SAR_CSR0_REG |= ADC_peak_SAR_SOF_START_CONV;
+ 409:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 410:Generated_Source\PSoC5/ADC_peak.c **** 
+ 411:Generated_Source\PSoC5/ADC_peak.c **** 
+ 412:Generated_Source\PSoC5/ADC_peak.c ****     /*******************************************************************************
+ 413:Generated_Source\PSoC5/ADC_peak.c ****     * Function Name: ADC_peak_StopConvert
+ 414:Generated_Source\PSoC5/ADC_peak.c ****     ********************************************************************************
+ 415:Generated_Source\PSoC5/ADC_peak.c ****     *
+ 416:Generated_Source\PSoC5/ADC_peak.c ****     * Summary:
+ 417:Generated_Source\PSoC5/ADC_peak.c ****     *  Forces the ADC to stop conversions. If a conversion is currently executing,
+ 418:Generated_Source\PSoC5/ADC_peak.c ****     *  that conversion will complete, but no further conversions will occur. This
+ 419:Generated_Source\PSoC5/ADC_peak.c ****     *  function is not available when the Hardware Trigger sample mode is selected.
+ 420:Generated_Source\PSoC5/ADC_peak.c ****     *
+ 421:Generated_Source\PSoC5/ADC_peak.c ****     * Parameters:
+ 422:Generated_Source\PSoC5/ADC_peak.c ****     *  None.
+ 423:Generated_Source\PSoC5/ADC_peak.c ****     *
+ 424:Generated_Source\PSoC5/ADC_peak.c ****     * Return:
+ 425:Generated_Source\PSoC5/ADC_peak.c ****     *  None.
+ 426:Generated_Source\PSoC5/ADC_peak.c ****     *
+ 427:Generated_Source\PSoC5/ADC_peak.c ****     * Theory:
+ 428:Generated_Source\PSoC5/ADC_peak.c ****     *  Stops ADC conversion in Free Running mode.
+ 429:Generated_Source\PSoC5/ADC_peak.c ****     *
+ 430:Generated_Source\PSoC5/ADC_peak.c ****     * Side Effects:
+ 431:Generated_Source\PSoC5/ADC_peak.c ****     *  In Software Trigger sample mode, this function sets a software version of the
+ 432:Generated_Source\PSoC5/ADC_peak.c ****     *  SOC to low level and switches the SOC source to hardware SOC input.
+ 433:Generated_Source\PSoC5/ADC_peak.c ****     *
+ 434:Generated_Source\PSoC5/ADC_peak.c ****     *******************************************************************************/
+ 435:Generated_Source\PSoC5/ADC_peak.c ****     void ADC_peak_StopConvert(void)
+ 436:Generated_Source\PSoC5/ADC_peak.c ****     {
+ 437:Generated_Source\PSoC5/ADC_peak.c ****         /* Stop all conversions */
+ 438:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_SAR_CSR0_REG &= (uint8)~ADC_peak_SAR_SOF_START_CONV;
+ 439:Generated_Source\PSoC5/ADC_peak.c **** 
+ 440:Generated_Source\PSoC5/ADC_peak.c ****         #if(ADC_peak_DEFAULT_CONV_MODE != ADC_peak__FREE_RUNNING)  /* If software triggered mode */
+ 441:Generated_Source\PSoC5/ADC_peak.c ****             /* Return source to UDB for hardware SOF signal */
+ 442:Generated_Source\PSoC5/ADC_peak.c ****             ADC_peak_SAR_CSR0_REG |= ADC_peak_SAR_MX_SOF_UDB;    /* source: UDB */
+ 443:Generated_Source\PSoC5/ADC_peak.c ****         #endif /* End ADC_peak_DEFAULT_CONV_MODE */
+ 444:Generated_Source\PSoC5/ADC_peak.c **** 
+ 445:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 446:Generated_Source\PSoC5/ADC_peak.c **** 
+ 447:Generated_Source\PSoC5/ADC_peak.c **** #endif /* End ADC_peak_DEFAULT_CONV_MODE != ADC_peak__HARDWARE_TRIGGER */
+ 448:Generated_Source\PSoC5/ADC_peak.c **** 
+ 449:Generated_Source\PSoC5/ADC_peak.c **** 
+ 450:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 451:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_IsEndConversion
+ 452:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 453:Generated_Source\PSoC5/ADC_peak.c **** *
+ 454:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 455:Generated_Source\PSoC5/ADC_peak.c **** *  Immediately returns the status of the conversion or does not return
+ 456:Generated_Source\PSoC5/ADC_peak.c **** *  (blocking) until the conversion completes, depending on the retMode
+ 457:Generated_Source\PSoC5/ADC_peak.c **** *  parameter.
+ 458:Generated_Source\PSoC5/ADC_peak.c **** *
+ 459:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 460:Generated_Source\PSoC5/ADC_peak.c **** *  retMode:  Check conversion return mode.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 14
+
+
+ 461:Generated_Source\PSoC5/ADC_peak.c **** *   ADC_peak_RETURN_STATUS: Immediately returns the status. If the
+ 462:Generated_Source\PSoC5/ADC_peak.c **** *     value returned is zero, the conversion is not complete, and this function
+ 463:Generated_Source\PSoC5/ADC_peak.c **** *     should be retried until a nonzero result is returned.
+ 464:Generated_Source\PSoC5/ADC_peak.c **** *   ADC_peak_WAIT_FOR_RESULT: Does not return a result until the ADC
+ 465:Generated_Source\PSoC5/ADC_peak.c **** *     conversion is complete.
+ 466:Generated_Source\PSoC5/ADC_peak.c **** *
+ 467:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 468:Generated_Source\PSoC5/ADC_peak.c **** *  (uint8)  0 =>  The ADC is still calculating the last result.
+ 469:Generated_Source\PSoC5/ADC_peak.c **** *           1 =>  The last conversion is complete.
+ 470:Generated_Source\PSoC5/ADC_peak.c **** *
+ 471:Generated_Source\PSoC5/ADC_peak.c **** * Side Effects:
+ 472:Generated_Source\PSoC5/ADC_peak.c **** *  This function reads the end of conversion status, which is cleared on read.
+ 473:Generated_Source\PSoC5/ADC_peak.c **** *
+ 474:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 475:Generated_Source\PSoC5/ADC_peak.c **** uint8 ADC_peak_IsEndConversion(uint8 retMode)
+ 476:Generated_Source\PSoC5/ADC_peak.c **** {
+ 477:Generated_Source\PSoC5/ADC_peak.c ****     uint8 status;
+ 478:Generated_Source\PSoC5/ADC_peak.c **** 
+ 479:Generated_Source\PSoC5/ADC_peak.c ****     do
+ 480:Generated_Source\PSoC5/ADC_peak.c ****     {
+ 481:Generated_Source\PSoC5/ADC_peak.c ****         status = ADC_peak_SAR_CSR1_REG & ADC_peak_SAR_EOF_1;
+ 482:Generated_Source\PSoC5/ADC_peak.c ****     } while ((status != ADC_peak_SAR_EOF_1) && (retMode == ADC_peak_WAIT_FOR_RESULT));
+ 483:Generated_Source\PSoC5/ADC_peak.c ****     /* If convertion complete, wait until EOF bit released */
+ 484:Generated_Source\PSoC5/ADC_peak.c ****     if(status == ADC_peak_SAR_EOF_1)
+ 485:Generated_Source\PSoC5/ADC_peak.c ****     {
+ 486:Generated_Source\PSoC5/ADC_peak.c ****         /* wait one ADC clock to let the EOC status bit release */
+ 487:Generated_Source\PSoC5/ADC_peak.c ****         CyDelayUs(1u);
+ 488:Generated_Source\PSoC5/ADC_peak.c ****         /* Do the unconditional read operation of the CSR1 register to make sure the EOC bit has be
+ 489:Generated_Source\PSoC5/ADC_peak.c ****         CY_GET_REG8(ADC_peak_SAR_CSR1_PTR);
+ 490:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 491:Generated_Source\PSoC5/ADC_peak.c **** 
+ 492:Generated_Source\PSoC5/ADC_peak.c ****     return(status);
+ 493:Generated_Source\PSoC5/ADC_peak.c **** }
+ 494:Generated_Source\PSoC5/ADC_peak.c **** 
+ 495:Generated_Source\PSoC5/ADC_peak.c **** 
+ 496:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 497:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_GetResult8
+ 498:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 499:Generated_Source\PSoC5/ADC_peak.c **** *
+ 500:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 501:Generated_Source\PSoC5/ADC_peak.c **** *  Returns the result of an 8-bit conversion. If the resolution is set greater
+ 502:Generated_Source\PSoC5/ADC_peak.c **** *  than 8 bits, the function returns the LSB of the result.
+ 503:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_IsEndConversion() should be called to verify that the data
+ 504:Generated_Source\PSoC5/ADC_peak.c **** *   sample is ready.
+ 505:Generated_Source\PSoC5/ADC_peak.c **** *
+ 506:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 507:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 508:Generated_Source\PSoC5/ADC_peak.c **** *
+ 509:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 510:Generated_Source\PSoC5/ADC_peak.c **** *  The LSB of the last ADC conversion.
+ 511:Generated_Source\PSoC5/ADC_peak.c **** *
+ 512:Generated_Source\PSoC5/ADC_peak.c **** * Global Variables:
+ 513:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_shift - used to convert the ADC counts to the 2s
+ 514:Generated_Source\PSoC5/ADC_peak.c **** *  compliment form.
+ 515:Generated_Source\PSoC5/ADC_peak.c **** *
+ 516:Generated_Source\PSoC5/ADC_peak.c **** * Side Effects:
+ 517:Generated_Source\PSoC5/ADC_peak.c **** *  Converts the ADC counts to the 2s complement form.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 15
+
+
+ 518:Generated_Source\PSoC5/ADC_peak.c **** *
+ 519:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 520:Generated_Source\PSoC5/ADC_peak.c **** int8 ADC_peak_GetResult8( void )
+ 521:Generated_Source\PSoC5/ADC_peak.c **** {
+ 522:Generated_Source\PSoC5/ADC_peak.c ****     return( (int8)ADC_peak_SAR_WRK0_REG - (int8)ADC_peak_shift);
+ 523:Generated_Source\PSoC5/ADC_peak.c **** }
+ 524:Generated_Source\PSoC5/ADC_peak.c **** 
+ 525:Generated_Source\PSoC5/ADC_peak.c **** 
+ 526:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 527:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_GetResult16
+ 528:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 529:Generated_Source\PSoC5/ADC_peak.c **** *
+ 530:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 531:Generated_Source\PSoC5/ADC_peak.c **** *  Returns a 16-bit result for a conversion with a result that has a resolution
+ 532:Generated_Source\PSoC5/ADC_peak.c **** *  of 8 to 12 bits.
+ 533:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_IsEndConversion() should be called to verify that the data
+ 534:Generated_Source\PSoC5/ADC_peak.c **** *   sample is ready
+ 535:Generated_Source\PSoC5/ADC_peak.c **** *
+ 536:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 537:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 538:Generated_Source\PSoC5/ADC_peak.c **** *
+ 539:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 540:Generated_Source\PSoC5/ADC_peak.c **** *  The 16-bit result of the last ADC conversion
+ 541:Generated_Source\PSoC5/ADC_peak.c **** *
+ 542:Generated_Source\PSoC5/ADC_peak.c **** * Global Variables:
+ 543:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_shift - used to convert the ADC counts to the 2s
+ 544:Generated_Source\PSoC5/ADC_peak.c **** *  compliment form.
+ 545:Generated_Source\PSoC5/ADC_peak.c **** *
+ 546:Generated_Source\PSoC5/ADC_peak.c **** * Side Effects:
+ 547:Generated_Source\PSoC5/ADC_peak.c **** *  Converts the ADC counts to the 2s complement form.
+ 548:Generated_Source\PSoC5/ADC_peak.c **** *
+ 549:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 550:Generated_Source\PSoC5/ADC_peak.c **** int16 ADC_peak_GetResult16( void )
+ 551:Generated_Source\PSoC5/ADC_peak.c **** {
+ 552:Generated_Source\PSoC5/ADC_peak.c ****     uint16 res;
+ 553:Generated_Source\PSoC5/ADC_peak.c **** 
+ 554:Generated_Source\PSoC5/ADC_peak.c ****     res = CY_GET_REG16(ADC_peak_SAR_WRK_PTR);
+ 555:Generated_Source\PSoC5/ADC_peak.c **** 
+ 556:Generated_Source\PSoC5/ADC_peak.c ****     return( (int16)res - ADC_peak_shift );
+ 557:Generated_Source\PSoC5/ADC_peak.c **** }
+ 558:Generated_Source\PSoC5/ADC_peak.c **** 
+ 559:Generated_Source\PSoC5/ADC_peak.c **** 
+ 560:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 561:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_SetOffset
+ 562:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 563:Generated_Source\PSoC5/ADC_peak.c **** *
+ 564:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 565:Generated_Source\PSoC5/ADC_peak.c **** *  Sets the ADC offset, which is used by ADC_peak_CountsTo_Volts(),
+ 566:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_CountsTo_mVolts(), and ADC_peak_CountsTo_uVolts()
+ 567:Generated_Source\PSoC5/ADC_peak.c **** *  to subtract the offset from the given reading before calculating the voltage
+ 568:Generated_Source\PSoC5/ADC_peak.c **** *  conversion.
+ 569:Generated_Source\PSoC5/ADC_peak.c **** *
+ 570:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 571:Generated_Source\PSoC5/ADC_peak.c **** *  int16: This value is measured when the inputs are shorted or connected to
+ 572:Generated_Source\PSoC5/ADC_peak.c ****    the same input voltage.
+ 573:Generated_Source\PSoC5/ADC_peak.c **** *
+ 574:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 16
+
+
+ 575:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 576:Generated_Source\PSoC5/ADC_peak.c **** *
+ 577:Generated_Source\PSoC5/ADC_peak.c **** * Global Variables:
+ 578:Generated_Source\PSoC5/ADC_peak.c **** *  The ADC_peak_offset variable modified. This variable is used for
+ 579:Generated_Source\PSoC5/ADC_peak.c **** *  offset calibration purpose.
+ 580:Generated_Source\PSoC5/ADC_peak.c **** *  Affects the ADC_peak_CountsTo_Volts,
+ 581:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_CountsTo_mVolts, ADC_peak_CountsTo_uVolts functions
+ 582:Generated_Source\PSoC5/ADC_peak.c **** *  by subtracting the given offset.
+ 583:Generated_Source\PSoC5/ADC_peak.c **** *
+ 584:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 585:Generated_Source\PSoC5/ADC_peak.c **** void ADC_peak_SetOffset(int16 offset)
+ 586:Generated_Source\PSoC5/ADC_peak.c **** {
+ 587:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_offset = offset;
+ 588:Generated_Source\PSoC5/ADC_peak.c **** }
+ 589:Generated_Source\PSoC5/ADC_peak.c **** 
+ 590:Generated_Source\PSoC5/ADC_peak.c **** 
+ 591:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 592:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_CalcGain
+ 593:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 594:Generated_Source\PSoC5/ADC_peak.c **** *
+ 595:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 596:Generated_Source\PSoC5/ADC_peak.c **** *  This function calculates the ADC gain in counts per 10 volt.
+ 597:Generated_Source\PSoC5/ADC_peak.c **** *
+ 598:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 599:Generated_Source\PSoC5/ADC_peak.c **** *  uint8: resolution
+ 600:Generated_Source\PSoC5/ADC_peak.c **** *
+ 601:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 602:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 603:Generated_Source\PSoC5/ADC_peak.c **** *
+ 604:Generated_Source\PSoC5/ADC_peak.c **** * Global Variables:
+ 605:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_shift variable initialized. This variable is used to
+ 606:Generated_Source\PSoC5/ADC_peak.c **** *  convert the ADC counts to the 2s compliment form.
+ 607:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_countsPer10Volt variable initialized. This variable is used
+ 608:Generated_Source\PSoC5/ADC_peak.c **** *  for gain calibration purpose.
+ 609:Generated_Source\PSoC5/ADC_peak.c **** *
+ 610:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 611:Generated_Source\PSoC5/ADC_peak.c **** static void ADC_peak_CalcGain( uint8 resolution )
+ 612:Generated_Source\PSoC5/ADC_peak.c **** {
+ 613:Generated_Source\PSoC5/ADC_peak.c ****     int32 counts;
+ 614:Generated_Source\PSoC5/ADC_peak.c ****     #if(!((ADC_peak_DEFAULT_RANGE == ADC_peak__VSS_TO_VREF) || \
+ 615:Generated_Source\PSoC5/ADC_peak.c ****          (ADC_peak_DEFAULT_RANGE == ADC_peak__VSSA_TO_VDDA) || \
+ 616:Generated_Source\PSoC5/ADC_peak.c ****          (ADC_peak_DEFAULT_RANGE == ADC_peak__VSSA_TO_VDAC)) )
+ 617:Generated_Source\PSoC5/ADC_peak.c ****         uint16 diff_zero;
+ 618:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* End ADC_peak_DEFAULT_RANGE */
+ 619:Generated_Source\PSoC5/ADC_peak.c **** 
+ 620:Generated_Source\PSoC5/ADC_peak.c ****     switch (resolution)
+ 621:Generated_Source\PSoC5/ADC_peak.c ****     {
+ 622:Generated_Source\PSoC5/ADC_peak.c ****         case (uint8)ADC_peak__BITS_12:
+ 623:Generated_Source\PSoC5/ADC_peak.c ****             counts = (int32)ADC_peak_SAR_WRK_MAX_12BIT;
+ 624:Generated_Source\PSoC5/ADC_peak.c ****             #if(!((ADC_peak_DEFAULT_RANGE == ADC_peak__VSS_TO_VREF) || \
+ 625:Generated_Source\PSoC5/ADC_peak.c ****                  (ADC_peak_DEFAULT_RANGE == ADC_peak__VSSA_TO_VDDA) || \
+ 626:Generated_Source\PSoC5/ADC_peak.c ****                  (ADC_peak_DEFAULT_RANGE == ADC_peak__VSSA_TO_VDAC)) )
+ 627:Generated_Source\PSoC5/ADC_peak.c ****                 diff_zero = ADC_peak_SAR_DIFF_SHIFT;
+ 628:Generated_Source\PSoC5/ADC_peak.c ****             #endif /* End ADC_peak_DEFAULT_RANGE */
+ 629:Generated_Source\PSoC5/ADC_peak.c ****             break;
+ 630:Generated_Source\PSoC5/ADC_peak.c ****         case (uint8)ADC_peak__BITS_10:
+ 631:Generated_Source\PSoC5/ADC_peak.c ****             counts = (int32)ADC_peak_SAR_WRK_MAX_10BIT;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 17
+
+
+ 632:Generated_Source\PSoC5/ADC_peak.c ****             #if(!((ADC_peak_DEFAULT_RANGE == ADC_peak__VSS_TO_VREF) || \
+ 633:Generated_Source\PSoC5/ADC_peak.c ****                  (ADC_peak_DEFAULT_RANGE == ADC_peak__VSSA_TO_VDDA) || \
+ 634:Generated_Source\PSoC5/ADC_peak.c ****                  (ADC_peak_DEFAULT_RANGE == ADC_peak__VSSA_TO_VDAC)) )
+ 635:Generated_Source\PSoC5/ADC_peak.c ****                 diff_zero = ADC_peak_SAR_DIFF_SHIFT >> 2u;
+ 636:Generated_Source\PSoC5/ADC_peak.c ****             #endif /* End ADC_peak_DEFAULT_RANGE */
+ 637:Generated_Source\PSoC5/ADC_peak.c ****             break;
+ 638:Generated_Source\PSoC5/ADC_peak.c ****         case (uint8)ADC_peak__BITS_8:
+ 639:Generated_Source\PSoC5/ADC_peak.c ****             counts = (int32)ADC_peak_SAR_WRK_MAX_8BIT;
+ 640:Generated_Source\PSoC5/ADC_peak.c ****             #if(!((ADC_peak_DEFAULT_RANGE == ADC_peak__VSS_TO_VREF) || \
+ 641:Generated_Source\PSoC5/ADC_peak.c ****                  (ADC_peak_DEFAULT_RANGE == ADC_peak__VSSA_TO_VDDA) || \
+ 642:Generated_Source\PSoC5/ADC_peak.c ****                  (ADC_peak_DEFAULT_RANGE == ADC_peak__VSSA_TO_VDAC)) )
+ 643:Generated_Source\PSoC5/ADC_peak.c ****                 diff_zero = ADC_peak_SAR_DIFF_SHIFT >> 4u;
+ 644:Generated_Source\PSoC5/ADC_peak.c ****             #endif /* End ADC_peak_DEFAULT_RANGE */
+ 645:Generated_Source\PSoC5/ADC_peak.c ****             break;
+ 646:Generated_Source\PSoC5/ADC_peak.c ****         default: /* Halt CPU in debug mode if resolution is out of valid range */
+ 647:Generated_Source\PSoC5/ADC_peak.c ****             counts = 0;
+ 648:Generated_Source\PSoC5/ADC_peak.c ****             #if(!((ADC_peak_DEFAULT_RANGE == ADC_peak__VSS_TO_VREF) || \
+ 649:Generated_Source\PSoC5/ADC_peak.c ****                  (ADC_peak_DEFAULT_RANGE == ADC_peak__VSSA_TO_VDDA) || \
+ 650:Generated_Source\PSoC5/ADC_peak.c ****                  (ADC_peak_DEFAULT_RANGE == ADC_peak__VSSA_TO_VDAC)) )
+ 651:Generated_Source\PSoC5/ADC_peak.c ****                 diff_zero = 0u;
+ 652:Generated_Source\PSoC5/ADC_peak.c ****             #endif /* End ADC_peak_DEFAULT_RANGE */
+ 653:Generated_Source\PSoC5/ADC_peak.c ****             CYASSERT(0u != 0u);
+ 654:Generated_Source\PSoC5/ADC_peak.c ****             break;
+ 655:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 656:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_countsPerVolt = 0; /* Clear obsolete variable */
+ 265              		.loc 1 656 0
+ 266 0028 0A4B     		ldr	r3, .L18+8
+ 267              	.LBE5:
+ 268              	.LBE4:
+ 362:Generated_Source\PSoC5/ADC_peak.c **** 
+ 269              		.loc 1 362 0
+ 270 002a 88BF     		it	hi
+ 271 002c 1146     		movhi	r1, r2
+ 272              	.LVL21:
+ 273              	.LBB7:
+ 274              	.LBB6:
+ 275              		.loc 1 656 0
+ 276 002e 1A80     		strh	r2, [r3]	@ movhi
+ 657:Generated_Source\PSoC5/ADC_peak.c ****     /* Calculate gain in counts per 10 volts with rounding */
+ 658:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_countsPer10Volt = (((counts * ADC_peak_10MV_COUNTS) +
+ 659:Generated_Source\PSoC5/ADC_peak.c ****                         ADC_peak_DEFAULT_REF_VOLTAGE_MV) / (ADC_peak_DEFAULT_REF_VOLTAGE_MV * 2));
+ 277              		.loc 1 659 0
+ 278 0030 42F21073 		movw	r3, #10000
+ 279 0034 4B43     		muls	r3, r1, r3
+ 280 0036 41F28831 		movw	r1, #5000
+ 281              	.LVL22:
+ 282 003a 03F6C413 		addw	r3, r3, #2500
+ 283 003e 93FBF1F3 		sdiv	r3, r3, r1
+ 658:Generated_Source\PSoC5/ADC_peak.c ****                         ADC_peak_DEFAULT_REF_VOLTAGE_MV) / (ADC_peak_DEFAULT_REF_VOLTAGE_MV * 2));
+ 284              		.loc 1 658 0
+ 285 0042 0549     		ldr	r1, .L18+12
+ 286 0044 0B60     		str	r3, [r1]
+ 660:Generated_Source\PSoC5/ADC_peak.c **** 
+ 661:Generated_Source\PSoC5/ADC_peak.c ****     #if( (ADC_peak_DEFAULT_RANGE == ADC_peak__VSS_TO_VREF) || \
+ 662:Generated_Source\PSoC5/ADC_peak.c ****          (ADC_peak_DEFAULT_RANGE == ADC_peak__VSSA_TO_VDDA) || \
+ 663:Generated_Source\PSoC5/ADC_peak.c ****          (ADC_peak_DEFAULT_RANGE == ADC_peak__VSSA_TO_VDAC) )
+ 664:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_shift = 0;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 18
+
+
+ 287              		.loc 1 664 0
+ 288 0046 054B     		ldr	r3, .L18+16
+ 289 0048 1A80     		strh	r2, [r3]	@ movhi
+ 290 004a 7047     		bx	lr
+ 291              	.L19:
+ 292              		.align	2
+ 293              	.L18:
+ 294 004c 02590040 		.word	1073764610
+ 295 0050 00000000 		.word	.LANCHOR0
+ 296 0054 00000000 		.word	ADC_peak_countsPerVolt
+ 297 0058 00000000 		.word	ADC_peak_countsPer10Volt
+ 298 005c 00000000 		.word	ADC_peak_shift
+ 299              	.LBE6:
+ 300              	.LBE7:
+ 301              		.cfi_endproc
+ 302              	.LFE5:
+ 303              		.size	ADC_peak_SetResolution, .-ADC_peak_SetResolution
+ 304              		.section	.text.ADC_peak_Init,"ax",%progbits
+ 305              		.align	1
+ 306              		.global	ADC_peak_Init
+ 307              		.thumb
+ 308              		.thumb_func
+ 309              		.type	ADC_peak_Init, %function
+ 310              	ADC_peak_Init:
+ 311              	.LFB1:
+ 107:Generated_Source\PSoC5/ADC_peak.c **** 
+ 312              		.loc 1 107 0
+ 313              		.cfi_startproc
+ 314              		@ args = 0, pretend = 0, frame = 0
+ 315              		@ frame_needed = 0, uses_anonymous_args = 0
+ 316 0000 08B5     		push	{r3, lr}
+ 317              		.cfi_def_cfa_offset 8
+ 318              		.cfi_offset 3, -8
+ 319              		.cfi_offset 14, -4
+ 111:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* End ADC_peak_DEFAULT_INTERNAL_CLK */
+ 320              		.loc 1 111 0
+ 321 0002 1020     		movs	r0, #16
+ 322 0004 FFF7FEFF 		bl	ADC_peak_theACLK_SetModeRegister
+ 323              	.LVL23:
+ 116:Generated_Source\PSoC5/ADC_peak.c ****         (void)CyIntSetVector(ADC_peak_INTC_NUMBER, &ADC_peak_ISR);
+ 324              		.loc 1 116 0
+ 325 0008 0721     		movs	r1, #7
+ 326 000a 0320     		movs	r0, #3
+ 327 000c FFF7FEFF 		bl	CyIntSetPriority
+ 328              	.LVL24:
+ 117:Generated_Source\PSoC5/ADC_peak.c ****     #endif   /* End ADC_peak_IRQ_REMOVE */
+ 329              		.loc 1 117 0
+ 330 0010 0749     		ldr	r1, .L21
+ 331 0012 0320     		movs	r0, #3
+ 332 0014 FFF7FEFF 		bl	CyIntSetVector
+ 333              	.LVL25:
+ 121:Generated_Source\PSoC5/ADC_peak.c **** 
+ 334              		.loc 1 121 0
+ 335 0018 064A     		ldr	r2, .L21+4
+ 124:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_offset = 0;
+ 336              		.loc 1 124 0
+ 337 001a 0C20     		movs	r0, #12
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 19
+
+
+ 121:Generated_Source\PSoC5/ADC_peak.c **** 
+ 338              		.loc 1 121 0
+ 339 001c 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 340 001e 43F00603 		orr	r3, r3, #6
+ 341 0022 1370     		strb	r3, [r2]
+ 124:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_offset = 0;
+ 342              		.loc 1 124 0
+ 343 0024 FFF7FEFF 		bl	ADC_peak_SetResolution
+ 344              	.LVL26:
+ 125:Generated_Source\PSoC5/ADC_peak.c **** }
+ 345              		.loc 1 125 0
+ 346 0028 034B     		ldr	r3, .L21+8
+ 347 002a 0022     		movs	r2, #0
+ 348 002c 1A80     		strh	r2, [r3]	@ movhi
+ 349 002e 08BD     		pop	{r3, pc}
+ 350              	.L22:
+ 351              		.align	2
+ 352              	.L21:
+ 353 0030 00000000 		.word	ADC_peak_ISR
+ 354 0034 01590040 		.word	1073764609
+ 355 0038 00000000 		.word	ADC_peak_offset
+ 356              		.cfi_endproc
+ 357              	.LFE1:
+ 358              		.size	ADC_peak_Init, .-ADC_peak_Init
+ 359              		.section	.text.ADC_peak_Start,"ax",%progbits
+ 360              		.align	1
+ 361              		.global	ADC_peak_Start
+ 362              		.thumb
+ 363              		.thumb_func
+ 364              		.type	ADC_peak_Start, %function
+ 365              	ADC_peak_Start:
+ 366              	.LFB0:
+  75:Generated_Source\PSoC5/ADC_peak.c **** 
+ 367              		.loc 1 75 0
+ 368              		.cfi_startproc
+ 369              		@ args = 0, pretend = 0, frame = 0
+ 370              		@ frame_needed = 0, uses_anonymous_args = 0
+ 371 0000 10B5     		push	{r4, lr}
+ 372              		.cfi_def_cfa_offset 8
+ 373              		.cfi_offset 4, -8
+ 374              		.cfi_offset 14, -4
+  78:Generated_Source\PSoC5/ADC_peak.c ****     {
+ 375              		.loc 1 78 0
+ 376 0002 054C     		ldr	r4, .L25
+ 377 0004 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 378 0006 1BB9     		cbnz	r3, .L24
+  80:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_initVar = 1u;
+ 379              		.loc 1 80 0
+ 380 0008 FFF7FEFF 		bl	ADC_peak_Init
+ 381              	.LVL27:
+  81:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 382              		.loc 1 81 0
+ 383 000c 0123     		movs	r3, #1
+ 384 000e 2370     		strb	r3, [r4]
+ 385              	.L24:
+  84:Generated_Source\PSoC5/ADC_peak.c **** 
+ 386              		.loc 1 84 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 20
+
+
+ 387 0010 BDE81040 		pop	{r4, lr}
+ 388              		.cfi_restore 14
+ 389              		.cfi_restore 4
+ 390              		.cfi_def_cfa_offset 0
+  83:Generated_Source\PSoC5/ADC_peak.c **** }
+ 391              		.loc 1 83 0
+ 392 0014 FFF7FEBF 		b	ADC_peak_Enable
+ 393              	.LVL28:
+ 394              	.L26:
+ 395              		.align	2
+ 396              	.L25:
+ 397 0018 00000000 		.word	.LANCHOR1
+ 398              		.cfi_endproc
+ 399              	.LFE0:
+ 400              		.size	ADC_peak_Start, .-ADC_peak_Start
+ 401              		.section	.text.ADC_peak_IsEndConversion,"ax",%progbits
+ 402              		.align	1
+ 403              		.global	ADC_peak_IsEndConversion
+ 404              		.thumb
+ 405              		.thumb_func
+ 406              		.type	ADC_peak_IsEndConversion, %function
+ 407              	ADC_peak_IsEndConversion:
+ 408              	.LFB6:
+ 476:Generated_Source\PSoC5/ADC_peak.c ****     uint8 status;
+ 409              		.loc 1 476 0
+ 410              		.cfi_startproc
+ 411              		@ args = 0, pretend = 0, frame = 0
+ 412              		@ frame_needed = 0, uses_anonymous_args = 0
+ 413              	.LVL29:
+ 414 0000 10B5     		push	{r4, lr}
+ 415              		.cfi_def_cfa_offset 8
+ 416              		.cfi_offset 4, -8
+ 417              		.cfi_offset 14, -4
+ 481:Generated_Source\PSoC5/ADC_peak.c ****     } while ((status != ADC_peak_SAR_EOF_1) && (retMode == ADC_peak_WAIT_FOR_RESULT));
+ 418              		.loc 1 481 0
+ 419 0002 084B     		ldr	r3, .L34
+ 420              	.L29:
+ 481:Generated_Source\PSoC5/ADC_peak.c ****     } while ((status != ADC_peak_SAR_EOF_1) && (retMode == ADC_peak_WAIT_FOR_RESULT));
+ 421              		.loc 1 481 0 is_stmt 0 discriminator 2
+ 422 0004 1C78     		ldrb	r4, [r3]	@ zero_extendqisi2
+ 423              	.LVL30:
+ 482:Generated_Source\PSoC5/ADC_peak.c ****     /* If convertion complete, wait until EOF bit released */
+ 424              		.loc 1 482 0 is_stmt 1 discriminator 2
+ 425 0006 14F00104 		ands	r4, r4, #1
+ 426              	.LVL31:
+ 427 000a 03D1     		bne	.L28
+ 482:Generated_Source\PSoC5/ADC_peak.c ****     /* If convertion complete, wait until EOF bit released */
+ 428              		.loc 1 482 0 is_stmt 0 discriminator 1
+ 429 000c 0028     		cmp	r0, #0
+ 430 000e F9D0     		beq	.L29
+ 431 0010 0024     		movs	r4, #0
+ 432 0012 04E0     		b	.L33
+ 433              	.L28:
+ 487:Generated_Source\PSoC5/ADC_peak.c ****         /* Do the unconditional read operation of the CSR1 register to make sure the EOC bit has be
+ 434              		.loc 1 487 0 is_stmt 1
+ 435 0014 2046     		mov	r0, r4
+ 436              	.LVL32:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 21
+
+
+ 437 0016 FFF7FEFF 		bl	CyDelayUs
+ 438              	.LVL33:
+ 489:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 439              		.loc 1 489 0
+ 440 001a 024B     		ldr	r3, .L34
+ 441 001c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 442              	.L33:
+ 493:Generated_Source\PSoC5/ADC_peak.c **** 
+ 443              		.loc 1 493 0
+ 444 001e 2046     		mov	r0, r4
+ 445 0020 10BD     		pop	{r4, pc}
+ 446              	.L35:
+ 447 0022 00BF     		.align	2
+ 448              	.L34:
+ 449 0024 01590040 		.word	1073764609
+ 450              		.cfi_endproc
+ 451              	.LFE6:
+ 452              		.size	ADC_peak_IsEndConversion, .-ADC_peak_IsEndConversion
+ 453              		.section	.text.ADC_peak_GetResult8,"ax",%progbits
+ 454              		.align	1
+ 455              		.global	ADC_peak_GetResult8
+ 456              		.thumb
+ 457              		.thumb_func
+ 458              		.type	ADC_peak_GetResult8, %function
+ 459              	ADC_peak_GetResult8:
+ 460              	.LFB7:
+ 521:Generated_Source\PSoC5/ADC_peak.c ****     return( (int8)ADC_peak_SAR_WRK0_REG - (int8)ADC_peak_shift);
+ 461              		.loc 1 521 0
+ 462              		.cfi_startproc
+ 463              		@ args = 0, pretend = 0, frame = 0
+ 464              		@ frame_needed = 0, uses_anonymous_args = 0
+ 465              		@ link register save eliminated.
+ 522:Generated_Source\PSoC5/ADC_peak.c **** }
+ 466              		.loc 1 522 0
+ 467 0000 034A     		ldr	r2, .L37
+ 468 0002 044B     		ldr	r3, .L37+4
+ 469 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 470 0006 1088     		ldrh	r0, [r2]
+ 471 0008 181A     		subs	r0, r3, r0
+ 523:Generated_Source\PSoC5/ADC_peak.c **** 
+ 472              		.loc 1 523 0
+ 473 000a 40B2     		sxtb	r0, r0
+ 474 000c 7047     		bx	lr
+ 475              	.L38:
+ 476 000e 00BF     		.align	2
+ 477              	.L37:
+ 478 0010 00000000 		.word	ADC_peak_shift
+ 479 0014 A05B0040 		.word	1073765280
+ 480              		.cfi_endproc
+ 481              	.LFE7:
+ 482              		.size	ADC_peak_GetResult8, .-ADC_peak_GetResult8
+ 483              		.section	.text.ADC_peak_GetResult16,"ax",%progbits
+ 484              		.align	1
+ 485              		.global	ADC_peak_GetResult16
+ 486              		.thumb
+ 487              		.thumb_func
+ 488              		.type	ADC_peak_GetResult16, %function
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 22
+
+
+ 489              	ADC_peak_GetResult16:
+ 490              	.LFB8:
+ 551:Generated_Source\PSoC5/ADC_peak.c ****     uint16 res;
+ 491              		.loc 1 551 0
+ 492              		.cfi_startproc
+ 493              		@ args = 0, pretend = 0, frame = 0
+ 494              		@ frame_needed = 0, uses_anonymous_args = 0
+ 495              		@ link register save eliminated.
+ 556:Generated_Source\PSoC5/ADC_peak.c **** }
+ 496              		.loc 1 556 0
+ 497 0000 034A     		ldr	r2, .L40
+ 554:Generated_Source\PSoC5/ADC_peak.c **** 
+ 498              		.loc 1 554 0
+ 499 0002 044B     		ldr	r3, .L40+4
+ 500 0004 1B88     		ldrh	r3, [r3]
+ 501              	.LVL34:
+ 556:Generated_Source\PSoC5/ADC_peak.c **** }
+ 502              		.loc 1 556 0
+ 503 0006 1088     		ldrh	r0, [r2]
+ 504 0008 181A     		subs	r0, r3, r0
+ 557:Generated_Source\PSoC5/ADC_peak.c **** 
+ 505              		.loc 1 557 0
+ 506 000a 00B2     		sxth	r0, r0
+ 507 000c 7047     		bx	lr
+ 508              	.L41:
+ 509 000e 00BF     		.align	2
+ 510              	.L40:
+ 511 0010 00000000 		.word	ADC_peak_shift
+ 512 0014 A05B0040 		.word	1073765280
+ 513              		.cfi_endproc
+ 514              	.LFE8:
+ 515              		.size	ADC_peak_GetResult16, .-ADC_peak_GetResult16
+ 516              		.section	.text.ADC_peak_SetOffset,"ax",%progbits
+ 517              		.align	1
+ 518              		.global	ADC_peak_SetOffset
+ 519              		.thumb
+ 520              		.thumb_func
+ 521              		.type	ADC_peak_SetOffset, %function
+ 522              	ADC_peak_SetOffset:
+ 523              	.LFB9:
+ 586:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_offset = offset;
+ 524              		.loc 1 586 0
+ 525              		.cfi_startproc
+ 526              		@ args = 0, pretend = 0, frame = 0
+ 527              		@ frame_needed = 0, uses_anonymous_args = 0
+ 528              		@ link register save eliminated.
+ 529              	.LVL35:
+ 587:Generated_Source\PSoC5/ADC_peak.c **** }
+ 530              		.loc 1 587 0
+ 531 0000 014B     		ldr	r3, .L43
+ 532 0002 1880     		strh	r0, [r3]	@ movhi
+ 533 0004 7047     		bx	lr
+ 534              	.L44:
+ 535 0006 00BF     		.align	2
+ 536              	.L43:
+ 537 0008 00000000 		.word	ADC_peak_offset
+ 538              		.cfi_endproc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 23
+
+
+ 539              	.LFE9:
+ 540              		.size	ADC_peak_SetOffset, .-ADC_peak_SetOffset
+ 541              		.section	.text.ADC_peak_SetGain,"ax",%progbits
+ 542              		.align	1
+ 543              		.global	ADC_peak_SetGain
+ 544              		.thumb
+ 545              		.thumb_func
+ 546              		.type	ADC_peak_SetGain, %function
+ 547              	ADC_peak_SetGain:
+ 548              	.LFB11:
+ 665:Generated_Source\PSoC5/ADC_peak.c ****     #else
+ 666:Generated_Source\PSoC5/ADC_peak.c ****         ADC_peak_shift = diff_zero;
+ 667:Generated_Source\PSoC5/ADC_peak.c ****     #endif /* End ADC_peak_DEFAULT_RANGE */
+ 668:Generated_Source\PSoC5/ADC_peak.c **** }
+ 669:Generated_Source\PSoC5/ADC_peak.c **** 
+ 670:Generated_Source\PSoC5/ADC_peak.c **** 
+ 671:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 672:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_SetGain
+ 673:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 674:Generated_Source\PSoC5/ADC_peak.c **** *
+ 675:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 676:Generated_Source\PSoC5/ADC_peak.c **** *  Sets the ADC gain in counts per volt for the voltage conversion functions
+ 677:Generated_Source\PSoC5/ADC_peak.c **** *  that follow. This value is set by default by the reference and input range
+ 678:Generated_Source\PSoC5/ADC_peak.c **** *  settings. It should only be used to further calibrate the ADC with a known
+ 679:Generated_Source\PSoC5/ADC_peak.c **** *  input or if the ADC is using an external reference.
+ 680:Generated_Source\PSoC5/ADC_peak.c **** *
+ 681:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 682:Generated_Source\PSoC5/ADC_peak.c **** *  int16 adcGain counts per volt
+ 683:Generated_Source\PSoC5/ADC_peak.c **** *
+ 684:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 685:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 686:Generated_Source\PSoC5/ADC_peak.c **** *
+ 687:Generated_Source\PSoC5/ADC_peak.c **** * Global Variables:
+ 688:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_countsPer10Volt variable modified. This variable is used
+ 689:Generated_Source\PSoC5/ADC_peak.c **** *  for gain calibration purpose.
+ 690:Generated_Source\PSoC5/ADC_peak.c **** *
+ 691:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 692:Generated_Source\PSoC5/ADC_peak.c **** void ADC_peak_SetGain(int16 adcGain)
+ 693:Generated_Source\PSoC5/ADC_peak.c **** {
+ 549              		.loc 1 693 0
+ 550              		.cfi_startproc
+ 551              		@ args = 0, pretend = 0, frame = 0
+ 552              		@ frame_needed = 0, uses_anonymous_args = 0
+ 553              		@ link register save eliminated.
+ 554              	.LVL36:
+ 694:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_countsPer10Volt = (int32)adcGain * 10;
+ 555              		.loc 1 694 0
+ 556 0000 0A23     		movs	r3, #10
+ 557 0002 5843     		muls	r0, r3, r0
+ 558              	.LVL37:
+ 559 0004 014B     		ldr	r3, .L46
+ 560 0006 1860     		str	r0, [r3]
+ 561 0008 7047     		bx	lr
+ 562              	.L47:
+ 563 000a 00BF     		.align	2
+ 564              	.L46:
+ 565 000c 00000000 		.word	ADC_peak_countsPer10Volt
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 24
+
+
+ 566              		.cfi_endproc
+ 567              	.LFE11:
+ 568              		.size	ADC_peak_SetGain, .-ADC_peak_SetGain
+ 569              		.section	.text.ADC_peak_SetScaledGain,"ax",%progbits
+ 570              		.align	1
+ 571              		.global	ADC_peak_SetScaledGain
+ 572              		.thumb
+ 573              		.thumb_func
+ 574              		.type	ADC_peak_SetScaledGain, %function
+ 575              	ADC_peak_SetScaledGain:
+ 576              	.LFB12:
+ 695:Generated_Source\PSoC5/ADC_peak.c **** }
+ 696:Generated_Source\PSoC5/ADC_peak.c **** 
+ 697:Generated_Source\PSoC5/ADC_peak.c **** 
+ 698:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 699:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_SetScaledGain
+ 700:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 701:Generated_Source\PSoC5/ADC_peak.c **** *
+ 702:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 703:Generated_Source\PSoC5/ADC_peak.c **** *  Sets the ADC gain in counts per 10 volt for the voltage conversion functions
+ 704:Generated_Source\PSoC5/ADC_peak.c **** *  that follow. This value is set by default by the reference and input range
+ 705:Generated_Source\PSoC5/ADC_peak.c **** *  settings. It should only be used to further calibrate the ADC with a known
+ 706:Generated_Source\PSoC5/ADC_peak.c **** *  input or if the ADC is using an external reference.
+ 707:Generated_Source\PSoC5/ADC_peak.c **** *
+ 708:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 709:Generated_Source\PSoC5/ADC_peak.c **** *  int32 adcGain  counts per 10 volt
+ 710:Generated_Source\PSoC5/ADC_peak.c **** *
+ 711:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 712:Generated_Source\PSoC5/ADC_peak.c **** *  None.
+ 713:Generated_Source\PSoC5/ADC_peak.c **** *
+ 714:Generated_Source\PSoC5/ADC_peak.c **** * Global Variables:
+ 715:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_countsPer10Volt variable modified. This variable is used
+ 716:Generated_Source\PSoC5/ADC_peak.c **** *  for gain calibration purpose.
+ 717:Generated_Source\PSoC5/ADC_peak.c **** *
+ 718:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 719:Generated_Source\PSoC5/ADC_peak.c **** void ADC_peak_SetScaledGain(int32 adcGain)
+ 720:Generated_Source\PSoC5/ADC_peak.c **** {
+ 577              		.loc 1 720 0
+ 578              		.cfi_startproc
+ 579              		@ args = 0, pretend = 0, frame = 0
+ 580              		@ frame_needed = 0, uses_anonymous_args = 0
+ 581              		@ link register save eliminated.
+ 582              	.LVL38:
+ 721:Generated_Source\PSoC5/ADC_peak.c ****     ADC_peak_countsPer10Volt = adcGain;
+ 583              		.loc 1 721 0
+ 584 0000 014B     		ldr	r3, .L49
+ 585 0002 1860     		str	r0, [r3]
+ 586 0004 7047     		bx	lr
+ 587              	.L50:
+ 588 0006 00BF     		.align	2
+ 589              	.L49:
+ 590 0008 00000000 		.word	ADC_peak_countsPer10Volt
+ 591              		.cfi_endproc
+ 592              	.LFE12:
+ 593              		.size	ADC_peak_SetScaledGain, .-ADC_peak_SetScaledGain
+ 594              		.section	.text.ADC_peak_CountsTo_mVolts,"ax",%progbits
+ 595              		.align	1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 25
+
+
+ 596              		.global	ADC_peak_CountsTo_mVolts
+ 597              		.thumb
+ 598              		.thumb_func
+ 599              		.type	ADC_peak_CountsTo_mVolts, %function
+ 600              	ADC_peak_CountsTo_mVolts:
+ 601              	.LFB13:
+ 722:Generated_Source\PSoC5/ADC_peak.c **** }
+ 723:Generated_Source\PSoC5/ADC_peak.c **** 
+ 724:Generated_Source\PSoC5/ADC_peak.c **** 
+ 725:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 726:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_CountsTo_mVolts
+ 727:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 728:Generated_Source\PSoC5/ADC_peak.c **** *
+ 729:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 730:Generated_Source\PSoC5/ADC_peak.c **** *  Converts the ADC output to millivolts as a 16-bit integer.
+ 731:Generated_Source\PSoC5/ADC_peak.c **** *
+ 732:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 733:Generated_Source\PSoC5/ADC_peak.c **** *  int16 adcCounts:  Result from the ADC conversion
+ 734:Generated_Source\PSoC5/ADC_peak.c **** *
+ 735:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 736:Generated_Source\PSoC5/ADC_peak.c **** *  int16 Result in mVolts
+ 737:Generated_Source\PSoC5/ADC_peak.c **** *
+ 738:Generated_Source\PSoC5/ADC_peak.c **** * Global Variables:
+ 739:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_offset variable used.
+ 740:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_countsPer10Volt variable used.
+ 741:Generated_Source\PSoC5/ADC_peak.c **** *
+ 742:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 743:Generated_Source\PSoC5/ADC_peak.c **** int16 ADC_peak_CountsTo_mVolts(int16 adcCounts)
+ 744:Generated_Source\PSoC5/ADC_peak.c **** {
+ 602              		.loc 1 744 0
+ 603              		.cfi_startproc
+ 604              		@ args = 0, pretend = 0, frame = 0
+ 605              		@ frame_needed = 0, uses_anonymous_args = 0
+ 606              		@ link register save eliminated.
+ 607              	.LVL39:
+ 745:Generated_Source\PSoC5/ADC_peak.c ****     int16 mVolts;
+ 746:Generated_Source\PSoC5/ADC_peak.c ****     int32 countsPer10Volt;
+ 747:Generated_Source\PSoC5/ADC_peak.c **** 
+ 748:Generated_Source\PSoC5/ADC_peak.c ****     if(ADC_peak_countsPerVolt != 0)
+ 608              		.loc 1 748 0
+ 609 0000 0E4A     		ldr	r2, .L56
+ 610 0002 1388     		ldrh	r3, [r2]
+ 611 0004 1BB2     		sxth	r3, r3
+ 612 0006 23B1     		cbz	r3, .L52
+ 749:Generated_Source\PSoC5/ADC_peak.c ****     {   /* Support obsolete method */
+ 750:Generated_Source\PSoC5/ADC_peak.c ****         countsPer10Volt = (int32)ADC_peak_countsPerVolt * 10;
+ 613              		.loc 1 750 0
+ 614 0008 1188     		ldrh	r1, [r2]
+ 615 000a 0A23     		movs	r3, #10
+ 616 000c 09B2     		sxth	r1, r1
+ 617 000e 5943     		muls	r1, r3, r1
+ 618              	.LVL40:
+ 619 0010 01E0     		b	.L53
+ 620              	.LVL41:
+ 621              	.L52:
+ 751:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 752:Generated_Source\PSoC5/ADC_peak.c ****     else
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 26
+
+
+ 753:Generated_Source\PSoC5/ADC_peak.c ****     {
+ 754:Generated_Source\PSoC5/ADC_peak.c ****         countsPer10Volt = ADC_peak_countsPer10Volt;
+ 622              		.loc 1 754 0
+ 623 0012 0B4B     		ldr	r3, .L56+4
+ 624 0014 1968     		ldr	r1, [r3]
+ 625              	.LVL42:
+ 626              	.L53:
+ 755:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 756:Generated_Source\PSoC5/ADC_peak.c **** 
+ 757:Generated_Source\PSoC5/ADC_peak.c ****     /* Subtract ADC offset */
+ 758:Generated_Source\PSoC5/ADC_peak.c ****     adcCounts -= ADC_peak_offset;
+ 627              		.loc 1 758 0
+ 628 0016 0B4B     		ldr	r3, .L56+8
+ 629 0018 1B88     		ldrh	r3, [r3]
+ 630 001a C01A     		subs	r0, r0, r3
+ 631              	.LVL43:
+ 759:Generated_Source\PSoC5/ADC_peak.c ****     /* Convert to millivolts with rounding */
+ 760:Generated_Source\PSoC5/ADC_peak.c ****     mVolts = (int16)( (( (int32)adcCounts * ADC_peak_10MV_COUNTS ) + ( (adcCounts > 0) ?
+ 632              		.loc 1 760 0
+ 633 001c 42F21073 		movw	r3, #10000
+ 758:Generated_Source\PSoC5/ADC_peak.c ****     /* Convert to millivolts with rounding */
+ 634              		.loc 1 758 0
+ 635 0020 00B2     		sxth	r0, r0
+ 636              	.LVL44:
+ 637              		.loc 1 760 0
+ 638 0022 03FB00F2 		mul	r2, r3, r0
+ 639 0026 0223     		movs	r3, #2
+ 761:Generated_Source\PSoC5/ADC_peak.c ****                        (countsPer10Volt / 2) : (-(countsPer10Volt / 2)) )) / countsPer10Volt);
+ 640              		.loc 1 761 0
+ 641 0028 91FBF3F3 		sdiv	r3, r1, r3
+ 642 002c 0028     		cmp	r0, #0
+ 643 002e D8BF     		it	le
+ 644 0030 5B42     		rsble	r3, r3, #0
+ 645              	.LVL45:
+ 762:Generated_Source\PSoC5/ADC_peak.c **** 
+ 763:Generated_Source\PSoC5/ADC_peak.c ****     return( mVolts );
+ 646              		.loc 1 763 0
+ 647 0032 1344     		add	r3, r3, r2
+ 648              	.LVL46:
+ 649 0034 93FBF1F0 		sdiv	r0, r3, r1
+ 650              	.LVL47:
+ 764:Generated_Source\PSoC5/ADC_peak.c **** }
+ 651              		.loc 1 764 0
+ 652 0038 00B2     		sxth	r0, r0
+ 653 003a 7047     		bx	lr
+ 654              	.L57:
+ 655              		.align	2
+ 656              	.L56:
+ 657 003c 00000000 		.word	ADC_peak_countsPerVolt
+ 658 0040 00000000 		.word	ADC_peak_countsPer10Volt
+ 659 0044 00000000 		.word	ADC_peak_offset
+ 660              		.cfi_endproc
+ 661              	.LFE13:
+ 662              		.size	ADC_peak_CountsTo_mVolts, .-ADC_peak_CountsTo_mVolts
+ 663              		.global	__aeabi_ldivmod
+ 664              		.section	.text.ADC_peak_CountsTo_uVolts,"ax",%progbits
+ 665              		.align	1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 27
+
+
+ 666              		.global	ADC_peak_CountsTo_uVolts
+ 667              		.thumb
+ 668              		.thumb_func
+ 669              		.type	ADC_peak_CountsTo_uVolts, %function
+ 670              	ADC_peak_CountsTo_uVolts:
+ 671              	.LFB14:
+ 765:Generated_Source\PSoC5/ADC_peak.c **** 
+ 766:Generated_Source\PSoC5/ADC_peak.c **** 
+ 767:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 768:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_CountsTo_uVolts
+ 769:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 770:Generated_Source\PSoC5/ADC_peak.c **** *
+ 771:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 772:Generated_Source\PSoC5/ADC_peak.c **** *  Converts the ADC output to microvolts as a 32-bit integer.
+ 773:Generated_Source\PSoC5/ADC_peak.c **** *
+ 774:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 775:Generated_Source\PSoC5/ADC_peak.c **** *  int16 adcCounts: Result from the ADC conversion
+ 776:Generated_Source\PSoC5/ADC_peak.c **** *
+ 777:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 778:Generated_Source\PSoC5/ADC_peak.c **** *  int32 Result in micro Volts
+ 779:Generated_Source\PSoC5/ADC_peak.c **** *
+ 780:Generated_Source\PSoC5/ADC_peak.c **** * Global Variables:
+ 781:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_offset variable used.
+ 782:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_countsPer10Volt used to convert ADC counts to uVolts.
+ 783:Generated_Source\PSoC5/ADC_peak.c **** *
+ 784:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 785:Generated_Source\PSoC5/ADC_peak.c **** int32 ADC_peak_CountsTo_uVolts(int16 adcCounts)
+ 786:Generated_Source\PSoC5/ADC_peak.c **** {
+ 672              		.loc 1 786 0
+ 673              		.cfi_startproc
+ 674              		@ args = 0, pretend = 0, frame = 0
+ 675              		@ frame_needed = 0, uses_anonymous_args = 0
+ 676              	.LVL48:
+ 787:Generated_Source\PSoC5/ADC_peak.c **** 
+ 788:Generated_Source\PSoC5/ADC_peak.c ****     int64 uVolts;
+ 789:Generated_Source\PSoC5/ADC_peak.c ****     int32 countsPer10Volt;
+ 790:Generated_Source\PSoC5/ADC_peak.c **** 
+ 791:Generated_Source\PSoC5/ADC_peak.c ****     if(ADC_peak_countsPerVolt != 0)
+ 677              		.loc 1 791 0
+ 678 0000 0C4A     		ldr	r2, .L61
+ 786:Generated_Source\PSoC5/ADC_peak.c **** 
+ 679              		.loc 1 786 0
+ 680 0002 38B5     		push	{r3, r4, r5, lr}
+ 681              		.cfi_def_cfa_offset 16
+ 682              		.cfi_offset 3, -16
+ 683              		.cfi_offset 4, -12
+ 684              		.cfi_offset 5, -8
+ 685              		.cfi_offset 14, -4
+ 686              		.loc 1 791 0
+ 687 0004 1388     		ldrh	r3, [r2]
+ 688 0006 1BB2     		sxth	r3, r3
+ 689 0008 23B1     		cbz	r3, .L59
+ 792:Generated_Source\PSoC5/ADC_peak.c ****     {   /* Support obsolete method */
+ 793:Generated_Source\PSoC5/ADC_peak.c ****         countsPer10Volt = (int32)ADC_peak_countsPerVolt * 10;
+ 690              		.loc 1 793 0
+ 691 000a 1288     		ldrh	r2, [r2]
+ 692 000c 0A23     		movs	r3, #10
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 28
+
+
+ 693 000e 12B2     		sxth	r2, r2
+ 694 0010 5A43     		muls	r2, r3, r2
+ 695              	.LVL49:
+ 696 0012 01E0     		b	.L60
+ 697              	.LVL50:
+ 698              	.L59:
+ 794:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 795:Generated_Source\PSoC5/ADC_peak.c ****     else
+ 796:Generated_Source\PSoC5/ADC_peak.c ****     {
+ 797:Generated_Source\PSoC5/ADC_peak.c ****         countsPer10Volt = ADC_peak_countsPer10Volt;
+ 699              		.loc 1 797 0
+ 700 0014 084B     		ldr	r3, .L61+4
+ 701 0016 1A68     		ldr	r2, [r3]
+ 702              	.LVL51:
+ 703              	.L60:
+ 798:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 799:Generated_Source\PSoC5/ADC_peak.c **** 
+ 800:Generated_Source\PSoC5/ADC_peak.c ****     /* Subtract ADC offset */
+ 801:Generated_Source\PSoC5/ADC_peak.c ****     adcCounts -= ADC_peak_offset;
+ 704              		.loc 1 801 0
+ 705 0018 084B     		ldr	r3, .L61+8
+ 706 001a 1C88     		ldrh	r4, [r3]
+ 802:Generated_Source\PSoC5/ADC_peak.c ****     /* To convert adcCounts to microVolts it is required to be multiplied
+ 803:Generated_Source\PSoC5/ADC_peak.c ****     *  on 10 million and later divide on gain in counts per 10V.
+ 804:Generated_Source\PSoC5/ADC_peak.c ****     */
+ 805:Generated_Source\PSoC5/ADC_peak.c ****     uVolts = (( (int64)adcCounts * ADC_peak_10UV_COUNTS ) / countsPer10Volt);
+ 806:Generated_Source\PSoC5/ADC_peak.c **** 
+ 807:Generated_Source\PSoC5/ADC_peak.c ****     return((int32) uVolts );
+ 707              		.loc 1 807 0
+ 708 001c 084B     		ldr	r3, .L61+12
+ 801:Generated_Source\PSoC5/ADC_peak.c ****     /* To convert adcCounts to microVolts it is required to be multiplied
+ 709              		.loc 1 801 0
+ 710 001e 041B     		subs	r4, r0, r4
+ 711              	.LVL52:
+ 712              		.loc 1 807 0
+ 713 0020 24B2     		sxth	r4, r4
+ 714 0022 A4FB0301 		umull	r0, r1, r4, r3
+ 715 0026 E517     		asrs	r5, r4, #31
+ 716 0028 03FB0511 		mla	r1, r3, r5, r1
+ 717 002c D317     		asrs	r3, r2, #31
+ 718 002e FFF7FEFF 		bl	__aeabi_ldivmod
+ 719              	.LVL53:
+ 808:Generated_Source\PSoC5/ADC_peak.c **** }
+ 720              		.loc 1 808 0
+ 721 0032 38BD     		pop	{r3, r4, r5, pc}
+ 722              	.LVL54:
+ 723              	.L62:
+ 724              		.align	2
+ 725              	.L61:
+ 726 0034 00000000 		.word	ADC_peak_countsPerVolt
+ 727 0038 00000000 		.word	ADC_peak_countsPer10Volt
+ 728 003c 00000000 		.word	ADC_peak_offset
+ 729 0040 80969800 		.word	10000000
+ 730              		.cfi_endproc
+ 731              	.LFE14:
+ 732              		.size	ADC_peak_CountsTo_uVolts, .-ADC_peak_CountsTo_uVolts
+ 733              		.global	__aeabi_i2f
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 29
+
+
+ 734              		.global	__aeabi_fmul
+ 735              		.global	__aeabi_fdiv
+ 736              		.section	.text.ADC_peak_CountsTo_Volts,"ax",%progbits
+ 737              		.align	1
+ 738              		.global	ADC_peak_CountsTo_Volts
+ 739              		.thumb
+ 740              		.thumb_func
+ 741              		.type	ADC_peak_CountsTo_Volts, %function
+ 742              	ADC_peak_CountsTo_Volts:
+ 743              	.LFB15:
+ 809:Generated_Source\PSoC5/ADC_peak.c **** 
+ 810:Generated_Source\PSoC5/ADC_peak.c **** 
+ 811:Generated_Source\PSoC5/ADC_peak.c **** /*******************************************************************************
+ 812:Generated_Source\PSoC5/ADC_peak.c **** * Function Name: ADC_peak_CountsTo_Volts
+ 813:Generated_Source\PSoC5/ADC_peak.c **** ********************************************************************************
+ 814:Generated_Source\PSoC5/ADC_peak.c **** *
+ 815:Generated_Source\PSoC5/ADC_peak.c **** * Summary:
+ 816:Generated_Source\PSoC5/ADC_peak.c **** *  Converts the ADC output to volts as a floating-point number.
+ 817:Generated_Source\PSoC5/ADC_peak.c **** *
+ 818:Generated_Source\PSoC5/ADC_peak.c **** * Parameters:
+ 819:Generated_Source\PSoC5/ADC_peak.c **** *  int16 adcCounts: Result from the ADC conversion
+ 820:Generated_Source\PSoC5/ADC_peak.c **** *
+ 821:Generated_Source\PSoC5/ADC_peak.c **** * Return:
+ 822:Generated_Source\PSoC5/ADC_peak.c **** *  float Result in Volts
+ 823:Generated_Source\PSoC5/ADC_peak.c **** *
+ 824:Generated_Source\PSoC5/ADC_peak.c **** * Global Variables:
+ 825:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_offset variable used.
+ 826:Generated_Source\PSoC5/ADC_peak.c **** *  ADC_peak_countsPer10Volt used to convert ADC counts to Volts.
+ 827:Generated_Source\PSoC5/ADC_peak.c **** *
+ 828:Generated_Source\PSoC5/ADC_peak.c **** *******************************************************************************/
+ 829:Generated_Source\PSoC5/ADC_peak.c **** float32 ADC_peak_CountsTo_Volts(int16 adcCounts)
+ 830:Generated_Source\PSoC5/ADC_peak.c **** {
+ 744              		.loc 1 830 0
+ 745              		.cfi_startproc
+ 746              		@ args = 0, pretend = 0, frame = 0
+ 747              		@ frame_needed = 0, uses_anonymous_args = 0
+ 748              	.LVL55:
+ 831:Generated_Source\PSoC5/ADC_peak.c ****     float32 volts;
+ 832:Generated_Source\PSoC5/ADC_peak.c ****     int32 countsPer10Volt;
+ 833:Generated_Source\PSoC5/ADC_peak.c **** 
+ 834:Generated_Source\PSoC5/ADC_peak.c ****     if(ADC_peak_countsPerVolt != 0)
+ 749              		.loc 1 834 0
+ 750 0000 0E4A     		ldr	r2, .L66
+ 830:Generated_Source\PSoC5/ADC_peak.c ****     float32 volts;
+ 751              		.loc 1 830 0
+ 752 0002 38B5     		push	{r3, r4, r5, lr}
+ 753              		.cfi_def_cfa_offset 16
+ 754              		.cfi_offset 3, -16
+ 755              		.cfi_offset 4, -12
+ 756              		.cfi_offset 5, -8
+ 757              		.cfi_offset 14, -4
+ 758              		.loc 1 834 0
+ 759 0004 1388     		ldrh	r3, [r2]
+ 760 0006 1BB2     		sxth	r3, r3
+ 761 0008 23B1     		cbz	r3, .L64
+ 835:Generated_Source\PSoC5/ADC_peak.c ****     {   /* Support obsolete method */
+ 836:Generated_Source\PSoC5/ADC_peak.c ****         countsPer10Volt = (int32)ADC_peak_countsPerVolt * 10;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 30
+
+
+ 762              		.loc 1 836 0
+ 763 000a 1488     		ldrh	r4, [r2]
+ 764 000c 0A23     		movs	r3, #10
+ 765 000e 24B2     		sxth	r4, r4
+ 766 0010 5C43     		muls	r4, r3, r4
+ 767              	.LVL56:
+ 768 0012 01E0     		b	.L65
+ 769              	.LVL57:
+ 770              	.L64:
+ 837:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 838:Generated_Source\PSoC5/ADC_peak.c ****     else
+ 839:Generated_Source\PSoC5/ADC_peak.c ****     {
+ 840:Generated_Source\PSoC5/ADC_peak.c ****         countsPer10Volt = ADC_peak_countsPer10Volt;
+ 771              		.loc 1 840 0
+ 772 0014 0A4B     		ldr	r3, .L66+4
+ 773 0016 1C68     		ldr	r4, [r3]
+ 774              	.LVL58:
+ 775              	.L65:
+ 841:Generated_Source\PSoC5/ADC_peak.c ****     }
+ 842:Generated_Source\PSoC5/ADC_peak.c **** 
+ 843:Generated_Source\PSoC5/ADC_peak.c ****     /* Subtract ADC offset */
+ 844:Generated_Source\PSoC5/ADC_peak.c ****     adcCounts -= ADC_peak_offset;
+ 776              		.loc 1 844 0
+ 777 0018 0A4B     		ldr	r3, .L66+8
+ 778 001a 1B88     		ldrh	r3, [r3]
+ 779 001c C01A     		subs	r0, r0, r3
+ 780              	.LVL59:
+ 845:Generated_Source\PSoC5/ADC_peak.c **** 
+ 846:Generated_Source\PSoC5/ADC_peak.c ****     volts = ((float32)adcCounts * ADC_peak_10V_COUNTS) / (float32)countsPer10Volt;
+ 847:Generated_Source\PSoC5/ADC_peak.c **** 
+ 848:Generated_Source\PSoC5/ADC_peak.c ****     return( volts );
+ 781              		.loc 1 848 0
+ 782 001e 00B2     		sxth	r0, r0
+ 783 0020 FFF7FEFF 		bl	__aeabi_i2f
+ 784              	.LVL60:
+ 785 0024 0849     		ldr	r1, .L66+12
+ 786 0026 FFF7FEFF 		bl	__aeabi_fmul
+ 787              	.LVL61:
+ 788 002a 0546     		mov	r5, r0
+ 789 002c 2046     		mov	r0, r4
+ 790 002e FFF7FEFF 		bl	__aeabi_i2f
+ 791              	.LVL62:
+ 792 0032 0146     		mov	r1, r0
+ 793 0034 2846     		mov	r0, r5
+ 794 0036 FFF7FEFF 		bl	__aeabi_fdiv
+ 795              	.LVL63:
+ 849:Generated_Source\PSoC5/ADC_peak.c **** }
+ 796              		.loc 1 849 0
+ 797 003a 38BD     		pop	{r3, r4, r5, pc}
+ 798              	.LVL64:
+ 799              	.L67:
+ 800              		.align	2
+ 801              	.L66:
+ 802 003c 00000000 		.word	ADC_peak_countsPerVolt
+ 803 0040 00000000 		.word	ADC_peak_countsPer10Volt
+ 804 0044 00000000 		.word	ADC_peak_offset
+ 805 0048 00002041 		.word	1092616192
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 31
+
+
+ 806              		.cfi_endproc
+ 807              	.LFE15:
+ 808              		.size	ADC_peak_CountsTo_Volts, .-ADC_peak_CountsTo_Volts
+ 809              		.comm	ADC_peak_shift,2,2
+ 810              		.comm	ADC_peak_countsPer10Volt,4,4
+ 811              		.comm	ADC_peak_countsPerVolt,2,2
+ 812              		.comm	ADC_peak_offset,2,2
+ 813              		.global	ADC_peak_initVar
+ 814              		.section	.rodata
+ 815              		.align	1
+ 816              		.set	.LANCHOR0,. + 0
+ 817              		.type	CSWTCH.24, %object
+ 818              		.size	CSWTCH.24, 10
+ 819              	CSWTCH.24:
+ 820 0000 0001     		.short	256
+ 821 0002 0000     		.short	0
+ 822 0004 0004     		.short	1024
+ 823 0006 0000     		.short	0
+ 824 0008 0010     		.short	4096
+ 825              		.bss
+ 826              		.set	.LANCHOR1,. + 0
+ 827              		.type	ADC_peak_initVar, %object
+ 828              		.size	ADC_peak_initVar, 1
+ 829              	ADC_peak_initVar:
+ 830 0000 00       		.space	1
+ 831              		.text
+ 832              	.Letext0:
+ 833              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+ 834              		.file 3 "Generated_Source\\PSoC5\\CyLib.h"
+ 835              		.file 4 "Generated_Source\\PSoC5\\ADC_peak_theACLK.h"
+ 836              		.section	.debug_info,"",%progbits
+ 837              	.Ldebug_info0:
+ 838 0000 68050000 		.4byte	0x568
+ 839 0004 0400     		.2byte	0x4
+ 840 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 841 000a 04       		.byte	0x4
+ 842 000b 01       		.uleb128 0x1
+ 843 000c 5F010000 		.4byte	.LASF62
+ 844 0010 0C       		.byte	0xc
+ 845 0011 76030000 		.4byte	.LASF63
+ 846 0015 6B000000 		.4byte	.LASF64
+ 847 0019 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 848 001d 00000000 		.4byte	0
+ 849 0021 00000000 		.4byte	.Ldebug_line0
+ 850 0025 02       		.uleb128 0x2
+ 851 0026 08       		.byte	0x8
+ 852 0027 07       		.byte	0x7
+ 853 0028 90000000 		.4byte	.LASF0
+ 854 002c 02       		.uleb128 0x2
+ 855 002d 04       		.byte	0x4
+ 856 002e 04       		.byte	0x4
+ 857 002f 1E030000 		.4byte	.LASF1
+ 858 0033 02       		.uleb128 0x2
+ 859 0034 08       		.byte	0x8
+ 860 0035 05       		.byte	0x5
+ 861 0036 BB000000 		.4byte	.LASF2
+ 862 003a 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 32
+
+
+ 863 003b 04       		.byte	0x4
+ 864 003c 05       		.byte	0x5
+ 865 003d 696E7400 		.ascii	"int\000"
+ 866 0041 02       		.uleb128 0x2
+ 867 0042 02       		.byte	0x2
+ 868 0043 05       		.byte	0x5
+ 869 0044 4C030000 		.4byte	.LASF3
+ 870 0048 02       		.uleb128 0x2
+ 871 0049 04       		.byte	0x4
+ 872 004a 07       		.byte	0x7
+ 873 004b 10020000 		.4byte	.LASF4
+ 874 004f 02       		.uleb128 0x2
+ 875 0050 01       		.byte	0x1
+ 876 0051 06       		.byte	0x6
+ 877 0052 C9000000 		.4byte	.LASF5
+ 878 0056 02       		.uleb128 0x2
+ 879 0057 01       		.byte	0x1
+ 880 0058 08       		.byte	0x8
+ 881 0059 3E030000 		.4byte	.LASF6
+ 882 005d 02       		.uleb128 0x2
+ 883 005e 02       		.byte	0x2
+ 884 005f 07       		.byte	0x7
+ 885 0060 53020000 		.4byte	.LASF7
+ 886 0064 02       		.uleb128 0x2
+ 887 0065 04       		.byte	0x4
+ 888 0066 05       		.byte	0x5
+ 889 0067 F4000000 		.4byte	.LASF8
+ 890 006b 02       		.uleb128 0x2
+ 891 006c 04       		.byte	0x4
+ 892 006d 07       		.byte	0x7
+ 893 006e 24020000 		.4byte	.LASF9
+ 894 0072 02       		.uleb128 0x2
+ 895 0073 04       		.byte	0x4
+ 896 0074 07       		.byte	0x7
+ 897 0075 E7020000 		.4byte	.LASF10
+ 898 0079 02       		.uleb128 0x2
+ 899 007a 01       		.byte	0x1
+ 900 007b 08       		.byte	0x8
+ 901 007c 98030000 		.4byte	.LASF11
+ 902 0080 04       		.uleb128 0x4
+ 903 0081 03010000 		.4byte	.LASF12
+ 904 0085 02       		.byte	0x2
+ 905 0086 9201     		.2byte	0x192
+ 906 0088 56000000 		.4byte	0x56
+ 907 008c 04       		.uleb128 0x4
+ 908 008d 00000000 		.4byte	.LASF13
+ 909 0091 02       		.byte	0x2
+ 910 0092 9301     		.2byte	0x193
+ 911 0094 5D000000 		.4byte	0x5d
+ 912 0098 04       		.uleb128 0x4
+ 913 0099 39010000 		.4byte	.LASF14
+ 914 009d 02       		.byte	0x2
+ 915 009e 9401     		.2byte	0x194
+ 916 00a0 6B000000 		.4byte	0x6b
+ 917 00a4 04       		.uleb128 0x4
+ 918 00a5 78020000 		.4byte	.LASF15
+ 919 00a9 02       		.byte	0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 33
+
+
+ 920 00aa 9501     		.2byte	0x195
+ 921 00ac 4F000000 		.4byte	0x4f
+ 922 00b0 04       		.uleb128 0x4
+ 923 00b1 15040000 		.4byte	.LASF16
+ 924 00b5 02       		.byte	0x2
+ 925 00b6 9601     		.2byte	0x196
+ 926 00b8 41000000 		.4byte	0x41
+ 927 00bc 04       		.uleb128 0x4
+ 928 00bd D5000000 		.4byte	.LASF17
+ 929 00c1 02       		.byte	0x2
+ 930 00c2 9701     		.2byte	0x197
+ 931 00c4 64000000 		.4byte	0x64
+ 932 00c8 04       		.uleb128 0x4
+ 933 00c9 DF020000 		.4byte	.LASF18
+ 934 00cd 02       		.byte	0x2
+ 935 00ce 9801     		.2byte	0x198
+ 936 00d0 2C000000 		.4byte	0x2c
+ 937 00d4 02       		.uleb128 0x2
+ 938 00d5 08       		.byte	0x8
+ 939 00d6 04       		.byte	0x4
+ 940 00d7 21010000 		.4byte	.LASF19
+ 941 00db 04       		.uleb128 0x4
+ 942 00dc 07030000 		.4byte	.LASF20
+ 943 00e0 02       		.byte	0x2
+ 944 00e1 9D01     		.2byte	0x19d
+ 945 00e3 33000000 		.4byte	0x33
+ 946 00e7 04       		.uleb128 0x4
+ 947 00e8 39030000 		.4byte	.LASF21
+ 948 00ec 02       		.byte	0x2
+ 949 00ed 3C02     		.2byte	0x23c
+ 950 00ef F3000000 		.4byte	0xf3
+ 951 00f3 05       		.uleb128 0x5
+ 952 00f4 80000000 		.4byte	0x80
+ 953 00f8 04       		.uleb128 0x4
+ 954 00f9 FD000000 		.4byte	.LASF22
+ 955 00fd 02       		.byte	0x2
+ 956 00fe 3D02     		.2byte	0x23d
+ 957 0100 04010000 		.4byte	0x104
+ 958 0104 05       		.uleb128 0x5
+ 959 0105 8C000000 		.4byte	0x8c
+ 960 0109 04       		.uleb128 0x4
+ 961 010a C9020000 		.4byte	.LASF23
+ 962 010e 02       		.byte	0x2
+ 963 010f 3E02     		.2byte	0x23e
+ 964 0111 15010000 		.4byte	0x115
+ 965 0115 05       		.uleb128 0x5
+ 966 0116 98000000 		.4byte	0x98
+ 967 011a 06       		.uleb128 0x6
+ 968 011b CF020000 		.4byte	.LASF26
+ 969 011f 01       		.byte	0x1
+ 970 0120 8F       		.byte	0x8f
+ 971 0121 00000000 		.4byte	.LFB2
+ 972 0125 9C000000 		.4byte	.LFE2-.LFB2
+ 973 0129 01       		.uleb128 0x1
+ 974 012a 9C       		.byte	0x9c
+ 975 012b 73010000 		.4byte	0x173
+ 976 012f 07       		.uleb128 0x7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 34
+
+
+ 977 0130 4D040000 		.4byte	.LASF24
+ 978 0134 01       		.byte	0x1
+ 979 0135 91       		.byte	0x91
+ 980 0136 80000000 		.4byte	0x80
+ 981 013a 00000000 		.4byte	.LLST0
+ 982 013e 07       		.uleb128 0x7
+ 983 013f E6030000 		.4byte	.LASF25
+ 984 0143 01       		.byte	0x1
+ 985 0144 92       		.byte	0x92
+ 986 0145 80000000 		.4byte	0x80
+ 987 0149 3D000000 		.4byte	.LLST1
+ 988 014d 08       		.uleb128 0x8
+ 989 014e 06000000 		.4byte	.LVL0
+ 990 0152 29050000 		.4byte	0x529
+ 991 0156 09       		.uleb128 0x9
+ 992 0157 7A000000 		.4byte	.LVL7
+ 993 015b 34050000 		.4byte	0x534
+ 994 015f 69010000 		.4byte	0x169
+ 995 0163 0A       		.uleb128 0xa
+ 996 0164 01       		.uleb128 0x1
+ 997 0165 50       		.byte	0x50
+ 998 0166 01       		.uleb128 0x1
+ 999 0167 3A       		.byte	0x3a
+ 1000 0168 00       		.byte	0
+ 1001 0169 0B       		.uleb128 0xb
+ 1002 016a 8A000000 		.4byte	.LVL9
+ 1003 016e 3F050000 		.4byte	0x53f
+ 1004 0172 00       		.byte	0
+ 1005 0173 06       		.uleb128 0x6
+ 1006 0174 BC030000 		.4byte	.LASF27
+ 1007 0178 01       		.byte	0x1
+ 1008 0179 F8       		.byte	0xf8
+ 1009 017a 00000000 		.4byte	.LFB3
+ 1010 017e 48000000 		.4byte	.LFE3-.LFB3
+ 1011 0182 01       		.uleb128 0x1
+ 1012 0183 9C       		.byte	0x9c
+ 1013 0184 AA010000 		.4byte	0x1aa
+ 1014 0188 07       		.uleb128 0x7
+ 1015 0189 E6030000 		.4byte	.LASF25
+ 1016 018d 01       		.byte	0x1
+ 1017 018e FA       		.byte	0xfa
+ 1018 018f 80000000 		.4byte	0x80
+ 1019 0193 50000000 		.4byte	.LLST2
+ 1020 0197 08       		.uleb128 0x8
+ 1021 0198 06000000 		.4byte	.LVL10
+ 1022 019c 29050000 		.4byte	0x529
+ 1023 01a0 0B       		.uleb128 0xb
+ 1024 01a1 42000000 		.4byte	.LVL11
+ 1025 01a5 3F050000 		.4byte	0x53f
+ 1026 01a9 00       		.byte	0
+ 1027 01aa 0C       		.uleb128 0xc
+ 1028 01ab 66020000 		.4byte	.LASF28
+ 1029 01af 01       		.byte	0x1
+ 1030 01b0 2201     		.2byte	0x122
+ 1031 01b2 00000000 		.4byte	.LFB4
+ 1032 01b6 18000000 		.4byte	.LFE4-.LFB4
+ 1033 01ba 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 35
+
+
+ 1034 01bb 9C       		.byte	0x9c
+ 1035 01bc E1010000 		.4byte	0x1e1
+ 1036 01c0 0D       		.uleb128 0xd
+ 1037 01c1 33030000 		.4byte	.LASF30
+ 1038 01c5 01       		.byte	0x1
+ 1039 01c6 2201     		.2byte	0x122
+ 1040 01c8 80000000 		.4byte	0x80
+ 1041 01cc 63000000 		.4byte	.LLST3
+ 1042 01d0 0E       		.uleb128 0xe
+ 1043 01d1 4D040000 		.4byte	.LASF24
+ 1044 01d5 01       		.byte	0x1
+ 1045 01d6 2401     		.2byte	0x124
+ 1046 01d8 80000000 		.4byte	0x80
+ 1047 01dc 95000000 		.4byte	.LLST4
+ 1048 01e0 00       		.byte	0
+ 1049 01e1 0F       		.uleb128 0xf
+ 1050 01e2 CA030000 		.4byte	.LASF65
+ 1051 01e6 01       		.byte	0x1
+ 1052 01e7 6302     		.2byte	0x263
+ 1053 01e9 01       		.byte	0x1
+ 1054 01ea 07020000 		.4byte	0x207
+ 1055 01ee 10       		.uleb128 0x10
+ 1056 01ef 56030000 		.4byte	.LASF31
+ 1057 01f3 01       		.byte	0x1
+ 1058 01f4 6302     		.2byte	0x263
+ 1059 01f6 80000000 		.4byte	0x80
+ 1060 01fa 11       		.uleb128 0x11
+ 1061 01fb 25000000 		.4byte	.LASF66
+ 1062 01ff 01       		.byte	0x1
+ 1063 0200 6502     		.2byte	0x265
+ 1064 0202 BC000000 		.4byte	0xbc
+ 1065 0206 00       		.byte	0
+ 1066 0207 0C       		.uleb128 0xc
+ 1067 0208 FE030000 		.4byte	.LASF29
+ 1068 020c 01       		.byte	0x1
+ 1069 020d 5401     		.2byte	0x154
+ 1070 020f 00000000 		.4byte	.LFB5
+ 1071 0213 60000000 		.4byte	.LFE5-.LFB5
+ 1072 0217 01       		.uleb128 0x1
+ 1073 0218 9C       		.byte	0x9c
+ 1074 0219 63020000 		.4byte	0x263
+ 1075 021d 0D       		.uleb128 0xd
+ 1076 021e 56030000 		.4byte	.LASF31
+ 1077 0222 01       		.byte	0x1
+ 1078 0223 5401     		.2byte	0x154
+ 1079 0225 80000000 		.4byte	0x80
+ 1080 0229 B3000000 		.4byte	.LLST5
+ 1081 022d 0E       		.uleb128 0xe
+ 1082 022e 4D040000 		.4byte	.LASF24
+ 1083 0232 01       		.byte	0x1
+ 1084 0233 5601     		.2byte	0x156
+ 1085 0235 80000000 		.4byte	0x80
+ 1086 0239 D4000000 		.4byte	.LLST6
+ 1087 023d 12       		.uleb128 0x12
+ 1088 023e E1010000 		.4byte	0x1e1
+ 1089 0242 28000000 		.4byte	.LBB4
+ 1090 0246 00000000 		.4byte	.Ldebug_ranges0+0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 36
+
+
+ 1091 024a 01       		.byte	0x1
+ 1092 024b 6D01     		.2byte	0x16d
+ 1093 024d 13       		.uleb128 0x13
+ 1094 024e EE010000 		.4byte	0x1ee
+ 1095 0252 14       		.uleb128 0x14
+ 1096 0253 00000000 		.4byte	.Ldebug_ranges0+0
+ 1097 0257 15       		.uleb128 0x15
+ 1098 0258 FA010000 		.4byte	0x1fa
+ 1099 025c E9000000 		.4byte	.LLST7
+ 1100 0260 00       		.byte	0
+ 1101 0261 00       		.byte	0
+ 1102 0262 00       		.byte	0
+ 1103 0263 06       		.uleb128 0x6
+ 1104 0264 09010000 		.4byte	.LASF32
+ 1105 0268 01       		.byte	0x1
+ 1106 0269 6A       		.byte	0x6a
+ 1107 026a 00000000 		.4byte	.LFB1
+ 1108 026e 3C000000 		.4byte	.LFE1-.LFB1
+ 1109 0272 01       		.uleb128 0x1
+ 1110 0273 9C       		.byte	0x9c
+ 1111 0274 C6020000 		.4byte	0x2c6
+ 1112 0278 09       		.uleb128 0x9
+ 1113 0279 08000000 		.4byte	.LVL23
+ 1114 027d 4A050000 		.4byte	0x54a
+ 1115 0281 8B020000 		.4byte	0x28b
+ 1116 0285 0A       		.uleb128 0xa
+ 1117 0286 01       		.uleb128 0x1
+ 1118 0287 50       		.byte	0x50
+ 1119 0288 01       		.uleb128 0x1
+ 1120 0289 40       		.byte	0x40
+ 1121 028a 00       		.byte	0
+ 1122 028b 09       		.uleb128 0x9
+ 1123 028c 10000000 		.4byte	.LVL24
+ 1124 0290 55050000 		.4byte	0x555
+ 1125 0294 A3020000 		.4byte	0x2a3
+ 1126 0298 0A       		.uleb128 0xa
+ 1127 0299 01       		.uleb128 0x1
+ 1128 029a 50       		.byte	0x50
+ 1129 029b 01       		.uleb128 0x1
+ 1130 029c 33       		.byte	0x33
+ 1131 029d 0A       		.uleb128 0xa
+ 1132 029e 01       		.uleb128 0x1
+ 1133 029f 51       		.byte	0x51
+ 1134 02a0 01       		.uleb128 0x1
+ 1135 02a1 37       		.byte	0x37
+ 1136 02a2 00       		.byte	0
+ 1137 02a3 09       		.uleb128 0x9
+ 1138 02a4 18000000 		.4byte	.LVL25
+ 1139 02a8 60050000 		.4byte	0x560
+ 1140 02ac B6020000 		.4byte	0x2b6
+ 1141 02b0 0A       		.uleb128 0xa
+ 1142 02b1 01       		.uleb128 0x1
+ 1143 02b2 50       		.byte	0x50
+ 1144 02b3 01       		.uleb128 0x1
+ 1145 02b4 33       		.byte	0x33
+ 1146 02b5 00       		.byte	0
+ 1147 02b6 16       		.uleb128 0x16
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 37
+
+
+ 1148 02b7 28000000 		.4byte	.LVL26
+ 1149 02bb 07020000 		.4byte	0x207
+ 1150 02bf 0A       		.uleb128 0xa
+ 1151 02c0 01       		.uleb128 0x1
+ 1152 02c1 50       		.byte	0x50
+ 1153 02c2 01       		.uleb128 0x1
+ 1154 02c3 3C       		.byte	0x3c
+ 1155 02c4 00       		.byte	0
+ 1156 02c5 00       		.byte	0
+ 1157 02c6 06       		.uleb128 0x6
+ 1158 02c7 24030000 		.4byte	.LASF33
+ 1159 02cb 01       		.byte	0x1
+ 1160 02cc 4A       		.byte	0x4a
+ 1161 02cd 00000000 		.4byte	.LFB0
+ 1162 02d1 1C000000 		.4byte	.LFE0-.LFB0
+ 1163 02d5 01       		.uleb128 0x1
+ 1164 02d6 9C       		.byte	0x9c
+ 1165 02d7 EE020000 		.4byte	0x2ee
+ 1166 02db 08       		.uleb128 0x8
+ 1167 02dc 0C000000 		.4byte	.LVL27
+ 1168 02e0 63020000 		.4byte	0x263
+ 1169 02e4 0B       		.uleb128 0xb
+ 1170 02e5 18000000 		.4byte	.LVL28
+ 1171 02e9 1A010000 		.4byte	0x11a
+ 1172 02ed 00       		.byte	0
+ 1173 02ee 17       		.uleb128 0x17
+ 1174 02ef 7D020000 		.4byte	.LASF36
+ 1175 02f3 01       		.byte	0x1
+ 1176 02f4 DB01     		.2byte	0x1db
+ 1177 02f6 80000000 		.4byte	0x80
+ 1178 02fa 00000000 		.4byte	.LFB6
+ 1179 02fe 28000000 		.4byte	.LFE6-.LFB6
+ 1180 0302 01       		.uleb128 0x1
+ 1181 0303 9C       		.byte	0x9c
+ 1182 0304 39030000 		.4byte	0x339
+ 1183 0308 0D       		.uleb128 0xd
+ 1184 0309 08020000 		.4byte	.LASF34
+ 1185 030d 01       		.byte	0x1
+ 1186 030e DB01     		.2byte	0x1db
+ 1187 0310 80000000 		.4byte	0x80
+ 1188 0314 FC000000 		.4byte	.LLST8
+ 1189 0318 0E       		.uleb128 0xe
+ 1190 0319 F7030000 		.4byte	.LASF35
+ 1191 031d 01       		.byte	0x1
+ 1192 031e DD01     		.2byte	0x1dd
+ 1193 0320 80000000 		.4byte	0x80
+ 1194 0324 1D010000 		.4byte	.LLST9
+ 1195 0328 16       		.uleb128 0x16
+ 1196 0329 1A000000 		.4byte	.LVL33
+ 1197 032d 34050000 		.4byte	0x534
+ 1198 0331 0A       		.uleb128 0xa
+ 1199 0332 01       		.uleb128 0x1
+ 1200 0333 50       		.byte	0x50
+ 1201 0334 02       		.uleb128 0x2
+ 1202 0335 74       		.byte	0x74
+ 1203 0336 00       		.sleb128 0
+ 1204 0337 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 38
+
+
+ 1205 0338 00       		.byte	0
+ 1206 0339 18       		.uleb128 0x18
+ 1207 033a A7000000 		.4byte	.LASF67
+ 1208 033e 01       		.byte	0x1
+ 1209 033f 0802     		.2byte	0x208
+ 1210 0341 A4000000 		.4byte	0xa4
+ 1211 0345 00000000 		.4byte	.LFB7
+ 1212 0349 18000000 		.4byte	.LFE7-.LFB7
+ 1213 034d 01       		.uleb128 0x1
+ 1214 034e 9C       		.byte	0x9c
+ 1215 034f 17       		.uleb128 0x17
+ 1216 0350 61030000 		.4byte	.LASF37
+ 1217 0354 01       		.byte	0x1
+ 1218 0355 2602     		.2byte	0x226
+ 1219 0357 B0000000 		.4byte	0xb0
+ 1220 035b 00000000 		.4byte	.LFB8
+ 1221 035f 18000000 		.4byte	.LFE8-.LFB8
+ 1222 0363 01       		.uleb128 0x1
+ 1223 0364 9C       		.byte	0x9c
+ 1224 0365 78030000 		.4byte	0x378
+ 1225 0369 19       		.uleb128 0x19
+ 1226 036a 72657300 		.ascii	"res\000"
+ 1227 036e 01       		.byte	0x1
+ 1228 036f 2802     		.2byte	0x228
+ 1229 0371 8C000000 		.4byte	0x8c
+ 1230 0375 01       		.uleb128 0x1
+ 1231 0376 53       		.byte	0x53
+ 1232 0377 00       		.byte	0
+ 1233 0378 0C       		.uleb128 0xc
+ 1234 0379 96020000 		.4byte	.LASF38
+ 1235 037d 01       		.byte	0x1
+ 1236 037e 4902     		.2byte	0x249
+ 1237 0380 00000000 		.4byte	.LFB9
+ 1238 0384 0C000000 		.4byte	.LFE9-.LFB9
+ 1239 0388 01       		.uleb128 0x1
+ 1240 0389 9C       		.byte	0x9c
+ 1241 038a 9D030000 		.4byte	0x39d
+ 1242 038e 1A       		.uleb128 0x1a
+ 1243 038f 9D030000 		.4byte	.LASF39
+ 1244 0393 01       		.byte	0x1
+ 1245 0394 4902     		.2byte	0x249
+ 1246 0396 B0000000 		.4byte	0xb0
+ 1247 039a 01       		.uleb128 0x1
+ 1248 039b 50       		.byte	0x50
+ 1249 039c 00       		.byte	0
+ 1250 039d 0C       		.uleb128 0xc
+ 1251 039e 28010000 		.4byte	.LASF40
+ 1252 03a2 01       		.byte	0x1
+ 1253 03a3 B402     		.2byte	0x2b4
+ 1254 03a5 00000000 		.4byte	.LFB11
+ 1255 03a9 10000000 		.4byte	.LFE11-.LFB11
+ 1256 03ad 01       		.uleb128 0x1
+ 1257 03ae 9C       		.byte	0x9c
+ 1258 03af C4030000 		.4byte	0x3c4
+ 1259 03b3 0D       		.uleb128 0xd
+ 1260 03b4 07000000 		.4byte	.LASF41
+ 1261 03b8 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 39
+
+
+ 1262 03b9 B402     		.2byte	0x2b4
+ 1263 03bb B0000000 		.4byte	0xb0
+ 1264 03bf 34010000 		.4byte	.LLST10
+ 1265 03c3 00       		.byte	0
+ 1266 03c4 0C       		.uleb128 0xc
+ 1267 03c5 3B000000 		.4byte	.LASF42
+ 1268 03c9 01       		.byte	0x1
+ 1269 03ca CF02     		.2byte	0x2cf
+ 1270 03cc 00000000 		.4byte	.LFB12
+ 1271 03d0 0C000000 		.4byte	.LFE12-.LFB12
+ 1272 03d4 01       		.uleb128 0x1
+ 1273 03d5 9C       		.byte	0x9c
+ 1274 03d6 E9030000 		.4byte	0x3e9
+ 1275 03da 1A       		.uleb128 0x1a
+ 1276 03db 07000000 		.4byte	.LASF41
+ 1277 03df 01       		.byte	0x1
+ 1278 03e0 CF02     		.2byte	0x2cf
+ 1279 03e2 BC000000 		.4byte	0xbc
+ 1280 03e6 01       		.uleb128 0x1
+ 1281 03e7 50       		.byte	0x50
+ 1282 03e8 00       		.byte	0
+ 1283 03e9 17       		.uleb128 0x17
+ 1284 03ea DB000000 		.4byte	.LASF43
+ 1285 03ee 01       		.byte	0x1
+ 1286 03ef E702     		.2byte	0x2e7
+ 1287 03f1 B0000000 		.4byte	0xb0
+ 1288 03f5 00000000 		.4byte	.LFB13
+ 1289 03f9 48000000 		.4byte	.LFE13-.LFB13
+ 1290 03fd 01       		.uleb128 0x1
+ 1291 03fe 9C       		.byte	0x9c
+ 1292 03ff 34040000 		.4byte	0x434
+ 1293 0403 0D       		.uleb128 0xd
+ 1294 0404 DC030000 		.4byte	.LASF44
+ 1295 0408 01       		.byte	0x1
+ 1296 0409 E702     		.2byte	0x2e7
+ 1297 040b B0000000 		.4byte	0xb0
+ 1298 040f 55010000 		.4byte	.LLST11
+ 1299 0413 0E       		.uleb128 0xe
+ 1300 0414 C2020000 		.4byte	.LASF45
+ 1301 0418 01       		.byte	0x1
+ 1302 0419 E902     		.2byte	0x2e9
+ 1303 041b B0000000 		.4byte	0xb0
+ 1304 041f 81010000 		.4byte	.LLST12
+ 1305 0423 0E       		.uleb128 0xe
+ 1306 0424 40010000 		.4byte	.LASF46
+ 1307 0428 01       		.byte	0x1
+ 1308 0429 EA02     		.2byte	0x2ea
+ 1309 042b BC000000 		.4byte	0xbc
+ 1310 042f 9C010000 		.4byte	.LLST13
+ 1311 0433 00       		.byte	0
+ 1312 0434 1B       		.uleb128 0x1b
+ 1313 0435 52000000 		.4byte	.LASF47
+ 1314 0439 01       		.byte	0x1
+ 1315 043a 1103     		.2byte	0x311
+ 1316 043c BC000000 		.4byte	0xbc
+ 1317 0440 00000000 		.4byte	.LFB14
+ 1318 0444 44000000 		.4byte	.LFE14-.LFB14
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 40
+
+
+ 1319 0448 01       		.uleb128 0x1
+ 1320 0449 9C       		.byte	0x9c
+ 1321 044a 7F040000 		.4byte	0x47f
+ 1322 044e 0D       		.uleb128 0xd
+ 1323 044f DC030000 		.4byte	.LASF44
+ 1324 0453 01       		.byte	0x1
+ 1325 0454 1103     		.2byte	0x311
+ 1326 0456 B0000000 		.4byte	0xb0
+ 1327 045a BA010000 		.4byte	.LLST14
+ 1328 045e 0E       		.uleb128 0xe
+ 1329 045f 1D020000 		.4byte	.LASF48
+ 1330 0463 01       		.byte	0x1
+ 1331 0464 1403     		.2byte	0x314
+ 1332 0466 DB000000 		.4byte	0xdb
+ 1333 046a D8010000 		.4byte	.LLST15
+ 1334 046e 0E       		.uleb128 0xe
+ 1335 046f 40010000 		.4byte	.LASF46
+ 1336 0473 01       		.byte	0x1
+ 1337 0474 1503     		.2byte	0x315
+ 1338 0476 BC000000 		.4byte	0xbc
+ 1339 047a 04020000 		.4byte	.LLST16
+ 1340 047e 00       		.byte	0
+ 1341 047f 1B       		.uleb128 0x1b
+ 1342 0480 A4030000 		.4byte	.LASF49
+ 1343 0484 01       		.byte	0x1
+ 1344 0485 3D03     		.2byte	0x33d
+ 1345 0487 C8000000 		.4byte	0xc8
+ 1346 048b 00000000 		.4byte	.LFB15
+ 1347 048f 4C000000 		.4byte	.LFE15-.LFB15
+ 1348 0493 01       		.uleb128 0x1
+ 1349 0494 9C       		.byte	0x9c
+ 1350 0495 CA040000 		.4byte	0x4ca
+ 1351 0499 0D       		.uleb128 0xd
+ 1352 049a DC030000 		.4byte	.LASF44
+ 1353 049e 01       		.byte	0x1
+ 1354 049f 3D03     		.2byte	0x33d
+ 1355 04a1 B0000000 		.4byte	0xb0
+ 1356 04a5 22020000 		.4byte	.LLST17
+ 1357 04a9 0E       		.uleb128 0xe
+ 1358 04aa 36020000 		.4byte	.LASF50
+ 1359 04ae 01       		.byte	0x1
+ 1360 04af 3F03     		.2byte	0x33f
+ 1361 04b1 C8000000 		.4byte	0xc8
+ 1362 04b5 40020000 		.4byte	.LLST18
+ 1363 04b9 0E       		.uleb128 0xe
+ 1364 04ba 40010000 		.4byte	.LASF46
+ 1365 04be 01       		.byte	0x1
+ 1366 04bf 4003     		.2byte	0x340
+ 1367 04c1 BC000000 		.4byte	0xbc
+ 1368 04c5 68020000 		.4byte	.LLST19
+ 1369 04c9 00       		.byte	0
+ 1370 04ca 1C       		.uleb128 0x1c
+ 1371 04cb 3C040000 		.4byte	.LASF51
+ 1372 04cf 01       		.byte	0x1
+ 1373 04d0 23       		.byte	0x23
+ 1374 04d1 80000000 		.4byte	0x80
+ 1375 04d5 05       		.uleb128 0x5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 41
+
+
+ 1376 04d6 03       		.byte	0x3
+ 1377 04d7 00000000 		.4byte	ADC_peak_initVar
+ 1378 04db 1C       		.uleb128 0x1c
+ 1379 04dc F8010000 		.4byte	.LASF52
+ 1380 04e0 01       		.byte	0x1
+ 1381 04e1 24       		.byte	0x24
+ 1382 04e2 EC040000 		.4byte	0x4ec
+ 1383 04e6 05       		.uleb128 0x5
+ 1384 04e7 03       		.byte	0x3
+ 1385 04e8 00000000 		.4byte	ADC_peak_offset
+ 1386 04ec 05       		.uleb128 0x5
+ 1387 04ed B0000000 		.4byte	0xb0
+ 1388 04f1 1C       		.uleb128 0x1c
+ 1389 04f2 F0020000 		.4byte	.LASF53
+ 1390 04f6 01       		.byte	0x1
+ 1391 04f7 25       		.byte	0x25
+ 1392 04f8 EC040000 		.4byte	0x4ec
+ 1393 04fc 05       		.uleb128 0x5
+ 1394 04fd 03       		.byte	0x3
+ 1395 04fe 00000000 		.4byte	ADC_peak_countsPerVolt
+ 1396 0502 1C       		.uleb128 0x1c
+ 1397 0503 A9020000 		.4byte	.LASF54
+ 1398 0507 01       		.byte	0x1
+ 1399 0508 26       		.byte	0x26
+ 1400 0509 13050000 		.4byte	0x513
+ 1401 050d 05       		.uleb128 0x5
+ 1402 050e 03       		.byte	0x3
+ 1403 050f 00000000 		.4byte	ADC_peak_countsPer10Volt
+ 1404 0513 05       		.uleb128 0x5
+ 1405 0514 BC000000 		.4byte	0xbc
+ 1406 0518 1C       		.uleb128 0x1c
+ 1407 0519 2C000000 		.4byte	.LASF55
+ 1408 051d 01       		.byte	0x1
+ 1409 051e 27       		.byte	0x27
+ 1410 051f EC040000 		.4byte	0x4ec
+ 1411 0523 05       		.uleb128 0x5
+ 1412 0524 03       		.byte	0x3
+ 1413 0525 00000000 		.4byte	ADC_peak_shift
+ 1414 0529 1D       		.uleb128 0x1d
+ 1415 052a 3C020000 		.4byte	.LASF56
+ 1416 052e 3C020000 		.4byte	.LASF56
+ 1417 0532 03       		.byte	0x3
+ 1418 0533 7D       		.byte	0x7d
+ 1419 0534 1D       		.uleb128 0x1d
+ 1420 0535 17010000 		.4byte	.LASF57
+ 1421 0539 17010000 		.4byte	.LASF57
+ 1422 053d 03       		.byte	0x3
+ 1423 053e 77       		.byte	0x77
+ 1424 053f 1D       		.uleb128 0x1d
+ 1425 0540 0F000000 		.4byte	.LASF58
+ 1426 0544 0F000000 		.4byte	.LASF58
+ 1427 0548 03       		.byte	0x3
+ 1428 0549 7E       		.byte	0x7e
+ 1429 054a 1D       		.uleb128 0x1d
+ 1430 054b 1B040000 		.4byte	.LASF59
+ 1431 054f 1B040000 		.4byte	.LASF59
+ 1432 0553 04       		.byte	0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 42
+
+
+ 1433 0554 32       		.byte	0x32
+ 1434 0555 1D       		.uleb128 0x1d
+ 1435 0556 0D030000 		.4byte	.LASF60
+ 1436 055a 0D030000 		.4byte	.LASF60
+ 1437 055e 03       		.byte	0x3
+ 1438 055f 8B       		.byte	0x8b
+ 1439 0560 1D       		.uleb128 0x1d
+ 1440 0561 50010000 		.4byte	.LASF61
+ 1441 0565 50010000 		.4byte	.LASF61
+ 1442 0569 03       		.byte	0x3
+ 1443 056a 88       		.byte	0x88
+ 1444 056b 00       		.byte	0
+ 1445              		.section	.debug_abbrev,"",%progbits
+ 1446              	.Ldebug_abbrev0:
+ 1447 0000 01       		.uleb128 0x1
+ 1448 0001 11       		.uleb128 0x11
+ 1449 0002 01       		.byte	0x1
+ 1450 0003 25       		.uleb128 0x25
+ 1451 0004 0E       		.uleb128 0xe
+ 1452 0005 13       		.uleb128 0x13
+ 1453 0006 0B       		.uleb128 0xb
+ 1454 0007 03       		.uleb128 0x3
+ 1455 0008 0E       		.uleb128 0xe
+ 1456 0009 1B       		.uleb128 0x1b
+ 1457 000a 0E       		.uleb128 0xe
+ 1458 000b 55       		.uleb128 0x55
+ 1459 000c 17       		.uleb128 0x17
+ 1460 000d 11       		.uleb128 0x11
+ 1461 000e 01       		.uleb128 0x1
+ 1462 000f 10       		.uleb128 0x10
+ 1463 0010 17       		.uleb128 0x17
+ 1464 0011 00       		.byte	0
+ 1465 0012 00       		.byte	0
+ 1466 0013 02       		.uleb128 0x2
+ 1467 0014 24       		.uleb128 0x24
+ 1468 0015 00       		.byte	0
+ 1469 0016 0B       		.uleb128 0xb
+ 1470 0017 0B       		.uleb128 0xb
+ 1471 0018 3E       		.uleb128 0x3e
+ 1472 0019 0B       		.uleb128 0xb
+ 1473 001a 03       		.uleb128 0x3
+ 1474 001b 0E       		.uleb128 0xe
+ 1475 001c 00       		.byte	0
+ 1476 001d 00       		.byte	0
+ 1477 001e 03       		.uleb128 0x3
+ 1478 001f 24       		.uleb128 0x24
+ 1479 0020 00       		.byte	0
+ 1480 0021 0B       		.uleb128 0xb
+ 1481 0022 0B       		.uleb128 0xb
+ 1482 0023 3E       		.uleb128 0x3e
+ 1483 0024 0B       		.uleb128 0xb
+ 1484 0025 03       		.uleb128 0x3
+ 1485 0026 08       		.uleb128 0x8
+ 1486 0027 00       		.byte	0
+ 1487 0028 00       		.byte	0
+ 1488 0029 04       		.uleb128 0x4
+ 1489 002a 16       		.uleb128 0x16
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 43
+
+
+ 1490 002b 00       		.byte	0
+ 1491 002c 03       		.uleb128 0x3
+ 1492 002d 0E       		.uleb128 0xe
+ 1493 002e 3A       		.uleb128 0x3a
+ 1494 002f 0B       		.uleb128 0xb
+ 1495 0030 3B       		.uleb128 0x3b
+ 1496 0031 05       		.uleb128 0x5
+ 1497 0032 49       		.uleb128 0x49
+ 1498 0033 13       		.uleb128 0x13
+ 1499 0034 00       		.byte	0
+ 1500 0035 00       		.byte	0
+ 1501 0036 05       		.uleb128 0x5
+ 1502 0037 35       		.uleb128 0x35
+ 1503 0038 00       		.byte	0
+ 1504 0039 49       		.uleb128 0x49
+ 1505 003a 13       		.uleb128 0x13
+ 1506 003b 00       		.byte	0
+ 1507 003c 00       		.byte	0
+ 1508 003d 06       		.uleb128 0x6
+ 1509 003e 2E       		.uleb128 0x2e
+ 1510 003f 01       		.byte	0x1
+ 1511 0040 3F       		.uleb128 0x3f
+ 1512 0041 19       		.uleb128 0x19
+ 1513 0042 03       		.uleb128 0x3
+ 1514 0043 0E       		.uleb128 0xe
+ 1515 0044 3A       		.uleb128 0x3a
+ 1516 0045 0B       		.uleb128 0xb
+ 1517 0046 3B       		.uleb128 0x3b
+ 1518 0047 0B       		.uleb128 0xb
+ 1519 0048 27       		.uleb128 0x27
+ 1520 0049 19       		.uleb128 0x19
+ 1521 004a 11       		.uleb128 0x11
+ 1522 004b 01       		.uleb128 0x1
+ 1523 004c 12       		.uleb128 0x12
+ 1524 004d 06       		.uleb128 0x6
+ 1525 004e 40       		.uleb128 0x40
+ 1526 004f 18       		.uleb128 0x18
+ 1527 0050 9742     		.uleb128 0x2117
+ 1528 0052 19       		.uleb128 0x19
+ 1529 0053 01       		.uleb128 0x1
+ 1530 0054 13       		.uleb128 0x13
+ 1531 0055 00       		.byte	0
+ 1532 0056 00       		.byte	0
+ 1533 0057 07       		.uleb128 0x7
+ 1534 0058 34       		.uleb128 0x34
+ 1535 0059 00       		.byte	0
+ 1536 005a 03       		.uleb128 0x3
+ 1537 005b 0E       		.uleb128 0xe
+ 1538 005c 3A       		.uleb128 0x3a
+ 1539 005d 0B       		.uleb128 0xb
+ 1540 005e 3B       		.uleb128 0x3b
+ 1541 005f 0B       		.uleb128 0xb
+ 1542 0060 49       		.uleb128 0x49
+ 1543 0061 13       		.uleb128 0x13
+ 1544 0062 02       		.uleb128 0x2
+ 1545 0063 17       		.uleb128 0x17
+ 1546 0064 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 44
+
+
+ 1547 0065 00       		.byte	0
+ 1548 0066 08       		.uleb128 0x8
+ 1549 0067 898201   		.uleb128 0x4109
+ 1550 006a 00       		.byte	0
+ 1551 006b 11       		.uleb128 0x11
+ 1552 006c 01       		.uleb128 0x1
+ 1553 006d 31       		.uleb128 0x31
+ 1554 006e 13       		.uleb128 0x13
+ 1555 006f 00       		.byte	0
+ 1556 0070 00       		.byte	0
+ 1557 0071 09       		.uleb128 0x9
+ 1558 0072 898201   		.uleb128 0x4109
+ 1559 0075 01       		.byte	0x1
+ 1560 0076 11       		.uleb128 0x11
+ 1561 0077 01       		.uleb128 0x1
+ 1562 0078 31       		.uleb128 0x31
+ 1563 0079 13       		.uleb128 0x13
+ 1564 007a 01       		.uleb128 0x1
+ 1565 007b 13       		.uleb128 0x13
+ 1566 007c 00       		.byte	0
+ 1567 007d 00       		.byte	0
+ 1568 007e 0A       		.uleb128 0xa
+ 1569 007f 8A8201   		.uleb128 0x410a
+ 1570 0082 00       		.byte	0
+ 1571 0083 02       		.uleb128 0x2
+ 1572 0084 18       		.uleb128 0x18
+ 1573 0085 9142     		.uleb128 0x2111
+ 1574 0087 18       		.uleb128 0x18
+ 1575 0088 00       		.byte	0
+ 1576 0089 00       		.byte	0
+ 1577 008a 0B       		.uleb128 0xb
+ 1578 008b 898201   		.uleb128 0x4109
+ 1579 008e 00       		.byte	0
+ 1580 008f 11       		.uleb128 0x11
+ 1581 0090 01       		.uleb128 0x1
+ 1582 0091 9542     		.uleb128 0x2115
+ 1583 0093 19       		.uleb128 0x19
+ 1584 0094 31       		.uleb128 0x31
+ 1585 0095 13       		.uleb128 0x13
+ 1586 0096 00       		.byte	0
+ 1587 0097 00       		.byte	0
+ 1588 0098 0C       		.uleb128 0xc
+ 1589 0099 2E       		.uleb128 0x2e
+ 1590 009a 01       		.byte	0x1
+ 1591 009b 3F       		.uleb128 0x3f
+ 1592 009c 19       		.uleb128 0x19
+ 1593 009d 03       		.uleb128 0x3
+ 1594 009e 0E       		.uleb128 0xe
+ 1595 009f 3A       		.uleb128 0x3a
+ 1596 00a0 0B       		.uleb128 0xb
+ 1597 00a1 3B       		.uleb128 0x3b
+ 1598 00a2 05       		.uleb128 0x5
+ 1599 00a3 27       		.uleb128 0x27
+ 1600 00a4 19       		.uleb128 0x19
+ 1601 00a5 11       		.uleb128 0x11
+ 1602 00a6 01       		.uleb128 0x1
+ 1603 00a7 12       		.uleb128 0x12
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 45
+
+
+ 1604 00a8 06       		.uleb128 0x6
+ 1605 00a9 40       		.uleb128 0x40
+ 1606 00aa 18       		.uleb128 0x18
+ 1607 00ab 9742     		.uleb128 0x2117
+ 1608 00ad 19       		.uleb128 0x19
+ 1609 00ae 01       		.uleb128 0x1
+ 1610 00af 13       		.uleb128 0x13
+ 1611 00b0 00       		.byte	0
+ 1612 00b1 00       		.byte	0
+ 1613 00b2 0D       		.uleb128 0xd
+ 1614 00b3 05       		.uleb128 0x5
+ 1615 00b4 00       		.byte	0
+ 1616 00b5 03       		.uleb128 0x3
+ 1617 00b6 0E       		.uleb128 0xe
+ 1618 00b7 3A       		.uleb128 0x3a
+ 1619 00b8 0B       		.uleb128 0xb
+ 1620 00b9 3B       		.uleb128 0x3b
+ 1621 00ba 05       		.uleb128 0x5
+ 1622 00bb 49       		.uleb128 0x49
+ 1623 00bc 13       		.uleb128 0x13
+ 1624 00bd 02       		.uleb128 0x2
+ 1625 00be 17       		.uleb128 0x17
+ 1626 00bf 00       		.byte	0
+ 1627 00c0 00       		.byte	0
+ 1628 00c1 0E       		.uleb128 0xe
+ 1629 00c2 34       		.uleb128 0x34
+ 1630 00c3 00       		.byte	0
+ 1631 00c4 03       		.uleb128 0x3
+ 1632 00c5 0E       		.uleb128 0xe
+ 1633 00c6 3A       		.uleb128 0x3a
+ 1634 00c7 0B       		.uleb128 0xb
+ 1635 00c8 3B       		.uleb128 0x3b
+ 1636 00c9 05       		.uleb128 0x5
+ 1637 00ca 49       		.uleb128 0x49
+ 1638 00cb 13       		.uleb128 0x13
+ 1639 00cc 02       		.uleb128 0x2
+ 1640 00cd 17       		.uleb128 0x17
+ 1641 00ce 00       		.byte	0
+ 1642 00cf 00       		.byte	0
+ 1643 00d0 0F       		.uleb128 0xf
+ 1644 00d1 2E       		.uleb128 0x2e
+ 1645 00d2 01       		.byte	0x1
+ 1646 00d3 03       		.uleb128 0x3
+ 1647 00d4 0E       		.uleb128 0xe
+ 1648 00d5 3A       		.uleb128 0x3a
+ 1649 00d6 0B       		.uleb128 0xb
+ 1650 00d7 3B       		.uleb128 0x3b
+ 1651 00d8 05       		.uleb128 0x5
+ 1652 00d9 27       		.uleb128 0x27
+ 1653 00da 19       		.uleb128 0x19
+ 1654 00db 20       		.uleb128 0x20
+ 1655 00dc 0B       		.uleb128 0xb
+ 1656 00dd 01       		.uleb128 0x1
+ 1657 00de 13       		.uleb128 0x13
+ 1658 00df 00       		.byte	0
+ 1659 00e0 00       		.byte	0
+ 1660 00e1 10       		.uleb128 0x10
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 46
+
+
+ 1661 00e2 05       		.uleb128 0x5
+ 1662 00e3 00       		.byte	0
+ 1663 00e4 03       		.uleb128 0x3
+ 1664 00e5 0E       		.uleb128 0xe
+ 1665 00e6 3A       		.uleb128 0x3a
+ 1666 00e7 0B       		.uleb128 0xb
+ 1667 00e8 3B       		.uleb128 0x3b
+ 1668 00e9 05       		.uleb128 0x5
+ 1669 00ea 49       		.uleb128 0x49
+ 1670 00eb 13       		.uleb128 0x13
+ 1671 00ec 00       		.byte	0
+ 1672 00ed 00       		.byte	0
+ 1673 00ee 11       		.uleb128 0x11
+ 1674 00ef 34       		.uleb128 0x34
+ 1675 00f0 00       		.byte	0
+ 1676 00f1 03       		.uleb128 0x3
+ 1677 00f2 0E       		.uleb128 0xe
+ 1678 00f3 3A       		.uleb128 0x3a
+ 1679 00f4 0B       		.uleb128 0xb
+ 1680 00f5 3B       		.uleb128 0x3b
+ 1681 00f6 05       		.uleb128 0x5
+ 1682 00f7 49       		.uleb128 0x49
+ 1683 00f8 13       		.uleb128 0x13
+ 1684 00f9 00       		.byte	0
+ 1685 00fa 00       		.byte	0
+ 1686 00fb 12       		.uleb128 0x12
+ 1687 00fc 1D       		.uleb128 0x1d
+ 1688 00fd 01       		.byte	0x1
+ 1689 00fe 31       		.uleb128 0x31
+ 1690 00ff 13       		.uleb128 0x13
+ 1691 0100 52       		.uleb128 0x52
+ 1692 0101 01       		.uleb128 0x1
+ 1693 0102 55       		.uleb128 0x55
+ 1694 0103 17       		.uleb128 0x17
+ 1695 0104 58       		.uleb128 0x58
+ 1696 0105 0B       		.uleb128 0xb
+ 1697 0106 59       		.uleb128 0x59
+ 1698 0107 05       		.uleb128 0x5
+ 1699 0108 00       		.byte	0
+ 1700 0109 00       		.byte	0
+ 1701 010a 13       		.uleb128 0x13
+ 1702 010b 05       		.uleb128 0x5
+ 1703 010c 00       		.byte	0
+ 1704 010d 31       		.uleb128 0x31
+ 1705 010e 13       		.uleb128 0x13
+ 1706 010f 00       		.byte	0
+ 1707 0110 00       		.byte	0
+ 1708 0111 14       		.uleb128 0x14
+ 1709 0112 0B       		.uleb128 0xb
+ 1710 0113 01       		.byte	0x1
+ 1711 0114 55       		.uleb128 0x55
+ 1712 0115 17       		.uleb128 0x17
+ 1713 0116 00       		.byte	0
+ 1714 0117 00       		.byte	0
+ 1715 0118 15       		.uleb128 0x15
+ 1716 0119 34       		.uleb128 0x34
+ 1717 011a 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 47
+
+
+ 1718 011b 31       		.uleb128 0x31
+ 1719 011c 13       		.uleb128 0x13
+ 1720 011d 02       		.uleb128 0x2
+ 1721 011e 17       		.uleb128 0x17
+ 1722 011f 00       		.byte	0
+ 1723 0120 00       		.byte	0
+ 1724 0121 16       		.uleb128 0x16
+ 1725 0122 898201   		.uleb128 0x4109
+ 1726 0125 01       		.byte	0x1
+ 1727 0126 11       		.uleb128 0x11
+ 1728 0127 01       		.uleb128 0x1
+ 1729 0128 31       		.uleb128 0x31
+ 1730 0129 13       		.uleb128 0x13
+ 1731 012a 00       		.byte	0
+ 1732 012b 00       		.byte	0
+ 1733 012c 17       		.uleb128 0x17
+ 1734 012d 2E       		.uleb128 0x2e
+ 1735 012e 01       		.byte	0x1
+ 1736 012f 3F       		.uleb128 0x3f
+ 1737 0130 19       		.uleb128 0x19
+ 1738 0131 03       		.uleb128 0x3
+ 1739 0132 0E       		.uleb128 0xe
+ 1740 0133 3A       		.uleb128 0x3a
+ 1741 0134 0B       		.uleb128 0xb
+ 1742 0135 3B       		.uleb128 0x3b
+ 1743 0136 05       		.uleb128 0x5
+ 1744 0137 27       		.uleb128 0x27
+ 1745 0138 19       		.uleb128 0x19
+ 1746 0139 49       		.uleb128 0x49
+ 1747 013a 13       		.uleb128 0x13
+ 1748 013b 11       		.uleb128 0x11
+ 1749 013c 01       		.uleb128 0x1
+ 1750 013d 12       		.uleb128 0x12
+ 1751 013e 06       		.uleb128 0x6
+ 1752 013f 40       		.uleb128 0x40
+ 1753 0140 18       		.uleb128 0x18
+ 1754 0141 9742     		.uleb128 0x2117
+ 1755 0143 19       		.uleb128 0x19
+ 1756 0144 01       		.uleb128 0x1
+ 1757 0145 13       		.uleb128 0x13
+ 1758 0146 00       		.byte	0
+ 1759 0147 00       		.byte	0
+ 1760 0148 18       		.uleb128 0x18
+ 1761 0149 2E       		.uleb128 0x2e
+ 1762 014a 00       		.byte	0
+ 1763 014b 3F       		.uleb128 0x3f
+ 1764 014c 19       		.uleb128 0x19
+ 1765 014d 03       		.uleb128 0x3
+ 1766 014e 0E       		.uleb128 0xe
+ 1767 014f 3A       		.uleb128 0x3a
+ 1768 0150 0B       		.uleb128 0xb
+ 1769 0151 3B       		.uleb128 0x3b
+ 1770 0152 05       		.uleb128 0x5
+ 1771 0153 27       		.uleb128 0x27
+ 1772 0154 19       		.uleb128 0x19
+ 1773 0155 49       		.uleb128 0x49
+ 1774 0156 13       		.uleb128 0x13
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 48
+
+
+ 1775 0157 11       		.uleb128 0x11
+ 1776 0158 01       		.uleb128 0x1
+ 1777 0159 12       		.uleb128 0x12
+ 1778 015a 06       		.uleb128 0x6
+ 1779 015b 40       		.uleb128 0x40
+ 1780 015c 18       		.uleb128 0x18
+ 1781 015d 9742     		.uleb128 0x2117
+ 1782 015f 19       		.uleb128 0x19
+ 1783 0160 00       		.byte	0
+ 1784 0161 00       		.byte	0
+ 1785 0162 19       		.uleb128 0x19
+ 1786 0163 34       		.uleb128 0x34
+ 1787 0164 00       		.byte	0
+ 1788 0165 03       		.uleb128 0x3
+ 1789 0166 08       		.uleb128 0x8
+ 1790 0167 3A       		.uleb128 0x3a
+ 1791 0168 0B       		.uleb128 0xb
+ 1792 0169 3B       		.uleb128 0x3b
+ 1793 016a 05       		.uleb128 0x5
+ 1794 016b 49       		.uleb128 0x49
+ 1795 016c 13       		.uleb128 0x13
+ 1796 016d 02       		.uleb128 0x2
+ 1797 016e 18       		.uleb128 0x18
+ 1798 016f 00       		.byte	0
+ 1799 0170 00       		.byte	0
+ 1800 0171 1A       		.uleb128 0x1a
+ 1801 0172 05       		.uleb128 0x5
+ 1802 0173 00       		.byte	0
+ 1803 0174 03       		.uleb128 0x3
+ 1804 0175 0E       		.uleb128 0xe
+ 1805 0176 3A       		.uleb128 0x3a
+ 1806 0177 0B       		.uleb128 0xb
+ 1807 0178 3B       		.uleb128 0x3b
+ 1808 0179 05       		.uleb128 0x5
+ 1809 017a 49       		.uleb128 0x49
+ 1810 017b 13       		.uleb128 0x13
+ 1811 017c 02       		.uleb128 0x2
+ 1812 017d 18       		.uleb128 0x18
+ 1813 017e 00       		.byte	0
+ 1814 017f 00       		.byte	0
+ 1815 0180 1B       		.uleb128 0x1b
+ 1816 0181 2E       		.uleb128 0x2e
+ 1817 0182 01       		.byte	0x1
+ 1818 0183 3F       		.uleb128 0x3f
+ 1819 0184 19       		.uleb128 0x19
+ 1820 0185 03       		.uleb128 0x3
+ 1821 0186 0E       		.uleb128 0xe
+ 1822 0187 3A       		.uleb128 0x3a
+ 1823 0188 0B       		.uleb128 0xb
+ 1824 0189 3B       		.uleb128 0x3b
+ 1825 018a 05       		.uleb128 0x5
+ 1826 018b 27       		.uleb128 0x27
+ 1827 018c 19       		.uleb128 0x19
+ 1828 018d 49       		.uleb128 0x49
+ 1829 018e 13       		.uleb128 0x13
+ 1830 018f 11       		.uleb128 0x11
+ 1831 0190 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 49
+
+
+ 1832 0191 12       		.uleb128 0x12
+ 1833 0192 06       		.uleb128 0x6
+ 1834 0193 40       		.uleb128 0x40
+ 1835 0194 18       		.uleb128 0x18
+ 1836 0195 9642     		.uleb128 0x2116
+ 1837 0197 19       		.uleb128 0x19
+ 1838 0198 01       		.uleb128 0x1
+ 1839 0199 13       		.uleb128 0x13
+ 1840 019a 00       		.byte	0
+ 1841 019b 00       		.byte	0
+ 1842 019c 1C       		.uleb128 0x1c
+ 1843 019d 34       		.uleb128 0x34
+ 1844 019e 00       		.byte	0
+ 1845 019f 03       		.uleb128 0x3
+ 1846 01a0 0E       		.uleb128 0xe
+ 1847 01a1 3A       		.uleb128 0x3a
+ 1848 01a2 0B       		.uleb128 0xb
+ 1849 01a3 3B       		.uleb128 0x3b
+ 1850 01a4 0B       		.uleb128 0xb
+ 1851 01a5 49       		.uleb128 0x49
+ 1852 01a6 13       		.uleb128 0x13
+ 1853 01a7 3F       		.uleb128 0x3f
+ 1854 01a8 19       		.uleb128 0x19
+ 1855 01a9 02       		.uleb128 0x2
+ 1856 01aa 18       		.uleb128 0x18
+ 1857 01ab 00       		.byte	0
+ 1858 01ac 00       		.byte	0
+ 1859 01ad 1D       		.uleb128 0x1d
+ 1860 01ae 2E       		.uleb128 0x2e
+ 1861 01af 00       		.byte	0
+ 1862 01b0 3F       		.uleb128 0x3f
+ 1863 01b1 19       		.uleb128 0x19
+ 1864 01b2 3C       		.uleb128 0x3c
+ 1865 01b3 19       		.uleb128 0x19
+ 1866 01b4 6E       		.uleb128 0x6e
+ 1867 01b5 0E       		.uleb128 0xe
+ 1868 01b6 03       		.uleb128 0x3
+ 1869 01b7 0E       		.uleb128 0xe
+ 1870 01b8 3A       		.uleb128 0x3a
+ 1871 01b9 0B       		.uleb128 0xb
+ 1872 01ba 3B       		.uleb128 0x3b
+ 1873 01bb 0B       		.uleb128 0xb
+ 1874 01bc 00       		.byte	0
+ 1875 01bd 00       		.byte	0
+ 1876 01be 00       		.byte	0
+ 1877              		.section	.debug_loc,"",%progbits
+ 1878              	.Ldebug_loc0:
+ 1879              	.LLST0:
+ 1880 0000 38000000 		.4byte	.LVL2
+ 1881 0004 3C000000 		.4byte	.LVL3
+ 1882 0008 0500     		.2byte	0x5
+ 1883 000a 73       		.byte	0x73
+ 1884 000b 00       		.sleb128 0
+ 1885 000c 32       		.byte	0x32
+ 1886 000d 21       		.byte	0x21
+ 1887 000e 9F       		.byte	0x9f
+ 1888 000f 3C000000 		.4byte	.LVL3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 50
+
+
+ 1889 0013 40000000 		.4byte	.LVL4
+ 1890 0017 0100     		.2byte	0x1
+ 1891 0019 53       		.byte	0x53
+ 1892 001a 40000000 		.4byte	.LVL4
+ 1893 001e 42000000 		.4byte	.LVL5
+ 1894 0022 0200     		.2byte	0x2
+ 1895 0024 72       		.byte	0x72
+ 1896 0025 00       		.sleb128 0
+ 1897 0026 42000000 		.4byte	.LVL5
+ 1898 002a 44000000 		.4byte	.LVL6
+ 1899 002e 0500     		.2byte	0x5
+ 1900 0030 0C       		.byte	0xc
+ 1901 0031 03590040 		.4byte	0x40005903
+ 1902 0035 00000000 		.4byte	0
+ 1903 0039 00000000 		.4byte	0
+ 1904              	.LLST1:
+ 1905 003d 0A000000 		.4byte	.LVL1
+ 1906 0041 84000000 		.4byte	.LVL8
+ 1907 0045 0100     		.2byte	0x1
+ 1908 0047 54       		.byte	0x54
+ 1909 0048 00000000 		.4byte	0
+ 1910 004c 00000000 		.4byte	0
+ 1911              	.LLST2:
+ 1912 0050 06000000 		.4byte	.LVL10
+ 1913 0054 41000000 		.4byte	.LVL11-1
+ 1914 0058 0100     		.2byte	0x1
+ 1915 005a 50       		.byte	0x50
+ 1916 005b 00000000 		.4byte	0
+ 1917 005f 00000000 		.4byte	0
+ 1918              	.LLST3:
+ 1919 0063 00000000 		.4byte	.LVL12
+ 1920 0067 00000000 		.4byte	.LVL12
+ 1921 006b 0100     		.2byte	0x1
+ 1922 006d 50       		.byte	0x50
+ 1923 006e 00000000 		.4byte	.LVL12
+ 1924 0072 0C000000 		.4byte	.LVL14
+ 1925 0076 0500     		.2byte	0x5
+ 1926 0078 70       		.byte	0x70
+ 1927 0079 00       		.sleb128 0
+ 1928 007a 33       		.byte	0x33
+ 1929 007b 1A       		.byte	0x1a
+ 1930 007c 9F       		.byte	0x9f
+ 1931 007d 0C000000 		.4byte	.LVL14
+ 1932 0081 18000000 		.4byte	.LFE4
+ 1933 0085 0600     		.2byte	0x6
+ 1934 0087 F3       		.byte	0xf3
+ 1935 0088 01       		.uleb128 0x1
+ 1936 0089 50       		.byte	0x50
+ 1937 008a 33       		.byte	0x33
+ 1938 008b 1A       		.byte	0x1a
+ 1939 008c 9F       		.byte	0x9f
+ 1940 008d 00000000 		.4byte	0
+ 1941 0091 00000000 		.4byte	0
+ 1942              	.LLST4:
+ 1943 0095 08000000 		.4byte	.LVL13
+ 1944 0099 0E000000 		.4byte	.LVL15
+ 1945 009d 0100     		.2byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 51
+
+
+ 1946 009f 53       		.byte	0x53
+ 1947 00a0 0E000000 		.4byte	.LVL15
+ 1948 00a4 18000000 		.4byte	.LFE4
+ 1949 00a8 0100     		.2byte	0x1
+ 1950 00aa 50       		.byte	0x50
+ 1951 00ab 00000000 		.4byte	0
+ 1952 00af 00000000 		.4byte	0
+ 1953              	.LLST5:
+ 1954 00b3 00000000 		.4byte	.LVL16
+ 1955 00b7 12000000 		.4byte	.LVL19
+ 1956 00bb 0100     		.2byte	0x1
+ 1957 00bd 50       		.byte	0x50
+ 1958 00be 12000000 		.4byte	.LVL19
+ 1959 00c2 60000000 		.4byte	.LFE5
+ 1960 00c6 0400     		.2byte	0x4
+ 1961 00c8 F3       		.byte	0xf3
+ 1962 00c9 01       		.uleb128 0x1
+ 1963 00ca 50       		.byte	0x50
+ 1964 00cb 9F       		.byte	0x9f
+ 1965 00cc 00000000 		.4byte	0
+ 1966 00d0 00000000 		.4byte	0
+ 1967              	.LLST6:
+ 1968 00d4 0E000000 		.4byte	.LVL17
+ 1969 00d8 10000000 		.4byte	.LVL18
+ 1970 00dc 0300     		.2byte	0x3
+ 1971 00de 08       		.byte	0x8
+ 1972 00df 44       		.byte	0x44
+ 1973 00e0 9F       		.byte	0x9f
+ 1974 00e1 00000000 		.4byte	0
+ 1975 00e5 00000000 		.4byte	0
+ 1976              	.LLST7:
+ 1977 00e9 2E000000 		.4byte	.LVL21
+ 1978 00ed 3A000000 		.4byte	.LVL22
+ 1979 00f1 0100     		.2byte	0x1
+ 1980 00f3 51       		.byte	0x51
+ 1981 00f4 00000000 		.4byte	0
+ 1982 00f8 00000000 		.4byte	0
+ 1983              	.LLST8:
+ 1984 00fc 00000000 		.4byte	.LVL29
+ 1985 0100 16000000 		.4byte	.LVL32
+ 1986 0104 0100     		.2byte	0x1
+ 1987 0106 50       		.byte	0x50
+ 1988 0107 16000000 		.4byte	.LVL32
+ 1989 010b 28000000 		.4byte	.LFE6
+ 1990 010f 0400     		.2byte	0x4
+ 1991 0111 F3       		.byte	0xf3
+ 1992 0112 01       		.uleb128 0x1
+ 1993 0113 50       		.byte	0x50
+ 1994 0114 9F       		.byte	0x9f
+ 1995 0115 00000000 		.4byte	0
+ 1996 0119 00000000 		.4byte	0
+ 1997              	.LLST9:
+ 1998 011d 06000000 		.4byte	.LVL30
+ 1999 0121 0A000000 		.4byte	.LVL31
+ 2000 0125 0500     		.2byte	0x5
+ 2001 0127 74       		.byte	0x74
+ 2002 0128 00       		.sleb128 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 52
+
+
+ 2003 0129 31       		.byte	0x31
+ 2004 012a 1A       		.byte	0x1a
+ 2005 012b 9F       		.byte	0x9f
+ 2006 012c 00000000 		.4byte	0
+ 2007 0130 00000000 		.4byte	0
+ 2008              	.LLST10:
+ 2009 0134 00000000 		.4byte	.LVL36
+ 2010 0138 04000000 		.4byte	.LVL37
+ 2011 013c 0100     		.2byte	0x1
+ 2012 013e 50       		.byte	0x50
+ 2013 013f 04000000 		.4byte	.LVL37
+ 2014 0143 10000000 		.4byte	.LFE11
+ 2015 0147 0400     		.2byte	0x4
+ 2016 0149 F3       		.byte	0xf3
+ 2017 014a 01       		.uleb128 0x1
+ 2018 014b 50       		.byte	0x50
+ 2019 014c 9F       		.byte	0x9f
+ 2020 014d 00000000 		.4byte	0
+ 2021 0151 00000000 		.4byte	0
+ 2022              	.LLST11:
+ 2023 0155 00000000 		.4byte	.LVL39
+ 2024 0159 1C000000 		.4byte	.LVL43
+ 2025 015d 0100     		.2byte	0x1
+ 2026 015f 50       		.byte	0x50
+ 2027 0160 1C000000 		.4byte	.LVL43
+ 2028 0164 22000000 		.4byte	.LVL44
+ 2029 0168 0400     		.2byte	0x4
+ 2030 016a F3       		.byte	0xf3
+ 2031 016b 01       		.uleb128 0x1
+ 2032 016c 50       		.byte	0x50
+ 2033 016d 9F       		.byte	0x9f
+ 2034 016e 22000000 		.4byte	.LVL44
+ 2035 0172 38000000 		.4byte	.LVL47
+ 2036 0176 0100     		.2byte	0x1
+ 2037 0178 50       		.byte	0x50
+ 2038 0179 00000000 		.4byte	0
+ 2039 017d 00000000 		.4byte	0
+ 2040              	.LLST12:
+ 2041 0181 32000000 		.4byte	.LVL45
+ 2042 0185 34000000 		.4byte	.LVL46
+ 2043 0189 0900     		.2byte	0x9
+ 2044 018b 73       		.byte	0x73
+ 2045 018c 00       		.sleb128 0
+ 2046 018d 72       		.byte	0x72
+ 2047 018e 00       		.sleb128 0
+ 2048 018f 22       		.byte	0x22
+ 2049 0190 71       		.byte	0x71
+ 2050 0191 00       		.sleb128 0
+ 2051 0192 1B       		.byte	0x1b
+ 2052 0193 9F       		.byte	0x9f
+ 2053 0194 00000000 		.4byte	0
+ 2054 0198 00000000 		.4byte	0
+ 2055              	.LLST13:
+ 2056 019c 10000000 		.4byte	.LVL40
+ 2057 01a0 12000000 		.4byte	.LVL41
+ 2058 01a4 0100     		.2byte	0x1
+ 2059 01a6 51       		.byte	0x51
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 53
+
+
+ 2060 01a7 16000000 		.4byte	.LVL42
+ 2061 01ab 48000000 		.4byte	.LFE13
+ 2062 01af 0100     		.2byte	0x1
+ 2063 01b1 51       		.byte	0x51
+ 2064 01b2 00000000 		.4byte	0
+ 2065 01b6 00000000 		.4byte	0
+ 2066              	.LLST14:
+ 2067 01ba 00000000 		.4byte	.LVL48
+ 2068 01be 20000000 		.4byte	.LVL52
+ 2069 01c2 0100     		.2byte	0x1
+ 2070 01c4 50       		.byte	0x50
+ 2071 01c5 20000000 		.4byte	.LVL52
+ 2072 01c9 34000000 		.4byte	.LVL54
+ 2073 01cd 0100     		.2byte	0x1
+ 2074 01cf 54       		.byte	0x54
+ 2075 01d0 00000000 		.4byte	0
+ 2076 01d4 00000000 		.4byte	0
+ 2077              	.LLST15:
+ 2078 01d8 20000000 		.4byte	.LVL52
+ 2079 01dc 31000000 		.4byte	.LVL53-1
+ 2080 01e0 1A00     		.2byte	0x1a
+ 2081 01e2 74       		.byte	0x74
+ 2082 01e3 00       		.sleb128 0
+ 2083 01e4 F7       		.byte	0xf7
+ 2084 01e5 41       		.uleb128 0x41
+ 2085 01e6 F7       		.byte	0xf7
+ 2086 01e7 25       		.uleb128 0x25
+ 2087 01e8 0C       		.byte	0xc
+ 2088 01e9 80969800 		.4byte	0x989680
+ 2089 01ed F7       		.byte	0xf7
+ 2090 01ee 25       		.uleb128 0x25
+ 2091 01ef 1E       		.byte	0x1e
+ 2092 01f0 F7       		.byte	0xf7
+ 2093 01f1 33       		.uleb128 0x33
+ 2094 01f2 72       		.byte	0x72
+ 2095 01f3 00       		.sleb128 0
+ 2096 01f4 F7       		.byte	0xf7
+ 2097 01f5 3A       		.uleb128 0x3a
+ 2098 01f6 F7       		.byte	0xf7
+ 2099 01f7 33       		.uleb128 0x33
+ 2100 01f8 1B       		.byte	0x1b
+ 2101 01f9 F7       		.byte	0xf7
+ 2102 01fa 25       		.uleb128 0x25
+ 2103 01fb 9F       		.byte	0x9f
+ 2104 01fc 00000000 		.4byte	0
+ 2105 0200 00000000 		.4byte	0
+ 2106              	.LLST16:
+ 2107 0204 12000000 		.4byte	.LVL49
+ 2108 0208 14000000 		.4byte	.LVL50
+ 2109 020c 0100     		.2byte	0x1
+ 2110 020e 52       		.byte	0x52
+ 2111 020f 18000000 		.4byte	.LVL51
+ 2112 0213 31000000 		.4byte	.LVL53-1
+ 2113 0217 0100     		.2byte	0x1
+ 2114 0219 52       		.byte	0x52
+ 2115 021a 00000000 		.4byte	0
+ 2116 021e 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 54
+
+
+ 2117              	.LLST17:
+ 2118 0222 00000000 		.4byte	.LVL55
+ 2119 0226 1E000000 		.4byte	.LVL59
+ 2120 022a 0100     		.2byte	0x1
+ 2121 022c 50       		.byte	0x50
+ 2122 022d 1E000000 		.4byte	.LVL59
+ 2123 0231 23000000 		.4byte	.LVL60-1
+ 2124 0235 0100     		.2byte	0x1
+ 2125 0237 50       		.byte	0x50
+ 2126 0238 00000000 		.4byte	0
+ 2127 023c 00000000 		.4byte	0
+ 2128              	.LLST18:
+ 2129 0240 1E000000 		.4byte	.LVL59
+ 2130 0244 23000000 		.4byte	.LVL60-1
+ 2131 0248 1600     		.2byte	0x16
+ 2132 024a 70       		.byte	0x70
+ 2133 024b 00       		.sleb128 0
+ 2134 024c F7       		.byte	0xf7
+ 2135 024d 41       		.uleb128 0x41
+ 2136 024e F7       		.byte	0xf7
+ 2137 024f 2C       		.uleb128 0x2c
+ 2138 0250 F4       		.byte	0xf4
+ 2139 0251 2C       		.uleb128 0x2c
+ 2140 0252 04       		.byte	0x4
+ 2141 0253 00002041 		.4byte	0x41200000
+ 2142 0257 1E       		.byte	0x1e
+ 2143 0258 74       		.byte	0x74
+ 2144 0259 00       		.sleb128 0
+ 2145 025a F7       		.byte	0xf7
+ 2146 025b 3A       		.uleb128 0x3a
+ 2147 025c F7       		.byte	0xf7
+ 2148 025d 2C       		.uleb128 0x2c
+ 2149 025e 1B       		.byte	0x1b
+ 2150 025f 9F       		.byte	0x9f
+ 2151 0260 00000000 		.4byte	0
+ 2152 0264 00000000 		.4byte	0
+ 2153              	.LLST19:
+ 2154 0268 12000000 		.4byte	.LVL56
+ 2155 026c 14000000 		.4byte	.LVL57
+ 2156 0270 0100     		.2byte	0x1
+ 2157 0272 54       		.byte	0x54
+ 2158 0273 18000000 		.4byte	.LVL58
+ 2159 0277 3C000000 		.4byte	.LVL64
+ 2160 027b 0100     		.2byte	0x1
+ 2161 027d 54       		.byte	0x54
+ 2162 027e 00000000 		.4byte	0
+ 2163 0282 00000000 		.4byte	0
+ 2164              		.section	.debug_aranges,"",%progbits
+ 2165 0000 8C000000 		.4byte	0x8c
+ 2166 0004 0200     		.2byte	0x2
+ 2167 0006 00000000 		.4byte	.Ldebug_info0
+ 2168 000a 04       		.byte	0x4
+ 2169 000b 00       		.byte	0
+ 2170 000c 0000     		.2byte	0
+ 2171 000e 0000     		.2byte	0
+ 2172 0010 00000000 		.4byte	.LFB2
+ 2173 0014 9C000000 		.4byte	.LFE2-.LFB2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 55
+
+
+ 2174 0018 00000000 		.4byte	.LFB3
+ 2175 001c 48000000 		.4byte	.LFE3-.LFB3
+ 2176 0020 00000000 		.4byte	.LFB4
+ 2177 0024 18000000 		.4byte	.LFE4-.LFB4
+ 2178 0028 00000000 		.4byte	.LFB5
+ 2179 002c 60000000 		.4byte	.LFE5-.LFB5
+ 2180 0030 00000000 		.4byte	.LFB1
+ 2181 0034 3C000000 		.4byte	.LFE1-.LFB1
+ 2182 0038 00000000 		.4byte	.LFB0
+ 2183 003c 1C000000 		.4byte	.LFE0-.LFB0
+ 2184 0040 00000000 		.4byte	.LFB6
+ 2185 0044 28000000 		.4byte	.LFE6-.LFB6
+ 2186 0048 00000000 		.4byte	.LFB7
+ 2187 004c 18000000 		.4byte	.LFE7-.LFB7
+ 2188 0050 00000000 		.4byte	.LFB8
+ 2189 0054 18000000 		.4byte	.LFE8-.LFB8
+ 2190 0058 00000000 		.4byte	.LFB9
+ 2191 005c 0C000000 		.4byte	.LFE9-.LFB9
+ 2192 0060 00000000 		.4byte	.LFB11
+ 2193 0064 10000000 		.4byte	.LFE11-.LFB11
+ 2194 0068 00000000 		.4byte	.LFB12
+ 2195 006c 0C000000 		.4byte	.LFE12-.LFB12
+ 2196 0070 00000000 		.4byte	.LFB13
+ 2197 0074 48000000 		.4byte	.LFE13-.LFB13
+ 2198 0078 00000000 		.4byte	.LFB14
+ 2199 007c 44000000 		.4byte	.LFE14-.LFB14
+ 2200 0080 00000000 		.4byte	.LFB15
+ 2201 0084 4C000000 		.4byte	.LFE15-.LFB15
+ 2202 0088 00000000 		.4byte	0
+ 2203 008c 00000000 		.4byte	0
+ 2204              		.section	.debug_ranges,"",%progbits
+ 2205              	.Ldebug_ranges0:
+ 2206 0000 28000000 		.4byte	.LBB4
+ 2207 0004 2A000000 		.4byte	.LBE4
+ 2208 0008 2E000000 		.4byte	.LBB7
+ 2209 000c 60000000 		.4byte	.LBE7
+ 2210 0010 00000000 		.4byte	0
+ 2211 0014 00000000 		.4byte	0
+ 2212 0018 00000000 		.4byte	.LFB2
+ 2213 001c 9C000000 		.4byte	.LFE2
+ 2214 0020 00000000 		.4byte	.LFB3
+ 2215 0024 48000000 		.4byte	.LFE3
+ 2216 0028 00000000 		.4byte	.LFB4
+ 2217 002c 18000000 		.4byte	.LFE4
+ 2218 0030 00000000 		.4byte	.LFB5
+ 2219 0034 60000000 		.4byte	.LFE5
+ 2220 0038 00000000 		.4byte	.LFB1
+ 2221 003c 3C000000 		.4byte	.LFE1
+ 2222 0040 00000000 		.4byte	.LFB0
+ 2223 0044 1C000000 		.4byte	.LFE0
+ 2224 0048 00000000 		.4byte	.LFB6
+ 2225 004c 28000000 		.4byte	.LFE6
+ 2226 0050 00000000 		.4byte	.LFB7
+ 2227 0054 18000000 		.4byte	.LFE7
+ 2228 0058 00000000 		.4byte	.LFB8
+ 2229 005c 18000000 		.4byte	.LFE8
+ 2230 0060 00000000 		.4byte	.LFB9
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 56
+
+
+ 2231 0064 0C000000 		.4byte	.LFE9
+ 2232 0068 00000000 		.4byte	.LFB11
+ 2233 006c 10000000 		.4byte	.LFE11
+ 2234 0070 00000000 		.4byte	.LFB12
+ 2235 0074 0C000000 		.4byte	.LFE12
+ 2236 0078 00000000 		.4byte	.LFB13
+ 2237 007c 48000000 		.4byte	.LFE13
+ 2238 0080 00000000 		.4byte	.LFB14
+ 2239 0084 44000000 		.4byte	.LFE14
+ 2240 0088 00000000 		.4byte	.LFB15
+ 2241 008c 4C000000 		.4byte	.LFE15
+ 2242 0090 00000000 		.4byte	0
+ 2243 0094 00000000 		.4byte	0
+ 2244              		.section	.debug_line,"",%progbits
+ 2245              	.Ldebug_line0:
+ 2246 0000 E9010000 		.section	.debug_str,"MS",%progbits,1
+ 2246      02006600 
+ 2246      00000201 
+ 2246      FB0E0D00 
+ 2246      01010101 
+ 2247              	.LASF13:
+ 2248 0000 75696E74 		.ascii	"uint16\000"
+ 2248      313600
+ 2249              	.LASF41:
+ 2250 0007 61646347 		.ascii	"adcGain\000"
+ 2250      61696E00 
+ 2251              	.LASF58:
+ 2252 000f 43794578 		.ascii	"CyExitCriticalSection\000"
+ 2252      69744372 
+ 2252      69746963 
+ 2252      616C5365 
+ 2252      6374696F 
+ 2253              	.LASF66:
+ 2254 0025 636F756E 		.ascii	"counts\000"
+ 2254      747300
+ 2255              	.LASF55:
+ 2256 002c 4144435F 		.ascii	"ADC_peak_shift\000"
+ 2256      7065616B 
+ 2256      5F736869 
+ 2256      667400
+ 2257              	.LASF42:
+ 2258 003b 4144435F 		.ascii	"ADC_peak_SetScaledGain\000"
+ 2258      7065616B 
+ 2258      5F536574 
+ 2258      5363616C 
+ 2258      65644761 
+ 2259              	.LASF47:
+ 2260 0052 4144435F 		.ascii	"ADC_peak_CountsTo_uVolts\000"
+ 2260      7065616B 
+ 2260      5F436F75 
+ 2260      6E747354 
+ 2260      6F5F7556 
+ 2261              	.LASF64:
+ 2262 006b 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 2262      73657273 
+ 2262      5C636865 
+ 2262      6D695C55 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 57
+
+
+ 2262      44335F51 
+ 2263              	.LASF0:
+ 2264 0090 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2264      206C6F6E 
+ 2264      6720756E 
+ 2264      7369676E 
+ 2264      65642069 
+ 2265              	.LASF67:
+ 2266 00a7 4144435F 		.ascii	"ADC_peak_GetResult8\000"
+ 2266      7065616B 
+ 2266      5F476574 
+ 2266      52657375 
+ 2266      6C743800 
+ 2267              	.LASF2:
+ 2268 00bb 6C6F6E67 		.ascii	"long long int\000"
+ 2268      206C6F6E 
+ 2268      6720696E 
+ 2268      7400
+ 2269              	.LASF5:
+ 2270 00c9 7369676E 		.ascii	"signed char\000"
+ 2270      65642063 
+ 2270      68617200 
+ 2271              	.LASF17:
+ 2272 00d5 696E7433 		.ascii	"int32\000"
+ 2272      3200
+ 2273              	.LASF43:
+ 2274 00db 4144435F 		.ascii	"ADC_peak_CountsTo_mVolts\000"
+ 2274      7065616B 
+ 2274      5F436F75 
+ 2274      6E747354 
+ 2274      6F5F6D56 
+ 2275              	.LASF8:
+ 2276 00f4 6C6F6E67 		.ascii	"long int\000"
+ 2276      20696E74 
+ 2276      00
+ 2277              	.LASF22:
+ 2278 00fd 72656731 		.ascii	"reg16\000"
+ 2278      3600
+ 2279              	.LASF12:
+ 2280 0103 75696E74 		.ascii	"uint8\000"
+ 2280      3800
+ 2281              	.LASF32:
+ 2282 0109 4144435F 		.ascii	"ADC_peak_Init\000"
+ 2282      7065616B 
+ 2282      5F496E69 
+ 2282      7400
+ 2283              	.LASF57:
+ 2284 0117 43794465 		.ascii	"CyDelayUs\000"
+ 2284      6C617955 
+ 2284      7300
+ 2285              	.LASF19:
+ 2286 0121 646F7562 		.ascii	"double\000"
+ 2286      6C6500
+ 2287              	.LASF40:
+ 2288 0128 4144435F 		.ascii	"ADC_peak_SetGain\000"
+ 2288      7065616B 
+ 2288      5F536574 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 58
+
+
+ 2288      4761696E 
+ 2288      00
+ 2289              	.LASF14:
+ 2290 0139 75696E74 		.ascii	"uint32\000"
+ 2290      333200
+ 2291              	.LASF46:
+ 2292 0140 636F756E 		.ascii	"countsPer10Volt\000"
+ 2292      74735065 
+ 2292      72313056 
+ 2292      6F6C7400 
+ 2293              	.LASF61:
+ 2294 0150 4379496E 		.ascii	"CyIntSetVector\000"
+ 2294      74536574 
+ 2294      56656374 
+ 2294      6F7200
+ 2295              	.LASF62:
+ 2296 015f 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2296      43393920 
+ 2296      352E342E 
+ 2296      31203230 
+ 2296      31363036 
+ 2297 0192 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2297      20726576 
+ 2297      6973696F 
+ 2297      6E203233 
+ 2297      37373135 
+ 2298 01c5 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 2298      74643D67 
+ 2298      6E753939 
+ 2298      202D6666 
+ 2298      756E6374 
+ 2299              	.LASF52:
+ 2300 01f8 4144435F 		.ascii	"ADC_peak_offset\000"
+ 2300      7065616B 
+ 2300      5F6F6666 
+ 2300      73657400 
+ 2301              	.LASF34:
+ 2302 0208 7265744D 		.ascii	"retMode\000"
+ 2302      6F646500 
+ 2303              	.LASF4:
+ 2304 0210 756E7369 		.ascii	"unsigned int\000"
+ 2304      676E6564 
+ 2304      20696E74 
+ 2304      00
+ 2305              	.LASF48:
+ 2306 021d 75566F6C 		.ascii	"uVolts\000"
+ 2306      747300
+ 2307              	.LASF9:
+ 2308 0224 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2308      20756E73 
+ 2308      69676E65 
+ 2308      6420696E 
+ 2308      7400
+ 2309              	.LASF50:
+ 2310 0236 766F6C74 		.ascii	"volts\000"
+ 2310      7300
+ 2311              	.LASF56:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 59
+
+
+ 2312 023c 4379456E 		.ascii	"CyEnterCriticalSection\000"
+ 2312      74657243 
+ 2312      72697469 
+ 2312      63616C53 
+ 2312      65637469 
+ 2313              	.LASF7:
+ 2314 0253 73686F72 		.ascii	"short unsigned int\000"
+ 2314      7420756E 
+ 2314      7369676E 
+ 2314      65642069 
+ 2314      6E7400
+ 2315              	.LASF28:
+ 2316 0266 4144435F 		.ascii	"ADC_peak_SetPower\000"
+ 2316      7065616B 
+ 2316      5F536574 
+ 2316      506F7765 
+ 2316      7200
+ 2317              	.LASF15:
+ 2318 0278 696E7438 		.ascii	"int8\000"
+ 2318      00
+ 2319              	.LASF36:
+ 2320 027d 4144435F 		.ascii	"ADC_peak_IsEndConversion\000"
+ 2320      7065616B 
+ 2320      5F497345 
+ 2320      6E64436F 
+ 2320      6E766572 
+ 2321              	.LASF38:
+ 2322 0296 4144435F 		.ascii	"ADC_peak_SetOffset\000"
+ 2322      7065616B 
+ 2322      5F536574 
+ 2322      4F666673 
+ 2322      657400
+ 2323              	.LASF54:
+ 2324 02a9 4144435F 		.ascii	"ADC_peak_countsPer10Volt\000"
+ 2324      7065616B 
+ 2324      5F636F75 
+ 2324      6E747350 
+ 2324      65723130 
+ 2325              	.LASF45:
+ 2326 02c2 6D566F6C 		.ascii	"mVolts\000"
+ 2326      747300
+ 2327              	.LASF23:
+ 2328 02c9 72656733 		.ascii	"reg32\000"
+ 2328      3200
+ 2329              	.LASF26:
+ 2330 02cf 4144435F 		.ascii	"ADC_peak_Enable\000"
+ 2330      7065616B 
+ 2330      5F456E61 
+ 2330      626C6500 
+ 2331              	.LASF18:
+ 2332 02df 666C6F61 		.ascii	"float32\000"
+ 2332      74333200 
+ 2333              	.LASF10:
+ 2334 02e7 73697A65 		.ascii	"sizetype\000"
+ 2334      74797065 
+ 2334      00
+ 2335              	.LASF53:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 60
+
+
+ 2336 02f0 4144435F 		.ascii	"ADC_peak_countsPerVolt\000"
+ 2336      7065616B 
+ 2336      5F636F75 
+ 2336      6E747350 
+ 2336      6572566F 
+ 2337              	.LASF20:
+ 2338 0307 696E7436 		.ascii	"int64\000"
+ 2338      3400
+ 2339              	.LASF60:
+ 2340 030d 4379496E 		.ascii	"CyIntSetPriority\000"
+ 2340      74536574 
+ 2340      5072696F 
+ 2340      72697479 
+ 2340      00
+ 2341              	.LASF1:
+ 2342 031e 666C6F61 		.ascii	"float\000"
+ 2342      7400
+ 2343              	.LASF33:
+ 2344 0324 4144435F 		.ascii	"ADC_peak_Start\000"
+ 2344      7065616B 
+ 2344      5F537461 
+ 2344      727400
+ 2345              	.LASF30:
+ 2346 0333 706F7765 		.ascii	"power\000"
+ 2346      7200
+ 2347              	.LASF21:
+ 2348 0339 72656738 		.ascii	"reg8\000"
+ 2348      00
+ 2349              	.LASF6:
+ 2350 033e 756E7369 		.ascii	"unsigned char\000"
+ 2350      676E6564 
+ 2350      20636861 
+ 2350      7200
+ 2351              	.LASF3:
+ 2352 034c 73686F72 		.ascii	"short int\000"
+ 2352      7420696E 
+ 2352      7400
+ 2353              	.LASF31:
+ 2354 0356 7265736F 		.ascii	"resolution\000"
+ 2354      6C757469 
+ 2354      6F6E00
+ 2355              	.LASF37:
+ 2356 0361 4144435F 		.ascii	"ADC_peak_GetResult16\000"
+ 2356      7065616B 
+ 2356      5F476574 
+ 2356      52657375 
+ 2356      6C743136 
+ 2357              	.LASF63:
+ 2358 0376 47656E65 		.ascii	"Generated_Source\\PSoC5\\ADC_peak.c\000"
+ 2358      72617465 
+ 2358      645F536F 
+ 2358      75726365 
+ 2358      5C50536F 
+ 2359              	.LASF11:
+ 2360 0398 63686172 		.ascii	"char\000"
+ 2360      00
+ 2361              	.LASF39:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 61
+
+
+ 2362 039d 6F666673 		.ascii	"offset\000"
+ 2362      657400
+ 2363              	.LASF49:
+ 2364 03a4 4144435F 		.ascii	"ADC_peak_CountsTo_Volts\000"
+ 2364      7065616B 
+ 2364      5F436F75 
+ 2364      6E747354 
+ 2364      6F5F566F 
+ 2365              	.LASF27:
+ 2366 03bc 4144435F 		.ascii	"ADC_peak_Stop\000"
+ 2366      7065616B 
+ 2366      5F53746F 
+ 2366      7000
+ 2367              	.LASF65:
+ 2368 03ca 4144435F 		.ascii	"ADC_peak_CalcGain\000"
+ 2368      7065616B 
+ 2368      5F43616C 
+ 2368      63476169 
+ 2368      6E00
+ 2369              	.LASF44:
+ 2370 03dc 61646343 		.ascii	"adcCounts\000"
+ 2370      6F756E74 
+ 2370      7300
+ 2371              	.LASF25:
+ 2372 03e6 656E6162 		.ascii	"enableInterrupts\000"
+ 2372      6C65496E 
+ 2372      74657272 
+ 2372      75707473 
+ 2372      00
+ 2373              	.LASF35:
+ 2374 03f7 73746174 		.ascii	"status\000"
+ 2374      757300
+ 2375              	.LASF29:
+ 2376 03fe 4144435F 		.ascii	"ADC_peak_SetResolution\000"
+ 2376      7065616B 
+ 2376      5F536574 
+ 2376      5265736F 
+ 2376      6C757469 
+ 2377              	.LASF16:
+ 2378 0415 696E7431 		.ascii	"int16\000"
+ 2378      3600
+ 2379              	.LASF59:
+ 2380 041b 4144435F 		.ascii	"ADC_peak_theACLK_SetModeRegister\000"
+ 2380      7065616B 
+ 2380      5F746865 
+ 2380      41434C4B 
+ 2380      5F536574 
+ 2381              	.LASF51:
+ 2382 043c 4144435F 		.ascii	"ADC_peak_initVar\000"
+ 2382      7065616B 
+ 2382      5F696E69 
+ 2382      74566172 
+ 2382      00
+ 2383              	.LASF24:
+ 2384 044d 746D7052 		.ascii	"tmpReg\000"
+ 2384      656700
+ 2385              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccvRlSjL.s 			page 62
+
+

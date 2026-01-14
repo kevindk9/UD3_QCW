@@ -1,0 +1,1435 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"i2c_helper.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.I2C_Write,"ax",%progbits
+  20              		.align	1
+  21              		.global	I2C_Write
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	I2C_Write, %function
+  25              	I2C_Write:
+  26              	.LFB68:
+  27              		.file 1 "..\\common\\ud3core\\helper\\i2c_helper.c"
+   1:..\common\ud3core\helper/i2c_helper.c **** /*
+   2:..\common\ud3core\helper/i2c_helper.c ****  * UD3
+   3:..\common\ud3core\helper/i2c_helper.c ****  *
+   4:..\common\ud3core\helper/i2c_helper.c ****  * Copyright (c) 2018 Jens Kerrinnes
+   5:..\common\ud3core\helper/i2c_helper.c ****  * Copyright (c) 2015 Steve Ward
+   6:..\common\ud3core\helper/i2c_helper.c ****  *
+   7:..\common\ud3core\helper/i2c_helper.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   8:..\common\ud3core\helper/i2c_helper.c ****  * this software and associated documentation files (the "Software"), to deal in
+   9:..\common\ud3core\helper/i2c_helper.c ****  * the Software without restriction, including without limitation the rights to
+  10:..\common\ud3core\helper/i2c_helper.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+  11:..\common\ud3core\helper/i2c_helper.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  12:..\common\ud3core\helper/i2c_helper.c ****  * subject to the following conditions:
+  13:..\common\ud3core\helper/i2c_helper.c ****  *
+  14:..\common\ud3core\helper/i2c_helper.c ****  * The above copyright notice and this permission notice shall be included in all
+  15:..\common\ud3core\helper/i2c_helper.c ****  * copies or substantial portions of the Software.
+  16:..\common\ud3core\helper/i2c_helper.c ****  *
+  17:..\common\ud3core\helper/i2c_helper.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  18:..\common\ud3core\helper/i2c_helper.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  19:..\common\ud3core\helper/i2c_helper.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  20:..\common\ud3core\helper/i2c_helper.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  21:..\common\ud3core\helper/i2c_helper.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  22:..\common\ud3core\helper/i2c_helper.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  23:..\common\ud3core\helper/i2c_helper.c **** */
+  24:..\common\ud3core\helper/i2c_helper.c **** 
+  25:..\common\ud3core\helper/i2c_helper.c **** #include "i2c_helper.h"
+  26:..\common\ud3core\helper/i2c_helper.c **** #include <device.h>
+  27:..\common\ud3core\helper/i2c_helper.c **** #include "FreeRTOS.h"
+  28:..\common\ud3core\helper/i2c_helper.c **** #include "task.h"
+  29:..\common\ud3core\helper/i2c_helper.c **** 
+  30:..\common\ud3core\helper/i2c_helper.c **** void I2C_Write(uint8_t address, uint8_t registerAddress, uint8_t data){
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 2
+
+
+  28              		.loc 1 30 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 38B5     		push	{r3, r4, r5, lr}
+  34              		.cfi_def_cfa_offset 16
+  35              		.cfi_offset 3, -16
+  36              		.cfi_offset 4, -12
+  37              		.cfi_offset 5, -8
+  38              		.cfi_offset 14, -4
+  39              		.loc 1 30 0
+  40 0002 0D46     		mov	r5, r1
+  41 0004 1446     		mov	r4, r2
+  31:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterSendStart(address,I2C_WRITE_XFER_MODE);
+  42              		.loc 1 31 0
+  43 0006 0021     		movs	r1, #0
+  44              	.LVL1:
+  45 0008 FFF7FEFF 		bl	I2C_MasterSendStart
+  46              	.LVL2:
+  32:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterWriteByte(registerAddress);
+  47              		.loc 1 32 0
+  48 000c 2846     		mov	r0, r5
+  49 000e FFF7FEFF 		bl	I2C_MasterWriteByte
+  50              	.LVL3:
+  33:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterWriteByte(data);
+  51              		.loc 1 33 0
+  52 0012 2046     		mov	r0, r4
+  53 0014 FFF7FEFF 		bl	I2C_MasterWriteByte
+  54              	.LVL4:
+  34:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterSendStop();
+  35:..\common\ud3core\helper/i2c_helper.c ****     
+  36:..\common\ud3core\helper/i2c_helper.c **** }
+  55              		.loc 1 36 0
+  56 0018 BDE83840 		pop	{r3, r4, r5, lr}
+  57              		.cfi_restore 14
+  58              		.cfi_restore 5
+  59              		.cfi_restore 4
+  60              		.cfi_restore 3
+  61              		.cfi_def_cfa_offset 0
+  34:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterSendStop();
+  62              		.loc 1 34 0
+  63 001c FFF7FEBF 		b	I2C_MasterSendStop
+  64              	.LVL5:
+  65              		.cfi_endproc
+  66              	.LFE68:
+  67              		.size	I2C_Write, .-I2C_Write
+  68              		.section	.text.I2C_Read,"ax",%progbits
+  69              		.align	1
+  70              		.global	I2C_Read
+  71              		.thumb
+  72              		.thumb_func
+  73              		.type	I2C_Read, %function
+  74              	I2C_Read:
+  75              	.LFB69:
+  37:..\common\ud3core\helper/i2c_helper.c **** 
+  38:..\common\ud3core\helper/i2c_helper.c **** uint8_t I2C_Read(uint8_t address, uint8_t registerAddress){
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 3
+
+
+  76              		.loc 1 38 0
+  77              		.cfi_startproc
+  78              		@ args = 0, pretend = 0, frame = 0
+  79              		@ frame_needed = 0, uses_anonymous_args = 0
+  80              	.LVL6:
+  81 0000 38B5     		push	{r3, r4, r5, lr}
+  82              		.cfi_def_cfa_offset 16
+  83              		.cfi_offset 3, -16
+  84              		.cfi_offset 4, -12
+  85              		.cfi_offset 5, -8
+  86              		.cfi_offset 14, -4
+  87              		.loc 1 38 0
+  88 0002 0D46     		mov	r5, r1
+  89 0004 0446     		mov	r4, r0
+  39:..\common\ud3core\helper/i2c_helper.c ****     uint8_t ret;
+  40:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterSendStart(address,I2C_WRITE_XFER_MODE);
+  90              		.loc 1 40 0
+  91 0006 0021     		movs	r1, #0
+  92              	.LVL7:
+  93 0008 FFF7FEFF 		bl	I2C_MasterSendStart
+  94              	.LVL8:
+  41:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterWriteByte(registerAddress);
+  95              		.loc 1 41 0
+  96 000c 2846     		mov	r0, r5
+  97 000e FFF7FEFF 		bl	I2C_MasterWriteByte
+  98              	.LVL9:
+  42:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterSendRestart(address,I2C_READ_XFER_MODE);
+  99              		.loc 1 42 0
+ 100 0012 0121     		movs	r1, #1
+ 101 0014 2046     		mov	r0, r4
+ 102 0016 FFF7FEFF 		bl	I2C_MasterSendRestart
+ 103              	.LVL10:
+  43:..\common\ud3core\helper/i2c_helper.c ****     ret = I2C_MasterReadByte(I2C_NAK_DATA);
+ 104              		.loc 1 43 0
+ 105 001a 0020     		movs	r0, #0
+ 106 001c FFF7FEFF 		bl	I2C_MasterReadByte
+ 107              	.LVL11:
+ 108 0020 0446     		mov	r4, r0
+ 109              	.LVL12:
+  44:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterSendStop();
+ 110              		.loc 1 44 0
+ 111 0022 FFF7FEFF 		bl	I2C_MasterSendStop
+ 112              	.LVL13:
+  45:..\common\ud3core\helper/i2c_helper.c ****     return ret; 
+  46:..\common\ud3core\helper/i2c_helper.c **** }
+ 113              		.loc 1 46 0
+ 114 0026 2046     		mov	r0, r4
+ 115 0028 38BD     		pop	{r3, r4, r5, pc}
+ 116              		.cfi_endproc
+ 117              	.LFE69:
+ 118              		.size	I2C_Read, .-I2C_Read
+ 119              		.section	.text.I2C_Write_Blk,"ax",%progbits
+ 120              		.align	1
+ 121              		.global	I2C_Write_Blk
+ 122              		.thumb
+ 123              		.thumb_func
+ 124              		.type	I2C_Write_Blk, %function
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 4
+
+
+ 125              	I2C_Write_Blk:
+ 126              	.LFB70:
+  47:..\common\ud3core\helper/i2c_helper.c **** 
+  48:..\common\ud3core\helper/i2c_helper.c **** void I2C_Write_Blk(uint8_t address, uint8_t * buffer, uint8_t cnt){
+ 127              		.loc 1 48 0
+ 128              		.cfi_startproc
+ 129              		@ args = 0, pretend = 0, frame = 0
+ 130              		@ frame_needed = 0, uses_anonymous_args = 0
+ 131              	.LVL14:
+ 132 0000 70B5     		push	{r4, r5, r6, lr}
+ 133              		.cfi_def_cfa_offset 16
+ 134              		.cfi_offset 4, -16
+ 135              		.cfi_offset 5, -12
+ 136              		.cfi_offset 6, -8
+ 137              		.cfi_offset 14, -4
+ 138              		.loc 1 48 0
+ 139 0002 0446     		mov	r4, r0
+ 140 0004 0D46     		mov	r5, r1
+ 141 0006 1646     		mov	r6, r2
+  49:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterClearStatus();
+ 142              		.loc 1 49 0
+ 143 0008 FFF7FEFF 		bl	I2C_MasterClearStatus
+ 144              	.LVL15:
+  50:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterWriteBuf(address,buffer,cnt,I2C_MODE_COMPLETE_XFER);
+ 145              		.loc 1 50 0
+ 146 000c 0023     		movs	r3, #0
+ 147 000e 3246     		mov	r2, r6
+ 148 0010 2946     		mov	r1, r5
+ 149 0012 2046     		mov	r0, r4
+ 150 0014 FFF7FEFF 		bl	I2C_MasterWriteBuf
+ 151              	.LVL16:
+ 152              	.L4:
+  51:..\common\ud3core\helper/i2c_helper.c ****     while(!(I2C_MasterStatus() & I2C_MSTAT_WR_CMPLT)){
+ 153              		.loc 1 51 0
+ 154 0018 FFF7FEFF 		bl	I2C_MasterStatus
+ 155              	.LVL17:
+ 156 001c 8307     		lsls	r3, r0, #30
+ 157 001e 03D4     		bmi	.L7
+  52:..\common\ud3core\helper/i2c_helper.c ****         vTaskDelay(1);   
+ 158              		.loc 1 52 0
+ 159 0020 0120     		movs	r0, #1
+ 160 0022 FFF7FEFF 		bl	vTaskDelay
+ 161              	.LVL18:
+ 162 0026 F7E7     		b	.L4
+ 163              	.L7:
+  53:..\common\ud3core\helper/i2c_helper.c ****     }
+  54:..\common\ud3core\helper/i2c_helper.c **** }
+ 164              		.loc 1 54 0
+ 165 0028 70BD     		pop	{r4, r5, r6, pc}
+ 166              		.cfi_endproc
+ 167              	.LFE70:
+ 168              		.size	I2C_Write_Blk, .-I2C_Write_Blk
+ 169              		.section	.text.I2C_Write_nBlk,"ax",%progbits
+ 170              		.align	1
+ 171              		.global	I2C_Write_nBlk
+ 172              		.thumb
+ 173              		.thumb_func
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 5
+
+
+ 174              		.type	I2C_Write_nBlk, %function
+ 175              	I2C_Write_nBlk:
+ 176              	.LFB71:
+  55:..\common\ud3core\helper/i2c_helper.c **** 
+  56:..\common\ud3core\helper/i2c_helper.c **** void I2C_Write_nBlk(uint8_t address, uint8_t * buffer, uint8_t cnt){
+ 177              		.loc 1 56 0
+ 178              		.cfi_startproc
+ 179              		@ args = 0, pretend = 0, frame = 0
+ 180              		@ frame_needed = 0, uses_anonymous_args = 0
+ 181              	.LVL19:
+ 182 0000 70B5     		push	{r4, r5, r6, lr}
+ 183              		.cfi_def_cfa_offset 16
+ 184              		.cfi_offset 4, -16
+ 185              		.cfi_offset 5, -12
+ 186              		.cfi_offset 6, -8
+ 187              		.cfi_offset 14, -4
+ 188              		.loc 1 56 0
+ 189 0002 0446     		mov	r4, r0
+ 190 0004 0D46     		mov	r5, r1
+ 191 0006 1646     		mov	r6, r2
+  57:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterClearStatus();
+ 192              		.loc 1 57 0
+ 193 0008 FFF7FEFF 		bl	I2C_MasterClearStatus
+ 194              	.LVL20:
+  58:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterWriteBuf(address,buffer,cnt,I2C_MODE_COMPLETE_XFER);
+ 195              		.loc 1 58 0
+ 196 000c 3246     		mov	r2, r6
+ 197 000e 2946     		mov	r1, r5
+ 198 0010 2046     		mov	r0, r4
+  59:..\common\ud3core\helper/i2c_helper.c **** }...
+ 199              		.loc 1 59 0
+ 200 0012 BDE87040 		pop	{r4, r5, r6, lr}
+ 201              		.cfi_restore 14
+ 202              		.cfi_restore 6
+ 203              		.cfi_restore 5
+ 204              		.cfi_restore 4
+ 205              		.cfi_def_cfa_offset 0
+ 206              	.LVL21:
+  58:..\common\ud3core\helper/i2c_helper.c ****     I2C_MasterWriteBuf(address,buffer,cnt,I2C_MODE_COMPLETE_XFER);
+ 207              		.loc 1 58 0
+ 208 0016 0023     		movs	r3, #0
+ 209 0018 FFF7FEBF 		b	I2C_MasterWriteBuf
+ 210              	.LVL22:
+ 211              		.cfi_endproc
+ 212              	.LFE71:
+ 213              		.size	I2C_Write_nBlk, .-I2C_Write_nBlk
+ 214              		.text
+ 215              	.Letext0:
+ 216              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 217              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 218              		.file 4 "Generated_Source\\PSoC5/I2C.h"
+ 219              		.file 5 "..\\common\\rtos\\include/task.h"
+ 220              		.file 6 "Generated_Source\\PSoC5/core_cm3.h"
+ 221              		.section	.debug_info,"",%progbits
+ 222              	.Ldebug_info0:
+ 223 0000 44030000 		.4byte	0x344
+ 224 0004 0400     		.2byte	0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 6
+
+
+ 225 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 226 000a 04       		.byte	0x4
+ 227 000b 01       		.uleb128 0x1
+ 228 000c A6000000 		.4byte	.LASF33
+ 229 0010 0C       		.byte	0xc
+ 230 0011 8B020000 		.4byte	.LASF34
+ 231 0015 28020000 		.4byte	.LASF35
+ 232 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 233 001d 00000000 		.4byte	0
+ 234 0021 00000000 		.4byte	.Ldebug_line0
+ 235 0025 02       		.uleb128 0x2
+ 236 0026 01       		.byte	0x1
+ 237 0027 06       		.byte	0x6
+ 238 0028 6F020000 		.4byte	.LASF0
+ 239 002c 03       		.uleb128 0x3
+ 240 002d 17000000 		.4byte	.LASF4
+ 241 0031 02       		.byte	0x2
+ 242 0032 1D       		.byte	0x1d
+ 243 0033 37000000 		.4byte	0x37
+ 244 0037 02       		.uleb128 0x2
+ 245 0038 01       		.byte	0x1
+ 246 0039 08       		.byte	0x8
+ 247 003a 73000000 		.4byte	.LASF1
+ 248 003e 02       		.uleb128 0x2
+ 249 003f 02       		.byte	0x2
+ 250 0040 05       		.byte	0x5
+ 251 0041 08020000 		.4byte	.LASF2
+ 252 0045 02       		.uleb128 0x2
+ 253 0046 02       		.byte	0x2
+ 254 0047 07       		.byte	0x7
+ 255 0048 3F010000 		.4byte	.LASF3
+ 256 004c 03       		.uleb128 0x3
+ 257 004d 34000000 		.4byte	.LASF5
+ 258 0051 02       		.byte	0x2
+ 259 0052 3F       		.byte	0x3f
+ 260 0053 57000000 		.4byte	0x57
+ 261 0057 02       		.uleb128 0x2
+ 262 0058 04       		.byte	0x4
+ 263 0059 05       		.byte	0x5
+ 264 005a 4D020000 		.4byte	.LASF6
+ 265 005e 02       		.uleb128 0x2
+ 266 005f 04       		.byte	0x4
+ 267 0060 07       		.byte	0x7
+ 268 0061 94000000 		.4byte	.LASF7
+ 269 0065 02       		.uleb128 0x2
+ 270 0066 08       		.byte	0x8
+ 271 0067 05       		.byte	0x5
+ 272 0068 00000000 		.4byte	.LASF8
+ 273 006c 02       		.uleb128 0x2
+ 274 006d 08       		.byte	0x8
+ 275 006e 07       		.byte	0x7
+ 276 006f 99010000 		.4byte	.LASF9
+ 277 0073 04       		.uleb128 0x4
+ 278 0074 04       		.byte	0x4
+ 279 0075 05       		.byte	0x5
+ 280 0076 696E7400 		.ascii	"int\000"
+ 281 007a 02       		.uleb128 0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 7
+
+
+ 282 007b 04       		.byte	0x4
+ 283 007c 07       		.byte	0x7
+ 284 007d 84010000 		.4byte	.LASF10
+ 285 0081 03       		.uleb128 0x3
+ 286 0082 B0010000 		.4byte	.LASF11
+ 287 0086 03       		.byte	0x3
+ 288 0087 18       		.byte	0x18
+ 289 0088 2C000000 		.4byte	0x2c
+ 290 008c 03       		.uleb128 0x3
+ 291 008d CE010000 		.4byte	.LASF12
+ 292 0091 03       		.byte	0x3
+ 293 0092 2C       		.byte	0x2c
+ 294 0093 4C000000 		.4byte	0x4c
+ 295 0097 02       		.uleb128 0x2
+ 296 0098 04       		.byte	0x4
+ 297 0099 04       		.byte	0x4
+ 298 009a 68000000 		.4byte	.LASF13
+ 299 009e 02       		.uleb128 0x2
+ 300 009f 08       		.byte	0x8
+ 301 00a0 04       		.byte	0x4
+ 302 00a1 73010000 		.4byte	.LASF14
+ 303 00a5 02       		.uleb128 0x2
+ 304 00a6 01       		.byte	0x1
+ 305 00a7 08       		.byte	0x8
+ 306 00a8 DF010000 		.4byte	.LASF15
+ 307 00ac 02       		.uleb128 0x2
+ 308 00ad 04       		.byte	0x4
+ 309 00ae 07       		.byte	0x7
+ 310 00af D6010000 		.4byte	.LASF16
+ 311 00b3 05       		.uleb128 0x5
+ 312 00b4 04       		.byte	0x4
+ 313 00b5 81000000 		.4byte	0x81
+ 314 00b9 06       		.uleb128 0x6
+ 315 00ba 7A010000 		.4byte	.LASF20
+ 316 00be 01       		.byte	0x1
+ 317 00bf 1E       		.byte	0x1e
+ 318 00c0 00000000 		.4byte	.LFB68
+ 319 00c4 20000000 		.4byte	.LFE68-.LFB68
+ 320 00c8 01       		.uleb128 0x1
+ 321 00c9 9C       		.byte	0x9c
+ 322 00ca 40010000 		.4byte	0x140
+ 323 00ce 07       		.uleb128 0x7
+ 324 00cf 91010000 		.4byte	.LASF17
+ 325 00d3 01       		.byte	0x1
+ 326 00d4 1E       		.byte	0x1e
+ 327 00d5 81000000 		.4byte	0x81
+ 328 00d9 00000000 		.4byte	.LLST0
+ 329 00dd 07       		.uleb128 0x7
+ 330 00de 7B020000 		.4byte	.LASF18
+ 331 00e2 01       		.byte	0x1
+ 332 00e3 1E       		.byte	0x1e
+ 333 00e4 81000000 		.4byte	0x81
+ 334 00e8 21000000 		.4byte	.LLST1
+ 335 00ec 07       		.uleb128 0x7
+ 336 00ed 6E000000 		.4byte	.LASF19
+ 337 00f1 01       		.byte	0x1
+ 338 00f2 1E       		.byte	0x1e
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 8
+
+
+ 339 00f3 81000000 		.4byte	0x81
+ 340 00f7 42000000 		.4byte	.LLST2
+ 341 00fb 08       		.uleb128 0x8
+ 342 00fc 0C000000 		.4byte	.LVL2
+ 343 0100 E3020000 		.4byte	0x2e3
+ 344 0104 0E010000 		.4byte	0x10e
+ 345 0108 09       		.uleb128 0x9
+ 346 0109 01       		.uleb128 0x1
+ 347 010a 51       		.byte	0x51
+ 348 010b 01       		.uleb128 0x1
+ 349 010c 30       		.byte	0x30
+ 350 010d 00       		.byte	0
+ 351 010e 08       		.uleb128 0x8
+ 352 010f 12000000 		.4byte	.LVL3
+ 353 0113 EE020000 		.4byte	0x2ee
+ 354 0117 22010000 		.4byte	0x122
+ 355 011b 09       		.uleb128 0x9
+ 356 011c 01       		.uleb128 0x1
+ 357 011d 50       		.byte	0x50
+ 358 011e 02       		.uleb128 0x2
+ 359 011f 75       		.byte	0x75
+ 360 0120 00       		.sleb128 0
+ 361 0121 00       		.byte	0
+ 362 0122 08       		.uleb128 0x8
+ 363 0123 18000000 		.4byte	.LVL4
+ 364 0127 EE020000 		.4byte	0x2ee
+ 365 012b 36010000 		.4byte	0x136
+ 366 012f 09       		.uleb128 0x9
+ 367 0130 01       		.uleb128 0x1
+ 368 0131 50       		.byte	0x50
+ 369 0132 02       		.uleb128 0x2
+ 370 0133 74       		.byte	0x74
+ 371 0134 00       		.sleb128 0
+ 372 0135 00       		.byte	0
+ 373 0136 0A       		.uleb128 0xa
+ 374 0137 20000000 		.4byte	.LVL5
+ 375 013b F9020000 		.4byte	0x2f9
+ 376 013f 00       		.byte	0
+ 377 0140 0B       		.uleb128 0xb
+ 378 0141 0E000000 		.4byte	.LASF36
+ 379 0145 01       		.byte	0x1
+ 380 0146 26       		.byte	0x26
+ 381 0147 81000000 		.4byte	0x81
+ 382 014b 00000000 		.4byte	.LFB69
+ 383 014f 2A000000 		.4byte	.LFE69-.LFB69
+ 384 0153 01       		.uleb128 0x1
+ 385 0154 9C       		.byte	0x9c
+ 386 0155 E7010000 		.4byte	0x1e7
+ 387 0159 07       		.uleb128 0x7
+ 388 015a 91010000 		.4byte	.LASF17
+ 389 015e 01       		.byte	0x1
+ 390 015f 26       		.byte	0x26
+ 391 0160 81000000 		.4byte	0x81
+ 392 0164 63000000 		.4byte	.LLST3
+ 393 0168 07       		.uleb128 0x7
+ 394 0169 7B020000 		.4byte	.LASF18
+ 395 016d 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 9
+
+
+ 396 016e 26       		.byte	0x26
+ 397 016f 81000000 		.4byte	0x81
+ 398 0173 84000000 		.4byte	.LLST4
+ 399 0177 0C       		.uleb128 0xc
+ 400 0178 72657400 		.ascii	"ret\000"
+ 401 017c 01       		.byte	0x1
+ 402 017d 27       		.byte	0x27
+ 403 017e 81000000 		.4byte	0x81
+ 404 0182 01       		.uleb128 0x1
+ 405 0183 54       		.byte	0x54
+ 406 0184 08       		.uleb128 0x8
+ 407 0185 0C000000 		.4byte	.LVL8
+ 408 0189 E3020000 		.4byte	0x2e3
+ 409 018d 9D010000 		.4byte	0x19d
+ 410 0191 09       		.uleb128 0x9
+ 411 0192 01       		.uleb128 0x1
+ 412 0193 50       		.byte	0x50
+ 413 0194 02       		.uleb128 0x2
+ 414 0195 74       		.byte	0x74
+ 415 0196 00       		.sleb128 0
+ 416 0197 09       		.uleb128 0x9
+ 417 0198 01       		.uleb128 0x1
+ 418 0199 51       		.byte	0x51
+ 419 019a 01       		.uleb128 0x1
+ 420 019b 30       		.byte	0x30
+ 421 019c 00       		.byte	0
+ 422 019d 08       		.uleb128 0x8
+ 423 019e 12000000 		.4byte	.LVL9
+ 424 01a2 EE020000 		.4byte	0x2ee
+ 425 01a6 B1010000 		.4byte	0x1b1
+ 426 01aa 09       		.uleb128 0x9
+ 427 01ab 01       		.uleb128 0x1
+ 428 01ac 50       		.byte	0x50
+ 429 01ad 02       		.uleb128 0x2
+ 430 01ae 75       		.byte	0x75
+ 431 01af 00       		.sleb128 0
+ 432 01b0 00       		.byte	0
+ 433 01b1 08       		.uleb128 0x8
+ 434 01b2 1A000000 		.4byte	.LVL10
+ 435 01b6 04030000 		.4byte	0x304
+ 436 01ba CA010000 		.4byte	0x1ca
+ 437 01be 09       		.uleb128 0x9
+ 438 01bf 01       		.uleb128 0x1
+ 439 01c0 50       		.byte	0x50
+ 440 01c1 02       		.uleb128 0x2
+ 441 01c2 74       		.byte	0x74
+ 442 01c3 00       		.sleb128 0
+ 443 01c4 09       		.uleb128 0x9
+ 444 01c5 01       		.uleb128 0x1
+ 445 01c6 51       		.byte	0x51
+ 446 01c7 01       		.uleb128 0x1
+ 447 01c8 31       		.byte	0x31
+ 448 01c9 00       		.byte	0
+ 449 01ca 08       		.uleb128 0x8
+ 450 01cb 20000000 		.4byte	.LVL11
+ 451 01cf 0F030000 		.4byte	0x30f
+ 452 01d3 DD010000 		.4byte	0x1dd
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 10
+
+
+ 453 01d7 09       		.uleb128 0x9
+ 454 01d8 01       		.uleb128 0x1
+ 455 01d9 50       		.byte	0x50
+ 456 01da 01       		.uleb128 0x1
+ 457 01db 30       		.byte	0x30
+ 458 01dc 00       		.byte	0
+ 459 01dd 0D       		.uleb128 0xd
+ 460 01de 26000000 		.4byte	.LVL13
+ 461 01e2 F9020000 		.4byte	0x2f9
+ 462 01e6 00       		.byte	0
+ 463 01e7 06       		.uleb128 0x6
+ 464 01e8 56020000 		.4byte	.LASF21
+ 465 01ec 01       		.byte	0x1
+ 466 01ed 30       		.byte	0x30
+ 467 01ee 00000000 		.4byte	.LFB70
+ 468 01f2 2A000000 		.4byte	.LFE70-.LFB70
+ 469 01f6 01       		.uleb128 0x1
+ 470 01f7 9C       		.byte	0x9c
+ 471 01f8 70020000 		.4byte	0x270
+ 472 01fc 07       		.uleb128 0x7
+ 473 01fd 91010000 		.4byte	.LASF17
+ 474 0201 01       		.byte	0x1
+ 475 0202 30       		.byte	0x30
+ 476 0203 81000000 		.4byte	0x81
+ 477 0207 A5000000 		.4byte	.LLST5
+ 478 020b 07       		.uleb128 0x7
+ 479 020c 12020000 		.4byte	.LASF22
+ 480 0210 01       		.byte	0x1
+ 481 0211 30       		.byte	0x30
+ 482 0212 B3000000 		.4byte	0xb3
+ 483 0216 C6000000 		.4byte	.LLST6
+ 484 021a 0E       		.uleb128 0xe
+ 485 021b 636E7400 		.ascii	"cnt\000"
+ 486 021f 01       		.byte	0x1
+ 487 0220 30       		.byte	0x30
+ 488 0221 81000000 		.4byte	0x81
+ 489 0225 E4000000 		.4byte	.LLST7
+ 490 0229 0D       		.uleb128 0xd
+ 491 022a 0C000000 		.4byte	.LVL15
+ 492 022e 1A030000 		.4byte	0x31a
+ 493 0232 08       		.uleb128 0x8
+ 494 0233 18000000 		.4byte	.LVL16
+ 495 0237 25030000 		.4byte	0x325
+ 496 023b 57020000 		.4byte	0x257
+ 497 023f 09       		.uleb128 0x9
+ 498 0240 01       		.uleb128 0x1
+ 499 0241 50       		.byte	0x50
+ 500 0242 02       		.uleb128 0x2
+ 501 0243 74       		.byte	0x74
+ 502 0244 00       		.sleb128 0
+ 503 0245 09       		.uleb128 0x9
+ 504 0246 01       		.uleb128 0x1
+ 505 0247 51       		.byte	0x51
+ 506 0248 02       		.uleb128 0x2
+ 507 0249 75       		.byte	0x75
+ 508 024a 00       		.sleb128 0
+ 509 024b 09       		.uleb128 0x9
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 11
+
+
+ 510 024c 01       		.uleb128 0x1
+ 511 024d 52       		.byte	0x52
+ 512 024e 02       		.uleb128 0x2
+ 513 024f 76       		.byte	0x76
+ 514 0250 00       		.sleb128 0
+ 515 0251 09       		.uleb128 0x9
+ 516 0252 01       		.uleb128 0x1
+ 517 0253 53       		.byte	0x53
+ 518 0254 01       		.uleb128 0x1
+ 519 0255 30       		.byte	0x30
+ 520 0256 00       		.byte	0
+ 521 0257 0D       		.uleb128 0xd
+ 522 0258 1C000000 		.4byte	.LVL17
+ 523 025c 30030000 		.4byte	0x330
+ 524 0260 0F       		.uleb128 0xf
+ 525 0261 26000000 		.4byte	.LVL18
+ 526 0265 3B030000 		.4byte	0x33b
+ 527 0269 09       		.uleb128 0x9
+ 528 026a 01       		.uleb128 0x1
+ 529 026b 50       		.byte	0x50
+ 530 026c 01       		.uleb128 0x1
+ 531 026d 31       		.byte	0x31
+ 532 026e 00       		.byte	0
+ 533 026f 00       		.byte	0
+ 534 0270 06       		.uleb128 0x6
+ 535 0271 19020000 		.4byte	.LASF23
+ 536 0275 01       		.byte	0x1
+ 537 0276 38       		.byte	0x38
+ 538 0277 00000000 		.4byte	.LFB71
+ 539 027b 1C000000 		.4byte	.LFE71-.LFB71
+ 540 027f 01       		.uleb128 0x1
+ 541 0280 9C       		.byte	0x9c
+ 542 0281 D2020000 		.4byte	0x2d2
+ 543 0285 07       		.uleb128 0x7
+ 544 0286 91010000 		.4byte	.LASF17
+ 545 028a 01       		.byte	0x1
+ 546 028b 38       		.byte	0x38
+ 547 028c 81000000 		.4byte	0x81
+ 548 0290 05010000 		.4byte	.LLST8
+ 549 0294 07       		.uleb128 0x7
+ 550 0295 12020000 		.4byte	.LASF22
+ 551 0299 01       		.byte	0x1
+ 552 029a 38       		.byte	0x38
+ 553 029b B3000000 		.4byte	0xb3
+ 554 029f 26010000 		.4byte	.LLST9
+ 555 02a3 0E       		.uleb128 0xe
+ 556 02a4 636E7400 		.ascii	"cnt\000"
+ 557 02a8 01       		.byte	0x1
+ 558 02a9 38       		.byte	0x38
+ 559 02aa 81000000 		.4byte	0x81
+ 560 02ae 5D010000 		.4byte	.LLST10
+ 561 02b2 0D       		.uleb128 0xd
+ 562 02b3 0C000000 		.4byte	.LVL20
+ 563 02b7 1A030000 		.4byte	0x31a
+ 564 02bb 10       		.uleb128 0x10
+ 565 02bc 1C000000 		.4byte	.LVL22
+ 566 02c0 25030000 		.4byte	0x325
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 12
+
+
+ 567 02c4 09       		.uleb128 0x9
+ 568 02c5 01       		.uleb128 0x1
+ 569 02c6 51       		.byte	0x51
+ 570 02c7 03       		.uleb128 0x3
+ 571 02c8 F3       		.byte	0xf3
+ 572 02c9 01       		.uleb128 0x1
+ 573 02ca 51       		.byte	0x51
+ 574 02cb 09       		.uleb128 0x9
+ 575 02cc 01       		.uleb128 0x1
+ 576 02cd 53       		.byte	0x53
+ 577 02ce 01       		.uleb128 0x1
+ 578 02cf 30       		.byte	0x30
+ 579 02d0 00       		.byte	0
+ 580 02d1 00       		.byte	0
+ 581 02d2 11       		.uleb128 0x11
+ 582 02d3 66010000 		.4byte	.LASF37
+ 583 02d7 06       		.byte	0x6
+ 584 02d8 1207     		.2byte	0x712
+ 585 02da DE020000 		.4byte	0x2de
+ 586 02de 12       		.uleb128 0x12
+ 587 02df 8C000000 		.4byte	0x8c
+ 588 02e3 13       		.uleb128 0x13
+ 589 02e4 52010000 		.4byte	.LASF24
+ 590 02e8 52010000 		.4byte	.LASF24
+ 591 02ec 04       		.byte	0x4
+ 592 02ed B1       		.byte	0xb1
+ 593 02ee 13       		.uleb128 0x13
+ 594 02ef 3E000000 		.4byte	.LASF25
+ 595 02f3 3E000000 		.4byte	.LASF25
+ 596 02f7 04       		.byte	0x4
+ 597 02f8 B6       		.byte	0xb6
+ 598 02f9 13       		.uleb128 0x13
+ 599 02fa 21000000 		.4byte	.LASF26
+ 600 02fe 21000000 		.4byte	.LASF26
+ 601 0302 04       		.byte	0x4
+ 602 0303 B5       		.byte	0xb5
+ 603 0304 13       		.uleb128 0x13
+ 604 0305 B8010000 		.4byte	.LASF27
+ 605 0309 B8010000 		.4byte	.LASF27
+ 606 030d 04       		.byte	0x4
+ 607 030e B3       		.byte	0xb3
+ 608 030f 13       		.uleb128 0x13
+ 609 0310 F5010000 		.4byte	.LASF28
+ 610 0314 F5010000 		.4byte	.LASF28
+ 611 0318 04       		.byte	0x4
+ 612 0319 B7       		.byte	0xb7
+ 613 031a 13       		.uleb128 0x13
+ 614 031b 52000000 		.4byte	.LASF29
+ 615 031f 52000000 		.4byte	.LASF29
+ 616 0323 04       		.byte	0x4
+ 617 0324 A4       		.byte	0xa4
+ 618 0325 13       		.uleb128 0x13
+ 619 0326 81000000 		.4byte	.LASF30
+ 620 032a 81000000 		.4byte	.LASF30
+ 621 032e 04       		.byte	0x4
+ 622 032f A7       		.byte	0xa7
+ 623 0330 13       		.uleb128 0x13
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 13
+
+
+ 624 0331 E4010000 		.4byte	.LASF31
+ 625 0335 E4010000 		.4byte	.LASF31
+ 626 0339 04       		.byte	0x4
+ 627 033a A3       		.byte	0xa3
+ 628 033b 14       		.uleb128 0x14
+ 629 033c 64020000 		.4byte	.LASF32
+ 630 0340 64020000 		.4byte	.LASF32
+ 631 0344 05       		.byte	0x5
+ 632 0345 0C03     		.2byte	0x30c
+ 633 0347 00       		.byte	0
+ 634              		.section	.debug_abbrev,"",%progbits
+ 635              	.Ldebug_abbrev0:
+ 636 0000 01       		.uleb128 0x1
+ 637 0001 11       		.uleb128 0x11
+ 638 0002 01       		.byte	0x1
+ 639 0003 25       		.uleb128 0x25
+ 640 0004 0E       		.uleb128 0xe
+ 641 0005 13       		.uleb128 0x13
+ 642 0006 0B       		.uleb128 0xb
+ 643 0007 03       		.uleb128 0x3
+ 644 0008 0E       		.uleb128 0xe
+ 645 0009 1B       		.uleb128 0x1b
+ 646 000a 0E       		.uleb128 0xe
+ 647 000b 55       		.uleb128 0x55
+ 648 000c 17       		.uleb128 0x17
+ 649 000d 11       		.uleb128 0x11
+ 650 000e 01       		.uleb128 0x1
+ 651 000f 10       		.uleb128 0x10
+ 652 0010 17       		.uleb128 0x17
+ 653 0011 00       		.byte	0
+ 654 0012 00       		.byte	0
+ 655 0013 02       		.uleb128 0x2
+ 656 0014 24       		.uleb128 0x24
+ 657 0015 00       		.byte	0
+ 658 0016 0B       		.uleb128 0xb
+ 659 0017 0B       		.uleb128 0xb
+ 660 0018 3E       		.uleb128 0x3e
+ 661 0019 0B       		.uleb128 0xb
+ 662 001a 03       		.uleb128 0x3
+ 663 001b 0E       		.uleb128 0xe
+ 664 001c 00       		.byte	0
+ 665 001d 00       		.byte	0
+ 666 001e 03       		.uleb128 0x3
+ 667 001f 16       		.uleb128 0x16
+ 668 0020 00       		.byte	0
+ 669 0021 03       		.uleb128 0x3
+ 670 0022 0E       		.uleb128 0xe
+ 671 0023 3A       		.uleb128 0x3a
+ 672 0024 0B       		.uleb128 0xb
+ 673 0025 3B       		.uleb128 0x3b
+ 674 0026 0B       		.uleb128 0xb
+ 675 0027 49       		.uleb128 0x49
+ 676 0028 13       		.uleb128 0x13
+ 677 0029 00       		.byte	0
+ 678 002a 00       		.byte	0
+ 679 002b 04       		.uleb128 0x4
+ 680 002c 24       		.uleb128 0x24
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 14
+
+
+ 681 002d 00       		.byte	0
+ 682 002e 0B       		.uleb128 0xb
+ 683 002f 0B       		.uleb128 0xb
+ 684 0030 3E       		.uleb128 0x3e
+ 685 0031 0B       		.uleb128 0xb
+ 686 0032 03       		.uleb128 0x3
+ 687 0033 08       		.uleb128 0x8
+ 688 0034 00       		.byte	0
+ 689 0035 00       		.byte	0
+ 690 0036 05       		.uleb128 0x5
+ 691 0037 0F       		.uleb128 0xf
+ 692 0038 00       		.byte	0
+ 693 0039 0B       		.uleb128 0xb
+ 694 003a 0B       		.uleb128 0xb
+ 695 003b 49       		.uleb128 0x49
+ 696 003c 13       		.uleb128 0x13
+ 697 003d 00       		.byte	0
+ 698 003e 00       		.byte	0
+ 699 003f 06       		.uleb128 0x6
+ 700 0040 2E       		.uleb128 0x2e
+ 701 0041 01       		.byte	0x1
+ 702 0042 3F       		.uleb128 0x3f
+ 703 0043 19       		.uleb128 0x19
+ 704 0044 03       		.uleb128 0x3
+ 705 0045 0E       		.uleb128 0xe
+ 706 0046 3A       		.uleb128 0x3a
+ 707 0047 0B       		.uleb128 0xb
+ 708 0048 3B       		.uleb128 0x3b
+ 709 0049 0B       		.uleb128 0xb
+ 710 004a 27       		.uleb128 0x27
+ 711 004b 19       		.uleb128 0x19
+ 712 004c 11       		.uleb128 0x11
+ 713 004d 01       		.uleb128 0x1
+ 714 004e 12       		.uleb128 0x12
+ 715 004f 06       		.uleb128 0x6
+ 716 0050 40       		.uleb128 0x40
+ 717 0051 18       		.uleb128 0x18
+ 718 0052 9742     		.uleb128 0x2117
+ 719 0054 19       		.uleb128 0x19
+ 720 0055 01       		.uleb128 0x1
+ 721 0056 13       		.uleb128 0x13
+ 722 0057 00       		.byte	0
+ 723 0058 00       		.byte	0
+ 724 0059 07       		.uleb128 0x7
+ 725 005a 05       		.uleb128 0x5
+ 726 005b 00       		.byte	0
+ 727 005c 03       		.uleb128 0x3
+ 728 005d 0E       		.uleb128 0xe
+ 729 005e 3A       		.uleb128 0x3a
+ 730 005f 0B       		.uleb128 0xb
+ 731 0060 3B       		.uleb128 0x3b
+ 732 0061 0B       		.uleb128 0xb
+ 733 0062 49       		.uleb128 0x49
+ 734 0063 13       		.uleb128 0x13
+ 735 0064 02       		.uleb128 0x2
+ 736 0065 17       		.uleb128 0x17
+ 737 0066 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 15
+
+
+ 738 0067 00       		.byte	0
+ 739 0068 08       		.uleb128 0x8
+ 740 0069 898201   		.uleb128 0x4109
+ 741 006c 01       		.byte	0x1
+ 742 006d 11       		.uleb128 0x11
+ 743 006e 01       		.uleb128 0x1
+ 744 006f 31       		.uleb128 0x31
+ 745 0070 13       		.uleb128 0x13
+ 746 0071 01       		.uleb128 0x1
+ 747 0072 13       		.uleb128 0x13
+ 748 0073 00       		.byte	0
+ 749 0074 00       		.byte	0
+ 750 0075 09       		.uleb128 0x9
+ 751 0076 8A8201   		.uleb128 0x410a
+ 752 0079 00       		.byte	0
+ 753 007a 02       		.uleb128 0x2
+ 754 007b 18       		.uleb128 0x18
+ 755 007c 9142     		.uleb128 0x2111
+ 756 007e 18       		.uleb128 0x18
+ 757 007f 00       		.byte	0
+ 758 0080 00       		.byte	0
+ 759 0081 0A       		.uleb128 0xa
+ 760 0082 898201   		.uleb128 0x4109
+ 761 0085 00       		.byte	0
+ 762 0086 11       		.uleb128 0x11
+ 763 0087 01       		.uleb128 0x1
+ 764 0088 9542     		.uleb128 0x2115
+ 765 008a 19       		.uleb128 0x19
+ 766 008b 31       		.uleb128 0x31
+ 767 008c 13       		.uleb128 0x13
+ 768 008d 00       		.byte	0
+ 769 008e 00       		.byte	0
+ 770 008f 0B       		.uleb128 0xb
+ 771 0090 2E       		.uleb128 0x2e
+ 772 0091 01       		.byte	0x1
+ 773 0092 3F       		.uleb128 0x3f
+ 774 0093 19       		.uleb128 0x19
+ 775 0094 03       		.uleb128 0x3
+ 776 0095 0E       		.uleb128 0xe
+ 777 0096 3A       		.uleb128 0x3a
+ 778 0097 0B       		.uleb128 0xb
+ 779 0098 3B       		.uleb128 0x3b
+ 780 0099 0B       		.uleb128 0xb
+ 781 009a 27       		.uleb128 0x27
+ 782 009b 19       		.uleb128 0x19
+ 783 009c 49       		.uleb128 0x49
+ 784 009d 13       		.uleb128 0x13
+ 785 009e 11       		.uleb128 0x11
+ 786 009f 01       		.uleb128 0x1
+ 787 00a0 12       		.uleb128 0x12
+ 788 00a1 06       		.uleb128 0x6
+ 789 00a2 40       		.uleb128 0x40
+ 790 00a3 18       		.uleb128 0x18
+ 791 00a4 9742     		.uleb128 0x2117
+ 792 00a6 19       		.uleb128 0x19
+ 793 00a7 01       		.uleb128 0x1
+ 794 00a8 13       		.uleb128 0x13
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 16
+
+
+ 795 00a9 00       		.byte	0
+ 796 00aa 00       		.byte	0
+ 797 00ab 0C       		.uleb128 0xc
+ 798 00ac 34       		.uleb128 0x34
+ 799 00ad 00       		.byte	0
+ 800 00ae 03       		.uleb128 0x3
+ 801 00af 08       		.uleb128 0x8
+ 802 00b0 3A       		.uleb128 0x3a
+ 803 00b1 0B       		.uleb128 0xb
+ 804 00b2 3B       		.uleb128 0x3b
+ 805 00b3 0B       		.uleb128 0xb
+ 806 00b4 49       		.uleb128 0x49
+ 807 00b5 13       		.uleb128 0x13
+ 808 00b6 02       		.uleb128 0x2
+ 809 00b7 18       		.uleb128 0x18
+ 810 00b8 00       		.byte	0
+ 811 00b9 00       		.byte	0
+ 812 00ba 0D       		.uleb128 0xd
+ 813 00bb 898201   		.uleb128 0x4109
+ 814 00be 00       		.byte	0
+ 815 00bf 11       		.uleb128 0x11
+ 816 00c0 01       		.uleb128 0x1
+ 817 00c1 31       		.uleb128 0x31
+ 818 00c2 13       		.uleb128 0x13
+ 819 00c3 00       		.byte	0
+ 820 00c4 00       		.byte	0
+ 821 00c5 0E       		.uleb128 0xe
+ 822 00c6 05       		.uleb128 0x5
+ 823 00c7 00       		.byte	0
+ 824 00c8 03       		.uleb128 0x3
+ 825 00c9 08       		.uleb128 0x8
+ 826 00ca 3A       		.uleb128 0x3a
+ 827 00cb 0B       		.uleb128 0xb
+ 828 00cc 3B       		.uleb128 0x3b
+ 829 00cd 0B       		.uleb128 0xb
+ 830 00ce 49       		.uleb128 0x49
+ 831 00cf 13       		.uleb128 0x13
+ 832 00d0 02       		.uleb128 0x2
+ 833 00d1 17       		.uleb128 0x17
+ 834 00d2 00       		.byte	0
+ 835 00d3 00       		.byte	0
+ 836 00d4 0F       		.uleb128 0xf
+ 837 00d5 898201   		.uleb128 0x4109
+ 838 00d8 01       		.byte	0x1
+ 839 00d9 11       		.uleb128 0x11
+ 840 00da 01       		.uleb128 0x1
+ 841 00db 31       		.uleb128 0x31
+ 842 00dc 13       		.uleb128 0x13
+ 843 00dd 00       		.byte	0
+ 844 00de 00       		.byte	0
+ 845 00df 10       		.uleb128 0x10
+ 846 00e0 898201   		.uleb128 0x4109
+ 847 00e3 01       		.byte	0x1
+ 848 00e4 11       		.uleb128 0x11
+ 849 00e5 01       		.uleb128 0x1
+ 850 00e6 9542     		.uleb128 0x2115
+ 851 00e8 19       		.uleb128 0x19
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 17
+
+
+ 852 00e9 31       		.uleb128 0x31
+ 853 00ea 13       		.uleb128 0x13
+ 854 00eb 00       		.byte	0
+ 855 00ec 00       		.byte	0
+ 856 00ed 11       		.uleb128 0x11
+ 857 00ee 34       		.uleb128 0x34
+ 858 00ef 00       		.byte	0
+ 859 00f0 03       		.uleb128 0x3
+ 860 00f1 0E       		.uleb128 0xe
+ 861 00f2 3A       		.uleb128 0x3a
+ 862 00f3 0B       		.uleb128 0xb
+ 863 00f4 3B       		.uleb128 0x3b
+ 864 00f5 05       		.uleb128 0x5
+ 865 00f6 49       		.uleb128 0x49
+ 866 00f7 13       		.uleb128 0x13
+ 867 00f8 3F       		.uleb128 0x3f
+ 868 00f9 19       		.uleb128 0x19
+ 869 00fa 3C       		.uleb128 0x3c
+ 870 00fb 19       		.uleb128 0x19
+ 871 00fc 00       		.byte	0
+ 872 00fd 00       		.byte	0
+ 873 00fe 12       		.uleb128 0x12
+ 874 00ff 35       		.uleb128 0x35
+ 875 0100 00       		.byte	0
+ 876 0101 49       		.uleb128 0x49
+ 877 0102 13       		.uleb128 0x13
+ 878 0103 00       		.byte	0
+ 879 0104 00       		.byte	0
+ 880 0105 13       		.uleb128 0x13
+ 881 0106 2E       		.uleb128 0x2e
+ 882 0107 00       		.byte	0
+ 883 0108 3F       		.uleb128 0x3f
+ 884 0109 19       		.uleb128 0x19
+ 885 010a 3C       		.uleb128 0x3c
+ 886 010b 19       		.uleb128 0x19
+ 887 010c 6E       		.uleb128 0x6e
+ 888 010d 0E       		.uleb128 0xe
+ 889 010e 03       		.uleb128 0x3
+ 890 010f 0E       		.uleb128 0xe
+ 891 0110 3A       		.uleb128 0x3a
+ 892 0111 0B       		.uleb128 0xb
+ 893 0112 3B       		.uleb128 0x3b
+ 894 0113 0B       		.uleb128 0xb
+ 895 0114 00       		.byte	0
+ 896 0115 00       		.byte	0
+ 897 0116 14       		.uleb128 0x14
+ 898 0117 2E       		.uleb128 0x2e
+ 899 0118 00       		.byte	0
+ 900 0119 3F       		.uleb128 0x3f
+ 901 011a 19       		.uleb128 0x19
+ 902 011b 3C       		.uleb128 0x3c
+ 903 011c 19       		.uleb128 0x19
+ 904 011d 6E       		.uleb128 0x6e
+ 905 011e 0E       		.uleb128 0xe
+ 906 011f 03       		.uleb128 0x3
+ 907 0120 0E       		.uleb128 0xe
+ 908 0121 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 18
+
+
+ 909 0122 0B       		.uleb128 0xb
+ 910 0123 3B       		.uleb128 0x3b
+ 911 0124 05       		.uleb128 0x5
+ 912 0125 00       		.byte	0
+ 913 0126 00       		.byte	0
+ 914 0127 00       		.byte	0
+ 915              		.section	.debug_loc,"",%progbits
+ 916              	.Ldebug_loc0:
+ 917              	.LLST0:
+ 918 0000 00000000 		.4byte	.LVL0
+ 919 0004 0B000000 		.4byte	.LVL2-1
+ 920 0008 0100     		.2byte	0x1
+ 921 000a 50       		.byte	0x50
+ 922 000b 0B000000 		.4byte	.LVL2-1
+ 923 000f 20000000 		.4byte	.LFE68
+ 924 0013 0400     		.2byte	0x4
+ 925 0015 F3       		.byte	0xf3
+ 926 0016 01       		.uleb128 0x1
+ 927 0017 50       		.byte	0x50
+ 928 0018 9F       		.byte	0x9f
+ 929 0019 00000000 		.4byte	0
+ 930 001d 00000000 		.4byte	0
+ 931              	.LLST1:
+ 932 0021 00000000 		.4byte	.LVL0
+ 933 0025 08000000 		.4byte	.LVL1
+ 934 0029 0100     		.2byte	0x1
+ 935 002b 51       		.byte	0x51
+ 936 002c 08000000 		.4byte	.LVL1
+ 937 0030 20000000 		.4byte	.LFE68
+ 938 0034 0400     		.2byte	0x4
+ 939 0036 F3       		.byte	0xf3
+ 940 0037 01       		.uleb128 0x1
+ 941 0038 51       		.byte	0x51
+ 942 0039 9F       		.byte	0x9f
+ 943 003a 00000000 		.4byte	0
+ 944 003e 00000000 		.4byte	0
+ 945              	.LLST2:
+ 946 0042 00000000 		.4byte	.LVL0
+ 947 0046 0B000000 		.4byte	.LVL2-1
+ 948 004a 0100     		.2byte	0x1
+ 949 004c 52       		.byte	0x52
+ 950 004d 0B000000 		.4byte	.LVL2-1
+ 951 0051 20000000 		.4byte	.LFE68
+ 952 0055 0400     		.2byte	0x4
+ 953 0057 F3       		.byte	0xf3
+ 954 0058 01       		.uleb128 0x1
+ 955 0059 52       		.byte	0x52
+ 956 005a 9F       		.byte	0x9f
+ 957 005b 00000000 		.4byte	0
+ 958 005f 00000000 		.4byte	0
+ 959              	.LLST3:
+ 960 0063 00000000 		.4byte	.LVL6
+ 961 0067 0B000000 		.4byte	.LVL8-1
+ 962 006b 0100     		.2byte	0x1
+ 963 006d 50       		.byte	0x50
+ 964 006e 0B000000 		.4byte	.LVL8-1
+ 965 0072 2A000000 		.4byte	.LFE69
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 19
+
+
+ 966 0076 0400     		.2byte	0x4
+ 967 0078 F3       		.byte	0xf3
+ 968 0079 01       		.uleb128 0x1
+ 969 007a 50       		.byte	0x50
+ 970 007b 9F       		.byte	0x9f
+ 971 007c 00000000 		.4byte	0
+ 972 0080 00000000 		.4byte	0
+ 973              	.LLST4:
+ 974 0084 00000000 		.4byte	.LVL6
+ 975 0088 08000000 		.4byte	.LVL7
+ 976 008c 0100     		.2byte	0x1
+ 977 008e 51       		.byte	0x51
+ 978 008f 08000000 		.4byte	.LVL7
+ 979 0093 2A000000 		.4byte	.LFE69
+ 980 0097 0400     		.2byte	0x4
+ 981 0099 F3       		.byte	0xf3
+ 982 009a 01       		.uleb128 0x1
+ 983 009b 51       		.byte	0x51
+ 984 009c 9F       		.byte	0x9f
+ 985 009d 00000000 		.4byte	0
+ 986 00a1 00000000 		.4byte	0
+ 987              	.LLST5:
+ 988 00a5 00000000 		.4byte	.LVL14
+ 989 00a9 0B000000 		.4byte	.LVL15-1
+ 990 00ad 0100     		.2byte	0x1
+ 991 00af 50       		.byte	0x50
+ 992 00b0 0B000000 		.4byte	.LVL15-1
+ 993 00b4 2A000000 		.4byte	.LFE70
+ 994 00b8 0400     		.2byte	0x4
+ 995 00ba F3       		.byte	0xf3
+ 996 00bb 01       		.uleb128 0x1
+ 997 00bc 50       		.byte	0x50
+ 998 00bd 9F       		.byte	0x9f
+ 999 00be 00000000 		.4byte	0
+ 1000 00c2 00000000 		.4byte	0
+ 1001              	.LLST6:
+ 1002 00c6 00000000 		.4byte	.LVL14
+ 1003 00ca 0B000000 		.4byte	.LVL15-1
+ 1004 00ce 0100     		.2byte	0x1
+ 1005 00d0 51       		.byte	0x51
+ 1006 00d1 0B000000 		.4byte	.LVL15-1
+ 1007 00d5 2A000000 		.4byte	.LFE70
+ 1008 00d9 0100     		.2byte	0x1
+ 1009 00db 55       		.byte	0x55
+ 1010 00dc 00000000 		.4byte	0
+ 1011 00e0 00000000 		.4byte	0
+ 1012              	.LLST7:
+ 1013 00e4 00000000 		.4byte	.LVL14
+ 1014 00e8 0B000000 		.4byte	.LVL15-1
+ 1015 00ec 0100     		.2byte	0x1
+ 1016 00ee 52       		.byte	0x52
+ 1017 00ef 0B000000 		.4byte	.LVL15-1
+ 1018 00f3 2A000000 		.4byte	.LFE70
+ 1019 00f7 0400     		.2byte	0x4
+ 1020 00f9 F3       		.byte	0xf3
+ 1021 00fa 01       		.uleb128 0x1
+ 1022 00fb 52       		.byte	0x52
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 20
+
+
+ 1023 00fc 9F       		.byte	0x9f
+ 1024 00fd 00000000 		.4byte	0
+ 1025 0101 00000000 		.4byte	0
+ 1026              	.LLST8:
+ 1027 0105 00000000 		.4byte	.LVL19
+ 1028 0109 0B000000 		.4byte	.LVL20-1
+ 1029 010d 0100     		.2byte	0x1
+ 1030 010f 50       		.byte	0x50
+ 1031 0110 0B000000 		.4byte	.LVL20-1
+ 1032 0114 1C000000 		.4byte	.LFE71
+ 1033 0118 0400     		.2byte	0x4
+ 1034 011a F3       		.byte	0xf3
+ 1035 011b 01       		.uleb128 0x1
+ 1036 011c 50       		.byte	0x50
+ 1037 011d 9F       		.byte	0x9f
+ 1038 011e 00000000 		.4byte	0
+ 1039 0122 00000000 		.4byte	0
+ 1040              	.LLST9:
+ 1041 0126 00000000 		.4byte	.LVL19
+ 1042 012a 0B000000 		.4byte	.LVL20-1
+ 1043 012e 0100     		.2byte	0x1
+ 1044 0130 51       		.byte	0x51
+ 1045 0131 0B000000 		.4byte	.LVL20-1
+ 1046 0135 16000000 		.4byte	.LVL21
+ 1047 0139 0100     		.2byte	0x1
+ 1048 013b 55       		.byte	0x55
+ 1049 013c 16000000 		.4byte	.LVL21
+ 1050 0140 1B000000 		.4byte	.LVL22-1
+ 1051 0144 0100     		.2byte	0x1
+ 1052 0146 51       		.byte	0x51
+ 1053 0147 1B000000 		.4byte	.LVL22-1
+ 1054 014b 1C000000 		.4byte	.LFE71
+ 1055 014f 0400     		.2byte	0x4
+ 1056 0151 F3       		.byte	0xf3
+ 1057 0152 01       		.uleb128 0x1
+ 1058 0153 51       		.byte	0x51
+ 1059 0154 9F       		.byte	0x9f
+ 1060 0155 00000000 		.4byte	0
+ 1061 0159 00000000 		.4byte	0
+ 1062              	.LLST10:
+ 1063 015d 00000000 		.4byte	.LVL19
+ 1064 0161 0B000000 		.4byte	.LVL20-1
+ 1065 0165 0100     		.2byte	0x1
+ 1066 0167 52       		.byte	0x52
+ 1067 0168 0B000000 		.4byte	.LVL20-1
+ 1068 016c 1C000000 		.4byte	.LFE71
+ 1069 0170 0400     		.2byte	0x4
+ 1070 0172 F3       		.byte	0xf3
+ 1071 0173 01       		.uleb128 0x1
+ 1072 0174 52       		.byte	0x52
+ 1073 0175 9F       		.byte	0x9f
+ 1074 0176 00000000 		.4byte	0
+ 1075 017a 00000000 		.4byte	0
+ 1076              		.section	.debug_aranges,"",%progbits
+ 1077 0000 34000000 		.4byte	0x34
+ 1078 0004 0200     		.2byte	0x2
+ 1079 0006 00000000 		.4byte	.Ldebug_info0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 21
+
+
+ 1080 000a 04       		.byte	0x4
+ 1081 000b 00       		.byte	0
+ 1082 000c 0000     		.2byte	0
+ 1083 000e 0000     		.2byte	0
+ 1084 0010 00000000 		.4byte	.LFB68
+ 1085 0014 20000000 		.4byte	.LFE68-.LFB68
+ 1086 0018 00000000 		.4byte	.LFB69
+ 1087 001c 2A000000 		.4byte	.LFE69-.LFB69
+ 1088 0020 00000000 		.4byte	.LFB70
+ 1089 0024 2A000000 		.4byte	.LFE70-.LFB70
+ 1090 0028 00000000 		.4byte	.LFB71
+ 1091 002c 1C000000 		.4byte	.LFE71-.LFB71
+ 1092 0030 00000000 		.4byte	0
+ 1093 0034 00000000 		.4byte	0
+ 1094              		.section	.debug_ranges,"",%progbits
+ 1095              	.Ldebug_ranges0:
+ 1096 0000 00000000 		.4byte	.LFB68
+ 1097 0004 20000000 		.4byte	.LFE68
+ 1098 0008 00000000 		.4byte	.LFB69
+ 1099 000c 2A000000 		.4byte	.LFE69
+ 1100 0010 00000000 		.4byte	.LFB70
+ 1101 0014 2A000000 		.4byte	.LFE70
+ 1102 0018 00000000 		.4byte	.LFB71
+ 1103 001c 1C000000 		.4byte	.LFE71
+ 1104 0020 00000000 		.4byte	0
+ 1105 0024 00000000 		.4byte	0
+ 1106              		.section	.debug_line,"",%progbits
+ 1107              	.Ldebug_line0:
+ 1108 0000 E2010000 		.section	.debug_str,"MS",%progbits,1
+ 1108      02008801 
+ 1108      00000201 
+ 1108      FB0E0D00 
+ 1108      01010101 
+ 1109              	.LASF8:
+ 1110 0000 6C6F6E67 		.ascii	"long long int\000"
+ 1110      206C6F6E 
+ 1110      6720696E 
+ 1110      7400
+ 1111              	.LASF36:
+ 1112 000e 4932435F 		.ascii	"I2C_Read\000"
+ 1112      52656164 
+ 1112      00
+ 1113              	.LASF4:
+ 1114 0017 5F5F7569 		.ascii	"__uint8_t\000"
+ 1114      6E74385F 
+ 1114      7400
+ 1115              	.LASF26:
+ 1116 0021 4932435F 		.ascii	"I2C_MasterSendStop\000"
+ 1116      4D617374 
+ 1116      65725365 
+ 1116      6E645374 
+ 1116      6F7000
+ 1117              	.LASF5:
+ 1118 0034 5F5F696E 		.ascii	"__int32_t\000"
+ 1118      7433325F 
+ 1118      7400
+ 1119              	.LASF25:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 22
+
+
+ 1120 003e 4932435F 		.ascii	"I2C_MasterWriteByte\000"
+ 1120      4D617374 
+ 1120      65725772 
+ 1120      69746542 
+ 1120      79746500 
+ 1121              	.LASF29:
+ 1122 0052 4932435F 		.ascii	"I2C_MasterClearStatus\000"
+ 1122      4D617374 
+ 1122      6572436C 
+ 1122      65617253 
+ 1122      74617475 
+ 1123              	.LASF13:
+ 1124 0068 666C6F61 		.ascii	"float\000"
+ 1124      7400
+ 1125              	.LASF19:
+ 1126 006e 64617461 		.ascii	"data\000"
+ 1126      00
+ 1127              	.LASF1:
+ 1128 0073 756E7369 		.ascii	"unsigned char\000"
+ 1128      676E6564 
+ 1128      20636861 
+ 1128      7200
+ 1129              	.LASF30:
+ 1130 0081 4932435F 		.ascii	"I2C_MasterWriteBuf\000"
+ 1130      4D617374 
+ 1130      65725772 
+ 1130      69746542 
+ 1130      756600
+ 1131              	.LASF7:
+ 1132 0094 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1132      20756E73 
+ 1132      69676E65 
+ 1132      6420696E 
+ 1132      7400
+ 1133              	.LASF33:
+ 1134 00a6 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1134      43393920 
+ 1134      352E342E 
+ 1134      31203230 
+ 1134      31363036 
+ 1135 00d9 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1135      20726576 
+ 1135      6973696F 
+ 1135      6E203233 
+ 1135      37373135 
+ 1136 010c 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 1136      74643D67 
+ 1136      6E753939 
+ 1136      202D6666 
+ 1136      756E6374 
+ 1137              	.LASF3:
+ 1138 013f 73686F72 		.ascii	"short unsigned int\000"
+ 1138      7420756E 
+ 1138      7369676E 
+ 1138      65642069 
+ 1138      6E7400
+ 1139              	.LASF24:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 23
+
+
+ 1140 0152 4932435F 		.ascii	"I2C_MasterSendStart\000"
+ 1140      4D617374 
+ 1140      65725365 
+ 1140      6E645374 
+ 1140      61727400 
+ 1141              	.LASF37:
+ 1142 0166 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1142      52784275 
+ 1142      66666572 
+ 1142      00
+ 1143              	.LASF14:
+ 1144 0173 646F7562 		.ascii	"double\000"
+ 1144      6C6500
+ 1145              	.LASF20:
+ 1146 017a 4932435F 		.ascii	"I2C_Write\000"
+ 1146      57726974 
+ 1146      6500
+ 1147              	.LASF10:
+ 1148 0184 756E7369 		.ascii	"unsigned int\000"
+ 1148      676E6564 
+ 1148      20696E74 
+ 1148      00
+ 1149              	.LASF17:
+ 1150 0191 61646472 		.ascii	"address\000"
+ 1150      65737300 
+ 1151              	.LASF9:
+ 1152 0199 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1152      206C6F6E 
+ 1152      6720756E 
+ 1152      7369676E 
+ 1152      65642069 
+ 1153              	.LASF11:
+ 1154 01b0 75696E74 		.ascii	"uint8_t\000"
+ 1154      385F7400 
+ 1155              	.LASF27:
+ 1156 01b8 4932435F 		.ascii	"I2C_MasterSendRestart\000"
+ 1156      4D617374 
+ 1156      65725365 
+ 1156      6E645265 
+ 1156      73746172 
+ 1157              	.LASF12:
+ 1158 01ce 696E7433 		.ascii	"int32_t\000"
+ 1158      325F7400 
+ 1159              	.LASF16:
+ 1160 01d6 73697A65 		.ascii	"sizetype\000"
+ 1160      74797065 
+ 1160      00
+ 1161              	.LASF15:
+ 1162 01df 63686172 		.ascii	"char\000"
+ 1162      00
+ 1163              	.LASF31:
+ 1164 01e4 4932435F 		.ascii	"I2C_MasterStatus\000"
+ 1164      4D617374 
+ 1164      65725374 
+ 1164      61747573 
+ 1164      00
+ 1165              	.LASF28:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccLFLt0b.s 			page 24
+
+
+ 1166 01f5 4932435F 		.ascii	"I2C_MasterReadByte\000"
+ 1166      4D617374 
+ 1166      65725265 
+ 1166      61644279 
+ 1166      746500
+ 1167              	.LASF2:
+ 1168 0208 73686F72 		.ascii	"short int\000"
+ 1168      7420696E 
+ 1168      7400
+ 1169              	.LASF22:
+ 1170 0212 62756666 		.ascii	"buffer\000"
+ 1170      657200
+ 1171              	.LASF23:
+ 1172 0219 4932435F 		.ascii	"I2C_Write_nBlk\000"
+ 1172      57726974 
+ 1172      655F6E42 
+ 1172      6C6B00
+ 1173              	.LASF35:
+ 1174 0228 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 1174      73657273 
+ 1174      5C636865 
+ 1174      6D695C55 
+ 1174      44335F51 
+ 1175              	.LASF6:
+ 1176 024d 6C6F6E67 		.ascii	"long int\000"
+ 1176      20696E74 
+ 1176      00
+ 1177              	.LASF21:
+ 1178 0256 4932435F 		.ascii	"I2C_Write_Blk\000"
+ 1178      57726974 
+ 1178      655F426C 
+ 1178      6B00
+ 1179              	.LASF32:
+ 1180 0264 76546173 		.ascii	"vTaskDelay\000"
+ 1180      6B44656C 
+ 1180      617900
+ 1181              	.LASF0:
+ 1182 026f 7369676E 		.ascii	"signed char\000"
+ 1182      65642063 
+ 1182      68617200 
+ 1183              	.LASF18:
+ 1184 027b 72656769 		.ascii	"registerAddress\000"
+ 1184      73746572 
+ 1184      41646472 
+ 1184      65737300 
+ 1185              	.LASF34:
+ 1186 028b 2E2E5C63 		.ascii	"..\\common\\ud3core\\helper\\i2c_helper.c\000"
+ 1186      6F6D6D6F 
+ 1186      6E5C7564 
+ 1186      33636F72 
+ 1186      655C6865 
+ 1187              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

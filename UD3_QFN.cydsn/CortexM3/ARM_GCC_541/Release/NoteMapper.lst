@@ -1,0 +1,4118 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"NoteMapper.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.loadNewProgramm,"ax",%progbits
+  20              		.align	1
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	loadNewProgramm, %function
+  24              	loadNewProgramm:
+  25              	.LFB70:
+  26              		.file 1 "..\\common\\vms\\NoteMapper.c"
+   1:..\common\vms/NoteMapper.c **** 
+   2:..\common\vms/NoteMapper.c **** #include <stdint.h>
+   3:..\common\vms/NoteMapper.c **** #include <string.h>
+   4:..\common\vms/NoteMapper.c **** 
+   5:..\common\vms/NoteMapper.c **** #include "FreeRTOS.h"
+   6:..\common\vms/NoteMapper.c **** #include "task.h"
+   7:..\common\vms/NoteMapper.c **** #include "DLL/include/DLL.h"
+   8:..\common\vms/NoteMapper.c **** #include "NoteMapper.h"
+   9:..\common\vms/NoteMapper.c **** #include "MidiProcessor.h"
+  10:..\common\vms/NoteMapper.c **** #include "SignalGenerator.h"
+  11:..\common\vms/NoteMapper.c **** #include "VMS.h"
+  12:..\common\vms/NoteMapper.c **** #include "VMSWrapper.h"
+  13:..\common\vms/NoteMapper.c **** #include "helper/nvm.h"
+  14:..\common\vms/NoteMapper.c **** #include "interrupter.h"
+  15:..\common\vms/NoteMapper.c **** #include "cli_common.h"
+  16:..\common\vms/NoteMapper.c **** #include "tasks/tsk_cli.h"
+  17:..\common\vms/NoteMapper.c **** 
+  18:..\common\vms/NoteMapper.c **** static MAPTABLE_HEADER_t * channelMap[MIDI_CHANNELCOUNT];
+  19:..\common\vms/NoteMapper.c **** static uint32_t Mapper_getNextVoice(uint8_t note, uint8_t channel);
+  20:..\common\vms/NoteMapper.c **** static uint32_t mapMemorySize = MAPPER_MAPMEM_SIZE;
+  21:..\common\vms/NoteMapper.c **** 
+  22:..\common\vms/NoteMapper.c **** const struct{
+  23:..\common\vms/NoteMapper.c ****     MAPTABLE_HEADER_t h0;
+  24:..\common\vms/NoteMapper.c ****     MAPTABLE_ENTRY_t h0e0;
+  25:..\common\vms/NoteMapper.c **** } DEFMAP = {.h0 = {.programNumberStart = 0, .programNumberEnd = 0x7f, .listEntries = 1} , .h0e0 = {
+  26:..\common\vms/NoteMapper.c **** 
+  27:..\common\vms/NoteMapper.c **** void Mapper_init(){
+  28:..\common\vms/NoteMapper.c ****     memset(channelMap, 0, sizeof(MAPTABLE_ENTRY_t*) * MIDI_CHANNELCOUNT);
+  29:..\common\vms/NoteMapper.c **** }
+  30:..\common\vms/NoteMapper.c **** 
+  31:..\common\vms/NoteMapper.c **** static uint32_t isHeaderValid(MAPTABLE_HEADER_t * header){
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 2
+
+
+  32:..\common\vms/NoteMapper.c ****     return header->listEntries != 0 && header->listEntries != 0xff;
+  33:..\common\vms/NoteMapper.c **** }
+  34:..\common\vms/NoteMapper.c **** 
+  35:..\common\vms/NoteMapper.c **** static void loadNewProgramm(uint32_t channel, uint32_t programm){
+  27              		.loc 1 35 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              	.LVL0:
+  36:..\common\vms/NoteMapper.c ****     //unlike in the MidiBox implementation the map list will always remain in flash instead of bein
+  37:..\common\vms/NoteMapper.c ****     //TERM_printDebug(min_handle[1], "loading mapentry\r\n");               
+  38:..\common\vms/NoteMapper.c ****     
+  39:..\common\vms/NoteMapper.c ****     //find map in NVM
+  40:..\common\vms/NoteMapper.c ****     channelMap[channel] = NULL;
+  41:..\common\vms/NoteMapper.c ****     
+  42:..\common\vms/NoteMapper.c ****     //go through all headers in the table and find the one we need
+  43:..\common\vms/NoteMapper.c ****     MAPTABLE_HEADER_t * currHeader = (MAPTABLE_HEADER_t *) NVM_mapMem;
+  32              		.loc 1 43 0
+  33 0000 154A     		ldr	r2, .L11
+  35:..\common\vms/NoteMapper.c ****     //unlike in the MidiBox implementation the map list will always remain in flash instead of bein
+  34              		.loc 1 35 0
+  35 0002 F0B5     		push	{r4, r5, r6, r7, lr}
+  36              		.cfi_def_cfa_offset 20
+  37              		.cfi_offset 4, -20
+  38              		.cfi_offset 5, -16
+  39              		.cfi_offset 6, -12
+  40              		.cfi_offset 7, -8
+  41              		.cfi_offset 14, -4
+  42              		.loc 1 43 0
+  43 0004 1668     		ldr	r6, [r2]
+  44              	.LVL1:
+  40:..\common\vms/NoteMapper.c ****     
+  45              		.loc 1 40 0
+  46 0006 154C     		ldr	r4, .L11+4
+  47              		.loc 1 43 0
+  48 0008 3246     		mov	r2, r6
+  40:..\common\vms/NoteMapper.c ****     
+  49              		.loc 1 40 0
+  50 000a 0023     		movs	r3, #0
+  51 000c 44F82030 		str	r3, [r4, r0, lsl #2]
+  52              	.LVL2:
+  53              	.L5:
+  44:..\common\vms/NoteMapper.c ****     uint32_t currOffset = 0;
+  45:..\common\vms/NoteMapper.c ****     while(1){
+  46:..\common\vms/NoteMapper.c ****         
+  47:..\common\vms/NoteMapper.c ****         //is the map uninialized?
+  48:..\common\vms/NoteMapper.c ****         if(currHeader->listEntries == 0 || currHeader->listEntries == 0xff){
+  54              		.loc 1 48 0
+  55 0010 1778     		ldrb	r7, [r2]	@ zero_extendqisi2
+  56 0012 7D1E     		subs	r5, r7, #1
+  57 0014 EDB2     		uxtb	r5, r5
+  58 0016 FD2D     		cmp	r5, #253
+  59 0018 16D8     		bhi	.L2
+  49:..\common\vms/NoteMapper.c ****             //yes map is not initialized => we reached the end
+  50:..\common\vms/NoteMapper.c ****             break;
+  51:..\common\vms/NoteMapper.c ****             
+  52:..\common\vms/NoteMapper.c ****         //does this header match the program number we are looking for?
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 3
+
+
+  53:..\common\vms/NoteMapper.c ****         }else if(currHeader->programNumberStart <= programm && currHeader->programNumberEnd >= prog
+  60              		.loc 1 53 0
+  61 001a 5578     		ldrb	r5, [r2, #1]	@ zero_extendqisi2
+  62 001c 8D42     		cmp	r5, r1
+  63 001e 06D8     		bhi	.L3
+  64              		.loc 1 53 0 is_stmt 0 discriminator 1
+  65 0020 92F802E0 		ldrb	lr, [r2, #2]	@ zero_extendqisi2
+  66 0024 7145     		cmp	r1, lr
+  67 0026 02D8     		bhi	.L3
+  54:..\common\vms/NoteMapper.c ****             //yes!  assign it to the channel
+  55:..\common\vms/NoteMapper.c ****             channelMap[channel] = currHeader;
+  68              		.loc 1 55 0 is_stmt 1
+  69 0028 44F82020 		str	r2, [r4, r0, lsl #2]
+  56:..\common\vms/NoteMapper.c ****             break;
+  70              		.loc 1 56 0
+  71 002c 0CE0     		b	.L2
+  72              	.L3:
+  57:..\common\vms/NoteMapper.c ****         }else if(currHeader->programNumberStart == 0xff && currHeader->programNumberEnd == 0xff){
+  73              		.loc 1 57 0
+  74 002e FF2D     		cmp	r5, #255
+  75 0030 02D1     		bne	.L4
+  76              		.loc 1 57 0 is_stmt 0 discriminator 1
+  77 0032 9278     		ldrb	r2, [r2, #2]	@ zero_extendqisi2
+  78              	.LVL3:
+  79 0034 FF2A     		cmp	r2, #255
+  80 0036 07D0     		beq	.L2
+  81              	.L4:
+  58:..\common\vms/NoteMapper.c ****             //we reached the end of usable data without finding anything :(
+  59:..\common\vms/NoteMapper.c ****             break;
+  60:..\common\vms/NoteMapper.c ****         }
+  61:..\common\vms/NoteMapper.c **** 
+  62:..\common\vms/NoteMapper.c ****         //no, update offset to the next header
+  63:..\common\vms/NoteMapper.c ****         currOffset += sizeof(MAPTABLE_HEADER_t) + currHeader->listEntries * sizeof(MAPTABLE_ENTRY_t
+  82              		.loc 1 63 0 is_stmt 1
+  83 0038 03EBC703 		add	r3, r3, r7, lsl #3
+  84              	.LVL4:
+  85 003c 1533     		adds	r3, r3, #21
+  86              	.LVL5:
+  64:..\common\vms/NoteMapper.c ****         
+  65:..\common\vms/NoteMapper.c ****         if(currOffset >= MAPMEM_SIZE) break;
+  87              		.loc 1 65 0
+  88 003e B3F5804F 		cmp	r3, #16384
+  89 0042 01D2     		bcs	.L2
+  66:..\common\vms/NoteMapper.c ****         
+  67:..\common\vms/NoteMapper.c ****         //and assign the new pointer
+  68:..\common\vms/NoteMapper.c ****         currHeader = (MAPTABLE_HEADER_t *) &NVM_mapMem[currOffset];
+  90              		.loc 1 68 0
+  91 0044 F218     		adds	r2, r6, r3
+  92              	.LVL6:
+  69:..\common\vms/NoteMapper.c ****     }
+  93              		.loc 1 69 0
+  94 0046 E3E7     		b	.L5
+  95              	.LVL7:
+  96              	.L2:
+  70:..\common\vms/NoteMapper.c **** 
+  71:..\common\vms/NoteMapper.c ****     //did we find the required map? If not: set the default map
+  72:..\common\vms/NoteMapper.c ****     if(channelMap[channel] == NULL) channelMap[channel] = (MAPTABLE_HEADER_t *) &DEFMAP;        
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 4
+
+
+  97              		.loc 1 72 0
+  98 0048 54F82030 		ldr	r3, [r4, r0, lsl #2]
+  99              	.LVL8:
+ 100 004c 1BB9     		cbnz	r3, .L1
+ 101              		.loc 1 72 0 is_stmt 0 discriminator 1
+ 102 004e 044A     		ldr	r2, .L11+8
+ 103 0050 024B     		ldr	r3, .L11+4
+ 104 0052 43F82020 		str	r2, [r3, r0, lsl #2]
+ 105              	.L1:
+ 106 0056 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 107              	.L12:
+ 108              		.align	2
+ 109              	.L11:
+ 110 0058 00000000 		.word	NVM_mapMem
+ 111 005c 00000000 		.word	.LANCHOR0
+ 112 0060 00000000 		.word	.LANCHOR1
+ 113              		.cfi_endproc
+ 114              	.LFE70:
+ 115              		.size	loadNewProgramm, .-loadNewProgramm
+ 116              		.section	.text.Mapper_init,"ax",%progbits
+ 117              		.align	1
+ 118              		.global	Mapper_init
+ 119              		.thumb
+ 120              		.thumb_func
+ 121              		.type	Mapper_init, %function
+ 122              	Mapper_init:
+ 123              	.LFB68:
+  27:..\common\vms/NoteMapper.c ****     memset(channelMap, 0, sizeof(MAPTABLE_ENTRY_t*) * MIDI_CHANNELCOUNT);
+ 124              		.loc 1 27 0 is_stmt 1
+ 125              		.cfi_startproc
+ 126              		@ args = 0, pretend = 0, frame = 0
+ 127              		@ frame_needed = 0, uses_anonymous_args = 0
+ 128              		@ link register save eliminated.
+  28:..\common\vms/NoteMapper.c **** }
+ 129              		.loc 1 28 0
+ 130 0000 4022     		movs	r2, #64
+ 131 0002 0021     		movs	r1, #0
+ 132 0004 0148     		ldr	r0, .L14
+ 133 0006 FFF7FEBF 		b	memset
+ 134              	.LVL9:
+ 135              	.L15:
+ 136 000a 00BF     		.align	2
+ 137              	.L14:
+ 138 000c 00000000 		.word	.LANCHOR0
+ 139              		.cfi_endproc
+ 140              	.LFE68:
+ 141              		.size	Mapper_init, .-Mapper_init
+ 142              		.section	.text.Mapper_getProgrammName,"ax",%progbits
+ 143              		.align	1
+ 144              		.global	Mapper_getProgrammName
+ 145              		.thumb
+ 146              		.thumb_func
+ 147              		.type	Mapper_getProgrammName, %function
+ 148              	Mapper_getProgrammName:
+ 149              	.LFB71:
+  73:..\common\vms/NoteMapper.c **** }
+  74:..\common\vms/NoteMapper.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 5
+
+
+  75:..\common\vms/NoteMapper.c **** const char * Mapper_getProgrammName(uint32_t channel){
+ 150              		.loc 1 75 0
+ 151              		.cfi_startproc
+ 152              		@ args = 0, pretend = 0, frame = 0
+ 153              		@ frame_needed = 0, uses_anonymous_args = 0
+ 154              		@ link register save eliminated.
+ 155              	.LVL10:
+  76:..\common\vms/NoteMapper.c ****     //is a map loaded on the channel?
+  77:..\common\vms/NoteMapper.c ****     if(channelMap[channel] == NULL){
+ 156              		.loc 1 77 0
+ 157 0000 054B     		ldr	r3, .L20
+ 158 0002 53F82000 		ldr	r0, [r3, r0, lsl #2]
+ 159              	.LVL11:
+ 160 0006 28B1     		cbz	r0, .L17
+  78:..\common\vms/NoteMapper.c ****         //nope => return NULL
+  79:..\common\vms/NoteMapper.c ****         return NULL;
+  80:..\common\vms/NoteMapper.c ****     }else if(channelMap[channel] == (MAPTABLE_HEADER_t *) &DEFMAP){
+ 161              		.loc 1 80 0
+ 162 0008 044B     		ldr	r3, .L20+4
+ 163 000a 9842     		cmp	r0, r3
+ 164 000c 01D0     		beq	.L19
+  81:..\common\vms/NoteMapper.c ****         //yes but its the defmap => return "DEFMAP"
+  82:..\common\vms/NoteMapper.c ****         return "DEFMAP";
+  83:..\common\vms/NoteMapper.c ****     }else{
+  84:..\common\vms/NoteMapper.c ****         return channelMap[channel]->name;
+ 165              		.loc 1 84 0
+ 166 000e 0330     		adds	r0, r0, #3
+ 167 0010 7047     		bx	lr
+ 168              	.L19:
+  82:..\common\vms/NoteMapper.c ****     }else{
+ 169              		.loc 1 82 0
+ 170 0012 0348     		ldr	r0, .L20+8
+ 171              	.L17:
+  85:..\common\vms/NoteMapper.c ****     }
+  86:..\common\vms/NoteMapper.c **** }
+ 172              		.loc 1 86 0
+ 173 0014 7047     		bx	lr
+ 174              	.L21:
+ 175 0016 00BF     		.align	2
+ 176              	.L20:
+ 177 0018 00000000 		.word	.LANCHOR0
+ 178 001c 00000000 		.word	.LANCHOR1
+ 179 0020 00000000 		.word	.LC0
+ 180              		.cfi_endproc
+ 181              	.LFE71:
+ 182              		.size	Mapper_getProgrammName, .-Mapper_getProgrammName
+ 183              		.section	.text.Mapper_bendHandler,"ax",%progbits
+ 184              		.align	1
+ 185              		.global	Mapper_bendHandler
+ 186              		.thumb
+ 187              		.thumb_func
+ 188              		.type	Mapper_bendHandler, %function
+ 189              	Mapper_bendHandler:
+ 190              	.LFB72:
+  87:..\common\vms/NoteMapper.c **** 
+  88:..\common\vms/NoteMapper.c **** void Mapper_bendHandler(uint32_t channel){
+ 191              		.loc 1 88 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 6
+
+
+ 192              		.cfi_startproc
+ 193              		@ args = 0, pretend = 0, frame = 0
+ 194              		@ frame_needed = 0, uses_anonymous_args = 0
+ 195              		@ link register save eliminated.
+ 196              	.LVL12:
+  89:..\common\vms/NoteMapper.c ****     VMSW_bendHandler(channel);
+ 197              		.loc 1 89 0
+ 198 0000 FFF7FEBF 		b	VMSW_bendHandler
+ 199              	.LVL13:
+ 200              		.cfi_endproc
+ 201              	.LFE72:
+ 202              		.size	Mapper_bendHandler, .-Mapper_bendHandler
+ 203              		.section	.text.Mapper_volumeChangeHandler,"ax",%progbits
+ 204              		.align	1
+ 205              		.global	Mapper_volumeChangeHandler
+ 206              		.thumb
+ 207              		.thumb_func
+ 208              		.type	Mapper_volumeChangeHandler, %function
+ 209              	Mapper_volumeChangeHandler:
+ 210              	.LFB73:
+  90:..\common\vms/NoteMapper.c **** }
+  91:..\common\vms/NoteMapper.c **** 
+  92:..\common\vms/NoteMapper.c **** void Mapper_volumeChangeHandler(uint32_t channel){
+ 211              		.loc 1 92 0
+ 212              		.cfi_startproc
+ 213              		@ args = 0, pretend = 0, frame = 0
+ 214              		@ frame_needed = 0, uses_anonymous_args = 0
+ 215              		@ link register save eliminated.
+ 216              	.LVL14:
+  93:..\common\vms/NoteMapper.c ****     VMSW_volumeChangeHandler(channel);
+ 217              		.loc 1 93 0
+ 218 0000 FFF7FEBF 		b	VMSW_volumeChangeHandler
+ 219              	.LVL15:
+ 220              		.cfi_endproc
+ 221              	.LFE73:
+ 222              		.size	Mapper_volumeChangeHandler, .-Mapper_volumeChangeHandler
+ 223              		.section	.text.Mapper_noteOffEventHandler,"ax",%progbits
+ 224              		.align	1
+ 225              		.global	Mapper_noteOffEventHandler
+ 226              		.thumb
+ 227              		.thumb_func
+ 228              		.type	Mapper_noteOffEventHandler, %function
+ 229              	Mapper_noteOffEventHandler:
+ 230              	.LFB74:
+  94:..\common\vms/NoteMapper.c **** }
+  95:..\common\vms/NoteMapper.c **** 
+  96:..\common\vms/NoteMapper.c **** void Mapper_noteOffEventHandler(uint32_t output, uint32_t note, uint32_t channel){
+ 231              		.loc 1 96 0
+ 232              		.cfi_startproc
+ 233              		@ args = 0, pretend = 0, frame = 0
+ 234              		@ frame_needed = 0, uses_anonymous_args = 0
+ 235              		@ link register save eliminated.
+ 236              	.LVL16:
+  97:..\common\vms/NoteMapper.c ****     VMSW_stopNote(output, note, channel);
+ 237              		.loc 1 97 0
+ 238 0000 FFF7FEBF 		b	VMSW_stopNote
+ 239              	.LVL17:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 7
+
+
+ 240              		.cfi_endproc
+ 241              	.LFE74:
+ 242              		.size	Mapper_noteOffEventHandler, .-Mapper_noteOffEventHandler
+ 243              		.section	.text.Mapper_programmChangeHandler,"ax",%progbits
+ 244              		.align	1
+ 245              		.global	Mapper_programmChangeHandler
+ 246              		.thumb
+ 247              		.thumb_func
+ 248              		.type	Mapper_programmChangeHandler, %function
+ 249              	Mapper_programmChangeHandler:
+ 250              	.LFB75:
+  98:..\common\vms/NoteMapper.c **** }
+  99:..\common\vms/NoteMapper.c **** 
+ 100:..\common\vms/NoteMapper.c **** void Mapper_programmChangeHandler(uint32_t channel, uint32_t programm){
+ 251              		.loc 1 100 0
+ 252              		.cfi_startproc
+ 253              		@ args = 0, pretend = 0, frame = 0
+ 254              		@ frame_needed = 0, uses_anonymous_args = 0
+ 255              		@ link register save eliminated.
+ 256              	.LVL18:
+ 101:..\common\vms/NoteMapper.c ****     loadNewProgramm(channel, programm);
+ 257              		.loc 1 101 0
+ 258 0000 FFF7FEBF 		b	loadNewProgramm
+ 259              	.LVL19:
+ 260              		.cfi_endproc
+ 261              	.LFE75:
+ 262              		.size	Mapper_programmChangeHandler, .-Mapper_programmChangeHandler
+ 263              		.section	.text.Mapper_noteOnEventHandler,"ax",%progbits
+ 264              		.align	1
+ 265              		.global	Mapper_noteOnEventHandler
+ 266              		.thumb
+ 267              		.thumb_func
+ 268              		.type	Mapper_noteOnEventHandler, %function
+ 269              	Mapper_noteOnEventHandler:
+ 270              	.LFB76:
+ 102:..\common\vms/NoteMapper.c **** }
+ 103:..\common\vms/NoteMapper.c **** 
+ 104:..\common\vms/NoteMapper.c **** void Mapper_noteOnEventHandler(uint32_t output, uint32_t note, uint32_t velocity, uint32_t channel,
+ 271              		.loc 1 104 0
+ 272              		.cfi_startproc
+ 273              		@ args = 4, pretend = 0, frame = 40
+ 274              		@ frame_needed = 0, uses_anonymous_args = 0
+ 275              	.LVL20:
+ 276 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 277              		.cfi_def_cfa_offset 36
+ 278              		.cfi_offset 4, -36
+ 279              		.cfi_offset 5, -32
+ 280              		.cfi_offset 6, -28
+ 281              		.cfi_offset 7, -24
+ 282              		.cfi_offset 8, -20
+ 283              		.cfi_offset 9, -16
+ 284              		.cfi_offset 10, -12
+ 285              		.cfi_offset 11, -8
+ 286              		.cfi_offset 14, -4
+ 287 0004 1C46     		mov	r4, r3
+ 105:..\common\vms/NoteMapper.c ****     //does the map loaded still match the one required?
+ 106:..\common\vms/NoteMapper.c ****     if(channelMap[channel] == 0 || (channelMap[channel]->programNumberStart > programm || channelMa
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 8
+
+
+ 288              		.loc 1 106 0
+ 289 0006 514B     		ldr	r3, .L57
+ 290              	.LVL21:
+ 104:..\common\vms/NoteMapper.c ****     //does the map loaded still match the one required?
+ 291              		.loc 1 104 0
+ 292 0008 9046     		mov	r8, r2
+ 293              		.loc 1 106 0
+ 294 000a 53F82420 		ldr	r2, [r3, r4, lsl #2]
+ 295              	.LVL22:
+ 104:..\common\vms/NoteMapper.c ****     //does the map loaded still match the one required?
+ 296              		.loc 1 104 0
+ 297 000e 91B0     		sub	sp, sp, #68
+ 298              		.cfi_def_cfa_offset 104
+ 104:..\common\vms/NoteMapper.c ****     //does the map loaded still match the one required?
+ 299              		.loc 1 104 0
+ 300 0010 0F46     		mov	r7, r1
+ 301 0012 8146     		mov	r9, r0
+ 302 0014 1A99     		ldr	r1, [sp, #104]
+ 303              	.LVL23:
+ 304 0016 1D46     		mov	r5, r3
+ 305              		.loc 1 106 0
+ 306 0018 2AB1     		cbz	r2, .L27
+ 307              		.loc 1 106 0 is_stmt 0 discriminator 1
+ 308 001a 5378     		ldrb	r3, [r2, #1]	@ zero_extendqisi2
+ 309 001c 8B42     		cmp	r3, r1
+ 310 001e 02D8     		bhi	.L27
+ 311              		.loc 1 106 0 discriminator 2
+ 312 0020 9378     		ldrb	r3, [r2, #2]	@ zero_extendqisi2
+ 313 0022 9942     		cmp	r1, r3
+ 314 0024 02D9     		bls	.L28
+ 315              	.L27:
+ 107:..\common\vms/NoteMapper.c ****         //reload the new data
+ 108:..\common\vms/NoteMapper.c ****         loadNewProgramm(channel, programm);
+ 316              		.loc 1 108 0 is_stmt 1
+ 317 0026 2046     		mov	r0, r4
+ 318              	.LVL24:
+ 319 0028 FFF7FEFF 		bl	loadNewProgramm
+ 320              	.LVL25:
+ 321              	.L28:
+ 322              	.LBB2:
+ 109:..\common\vms/NoteMapper.c ****     }
+ 110:..\common\vms/NoteMapper.c ****     
+ 111:..\common\vms/NoteMapper.c ****     uint32_t requestedVoiceCount = 0;
+ 112:..\common\vms/NoteMapper.c ****     MAPTABLE_ENTRY_t * entries[SIGGEN_VOICECOUNT];
+ 113:..\common\vms/NoteMapper.c ****     
+ 114:..\common\vms/NoteMapper.c ****     //find entry matching our note
+ 115:..\common\vms/NoteMapper.c ****     MAPTABLE_ENTRY_t * currEntry = NULL;
+ 116:..\common\vms/NoteMapper.c ****     for(uint32_t currEntryIdx = 0; currEntryIdx < channelMap[channel]->listEntries; currEntryIdx++)
+ 323              		.loc 1 116 0 discriminator 1
+ 324 002c 0022     		movs	r2, #0
+ 325 002e 1646     		mov	r6, r2
+ 326 0030 55F82430 		ldr	r3, [r5, r4, lsl #2]
+ 327 0034 13F8151B 		ldrb	r1, [r3], #21	@ zero_extendqisi2
+ 328              	.L29:
+ 329              	.LVL26:
+ 330 0038 8A42     		cmp	r2, r1
+ 331 003a 0ED2     		bcs	.L56
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 9
+
+
+ 332              	.LVL27:
+ 117:..\common\vms/NoteMapper.c ****         //get pointer to current entry
+ 118:..\common\vms/NoteMapper.c ****         currEntry = MAPPER_ENTRY_FROM_HEADER(channelMap[channel], currEntryIdx);
+ 119:..\common\vms/NoteMapper.c ****           
+ 120:..\common\vms/NoteMapper.c ****         //does the note fall within the range of the current header entry?
+ 121:..\common\vms/NoteMapper.c ****         if(note >= currEntry->startNote && note <= currEntry->endNote){
+ 333              		.loc 1 121 0
+ 334 003c 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 335 003e B842     		cmp	r0, r7
+ 336 0040 08D8     		bhi	.L30
+ 337              	.LVL28:
+ 338              		.loc 1 121 0 is_stmt 0 discriminator 1
+ 339 0042 5878     		ldrb	r0, [r3, #1]	@ zero_extendqisi2
+ 340 0044 8742     		cmp	r7, r0
+ 122:..\common\vms/NoteMapper.c ****             //yes :) add entry to the list of ones to process
+ 123:..\common\vms/NoteMapper.c ****             entries[requestedVoiceCount++] = currEntry;
+ 341              		.loc 1 123 0 is_stmt 1 discriminator 1
+ 342 0046 9FBF     		itttt	ls
+ 343 0048 10A8     		addls	r0, sp, #64
+ 344 004a 00EB8600 		addls	r0, r0, r6, lsl #2
+ 345 004e 40F8183C 		strls	r3, [r0, #-24]
+ 346 0052 0136     		addls	r6, r6, #1
+ 347              	.LVL29:
+ 348              	.L30:
+ 116:..\common\vms/NoteMapper.c ****         //get pointer to current entry
+ 349              		.loc 1 116 0 discriminator 2
+ 350 0054 0132     		adds	r2, r2, #1
+ 351              	.LVL30:
+ 352 0056 0833     		adds	r3, r3, #8
+ 353              	.LVL31:
+ 354 0058 EEE7     		b	.L29
+ 355              	.LVL32:
+ 356              	.L56:
+ 357              	.LBE2:
+ 124:..\common\vms/NoteMapper.c ****         }else{
+ 125:..\common\vms/NoteMapper.c ****             //no, make sure to NULL the pointer, incase the loop ends after this entry. We need to 
+ 126:..\common\vms/NoteMapper.c ****             currEntry = NULL;
+ 127:..\common\vms/NoteMapper.c ****         }
+ 128:..\common\vms/NoteMapper.c ****     }
+ 129:..\common\vms/NoteMapper.c ****     
+ 130:..\common\vms/NoteMapper.c ****     //did we find at least one entry?
+ 131:..\common\vms/NoteMapper.c ****     if(requestedVoiceCount == 0){
+ 358              		.loc 1 131 0
+ 359 005a 002E     		cmp	r6, #0
+ 360 005c 73D0     		beq	.L26
+ 361 005e 0025     		movs	r5, #0
+ 362              	.LBB3:
+ 363              	.LBB4:
+ 132:..\common\vms/NoteMapper.c ****         //no, this means no entry deals with the note currently played, aka it will be silent
+ 133:..\common\vms/NoteMapper.c ****         return;
+ 134:..\common\vms/NoteMapper.c ****     }
+ 135:..\common\vms/NoteMapper.c ****     
+ 136:..\common\vms/NoteMapper.c ****     //yes! now prepare the data for VMS
+ 137:..\common\vms/NoteMapper.c ****     for(uint32_t i = 0; i < requestedVoiceCount; i++){
+ 138:..\common\vms/NoteMapper.c ****         MAPTABLE_DATA_t *data = &(entries[i]->data);
+ 139:..\common\vms/NoteMapper.c ****         
+ 140:..\common\vms/NoteMapper.c ****         //TODO maybe add an offset to this in the map?
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 10
+
+
+ 141:..\common\vms/NoteMapper.c ****         uint32_t targetOnTime_us = param.pw;
+ 142:..\common\vms/NoteMapper.c ****     
+ 143:..\common\vms/NoteMapper.c ****         volatile uint32_t targetVolume = (MAX_VOL * data->targetOT) / MAPPER_VOLUME_MAX;
+ 364              		.loc 1 143 0
+ 365 0060 4FF0FF0A 		mov	r10, #255
+ 366              	.LVL33:
+ 367              	.L38:
+ 138:..\common\vms/NoteMapper.c ****         
+ 368              		.loc 1 138 0
+ 369 0064 0AAB     		add	r3, sp, #40
+ 370 0066 53F825B0 		ldr	fp, [r3, r5, lsl #2]
+ 371              	.LVL34:
+ 141:..\common\vms/NoteMapper.c ****     
+ 372              		.loc 1 141 0
+ 373 006a 394B     		ldr	r3, .L57+4
+ 374 006c 1B88     		ldrh	r3, [r3]
+ 375 006e 0693     		str	r3, [sp, #24]
+ 376              	.LVL35:
+ 377              		.loc 1 143 0
+ 378 0070 9BF80430 		ldrb	r3, [fp, #4]	@ zero_extendqisi2
+ 379              	.LVL36:
+ 380 0074 C3EBC333 		rsb	r3, r3, r3, lsl #15
+ 381 0078 93FBFAF3 		sdiv	r3, r3, r10
+ 382 007c 0893     		str	r3, [sp, #32]
+ 144:..\common\vms/NoteMapper.c ****         uint32_t baseVolume = targetVolume;
+ 383              		.loc 1 144 0
+ 384 007e 089B     		ldr	r3, [sp, #32]
+ 385 0080 0793     		str	r3, [sp, #28]
+ 386              	.LVL37:
+ 145:..\common\vms/NoteMapper.c ****         
+ 146:..\common\vms/NoteMapper.c ****         volatile uint32_t targetFrequency = 0;
+ 387              		.loc 1 146 0
+ 388 0082 0023     		movs	r3, #0
+ 389              	.LVL38:
+ 390 0084 0993     		str	r3, [sp, #36]
+ 147:..\common\vms/NoteMapper.c **** 
+ 148:..\common\vms/NoteMapper.c **** 
+ 149:..\common\vms/NoteMapper.c ****         //check which volume effects are enabled and apply them
+ 150:..\common\vms/NoteMapper.c ****         if(data->flags & MAP_ENA_DAMPER){
+ 391              		.loc 1 150 0
+ 392 0086 9BF80530 		ldrb	r3, [fp, #5]	@ zero_extendqisi2
+ 393 008a D906     		lsls	r1, r3, #27
+ 394 008c 0AD5     		bpl	.L33
+ 151:..\common\vms/NoteMapper.c ****             targetVolume *= MidiProcessor_getDamperVolume(channel);
+ 395              		.loc 1 151 0
+ 396 008e 2046     		mov	r0, r4
+ 397 0090 FFF7FEFF 		bl	MidiProcessor_getDamperVolume
+ 398              	.LVL39:
+ 399 0094 089B     		ldr	r3, [sp, #32]
+ 152:..\common\vms/NoteMapper.c ****             targetVolume /= MIDI_VOLUME_MAX;
+ 400              		.loc 1 152 0
+ 401 0096 7F21     		movs	r1, #127
+ 151:..\common\vms/NoteMapper.c ****             targetVolume *= MidiProcessor_getDamperVolume(channel);
+ 402              		.loc 1 151 0
+ 403 0098 5843     		muls	r0, r3, r0
+ 404 009a 0890     		str	r0, [sp, #32]
+ 405              		.loc 1 152 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 11
+
+
+ 406 009c 089B     		ldr	r3, [sp, #32]
+ 407 009e B3FBF1F3 		udiv	r3, r3, r1
+ 408 00a2 0893     		str	r3, [sp, #32]
+ 409              	.L33:
+ 153:..\common\vms/NoteMapper.c ****         }
+ 154:..\common\vms/NoteMapper.c **** 
+ 155:..\common\vms/NoteMapper.c ****         if(data->flags & MAP_ENA_STEREO){
+ 410              		.loc 1 155 0
+ 411 00a4 9BF80530 		ldrb	r3, [fp, #5]	@ zero_extendqisi2
+ 412 00a8 5A06     		lsls	r2, r3, #25
+ 413 00aa 0AD5     		bpl	.L34
+ 156:..\common\vms/NoteMapper.c ****             targetVolume *= MidiProcessor_getStereoVolume(channel);
+ 414              		.loc 1 156 0
+ 415 00ac 2046     		mov	r0, r4
+ 416 00ae FFF7FEFF 		bl	MidiProcessor_getStereoVolume
+ 417              	.LVL40:
+ 418 00b2 089B     		ldr	r3, [sp, #32]
+ 157:..\common\vms/NoteMapper.c ****             targetVolume /= MIDI_VOLUME_MAX;
+ 419              		.loc 1 157 0
+ 420 00b4 7F21     		movs	r1, #127
+ 156:..\common\vms/NoteMapper.c ****             targetVolume *= MidiProcessor_getStereoVolume(channel);
+ 421              		.loc 1 156 0
+ 422 00b6 5843     		muls	r0, r3, r0
+ 423 00b8 0890     		str	r0, [sp, #32]
+ 424              		.loc 1 157 0
+ 425 00ba 089B     		ldr	r3, [sp, #32]
+ 426 00bc B3FBF1F3 		udiv	r3, r3, r1
+ 427 00c0 0893     		str	r3, [sp, #32]
+ 428              	.L34:
+ 158:..\common\vms/NoteMapper.c ****         }
+ 159:..\common\vms/NoteMapper.c **** 
+ 160:..\common\vms/NoteMapper.c ****         if(data->flags & MAP_ENA_VOLUME){
+ 429              		.loc 1 160 0
+ 430 00c2 9BF80530 		ldrb	r3, [fp, #5]	@ zero_extendqisi2
+ 431 00c6 9B06     		lsls	r3, r3, #26
+ 432 00c8 12D5     		bpl	.L35
+ 161:..\common\vms/NoteMapper.c ****             targetVolume *= MidiProcessor_getVolume(channel);
+ 433              		.loc 1 161 0
+ 434 00ca 2046     		mov	r0, r4
+ 435 00cc FFF7FEFF 		bl	MidiProcessor_getVolume
+ 436              	.LVL41:
+ 437 00d0 089B     		ldr	r3, [sp, #32]
+ 438 00d2 5843     		muls	r0, r3, r0
+ 439 00d4 0890     		str	r0, [sp, #32]
+ 162:..\common\vms/NoteMapper.c ****             targetVolume /= MIDI_VOLUME_MAX;
+ 440              		.loc 1 162 0
+ 441 00d6 0899     		ldr	r1, [sp, #32]
+ 442 00d8 7F20     		movs	r0, #127
+ 443 00da B1FBF0F1 		udiv	r1, r1, r0
+ 444 00de 0891     		str	r1, [sp, #32]
+ 163:..\common\vms/NoteMapper.c ****                     
+ 164:..\common\vms/NoteMapper.c ****             targetVolume *= velocity;
+ 445              		.loc 1 164 0
+ 446 00e0 0899     		ldr	r1, [sp, #32]
+ 447 00e2 08FB01F1 		mul	r1, r8, r1
+ 448 00e6 0891     		str	r1, [sp, #32]
+ 165:..\common\vms/NoteMapper.c ****             targetVolume /= MIDI_VOLUME_MAX;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 12
+
+
+ 449              		.loc 1 165 0
+ 450 00e8 089B     		ldr	r3, [sp, #32]
+ 451 00ea B3FBF0F3 		udiv	r3, r3, r0
+ 452 00ee 0893     		str	r3, [sp, #32]
+ 453              	.L35:
+ 166:..\common\vms/NoteMapper.c ****         }
+ 167:..\common\vms/NoteMapper.c **** 
+ 168:..\common\vms/NoteMapper.c ****         if(data->flags & MAP_ENA_EQ){
+ 169:..\common\vms/NoteMapper.c ****             //meh this needs to happen after VMS
+ 170:..\common\vms/NoteMapper.c ****         }
+ 171:..\common\vms/NoteMapper.c **** 
+ 172:..\common\vms/NoteMapper.c ****         //check for note frequency effects
+ 173:..\common\vms/NoteMapper.c **** 
+ 174:..\common\vms/NoteMapper.c ****         //get note frequency from map entry and scale to tenths
+ 175:..\common\vms/NoteMapper.c ****         if((data->flags & MAP_FREQ_MODE) == FREQ_MODE_OFFSET){
+ 454              		.loc 1 175 0
+ 455 00f0 9BF80530 		ldrb	r3, [fp, #5]	@ zero_extendqisi2
+ 456 00f4 13F0010F 		tst	r3, #1
+ 457 00f8 BBF90230 		ldrsh	r3, [fp, #2]	@ unaligned
+ 458 00fc 09D0     		beq	.L36
+ 459              	.LBB5:
+ 176:..\common\vms/NoteMapper.c ****             //octave offset mode
+ 177:..\common\vms/NoteMapper.c ****             int16_t currNote = note + data->noteFreq;
+ 460              		.loc 1 177 0
+ 461 00fe 3B44     		add	r3, r3, r7
+ 462 0100 9BB2     		uxth	r3, r3
+ 463 0102 18B2     		sxth	r0, r3
+ 464              	.LVL42:
+ 178:..\common\vms/NoteMapper.c ****             if(currNote > 127 || currNote < 1) return;
+ 465              		.loc 1 178 0
+ 466 0104 013B     		subs	r3, r3, #1
+ 467 0106 7E2B     		cmp	r3, #126
+ 468 0108 1DD8     		bhi	.L26
+ 179:..\common\vms/NoteMapper.c ****             targetFrequency = MidiProcessor_noteToFrequency_dHz(currNote);
+ 469              		.loc 1 179 0
+ 470 010a FFF7FEFF 		bl	MidiProcessor_noteToFrequency_dHz
+ 471              	.LVL43:
+ 472 010e 0990     		str	r0, [sp, #36]
+ 473              	.LBE5:
+ 474 0110 02E0     		b	.L37
+ 475              	.L36:
+ 180:..\common\vms/NoteMapper.c ****         }else{
+ 181:..\common\vms/NoteMapper.c ****             //fixed frequency mode
+ 182:..\common\vms/NoteMapper.c ****             targetFrequency = data->noteFreq * 10;
+ 476              		.loc 1 182 0
+ 477 0112 0A21     		movs	r1, #10
+ 478 0114 4B43     		muls	r3, r1, r3
+ 479 0116 0993     		str	r3, [sp, #36]
+ 480              	.L37:
+ 183:..\common\vms/NoteMapper.c ****         }
+ 184:..\common\vms/NoteMapper.c **** 
+ 185:..\common\vms/NoteMapper.c ****         if(data->flags & MAP_ENA_PORTAMENTO){
+ 186:..\common\vms/NoteMapper.c ****             /*
+ 187:..\common\vms/NoteMapper.c ****              * portamento will be handled differently in this version:
+ 188:..\common\vms/NoteMapper.c ****              * 
+ 189:..\common\vms/NoteMapper.c ****              * instead of using a VMS_LIN block with a custom slope to shift the frequency around w
+ 190:..\common\vms/NoteMapper.c ****              * this will scale the frequency between frequencyTarget and lastFrequency across a val
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 13
+
+
+ 191:..\common\vms/NoteMapper.c ****              * 
+ 192:..\common\vms/NoteMapper.c ****              * A new portamento block will then be a VMS_LIN of portamentoFactor
+ 193:..\common\vms/NoteMapper.c ****              */
+ 194:..\common\vms/NoteMapper.c ****             
+ 195:..\common\vms/NoteMapper.c ****             //TODO ?
+ 196:..\common\vms/NoteMapper.c ****         }
+ 197:..\common\vms/NoteMapper.c ****         
+ 198:..\common\vms/NoteMapper.c ****         VMSW_startNote(output, data->startblockID, note, channel, targetOnTime_us, targetVolume, ta
+ 481              		.loc 1 198 0
+ 482 0118 079A     		ldr	r2, [sp, #28]
+ 483 011a 089B     		ldr	r3, [sp, #32]
+ 484 011c BBF80610 		ldrh	r1, [fp, #6]	@ unaligned
+ 485 0120 CDF81480 		str	r8, [sp, #20]
+ 486 0124 0492     		str	r2, [sp, #16]
+ 487 0126 9BF80520 		ldrb	r2, [fp, #5]	@ zero_extendqisi2
+ 488 012a 0998     		ldr	r0, [sp, #36]
+ 489 012c 0193     		str	r3, [sp, #4]
+ 490 012e 069B     		ldr	r3, [sp, #24]
+ 491 0130 0392     		str	r2, [sp, #12]
+ 492 0132 0290     		str	r0, [sp, #8]
+ 493 0134 0093     		str	r3, [sp]
+ 494 0136 3A46     		mov	r2, r7
+ 495 0138 2346     		mov	r3, r4
+ 496 013a 4846     		mov	r0, r9
+ 497              	.LBE4:
+ 137:..\common\vms/NoteMapper.c ****         MAPTABLE_DATA_t *data = &(entries[i]->data);
+ 498              		.loc 1 137 0
+ 499 013c 0135     		adds	r5, r5, #1
+ 500              	.LVL44:
+ 501              	.LBB6:
+ 502              		.loc 1 198 0
+ 503 013e FFF7FEFF 		bl	VMSW_startNote
+ 504              	.LVL45:
+ 505              	.LBE6:
+ 137:..\common\vms/NoteMapper.c ****         MAPTABLE_DATA_t *data = &(entries[i]->data);
+ 506              		.loc 1 137 0
+ 507 0142 AE42     		cmp	r6, r5
+ 508 0144 8ED1     		bne	.L38
+ 509              	.LVL46:
+ 510              	.L26:
+ 511              	.LBE3:
+ 199:..\common\vms/NoteMapper.c ****     }
+ 200:..\common\vms/NoteMapper.c **** }
+ 512              		.loc 1 200 0
+ 513 0146 11B0     		add	sp, sp, #68
+ 514              		.cfi_def_cfa_offset 36
+ 515              		@ sp needed
+ 516 0148 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 517              	.LVL47:
+ 518              	.L58:
+ 519              		.align	2
+ 520              	.L57:
+ 521 014c 00000000 		.word	.LANCHOR0
+ 522 0150 00000000 		.word	param
+ 523              		.cfi_endproc
+ 524              	.LFE76:
+ 525              		.size	Mapper_noteOnEventHandler, .-Mapper_noteOnEventHandler
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 14
+
+
+ 526              		.section	.text.MAPPER_convertToLegayMapEntry,"ax",%progbits
+ 527              		.align	1
+ 528              		.global	MAPPER_convertToLegayMapEntry
+ 529              		.thumb
+ 530              		.thumb_func
+ 531              		.type	MAPPER_convertToLegayMapEntry, %function
+ 532              	MAPPER_convertToLegayMapEntry:
+ 533              	.LFB77:
+ 201:..\common\vms/NoteMapper.c **** 
+ 202:..\common\vms/NoteMapper.c **** void MAPPER_convertToLegayMapEntry(LegayMapEntry_t * dst, MAPTABLE_ENTRY_t * src){
+ 534              		.loc 1 202 0
+ 535              		.cfi_startproc
+ 536              		@ args = 0, pretend = 0, frame = 0
+ 537              		@ frame_needed = 0, uses_anonymous_args = 0
+ 538              		@ link register save eliminated.
+ 539              	.LVL48:
+ 203:..\common\vms/NoteMapper.c ****     if(src == NULL || dst == NULL) return;
+ 540              		.loc 1 203 0
+ 541 0000 79B1     		cbz	r1, .L59
+ 542              		.loc 1 203 0 is_stmt 0 discriminator 1
+ 543 0002 70B1     		cbz	r0, .L59
+ 204:..\common\vms/NoteMapper.c ****     
+ 205:..\common\vms/NoteMapper.c ****     dst->startNote = src->startNote;
+ 544              		.loc 1 205 0 is_stmt 1
+ 545 0004 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 546 0006 0370     		strb	r3, [r0]
+ 206:..\common\vms/NoteMapper.c ****     dst->endNote = src->endNote;
+ 547              		.loc 1 206 0
+ 548 0008 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 549 000a 4370     		strb	r3, [r0, #1]
+ 207:..\common\vms/NoteMapper.c ****     
+ 208:..\common\vms/NoteMapper.c ****     dst->data.flags = src->data.flags;
+ 550              		.loc 1 208 0
+ 551 000c 4B79     		ldrb	r3, [r1, #5]	@ zero_extendqisi2
+ 552 000e 4371     		strb	r3, [r0, #5]
+ 209:..\common\vms/NoteMapper.c ****     dst->data.noteFreq = src->data.noteFreq;
+ 553              		.loc 1 209 0
+ 554 0010 B1F90230 		ldrsh	r3, [r1, #2]	@ unaligned
+ 555 0014 4380     		strh	r3, [r0, #2]	@ unaligned
+ 210:..\common\vms/NoteMapper.c ****     dst->data.startblockID = src->data.startblockID + 1;
+ 556              		.loc 1 210 0
+ 557 0016 CB88     		ldrh	r3, [r1, #6]	@ unaligned
+ 558 0018 0133     		adds	r3, r3, #1
+ 559 001a C0F80630 		str	r3, [r0, #6]	@ unaligned
+ 211:..\common\vms/NoteMapper.c ****     dst->data.targetOT = src->data.targetOT;
+ 560              		.loc 1 211 0
+ 561 001e 0B79     		ldrb	r3, [r1, #4]	@ zero_extendqisi2
+ 562 0020 0371     		strb	r3, [r0, #4]
+ 563              	.L59:
+ 564 0022 7047     		bx	lr
+ 565              		.cfi_endproc
+ 566              	.LFE77:
+ 567              		.size	MAPPER_convertToLegayMapEntry, .-MAPPER_convertToLegayMapEntry
+ 568              		.section	.text.MAPPER_convertFromLegayMapEntry,"ax",%progbits
+ 569              		.align	1
+ 570              		.global	MAPPER_convertFromLegayMapEntry
+ 571              		.thumb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 15
+
+
+ 572              		.thumb_func
+ 573              		.type	MAPPER_convertFromLegayMapEntry, %function
+ 574              	MAPPER_convertFromLegayMapEntry:
+ 575              	.LFB78:
+ 212:..\common\vms/NoteMapper.c **** }
+ 213:..\common\vms/NoteMapper.c **** 
+ 214:..\common\vms/NoteMapper.c **** void MAPPER_convertFromLegayMapEntry(MAPTABLE_ENTRY_t * dst, LegayMapEntry_t * src){
+ 576              		.loc 1 214 0
+ 577              		.cfi_startproc
+ 578              		@ args = 0, pretend = 0, frame = 0
+ 579              		@ frame_needed = 0, uses_anonymous_args = 0
+ 580              		@ link register save eliminated.
+ 581              	.LVL49:
+ 215:..\common\vms/NoteMapper.c ****     if(src == NULL || dst == NULL) return;
+ 582              		.loc 1 215 0
+ 583 0000 79B1     		cbz	r1, .L67
+ 584              		.loc 1 215 0 is_stmt 0 discriminator 1
+ 585 0002 70B1     		cbz	r0, .L67
+ 216:..\common\vms/NoteMapper.c ****     
+ 217:..\common\vms/NoteMapper.c ****     dst->startNote = src->startNote;
+ 586              		.loc 1 217 0 is_stmt 1
+ 587 0004 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 588 0006 0370     		strb	r3, [r0]
+ 218:..\common\vms/NoteMapper.c ****     dst->endNote = src->endNote;
+ 589              		.loc 1 218 0
+ 590 0008 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 591 000a 4370     		strb	r3, [r0, #1]
+ 219:..\common\vms/NoteMapper.c ****     
+ 220:..\common\vms/NoteMapper.c ****     dst->data.flags = src->data.flags;
+ 592              		.loc 1 220 0
+ 593 000c 4B79     		ldrb	r3, [r1, #5]	@ zero_extendqisi2
+ 594 000e 4371     		strb	r3, [r0, #5]
+ 221:..\common\vms/NoteMapper.c ****     dst->data.noteFreq = src->data.noteFreq;
+ 595              		.loc 1 221 0
+ 596 0010 B1F90230 		ldrsh	r3, [r1, #2]	@ unaligned
+ 597 0014 4380     		strh	r3, [r0, #2]	@ unaligned
+ 222:..\common\vms/NoteMapper.c ****     dst->data.startblockID = src->data.startblockID - 1;
+ 598              		.loc 1 222 0
+ 599 0016 D1F80630 		ldr	r3, [r1, #6]	@ unaligned
+ 600 001a 013B     		subs	r3, r3, #1
+ 601 001c C380     		strh	r3, [r0, #6]	@ unaligned
+ 223:..\common\vms/NoteMapper.c ****     dst->data.targetOT = src->data.targetOT;
+ 602              		.loc 1 223 0
+ 603 001e 0B79     		ldrb	r3, [r1, #4]	@ zero_extendqisi2
+ 604 0020 0371     		strb	r3, [r0, #4]
+ 605              	.L67:
+ 606 0022 7047     		bx	lr
+ 607              		.cfi_endproc
+ 608              	.LFE78:
+ 609              		.size	MAPPER_convertFromLegayMapEntry, .-MAPPER_convertFromLegayMapEntry
+ 610              		.section	.text.MAPPER_convertToLegayMapHeader,"ax",%progbits
+ 611              		.align	1
+ 612              		.global	MAPPER_convertToLegayMapHeader
+ 613              		.thumb
+ 614              		.thumb_func
+ 615              		.type	MAPPER_convertToLegayMapHeader, %function
+ 616              	MAPPER_convertToLegayMapHeader:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 16
+
+
+ 617              	.LFB79:
+ 224:..\common\vms/NoteMapper.c **** }
+ 225:..\common\vms/NoteMapper.c **** 
+ 226:..\common\vms/NoteMapper.c **** void MAPPER_convertToLegayMapHeader(LegayMapHeader_t * dst, MAPTABLE_HEADER_t * src){
+ 618              		.loc 1 226 0
+ 619              		.cfi_startproc
+ 620              		@ args = 0, pretend = 0, frame = 0
+ 621              		@ frame_needed = 0, uses_anonymous_args = 0
+ 622              		@ link register save eliminated.
+ 623              	.LVL50:
+ 227:..\common\vms/NoteMapper.c ****     if(src == NULL || dst == NULL) return;
+ 624              		.loc 1 227 0
+ 625 0000 89B1     		cbz	r1, .L75
+ 626              		.loc 1 227 0 is_stmt 0 discriminator 1
+ 627 0002 80B1     		cbz	r0, .L75
+ 228:..\common\vms/NoteMapper.c ****     
+ 229:..\common\vms/NoteMapper.c ****     dst->listEntries = src->listEntries;
+ 628              		.loc 1 229 0 is_stmt 1
+ 629 0004 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 230:..\common\vms/NoteMapper.c ****     dst->programNumberStart = src->programNumberStart;
+ 231:..\common\vms/NoteMapper.c ****     memcpy(dst->name, src->name, MAPPER_MAP_NAME_LENGTH);
+ 630              		.loc 1 231 0
+ 631 0006 0230     		adds	r0, r0, #2
+ 632              	.LVL51:
+ 229:..\common\vms/NoteMapper.c ****     dst->programNumberStart = src->programNumberStart;
+ 633              		.loc 1 229 0
+ 634 0008 00F8023C 		strb	r3, [r0, #-2]
+ 230:..\common\vms/NoteMapper.c ****     dst->programNumberStart = src->programNumberStart;
+ 635              		.loc 1 230 0
+ 636 000c 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 637 000e 00F8013C 		strb	r3, [r0, #-1]
+ 638              		.loc 1 231 0
+ 639 0012 CB1C     		adds	r3, r1, #3
+ 640 0014 1331     		adds	r1, r1, #19
+ 641              	.LVL52:
+ 642              	.L77:
+ 643 0016 53F8042B 		ldr	r2, [r3], #4	@ unaligned
+ 644 001a 8B42     		cmp	r3, r1
+ 645 001c 40F8042B 		str	r2, [r0], #4	@ unaligned
+ 646 0020 F9D1     		bne	.L77
+ 647 0022 1B88     		ldrh	r3, [r3]	@ unaligned
+ 648 0024 0380     		strh	r3, [r0]	@ unaligned
+ 649              	.LVL53:
+ 650              	.L75:
+ 651 0026 7047     		bx	lr
+ 652              		.cfi_endproc
+ 653              	.LFE79:
+ 654              		.size	MAPPER_convertToLegayMapHeader, .-MAPPER_convertToLegayMapHeader
+ 655              		.section	.text.MAPPER_convertFromLegayMapHeader,"ax",%progbits
+ 656              		.align	1
+ 657              		.global	MAPPER_convertFromLegayMapHeader
+ 658              		.thumb
+ 659              		.thumb_func
+ 660              		.type	MAPPER_convertFromLegayMapHeader, %function
+ 661              	MAPPER_convertFromLegayMapHeader:
+ 662              	.LFB80:
+ 232:..\common\vms/NoteMapper.c **** }
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 17
+
+
+ 233:..\common\vms/NoteMapper.c **** 
+ 234:..\common\vms/NoteMapper.c **** void MAPPER_convertFromLegayMapHeader(MAPTABLE_HEADER_t * dst, LegayMapHeader_t * src){
+ 663              		.loc 1 234 0
+ 664              		.cfi_startproc
+ 665              		@ args = 0, pretend = 0, frame = 0
+ 666              		@ frame_needed = 0, uses_anonymous_args = 0
+ 667              		@ link register save eliminated.
+ 668              	.LVL54:
+ 235:..\common\vms/NoteMapper.c ****     if(src == NULL || dst == NULL) return;
+ 669              		.loc 1 235 0
+ 670 0000 A1B1     		cbz	r1, .L85
+ 671              		.loc 1 235 0 is_stmt 0 discriminator 1
+ 672 0002 98B1     		cbz	r0, .L85
+ 236:..\common\vms/NoteMapper.c ****     
+ 237:..\common\vms/NoteMapper.c ****     dst->listEntries = src->listEntries;
+ 673              		.loc 1 237 0 is_stmt 1
+ 674 0004 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 238:..\common\vms/NoteMapper.c ****     dst->programNumberStart = src->programNumberStart;
+ 239:..\common\vms/NoteMapper.c ****     dst->programNumberEnd = src->programNumberStart;
+ 240:..\common\vms/NoteMapper.c ****     memcpy(dst->name, src->name, MAPPER_MAP_NAME_LENGTH);
+ 675              		.loc 1 240 0
+ 676 0006 0330     		adds	r0, r0, #3
+ 677              	.LVL55:
+ 237:..\common\vms/NoteMapper.c ****     dst->programNumberStart = src->programNumberStart;
+ 678              		.loc 1 237 0
+ 679 0008 00F8033C 		strb	r3, [r0, #-3]
+ 238:..\common\vms/NoteMapper.c ****     dst->programNumberStart = src->programNumberStart;
+ 680              		.loc 1 238 0
+ 681 000c 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 682 000e 00F8023C 		strb	r3, [r0, #-2]
+ 239:..\common\vms/NoteMapper.c ****     memcpy(dst->name, src->name, MAPPER_MAP_NAME_LENGTH);
+ 683              		.loc 1 239 0
+ 684 0012 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 685 0014 00F8013C 		strb	r3, [r0, #-1]
+ 686              		.loc 1 240 0
+ 687 0018 8B1C     		adds	r3, r1, #2
+ 688 001a 1231     		adds	r1, r1, #18
+ 689              	.LVL56:
+ 690              	.L87:
+ 691 001c 53F8042B 		ldr	r2, [r3], #4	@ unaligned
+ 692 0020 8B42     		cmp	r3, r1
+ 693 0022 40F8042B 		str	r2, [r0], #4	@ unaligned
+ 694 0026 F9D1     		bne	.L87
+ 695 0028 1B88     		ldrh	r3, [r3]	@ unaligned
+ 696 002a 0380     		strh	r3, [r0]	@ unaligned
+ 697              	.LVL57:
+ 698              	.L85:
+ 699 002c 7047     		bx	lr
+ 700              		.cfi_endproc
+ 701              	.LFE80:
+ 702              		.size	MAPPER_convertFromLegayMapHeader, .-MAPPER_convertFromLegayMapHeader
+ 703              		.global	DEFMAP
+ 704              		.comm	interrupter,12,4
+ 705              		.section	.rodata
+ 706              		.set	.LANCHOR1,. + 0
+ 707              		.type	DEFMAP, %object
+ 708              		.size	DEFMAP, 29
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 18
+
+
+ 709              	DEFMAP:
+ 710 0000 01       		.byte	1
+ 711 0001 00       		.byte	0
+ 712 0002 7F       		.byte	127
+ 713 0003 00000000 		.space	18
+ 713      00000000 
+ 713      00000000 
+ 713      00000000 
+ 713      0000
+ 714 0015 00       		.byte	0
+ 715 0016 7F       		.byte	127
+ 716 0017 0000     		.2byte	0
+ 717 0019 FF       		.byte	-1
+ 718 001a F1       		.byte	-15
+ 719 001b F0FF     		.2byte	-16
+ 720              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 721              	.LC0:
+ 722 0000 4445464D 		.ascii	"DEFMAP\000"
+ 722      415000
+ 723              		.bss
+ 724              		.align	2
+ 725              		.set	.LANCHOR0,. + 0
+ 726              		.type	channelMap, %object
+ 727              		.size	channelMap, 64
+ 728              	channelMap:
+ 729 0000 00000000 		.space	64
+ 729      00000000 
+ 729      00000000 
+ 729      00000000 
+ 729      00000000 
+ 730              		.text
+ 731              	.Letext0:
+ 732              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 733              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 734              		.file 4 "..\\common\\vms\\NoteMapper.h"
+ 735              		.file 5 "..\\common\\rtos\\include/timers.h"
+ 736              		.file 6 "..\\common\\ud3core/interrupter.h"
+ 737              		.file 7 "..\\common\\ud3core/cli_common.h"
+ 738              		.file 8 "Generated_Source\\PSoC5/core_cm3.h"
+ 739              		.file 9 "..\\common\\ud3core/helper/nvm.h"
+ 740              		.file 10 "..\\common\\vms\\VMSWrapper.h"
+ 741              		.file 11 "..\\common\\vms\\MidiProcessor.h"
+ 742              		.section	.debug_info,"",%progbits
+ 743              	.Ldebug_info0:
+ 744 0000 090A0000 		.4byte	0xa09
+ 745 0004 0400     		.2byte	0x4
+ 746 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 747 000a 04       		.byte	0x4
+ 748 000b 01       		.uleb128 0x1
+ 749 000c 27020000 		.4byte	.LASF121
+ 750 0010 0C       		.byte	0xc
+ 751 0011 9B010000 		.4byte	.LASF122
+ 752 0015 C8000000 		.4byte	.LASF123
+ 753 0019 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 754 001d 00000000 		.4byte	0
+ 755 0021 00000000 		.4byte	.Ldebug_line0
+ 756 0025 02       		.uleb128 0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 19
+
+
+ 757 0026 01       		.byte	0x1
+ 758 0027 06       		.byte	0x6
+ 759 0028 43010000 		.4byte	.LASF0
+ 760 002c 03       		.uleb128 0x3
+ 761 002d 45000000 		.4byte	.LASF2
+ 762 0031 02       		.byte	0x2
+ 763 0032 1D       		.byte	0x1d
+ 764 0033 37000000 		.4byte	0x37
+ 765 0037 02       		.uleb128 0x2
+ 766 0038 01       		.byte	0x1
+ 767 0039 08       		.byte	0x8
+ 768 003a 17050000 		.4byte	.LASF1
+ 769 003e 03       		.uleb128 0x3
+ 770 003f C0020000 		.4byte	.LASF3
+ 771 0043 02       		.byte	0x2
+ 772 0044 29       		.byte	0x29
+ 773 0045 49000000 		.4byte	0x49
+ 774 0049 02       		.uleb128 0x2
+ 775 004a 02       		.byte	0x2
+ 776 004b 05       		.byte	0x5
+ 777 004c 44050000 		.4byte	.LASF4
+ 778 0050 03       		.uleb128 0x3
+ 779 0051 4D060000 		.4byte	.LASF5
+ 780 0055 02       		.byte	0x2
+ 781 0056 2B       		.byte	0x2b
+ 782 0057 5B000000 		.4byte	0x5b
+ 783 005b 02       		.uleb128 0x2
+ 784 005c 02       		.byte	0x2
+ 785 005d 07       		.byte	0x7
+ 786 005e 8B030000 		.4byte	.LASF6
+ 787 0062 03       		.uleb128 0x3
+ 788 0063 62060000 		.4byte	.LASF7
+ 789 0067 02       		.byte	0x2
+ 790 0068 3F       		.byte	0x3f
+ 791 0069 6D000000 		.4byte	0x6d
+ 792 006d 02       		.uleb128 0x2
+ 793 006e 04       		.byte	0x4
+ 794 006f 05       		.byte	0x5
+ 795 0070 80010000 		.4byte	.LASF8
+ 796 0074 03       		.uleb128 0x3
+ 797 0075 11020000 		.4byte	.LASF9
+ 798 0079 02       		.byte	0x2
+ 799 007a 41       		.byte	0x41
+ 800 007b 7F000000 		.4byte	0x7f
+ 801 007f 02       		.uleb128 0x2
+ 802 0080 04       		.byte	0x4
+ 803 0081 07       		.byte	0x7
+ 804 0082 1E060000 		.4byte	.LASF10
+ 805 0086 02       		.uleb128 0x2
+ 806 0087 08       		.byte	0x8
+ 807 0088 05       		.byte	0x5
+ 808 0089 35010000 		.4byte	.LASF11
+ 809 008d 02       		.uleb128 0x2
+ 810 008e 08       		.byte	0x8
+ 811 008f 07       		.byte	0x7
+ 812 0090 ED000000 		.4byte	.LASF12
+ 813 0094 04       		.uleb128 0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 20
+
+
+ 814 0095 04       		.byte	0x4
+ 815 0096 05       		.byte	0x5
+ 816 0097 696E7400 		.ascii	"int\000"
+ 817 009b 02       		.uleb128 0x2
+ 818 009c 04       		.byte	0x4
+ 819 009d 07       		.byte	0x7
+ 820 009e E1020000 		.4byte	.LASF13
+ 821 00a2 03       		.uleb128 0x3
+ 822 00a3 2D070000 		.4byte	.LASF14
+ 823 00a7 03       		.byte	0x3
+ 824 00a8 18       		.byte	0x18
+ 825 00a9 2C000000 		.4byte	0x2c
+ 826 00ad 03       		.uleb128 0x3
+ 827 00ae 2D010000 		.4byte	.LASF15
+ 828 00b2 03       		.byte	0x3
+ 829 00b3 20       		.byte	0x20
+ 830 00b4 3E000000 		.4byte	0x3e
+ 831 00b8 03       		.uleb128 0x3
+ 832 00b9 CB030000 		.4byte	.LASF16
+ 833 00bd 03       		.byte	0x3
+ 834 00be 24       		.byte	0x24
+ 835 00bf 50000000 		.4byte	0x50
+ 836 00c3 03       		.uleb128 0x3
+ 837 00c4 0F050000 		.4byte	.LASF17
+ 838 00c8 03       		.byte	0x3
+ 839 00c9 2C       		.byte	0x2c
+ 840 00ca 62000000 		.4byte	0x62
+ 841 00ce 03       		.uleb128 0x3
+ 842 00cf D8050000 		.4byte	.LASF18
+ 843 00d3 03       		.byte	0x3
+ 844 00d4 30       		.byte	0x30
+ 845 00d5 74000000 		.4byte	0x74
+ 846 00d9 02       		.uleb128 0x2
+ 847 00da 04       		.byte	0x4
+ 848 00db 07       		.byte	0x7
+ 849 00dc 4E040000 		.4byte	.LASF19
+ 850 00e0 02       		.uleb128 0x2
+ 851 00e1 01       		.byte	0x1
+ 852 00e2 08       		.byte	0x8
+ 853 00e3 30060000 		.4byte	.LASF20
+ 854 00e7 05       		.uleb128 0x5
+ 855 00e8 04       		.byte	0x4
+ 856 00e9 ED000000 		.4byte	0xed
+ 857 00ed 06       		.uleb128 0x6
+ 858 00ee E0000000 		.4byte	0xe0
+ 859 00f2 02       		.uleb128 0x2
+ 860 00f3 04       		.byte	0x4
+ 861 00f4 04       		.byte	0x4
+ 862 00f5 90040000 		.4byte	.LASF21
+ 863 00f9 02       		.uleb128 0x2
+ 864 00fa 08       		.byte	0x8
+ 865 00fb 04       		.byte	0x4
+ 866 00fc BF010000 		.4byte	.LASF22
+ 867 0100 07       		.uleb128 0x7
+ 868 0101 CE000000 		.4byte	0xce
+ 869 0105 03       		.uleb128 0x3
+ 870 0106 3D030000 		.4byte	.LASF23
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 21
+
+
+ 871 010a 04       		.byte	0x4
+ 872 010b 1C       		.byte	0x1c
+ 873 010c 10010000 		.4byte	0x110
+ 874 0110 08       		.uleb128 0x8
+ 875 0111 7C060000 		.4byte	.LASF29
+ 876 0115 06       		.byte	0x6
+ 877 0116 04       		.byte	0x4
+ 878 0117 20       		.byte	0x20
+ 879 0118 4D010000 		.4byte	0x14d
+ 880 011c 09       		.uleb128 0x9
+ 881 011d 3C000000 		.4byte	.LASF24
+ 882 0121 04       		.byte	0x4
+ 883 0122 21       		.byte	0x21
+ 884 0123 AD000000 		.4byte	0xad
+ 885 0127 00       		.byte	0
+ 886 0128 09       		.uleb128 0x9
+ 887 0129 64010000 		.4byte	.LASF25
+ 888 012d 04       		.byte	0x4
+ 889 012e 22       		.byte	0x22
+ 890 012f A2000000 		.4byte	0xa2
+ 891 0133 02       		.byte	0x2
+ 892 0134 09       		.uleb128 0x9
+ 893 0135 45070000 		.4byte	.LASF26
+ 894 0139 04       		.byte	0x4
+ 895 013a 23       		.byte	0x23
+ 896 013b A2000000 		.4byte	0xa2
+ 897 013f 03       		.byte	0x3
+ 898 0140 09       		.uleb128 0x9
+ 899 0141 F6040000 		.4byte	.LASF27
+ 900 0145 04       		.byte	0x4
+ 901 0146 24       		.byte	0x24
+ 902 0147 B8000000 		.4byte	0xb8
+ 903 014b 04       		.byte	0x4
+ 904 014c 00       		.byte	0
+ 905 014d 03       		.uleb128 0x3
+ 906 014e 12070000 		.4byte	.LASF28
+ 907 0152 04       		.byte	0x4
+ 908 0153 1D       		.byte	0x1d
+ 909 0154 58010000 		.4byte	0x158
+ 910 0158 08       		.uleb128 0x8
+ 911 0159 9F040000 		.4byte	.LASF30
+ 912 015d 08       		.byte	0x8
+ 913 015e 04       		.byte	0x4
+ 914 015f 27       		.byte	0x27
+ 915 0160 89010000 		.4byte	0x189
+ 916 0164 09       		.uleb128 0x9
+ 917 0165 23070000 		.4byte	.LASF31
+ 918 0169 04       		.byte	0x4
+ 919 016a 28       		.byte	0x28
+ 920 016b A2000000 		.4byte	0xa2
+ 921 016f 00       		.byte	0
+ 922 0170 09       		.uleb128 0x9
+ 923 0171 EC010000 		.4byte	.LASF32
+ 924 0175 04       		.byte	0x4
+ 925 0176 29       		.byte	0x29
+ 926 0177 A2000000 		.4byte	0xa2
+ 927 017b 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 22
+
+
+ 928 017c 09       		.uleb128 0x9
+ 929 017d 86030000 		.4byte	.LASF33
+ 930 0181 04       		.byte	0x4
+ 931 0182 2A       		.byte	0x2a
+ 932 0183 05010000 		.4byte	0x105
+ 933 0187 02       		.byte	0x2
+ 934 0188 00       		.byte	0
+ 935 0189 03       		.uleb128 0x3
+ 936 018a D2010000 		.4byte	.LASF34
+ 937 018e 04       		.byte	0x4
+ 938 018f 1E       		.byte	0x1e
+ 939 0190 94010000 		.4byte	0x194
+ 940 0194 08       		.uleb128 0x8
+ 941 0195 5B000000 		.4byte	.LASF35
+ 942 0199 15       		.byte	0x15
+ 943 019a 04       		.byte	0x4
+ 944 019b 2D       		.byte	0x2d
+ 945 019c D1010000 		.4byte	0x1d1
+ 946 01a0 09       		.uleb128 0x9
+ 947 01a1 C6010000 		.4byte	.LASF36
+ 948 01a5 04       		.byte	0x4
+ 949 01a6 2E       		.byte	0x2e
+ 950 01a7 A2000000 		.4byte	0xa2
+ 951 01ab 00       		.byte	0
+ 952 01ac 09       		.uleb128 0x9
+ 953 01ad 8D050000 		.4byte	.LASF37
+ 954 01b1 04       		.byte	0x4
+ 955 01b2 2F       		.byte	0x2f
+ 956 01b3 A2000000 		.4byte	0xa2
+ 957 01b7 01       		.byte	0x1
+ 958 01b8 09       		.uleb128 0x9
+ 959 01b9 33050000 		.4byte	.LASF38
+ 960 01bd 04       		.byte	0x4
+ 961 01be 30       		.byte	0x30
+ 962 01bf A2000000 		.4byte	0xa2
+ 963 01c3 02       		.byte	0x2
+ 964 01c4 09       		.uleb128 0x9
+ 965 01c5 81030000 		.4byte	.LASF39
+ 966 01c9 04       		.byte	0x4
+ 967 01ca 31       		.byte	0x31
+ 968 01cb D1010000 		.4byte	0x1d1
+ 969 01cf 03       		.byte	0x3
+ 970 01d0 00       		.byte	0
+ 971 01d1 0A       		.uleb128 0xa
+ 972 01d2 E0000000 		.4byte	0xe0
+ 973 01d6 E1010000 		.4byte	0x1e1
+ 974 01da 0B       		.uleb128 0xb
+ 975 01db D9000000 		.4byte	0xd9
+ 976 01df 11       		.byte	0x11
+ 977 01e0 00       		.byte	0
+ 978 01e1 0C       		.uleb128 0xc
+ 979 01e2 14       		.byte	0x14
+ 980 01e3 04       		.byte	0x4
+ 981 01e4 36       		.byte	0x36
+ 982 01e5 0E020000 		.4byte	0x20e
+ 983 01e9 09       		.uleb128 0x9
+ 984 01ea C6010000 		.4byte	.LASF36
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 23
+
+
+ 985 01ee 04       		.byte	0x4
+ 986 01ef 37       		.byte	0x37
+ 987 01f0 A2000000 		.4byte	0xa2
+ 988 01f4 00       		.byte	0
+ 989 01f5 09       		.uleb128 0x9
+ 990 01f6 8D050000 		.4byte	.LASF37
+ 991 01fa 04       		.byte	0x4
+ 992 01fb 38       		.byte	0x38
+ 993 01fc A2000000 		.4byte	0xa2
+ 994 0200 01       		.byte	0x1
+ 995 0201 09       		.uleb128 0x9
+ 996 0202 81030000 		.4byte	.LASF39
+ 997 0206 04       		.byte	0x4
+ 998 0207 39       		.byte	0x39
+ 999 0208 D1010000 		.4byte	0x1d1
+ 1000 020c 02       		.byte	0x2
+ 1001 020d 00       		.byte	0
+ 1002 020e 03       		.uleb128 0x3
+ 1003 020f 04010000 		.4byte	.LASF40
+ 1004 0213 04       		.byte	0x4
+ 1005 0214 3A       		.byte	0x3a
+ 1006 0215 E1010000 		.4byte	0x1e1
+ 1007 0219 0C       		.uleb128 0xc
+ 1008 021a 08       		.byte	0x8
+ 1009 021b 04       		.byte	0x4
+ 1010 021c 3C       		.byte	0x3c
+ 1011 021d 52020000 		.4byte	0x252
+ 1012 0221 09       		.uleb128 0x9
+ 1013 0222 3C000000 		.4byte	.LASF24
+ 1014 0226 04       		.byte	0x4
+ 1015 0227 3D       		.byte	0x3d
+ 1016 0228 AD000000 		.4byte	0xad
+ 1017 022c 00       		.byte	0
+ 1018 022d 09       		.uleb128 0x9
+ 1019 022e 64010000 		.4byte	.LASF25
+ 1020 0232 04       		.byte	0x4
+ 1021 0233 3E       		.byte	0x3e
+ 1022 0234 A2000000 		.4byte	0xa2
+ 1023 0238 02       		.byte	0x2
+ 1024 0239 09       		.uleb128 0x9
+ 1025 023a 45070000 		.4byte	.LASF26
+ 1026 023e 04       		.byte	0x4
+ 1027 023f 3F       		.byte	0x3f
+ 1028 0240 A2000000 		.4byte	0xa2
+ 1029 0244 03       		.byte	0x3
+ 1030 0245 09       		.uleb128 0x9
+ 1031 0246 F6040000 		.4byte	.LASF27
+ 1032 024a 04       		.byte	0x4
+ 1033 024b 40       		.byte	0x40
+ 1034 024c CE000000 		.4byte	0xce
+ 1035 0250 04       		.byte	0x4
+ 1036 0251 00       		.byte	0
+ 1037 0252 03       		.uleb128 0x3
+ 1038 0253 72030000 		.4byte	.LASF41
+ 1039 0257 04       		.byte	0x4
+ 1040 0258 41       		.byte	0x41
+ 1041 0259 19020000 		.4byte	0x219
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 24
+
+
+ 1042 025d 0C       		.uleb128 0xc
+ 1043 025e 0A       		.byte	0xa
+ 1044 025f 04       		.byte	0x4
+ 1045 0260 43       		.byte	0x43
+ 1046 0261 8A020000 		.4byte	0x28a
+ 1047 0265 09       		.uleb128 0x9
+ 1048 0266 23070000 		.4byte	.LASF31
+ 1049 026a 04       		.byte	0x4
+ 1050 026b 44       		.byte	0x44
+ 1051 026c A2000000 		.4byte	0xa2
+ 1052 0270 00       		.byte	0
+ 1053 0271 09       		.uleb128 0x9
+ 1054 0272 EC010000 		.4byte	.LASF32
+ 1055 0276 04       		.byte	0x4
+ 1056 0277 45       		.byte	0x45
+ 1057 0278 A2000000 		.4byte	0xa2
+ 1058 027c 01       		.byte	0x1
+ 1059 027d 09       		.uleb128 0x9
+ 1060 027e 86030000 		.4byte	.LASF33
+ 1061 0282 04       		.byte	0x4
+ 1062 0283 46       		.byte	0x46
+ 1063 0284 52020000 		.4byte	0x252
+ 1064 0288 02       		.byte	0x2
+ 1065 0289 00       		.byte	0
+ 1066 028a 03       		.uleb128 0x3
+ 1067 028b 6C060000 		.4byte	.LASF42
+ 1068 028f 04       		.byte	0x4
+ 1069 0290 47       		.byte	0x47
+ 1070 0291 5D020000 		.4byte	0x25d
+ 1071 0295 06       		.uleb128 0x6
+ 1072 0296 A2000000 		.4byte	0xa2
+ 1073 029a 07       		.uleb128 0x7
+ 1074 029b C3000000 		.4byte	0xc3
+ 1075 029f 03       		.uleb128 0x3
+ 1076 02a0 19030000 		.4byte	.LASF43
+ 1077 02a4 05       		.byte	0x5
+ 1078 02a5 4E       		.byte	0x4e
+ 1079 02a6 AA020000 		.4byte	0x2aa
+ 1080 02aa 05       		.uleb128 0x5
+ 1081 02ab 04       		.byte	0x4
+ 1082 02ac B0020000 		.4byte	0x2b0
+ 1083 02b0 0D       		.uleb128 0xd
+ 1084 02b1 6F000000 		.4byte	.LASF124
+ 1085 02b5 0E       		.uleb128 0xe
+ 1086 02b6 1A000000 		.4byte	.LASF46
+ 1087 02ba 01       		.byte	0x1
+ 1088 02bb 37000000 		.4byte	0x37
+ 1089 02bf 06       		.byte	0x6
+ 1090 02c0 38       		.byte	0x38
+ 1091 02c1 D2020000 		.4byte	0x2d2
+ 1092 02c5 0F       		.uleb128 0xf
+ 1093 02c6 23040000 		.4byte	.LASF44
+ 1094 02ca 00       		.byte	0
+ 1095 02cb 0F       		.uleb128 0xf
+ 1096 02cc 5E050000 		.4byte	.LASF45
+ 1097 02d0 01       		.byte	0x1
+ 1098 02d1 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 25
+
+
+ 1099 02d2 0E       		.uleb128 0xe
+ 1100 02d3 F2030000 		.4byte	.LASF47
+ 1101 02d7 01       		.byte	0x1
+ 1102 02d8 37000000 		.4byte	0x37
+ 1103 02dc 06       		.byte	0x6
+ 1104 02dd 3D       		.byte	0x3d
+ 1105 02de F5020000 		.4byte	0x2f5
+ 1106 02e2 0F       		.uleb128 0xf
+ 1107 02e3 6A040000 		.4byte	.LASF48
+ 1108 02e7 00       		.byte	0
+ 1109 02e8 0F       		.uleb128 0xf
+ 1110 02e9 9A060000 		.4byte	.LASF49
+ 1111 02ed 01       		.byte	0x1
+ 1112 02ee 0F       		.uleb128 0xf
+ 1113 02ef 89010000 		.4byte	.LASF50
+ 1114 02f3 02       		.byte	0x2
+ 1115 02f4 00       		.byte	0
+ 1116 02f5 0E       		.uleb128 0xe
+ 1117 02f6 00070000 		.4byte	.LASF51
+ 1118 02fa 01       		.byte	0x1
+ 1119 02fb 37000000 		.4byte	0x37
+ 1120 02ff 06       		.byte	0x6
+ 1121 0300 43       		.byte	0x43
+ 1122 0301 12030000 		.4byte	0x312
+ 1123 0305 0F       		.uleb128 0xf
+ 1124 0306 D5040000 		.4byte	.LASF52
+ 1125 030a 00       		.byte	0
+ 1126 030b 0F       		.uleb128 0xf
+ 1127 030c 03040000 		.4byte	.LASF53
+ 1128 0310 01       		.byte	0x1
+ 1129 0311 00       		.byte	0
+ 1130 0312 0E       		.uleb128 0xe
+ 1131 0313 37040000 		.4byte	.LASF54
+ 1132 0317 01       		.byte	0x1
+ 1133 0318 37000000 		.4byte	0x37
+ 1134 031c 06       		.byte	0x6
+ 1135 031d 49       		.byte	0x49
+ 1136 031e 2F030000 		.4byte	0x32f
+ 1137 0322 0F       		.uleb128 0xf
+ 1138 0323 74010000 		.4byte	.LASF55
+ 1139 0327 00       		.byte	0
+ 1140 0328 0F       		.uleb128 0xf
+ 1141 0329 4F010000 		.4byte	.LASF56
+ 1142 032d 01       		.byte	0x1
+ 1143 032e 00       		.byte	0
+ 1144 032f 0C       		.uleb128 0xc
+ 1145 0330 0C       		.byte	0xc
+ 1146 0331 06       		.byte	0x6
+ 1147 0332 4E       		.byte	0x4e
+ 1148 0333 8B030000 		.4byte	0x38b
+ 1149 0337 10       		.uleb128 0x10
+ 1150 0338 707700   		.ascii	"pw\000"
+ 1151 033b 06       		.byte	0x6
+ 1152 033c 50       		.byte	0x50
+ 1153 033d B8000000 		.4byte	0xb8
+ 1154 0341 00       		.byte	0
+ 1155 0342 10       		.uleb128 0x10
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 26
+
+
+ 1156 0343 70726400 		.ascii	"prd\000"
+ 1157 0347 06       		.byte	0x6
+ 1158 0348 51       		.byte	0x51
+ 1159 0349 B8000000 		.4byte	0xb8
+ 1160 034d 02       		.byte	0x2
+ 1161 034e 09       		.uleb128 0x9
+ 1162 034f 35060000 		.4byte	.LASF57
+ 1163 0353 06       		.byte	0x6
+ 1164 0354 52       		.byte	0x52
+ 1165 0355 D2020000 		.4byte	0x2d2
+ 1166 0359 04       		.byte	0x4
+ 1167 035a 09       		.uleb128 0x9
+ 1168 035b 4F000000 		.4byte	.LASF58
+ 1169 035f 06       		.byte	0x6
+ 1170 0360 53       		.byte	0x53
+ 1171 0361 F5020000 		.4byte	0x2f5
+ 1172 0365 05       		.byte	0x5
+ 1173 0366 10       		.uleb128 0x10
+ 1174 0367 6D6F6400 		.ascii	"mod\000"
+ 1175 036b 06       		.byte	0x6
+ 1176 036c 54       		.byte	0x54
+ 1177 036d 12030000 		.4byte	0x312
+ 1178 0371 06       		.byte	0x6
+ 1179 0372 09       		.uleb128 0x9
+ 1180 0373 78040000 		.4byte	.LASF59
+ 1181 0377 06       		.byte	0x6
+ 1182 0378 55       		.byte	0x55
+ 1183 0379 B5020000 		.4byte	0x2b5
+ 1184 037d 07       		.byte	0x7
+ 1185 037e 09       		.uleb128 0x9
+ 1186 037f 16040000 		.4byte	.LASF60
+ 1187 0383 06       		.byte	0x6
+ 1188 0384 56       		.byte	0x56
+ 1189 0385 9F020000 		.4byte	0x29f
+ 1190 0389 08       		.byte	0x8
+ 1191 038a 00       		.byte	0
+ 1192 038b 03       		.uleb128 0x3
+ 1193 038c 7F000000 		.4byte	.LASF61
+ 1194 0390 06       		.byte	0x6
+ 1195 0391 57       		.byte	0x57
+ 1196 0392 2F030000 		.4byte	0x32f
+ 1197 0396 08       		.uleb128 0x8
+ 1198 0397 D0020000 		.4byte	.LASF62
+ 1199 039b 24       		.byte	0x24
+ 1200 039c 07       		.byte	0x7
+ 1201 039d 8A       		.byte	0x8a
+ 1202 039e 86040000 		.4byte	0x486
+ 1203 03a2 10       		.uleb128 0x10
+ 1204 03a3 707700   		.ascii	"pw\000"
+ 1205 03a6 07       		.byte	0x7
+ 1206 03a7 8B       		.byte	0x8b
+ 1207 03a8 B8000000 		.4byte	0xb8
+ 1208 03ac 00       		.byte	0
+ 1209 03ad 10       		.uleb128 0x10
+ 1210 03ae 70776400 		.ascii	"pwd\000"
+ 1211 03b2 07       		.byte	0x7
+ 1212 03b3 8C       		.byte	0x8c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 27
+
+
+ 1213 03b4 B8000000 		.4byte	0xb8
+ 1214 03b8 02       		.byte	0x2
+ 1215 03b9 10       		.uleb128 0x10
+ 1216 03ba 766F6C00 		.ascii	"vol\000"
+ 1217 03be 07       		.byte	0x7
+ 1218 03bf 8D       		.byte	0x8d
+ 1219 03c0 B8000000 		.4byte	0xb8
+ 1220 03c4 04       		.byte	0x4
+ 1221 03c5 09       		.uleb128 0x9
+ 1222 03c6 77050000 		.4byte	.LASF63
+ 1223 03ca 07       		.byte	0x7
+ 1224 03cb 8E       		.byte	0x8e
+ 1225 03cc B8000000 		.4byte	0xb8
+ 1226 03d0 06       		.byte	0x6
+ 1227 03d1 09       		.uleb128 0x9
+ 1228 03d2 4E050000 		.4byte	.LASF64
+ 1229 03d6 07       		.byte	0x7
+ 1230 03d7 8F       		.byte	0x8f
+ 1231 03d8 B8000000 		.4byte	0xb8
+ 1232 03dc 08       		.byte	0x8
+ 1233 03dd 09       		.uleb128 0x9
+ 1234 03de E4010000 		.4byte	.LASF65
+ 1235 03e2 07       		.byte	0x7
+ 1236 03e3 90       		.byte	0x90
+ 1237 03e4 B8000000 		.4byte	0xb8
+ 1238 03e8 0A       		.byte	0xa
+ 1239 03e9 09       		.uleb128 0x9
+ 1240 03ea 82050000 		.4byte	.LASF66
+ 1241 03ee 07       		.byte	0x7
+ 1242 03ef 91       		.byte	0x91
+ 1243 03f0 B8000000 		.4byte	0xb8
+ 1244 03f4 0C       		.byte	0xc
+ 1245 03f5 09       		.uleb128 0x9
+ 1246 03f6 67000000 		.4byte	.LASF67
+ 1247 03fa 07       		.byte	0x7
+ 1248 03fb 92       		.byte	0x92
+ 1249 03fc B8000000 		.4byte	0xb8
+ 1250 0400 0E       		.byte	0xe
+ 1251 0401 09       		.uleb128 0x9
+ 1252 0402 0D040000 		.4byte	.LASF68
+ 1253 0406 07       		.byte	0x7
+ 1254 0407 93       		.byte	0x93
+ 1255 0408 B8000000 		.4byte	0xb8
+ 1256 040c 10       		.byte	0x10
+ 1257 040d 09       		.uleb128 0x9
+ 1258 040e 6B050000 		.4byte	.LASF69
+ 1259 0412 07       		.byte	0x7
+ 1260 0413 94       		.byte	0x94
+ 1261 0414 A2000000 		.4byte	0xa2
+ 1262 0418 12       		.byte	0x12
+ 1263 0419 09       		.uleb128 0x9
+ 1264 041a F9020000 		.4byte	.LASF70
+ 1265 041e 07       		.byte	0x7
+ 1266 041f 95       		.byte	0x95
+ 1267 0420 A2000000 		.4byte	0xa2
+ 1268 0424 13       		.byte	0x13
+ 1269 0425 09       		.uleb128 0x9
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 28
+
+
+ 1270 0426 5C010000 		.4byte	.LASF71
+ 1271 042a 07       		.byte	0x7
+ 1272 042b 96       		.byte	0x96
+ 1273 042c A2000000 		.4byte	0xa2
+ 1274 0430 14       		.byte	0x14
+ 1275 0431 09       		.uleb128 0x9
+ 1276 0432 1C020000 		.4byte	.LASF72
+ 1277 0436 07       		.byte	0x7
+ 1278 0437 97       		.byte	0x97
+ 1279 0438 B8000000 		.4byte	0xb8
+ 1280 043c 16       		.byte	0x16
+ 1281 043d 09       		.uleb128 0x9
+ 1282 043e 2A050000 		.4byte	.LASF73
+ 1283 0442 07       		.byte	0x7
+ 1284 0443 98       		.byte	0x98
+ 1285 0444 B8000000 		.4byte	0xb8
+ 1286 0448 18       		.byte	0x18
+ 1287 0449 09       		.uleb128 0x9
+ 1288 044a 27030000 		.4byte	.LASF74
+ 1289 044e 07       		.byte	0x7
+ 1290 044f 99       		.byte	0x99
+ 1291 0450 A2000000 		.4byte	0xa2
+ 1292 0454 1A       		.byte	0x1a
+ 1293 0455 09       		.uleb128 0x9
+ 1294 0456 33000000 		.4byte	.LASF75
+ 1295 045a 07       		.byte	0x7
+ 1296 045b 9A       		.byte	0x9a
+ 1297 045c B8000000 		.4byte	0xb8
+ 1298 0460 1C       		.byte	0x1c
+ 1299 0461 09       		.uleb128 0x9
+ 1300 0462 4D030000 		.4byte	.LASF76
+ 1301 0466 07       		.byte	0x7
+ 1302 0467 9B       		.byte	0x9b
+ 1303 0468 B8000000 		.4byte	0xb8
+ 1304 046c 1E       		.byte	0x1e
+ 1305 046d 09       		.uleb128 0x9
+ 1306 046e CA020000 		.4byte	.LASF77
+ 1307 0472 07       		.byte	0x7
+ 1308 0473 9C       		.byte	0x9c
+ 1309 0474 A2000000 		.4byte	0xa2
+ 1310 0478 20       		.byte	0x20
+ 1311 0479 09       		.uleb128 0x9
+ 1312 047a 58060000 		.4byte	.LASF78
+ 1313 047e 07       		.byte	0x7
+ 1314 047f 9D       		.byte	0x9d
+ 1315 0480 B8000000 		.4byte	0xb8
+ 1316 0484 22       		.byte	0x22
+ 1317 0485 00       		.byte	0
+ 1318 0486 03       		.uleb128 0x3
+ 1319 0487 2F030000 		.4byte	.LASF79
+ 1320 048b 07       		.byte	0x7
+ 1321 048c 9F       		.byte	0x9f
+ 1322 048d 96030000 		.4byte	0x396
+ 1323 0491 0C       		.uleb128 0xc
+ 1324 0492 1D       		.byte	0x1d
+ 1325 0493 01       		.byte	0x1
+ 1326 0494 16       		.byte	0x16
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 29
+
+
+ 1327 0495 B1040000 		.4byte	0x4b1
+ 1328 0499 10       		.uleb128 0x10
+ 1329 049a 683000   		.ascii	"h0\000"
+ 1330 049d 01       		.byte	0x1
+ 1331 049e 17       		.byte	0x17
+ 1332 049f 89010000 		.4byte	0x189
+ 1333 04a3 00       		.byte	0
+ 1334 04a4 09       		.uleb128 0x9
+ 1335 04a5 C8050000 		.4byte	.LASF80
+ 1336 04a9 01       		.byte	0x1
+ 1337 04aa 18       		.byte	0x18
+ 1338 04ab 4D010000 		.4byte	0x14d
+ 1339 04af 15       		.byte	0x15
+ 1340 04b0 00       		.byte	0
+ 1341 04b1 11       		.uleb128 0x11
+ 1342 04b2 35070000 		.4byte	.LASF125
+ 1343 04b6 01       		.byte	0x1
+ 1344 04b7 23       		.byte	0x23
+ 1345 04b8 00000000 		.4byte	.LFB70
+ 1346 04bc 64000000 		.4byte	.LFE70-.LFB70
+ 1347 04c0 01       		.uleb128 0x1
+ 1348 04c1 9C       		.byte	0x9c
+ 1349 04c2 FF040000 		.4byte	0x4ff
+ 1350 04c6 12       		.uleb128 0x12
+ 1351 04c7 A0050000 		.4byte	.LASF81
+ 1352 04cb 01       		.byte	0x1
+ 1353 04cc 23       		.byte	0x23
+ 1354 04cd CE000000 		.4byte	0xce
+ 1355 04d1 01       		.uleb128 0x1
+ 1356 04d2 50       		.byte	0x50
+ 1357 04d3 12       		.uleb128 0x12
+ 1358 04d4 B6010000 		.4byte	.LASF82
+ 1359 04d8 01       		.byte	0x1
+ 1360 04d9 23       		.byte	0x23
+ 1361 04da CE000000 		.4byte	0xce
+ 1362 04de 01       		.uleb128 0x1
+ 1363 04df 51       		.byte	0x51
+ 1364 04e0 13       		.uleb128 0x13
+ 1365 04e1 22010000 		.4byte	.LASF83
+ 1366 04e5 01       		.byte	0x1
+ 1367 04e6 2B       		.byte	0x2b
+ 1368 04e7 FF040000 		.4byte	0x4ff
+ 1369 04eb 00000000 		.4byte	.LLST0
+ 1370 04ef 13       		.uleb128 0x13
+ 1371 04f0 58070000 		.4byte	.LASF84
+ 1372 04f4 01       		.byte	0x1
+ 1373 04f5 2C       		.byte	0x2c
+ 1374 04f6 CE000000 		.4byte	0xce
+ 1375 04fa 29000000 		.4byte	.LLST1
+ 1376 04fe 00       		.byte	0
+ 1377 04ff 05       		.uleb128 0x5
+ 1378 0500 04       		.byte	0x4
+ 1379 0501 89010000 		.4byte	0x189
+ 1380 0505 14       		.uleb128 0x14
+ 1381 0506 03050000 		.4byte	.LASF126
+ 1382 050a 01       		.byte	0x1
+ 1383 050b 1B       		.byte	0x1b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 30
+
+
+ 1384 050c 00000000 		.4byte	.LFB68
+ 1385 0510 10000000 		.4byte	.LFE68-.LFB68
+ 1386 0514 01       		.uleb128 0x1
+ 1387 0515 9C       		.byte	0x9c
+ 1388 0516 39050000 		.4byte	0x539
+ 1389 051a 15       		.uleb128 0x15
+ 1390 051b 0A000000 		.4byte	.LVL9
+ 1391 051f AB090000 		.4byte	0x9ab
+ 1392 0523 16       		.uleb128 0x16
+ 1393 0524 01       		.uleb128 0x1
+ 1394 0525 50       		.byte	0x50
+ 1395 0526 05       		.uleb128 0x5
+ 1396 0527 03       		.byte	0x3
+ 1397 0528 00000000 		.4byte	.LANCHOR0
+ 1398 052c 16       		.uleb128 0x16
+ 1399 052d 01       		.uleb128 0x1
+ 1400 052e 51       		.byte	0x51
+ 1401 052f 01       		.uleb128 0x1
+ 1402 0530 30       		.byte	0x30
+ 1403 0531 16       		.uleb128 0x16
+ 1404 0532 01       		.uleb128 0x1
+ 1405 0533 52       		.byte	0x52
+ 1406 0534 02       		.uleb128 0x2
+ 1407 0535 08       		.byte	0x8
+ 1408 0536 40       		.byte	0x40
+ 1409 0537 00       		.byte	0
+ 1410 0538 00       		.byte	0
+ 1411 0539 17       		.uleb128 0x17
+ 1412 053a 63070000 		.4byte	.LASF127
+ 1413 053e 01       		.byte	0x1
+ 1414 053f 4B       		.byte	0x4b
+ 1415 0540 E7000000 		.4byte	0xe7
+ 1416 0544 00000000 		.4byte	.LFB71
+ 1417 0548 24000000 		.4byte	.LFE71-.LFB71
+ 1418 054c 01       		.uleb128 0x1
+ 1419 054d 9C       		.byte	0x9c
+ 1420 054e 62050000 		.4byte	0x562
+ 1421 0552 18       		.uleb128 0x18
+ 1422 0553 A0050000 		.4byte	.LASF81
+ 1423 0557 01       		.byte	0x1
+ 1424 0558 4B       		.byte	0x4b
+ 1425 0559 CE000000 		.4byte	0xce
+ 1426 055d 53000000 		.4byte	.LLST2
+ 1427 0561 00       		.byte	0
+ 1428 0562 19       		.uleb128 0x19
+ 1429 0563 3A060000 		.4byte	.LASF85
+ 1430 0567 01       		.byte	0x1
+ 1431 0568 58       		.byte	0x58
+ 1432 0569 00000000 		.4byte	.LFB72
+ 1433 056d 04000000 		.4byte	.LFE72-.LFB72
+ 1434 0571 01       		.uleb128 0x1
+ 1435 0572 9C       		.byte	0x9c
+ 1436 0573 98050000 		.4byte	0x598
+ 1437 0577 18       		.uleb128 0x18
+ 1438 0578 A0050000 		.4byte	.LASF81
+ 1439 057c 01       		.byte	0x1
+ 1440 057d 58       		.byte	0x58
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 31
+
+
+ 1441 057e CE000000 		.4byte	0xce
+ 1442 0582 74000000 		.4byte	.LLST3
+ 1443 0586 15       		.uleb128 0x15
+ 1444 0587 04000000 		.4byte	.LVL13
+ 1445 058b B4090000 		.4byte	0x9b4
+ 1446 058f 16       		.uleb128 0x16
+ 1447 0590 01       		.uleb128 0x1
+ 1448 0591 50       		.byte	0x50
+ 1449 0592 03       		.uleb128 0x3
+ 1450 0593 F3       		.byte	0xf3
+ 1451 0594 01       		.uleb128 0x1
+ 1452 0595 50       		.byte	0x50
+ 1453 0596 00       		.byte	0
+ 1454 0597 00       		.byte	0
+ 1455 0598 19       		.uleb128 0x19
+ 1456 0599 57030000 		.4byte	.LASF86
+ 1457 059d 01       		.byte	0x1
+ 1458 059e 5C       		.byte	0x5c
+ 1459 059f 00000000 		.4byte	.LFB73
+ 1460 05a3 04000000 		.4byte	.LFE73-.LFB73
+ 1461 05a7 01       		.uleb128 0x1
+ 1462 05a8 9C       		.byte	0x9c
+ 1463 05a9 CE050000 		.4byte	0x5ce
+ 1464 05ad 18       		.uleb128 0x18
+ 1465 05ae A0050000 		.4byte	.LASF81
+ 1466 05b2 01       		.byte	0x1
+ 1467 05b3 5C       		.byte	0x5c
+ 1468 05b4 CE000000 		.4byte	0xce
+ 1469 05b8 95000000 		.4byte	.LLST4
+ 1470 05bc 15       		.uleb128 0x15
+ 1471 05bd 04000000 		.4byte	.LVL15
+ 1472 05c1 BF090000 		.4byte	0x9bf
+ 1473 05c5 16       		.uleb128 0x16
+ 1474 05c6 01       		.uleb128 0x1
+ 1475 05c7 50       		.byte	0x50
+ 1476 05c8 03       		.uleb128 0x3
+ 1477 05c9 F3       		.byte	0xf3
+ 1478 05ca 01       		.uleb128 0x1
+ 1479 05cb 50       		.byte	0x50
+ 1480 05cc 00       		.byte	0
+ 1481 05cd 00       		.byte	0
+ 1482 05ce 19       		.uleb128 0x19
+ 1483 05cf 9D000000 		.4byte	.LASF87
+ 1484 05d3 01       		.byte	0x1
+ 1485 05d4 60       		.byte	0x60
+ 1486 05d5 00000000 		.4byte	.LFB74
+ 1487 05d9 04000000 		.4byte	.LFE74-.LFB74
+ 1488 05dd 01       		.uleb128 0x1
+ 1489 05de 9C       		.byte	0x9c
+ 1490 05df 30060000 		.4byte	0x630
+ 1491 05e3 18       		.uleb128 0x18
+ 1492 05e4 12030000 		.4byte	.LASF88
+ 1493 05e8 01       		.byte	0x1
+ 1494 05e9 60       		.byte	0x60
+ 1495 05ea CE000000 		.4byte	0xce
+ 1496 05ee B6000000 		.4byte	.LLST5
+ 1497 05f2 18       		.uleb128 0x18
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 32
+
+
+ 1498 05f3 25050000 		.4byte	.LASF89
+ 1499 05f7 01       		.byte	0x1
+ 1500 05f8 60       		.byte	0x60
+ 1501 05f9 CE000000 		.4byte	0xce
+ 1502 05fd D7000000 		.4byte	.LLST6
+ 1503 0601 18       		.uleb128 0x18
+ 1504 0602 A0050000 		.4byte	.LASF81
+ 1505 0606 01       		.byte	0x1
+ 1506 0607 60       		.byte	0x60
+ 1507 0608 CE000000 		.4byte	0xce
+ 1508 060c F8000000 		.4byte	.LLST7
+ 1509 0610 15       		.uleb128 0x15
+ 1510 0611 04000000 		.4byte	.LVL17
+ 1511 0615 CA090000 		.4byte	0x9ca
+ 1512 0619 16       		.uleb128 0x16
+ 1513 061a 01       		.uleb128 0x1
+ 1514 061b 50       		.byte	0x50
+ 1515 061c 03       		.uleb128 0x3
+ 1516 061d F3       		.byte	0xf3
+ 1517 061e 01       		.uleb128 0x1
+ 1518 061f 50       		.byte	0x50
+ 1519 0620 16       		.uleb128 0x16
+ 1520 0621 01       		.uleb128 0x1
+ 1521 0622 51       		.byte	0x51
+ 1522 0623 03       		.uleb128 0x3
+ 1523 0624 F3       		.byte	0xf3
+ 1524 0625 01       		.uleb128 0x1
+ 1525 0626 51       		.byte	0x51
+ 1526 0627 16       		.uleb128 0x16
+ 1527 0628 01       		.uleb128 0x1
+ 1528 0629 52       		.byte	0x52
+ 1529 062a 03       		.uleb128 0x3
+ 1530 062b F3       		.byte	0xf3
+ 1531 062c 01       		.uleb128 0x1
+ 1532 062d 52       		.byte	0x52
+ 1533 062e 00       		.byte	0
+ 1534 062f 00       		.byte	0
+ 1535 0630 19       		.uleb128 0x19
+ 1536 0631 F4010000 		.4byte	.LASF90
+ 1537 0635 01       		.byte	0x1
+ 1538 0636 64       		.byte	0x64
+ 1539 0637 00000000 		.4byte	.LFB75
+ 1540 063b 04000000 		.4byte	.LFE75-.LFB75
+ 1541 063f 01       		.uleb128 0x1
+ 1542 0640 9C       		.byte	0x9c
+ 1543 0641 7C060000 		.4byte	0x67c
+ 1544 0645 18       		.uleb128 0x18
+ 1545 0646 A0050000 		.4byte	.LASF81
+ 1546 064a 01       		.byte	0x1
+ 1547 064b 64       		.byte	0x64
+ 1548 064c CE000000 		.4byte	0xce
+ 1549 0650 19010000 		.4byte	.LLST8
+ 1550 0654 18       		.uleb128 0x18
+ 1551 0655 B6010000 		.4byte	.LASF82
+ 1552 0659 01       		.byte	0x1
+ 1553 065a 64       		.byte	0x64
+ 1554 065b CE000000 		.4byte	0xce
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 33
+
+
+ 1555 065f 3A010000 		.4byte	.LLST9
+ 1556 0663 15       		.uleb128 0x15
+ 1557 0664 04000000 		.4byte	.LVL19
+ 1558 0668 B1040000 		.4byte	0x4b1
+ 1559 066c 16       		.uleb128 0x16
+ 1560 066d 01       		.uleb128 0x1
+ 1561 066e 50       		.byte	0x50
+ 1562 066f 03       		.uleb128 0x3
+ 1563 0670 F3       		.byte	0xf3
+ 1564 0671 01       		.uleb128 0x1
+ 1565 0672 50       		.byte	0x50
+ 1566 0673 16       		.uleb128 0x16
+ 1567 0674 01       		.uleb128 0x1
+ 1568 0675 51       		.byte	0x51
+ 1569 0676 03       		.uleb128 0x3
+ 1570 0677 F3       		.byte	0xf3
+ 1571 0678 01       		.uleb128 0x1
+ 1572 0679 51       		.byte	0x51
+ 1573 067a 00       		.byte	0
+ 1574 067b 00       		.byte	0
+ 1575 067c 19       		.uleb128 0x19
+ 1576 067d 00000000 		.4byte	.LASF91
+ 1577 0681 01       		.byte	0x1
+ 1578 0682 68       		.byte	0x68
+ 1579 0683 00000000 		.4byte	.LFB76
+ 1580 0687 54010000 		.4byte	.LFE76-.LFB76
+ 1581 068b 01       		.uleb128 0x1
+ 1582 068c 9C       		.byte	0x9c
+ 1583 068d 39080000 		.4byte	0x839
+ 1584 0691 18       		.uleb128 0x18
+ 1585 0692 12030000 		.4byte	.LASF88
+ 1586 0696 01       		.byte	0x1
+ 1587 0697 68       		.byte	0x68
+ 1588 0698 CE000000 		.4byte	0xce
+ 1589 069c 5B010000 		.4byte	.LLST10
+ 1590 06a0 18       		.uleb128 0x18
+ 1591 06a1 25050000 		.4byte	.LASF89
+ 1592 06a5 01       		.byte	0x1
+ 1593 06a6 68       		.byte	0x68
+ 1594 06a7 CE000000 		.4byte	0xce
+ 1595 06ab 87010000 		.4byte	.LLST11
+ 1596 06af 18       		.uleb128 0x18
+ 1597 06b0 96040000 		.4byte	.LASF92
+ 1598 06b4 01       		.byte	0x1
+ 1599 06b5 68       		.byte	0x68
+ 1600 06b6 CE000000 		.4byte	0xce
+ 1601 06ba B3010000 		.4byte	.LLST12
+ 1602 06be 18       		.uleb128 0x18
+ 1603 06bf A0050000 		.4byte	.LASF81
+ 1604 06c3 01       		.byte	0x1
+ 1605 06c4 68       		.byte	0x68
+ 1606 06c5 CE000000 		.4byte	0xce
+ 1607 06c9 DF010000 		.4byte	.LLST13
+ 1608 06cd 18       		.uleb128 0x18
+ 1609 06ce B6010000 		.4byte	.LASF82
+ 1610 06d2 01       		.byte	0x1
+ 1611 06d3 68       		.byte	0x68
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 34
+
+
+ 1612 06d4 CE000000 		.4byte	0xce
+ 1613 06d8 0B020000 		.4byte	.LLST14
+ 1614 06dc 13       		.uleb128 0x13
+ 1615 06dd 86060000 		.4byte	.LASF93
+ 1616 06e1 01       		.byte	0x1
+ 1617 06e2 6F       		.byte	0x6f
+ 1618 06e3 CE000000 		.4byte	0xce
+ 1619 06e7 2B020000 		.4byte	.LLST15
+ 1620 06eb 1A       		.uleb128 0x1a
+ 1621 06ec 2F040000 		.4byte	.LASF94
+ 1622 06f0 01       		.byte	0x1
+ 1623 06f1 70       		.byte	0x70
+ 1624 06f2 39080000 		.4byte	0x839
+ 1625 06f6 02       		.uleb128 0x2
+ 1626 06f7 91       		.byte	0x91
+ 1627 06f8 40       		.sleb128 -64
+ 1628 06f9 13       		.uleb128 0x13
+ 1629 06fa AA040000 		.4byte	.LASF95
+ 1630 06fe 01       		.byte	0x1
+ 1631 06ff 73       		.byte	0x73
+ 1632 0700 49080000 		.4byte	0x849
+ 1633 0704 56020000 		.4byte	.LLST16
+ 1634 0708 1B       		.uleb128 0x1b
+ 1635 0709 2C000000 		.4byte	.LBB2
+ 1636 070d 2E000000 		.4byte	.LBE2-.LBB2
+ 1637 0711 25070000 		.4byte	0x725
+ 1638 0715 13       		.uleb128 0x13
+ 1639 0716 4B070000 		.4byte	.LASF96
+ 1640 071a 01       		.byte	0x1
+ 1641 071b 74       		.byte	0x74
+ 1642 071c CE000000 		.4byte	0xce
+ 1643 0720 76020000 		.4byte	.LLST17
+ 1644 0724 00       		.byte	0
+ 1645 0725 1B       		.uleb128 0x1b
+ 1646 0726 60000000 		.4byte	.LBB3
+ 1647 072a E6000000 		.4byte	.LBE3-.LBB3
+ 1648 072e 28080000 		.4byte	0x828
+ 1649 0732 1C       		.uleb128 0x1c
+ 1650 0733 6900     		.ascii	"i\000"
+ 1651 0735 01       		.byte	0x1
+ 1652 0736 89       		.byte	0x89
+ 1653 0737 CE000000 		.4byte	0xce
+ 1654 073b 89020000 		.4byte	.LLST18
+ 1655 073f 1D       		.uleb128 0x1d
+ 1656 0740 00000000 		.4byte	.Ldebug_ranges0+0
+ 1657 0744 13       		.uleb128 0x13
+ 1658 0745 86030000 		.4byte	.LASF33
+ 1659 0749 01       		.byte	0x1
+ 1660 074a 8A       		.byte	0x8a
+ 1661 074b 4F080000 		.4byte	0x84f
+ 1662 074f B4020000 		.4byte	.LLST19
+ 1663 0753 13       		.uleb128 0x13
+ 1664 0754 B8000000 		.4byte	.LASF97
+ 1665 0758 01       		.byte	0x1
+ 1666 0759 8D       		.byte	0x8d
+ 1667 075a CE000000 		.4byte	0xce
+ 1668 075e C9020000 		.4byte	.LLST20
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 35
+
+
+ 1669 0762 1A       		.uleb128 0x1a
+ 1670 0763 57040000 		.4byte	.LASF98
+ 1671 0767 01       		.byte	0x1
+ 1672 0768 8F       		.byte	0x8f
+ 1673 0769 00010000 		.4byte	0x100
+ 1674 076d 03       		.uleb128 0x3
+ 1675 076e 91       		.byte	0x91
+ 1676 076f B87F     		.sleb128 -72
+ 1677 0771 13       		.uleb128 0x13
+ 1678 0772 92000000 		.4byte	.LASF99
+ 1679 0776 01       		.byte	0x1
+ 1680 0777 90       		.byte	0x90
+ 1681 0778 CE000000 		.4byte	0xce
+ 1682 077c E9020000 		.4byte	.LLST21
+ 1683 0780 1A       		.uleb128 0x1a
+ 1684 0781 BB030000 		.4byte	.LASF100
+ 1685 0785 01       		.byte	0x1
+ 1686 0786 92       		.byte	0x92
+ 1687 0787 00010000 		.4byte	0x100
+ 1688 078b 03       		.uleb128 0x3
+ 1689 078c 91       		.byte	0x91
+ 1690 078d BC7F     		.sleb128 -68
+ 1691 078f 1B       		.uleb128 0x1b
+ 1692 0790 FE000000 		.4byte	.LBB5
+ 1693 0794 12000000 		.4byte	.LBE5-.LBB5
+ 1694 0798 B5070000 		.4byte	0x7b5
+ 1695 079c 13       		.uleb128 0x13
+ 1696 079d 2A000000 		.4byte	.LASF101
+ 1697 07a1 01       		.byte	0x1
+ 1698 07a2 B1       		.byte	0xb1
+ 1699 07a3 AD000000 		.4byte	0xad
+ 1700 07a7 09030000 		.4byte	.LLST22
+ 1701 07ab 1E       		.uleb128 0x1e
+ 1702 07ac 0E010000 		.4byte	.LVL43
+ 1703 07b0 D5090000 		.4byte	0x9d5
+ 1704 07b4 00       		.byte	0
+ 1705 07b5 1F       		.uleb128 0x1f
+ 1706 07b6 94000000 		.4byte	.LVL39
+ 1707 07ba E0090000 		.4byte	0x9e0
+ 1708 07be C9070000 		.4byte	0x7c9
+ 1709 07c2 16       		.uleb128 0x16
+ 1710 07c3 01       		.uleb128 0x1
+ 1711 07c4 50       		.byte	0x50
+ 1712 07c5 02       		.uleb128 0x2
+ 1713 07c6 74       		.byte	0x74
+ 1714 07c7 00       		.sleb128 0
+ 1715 07c8 00       		.byte	0
+ 1716 07c9 1F       		.uleb128 0x1f
+ 1717 07ca B2000000 		.4byte	.LVL40
+ 1718 07ce EB090000 		.4byte	0x9eb
+ 1719 07d2 DD070000 		.4byte	0x7dd
+ 1720 07d6 16       		.uleb128 0x16
+ 1721 07d7 01       		.uleb128 0x1
+ 1722 07d8 50       		.byte	0x50
+ 1723 07d9 02       		.uleb128 0x2
+ 1724 07da 74       		.byte	0x74
+ 1725 07db 00       		.sleb128 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 36
+
+
+ 1726 07dc 00       		.byte	0
+ 1727 07dd 1F       		.uleb128 0x1f
+ 1728 07de D0000000 		.4byte	.LVL41
+ 1729 07e2 F6090000 		.4byte	0x9f6
+ 1730 07e6 F1070000 		.4byte	0x7f1
+ 1731 07ea 16       		.uleb128 0x16
+ 1732 07eb 01       		.uleb128 0x1
+ 1733 07ec 50       		.byte	0x50
+ 1734 07ed 02       		.uleb128 0x2
+ 1735 07ee 74       		.byte	0x74
+ 1736 07ef 00       		.sleb128 0
+ 1737 07f0 00       		.byte	0
+ 1738 07f1 20       		.uleb128 0x20
+ 1739 07f2 42010000 		.4byte	.LVL45
+ 1740 07f6 010A0000 		.4byte	0xa01
+ 1741 07fa 16       		.uleb128 0x16
+ 1742 07fb 01       		.uleb128 0x1
+ 1743 07fc 50       		.byte	0x50
+ 1744 07fd 02       		.uleb128 0x2
+ 1745 07fe 79       		.byte	0x79
+ 1746 07ff 00       		.sleb128 0
+ 1747 0800 16       		.uleb128 0x16
+ 1748 0801 01       		.uleb128 0x1
+ 1749 0802 52       		.byte	0x52
+ 1750 0803 02       		.uleb128 0x2
+ 1751 0804 77       		.byte	0x77
+ 1752 0805 00       		.sleb128 0
+ 1753 0806 16       		.uleb128 0x16
+ 1754 0807 01       		.uleb128 0x1
+ 1755 0808 53       		.byte	0x53
+ 1756 0809 02       		.uleb128 0x2
+ 1757 080a 74       		.byte	0x74
+ 1758 080b 00       		.sleb128 0
+ 1759 080c 16       		.uleb128 0x16
+ 1760 080d 02       		.uleb128 0x2
+ 1761 080e 7D       		.byte	0x7d
+ 1762 080f 00       		.sleb128 0
+ 1763 0810 04       		.uleb128 0x4
+ 1764 0811 91       		.byte	0x91
+ 1765 0812 B07F     		.sleb128 -80
+ 1766 0814 06       		.byte	0x6
+ 1767 0815 16       		.uleb128 0x16
+ 1768 0816 02       		.uleb128 0x2
+ 1769 0817 7D       		.byte	0x7d
+ 1770 0818 10       		.sleb128 16
+ 1771 0819 04       		.uleb128 0x4
+ 1772 081a 91       		.byte	0x91
+ 1773 081b B47F     		.sleb128 -76
+ 1774 081d 06       		.byte	0x6
+ 1775 081e 16       		.uleb128 0x16
+ 1776 081f 02       		.uleb128 0x2
+ 1777 0820 7D       		.byte	0x7d
+ 1778 0821 14       		.sleb128 20
+ 1779 0822 02       		.uleb128 0x2
+ 1780 0823 78       		.byte	0x78
+ 1781 0824 00       		.sleb128 0
+ 1782 0825 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 37
+
+
+ 1783 0826 00       		.byte	0
+ 1784 0827 00       		.byte	0
+ 1785 0828 20       		.uleb128 0x20
+ 1786 0829 2C000000 		.4byte	.LVL25
+ 1787 082d B1040000 		.4byte	0x4b1
+ 1788 0831 16       		.uleb128 0x16
+ 1789 0832 01       		.uleb128 0x1
+ 1790 0833 50       		.byte	0x50
+ 1791 0834 02       		.uleb128 0x2
+ 1792 0835 74       		.byte	0x74
+ 1793 0836 00       		.sleb128 0
+ 1794 0837 00       		.byte	0
+ 1795 0838 00       		.byte	0
+ 1796 0839 0A       		.uleb128 0xa
+ 1797 083a 49080000 		.4byte	0x849
+ 1798 083e 49080000 		.4byte	0x849
+ 1799 0842 0B       		.uleb128 0xb
+ 1800 0843 D9000000 		.4byte	0xd9
+ 1801 0847 05       		.byte	0x5
+ 1802 0848 00       		.byte	0
+ 1803 0849 05       		.uleb128 0x5
+ 1804 084a 04       		.byte	0x4
+ 1805 084b 4D010000 		.4byte	0x14d
+ 1806 084f 05       		.uleb128 0x5
+ 1807 0850 04       		.byte	0x4
+ 1808 0851 05010000 		.4byte	0x105
+ 1809 0855 19       		.uleb128 0x19
+ 1810 0856 D4030000 		.4byte	.LASF102
+ 1811 085a 01       		.byte	0x1
+ 1812 085b CA       		.byte	0xca
+ 1813 085c 00000000 		.4byte	.LFB77
+ 1814 0860 24000000 		.4byte	.LFE77-.LFB77
+ 1815 0864 01       		.uleb128 0x1
+ 1816 0865 9C       		.byte	0x9c
+ 1817 0866 85080000 		.4byte	0x885
+ 1818 086a 21       		.uleb128 0x21
+ 1819 086b 64737400 		.ascii	"dst\000"
+ 1820 086f 01       		.byte	0x1
+ 1821 0870 CA       		.byte	0xca
+ 1822 0871 85080000 		.4byte	0x885
+ 1823 0875 01       		.uleb128 0x1
+ 1824 0876 50       		.byte	0x50
+ 1825 0877 21       		.uleb128 0x21
+ 1826 0878 73726300 		.ascii	"src\000"
+ 1827 087c 01       		.byte	0x1
+ 1828 087d CA       		.byte	0xca
+ 1829 087e 49080000 		.4byte	0x849
+ 1830 0882 01       		.uleb128 0x1
+ 1831 0883 51       		.byte	0x51
+ 1832 0884 00       		.byte	0
+ 1833 0885 05       		.uleb128 0x5
+ 1834 0886 04       		.byte	0x4
+ 1835 0887 8A020000 		.4byte	0x28a
+ 1836 088b 19       		.uleb128 0x19
+ 1837 088c A8050000 		.4byte	.LASF103
+ 1838 0890 01       		.byte	0x1
+ 1839 0891 D6       		.byte	0xd6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 38
+
+
+ 1840 0892 00000000 		.4byte	.LFB78
+ 1841 0896 24000000 		.4byte	.LFE78-.LFB78
+ 1842 089a 01       		.uleb128 0x1
+ 1843 089b 9C       		.byte	0x9c
+ 1844 089c BB080000 		.4byte	0x8bb
+ 1845 08a0 21       		.uleb128 0x21
+ 1846 08a1 64737400 		.ascii	"dst\000"
+ 1847 08a5 01       		.byte	0x1
+ 1848 08a6 D6       		.byte	0xd6
+ 1849 08a7 49080000 		.4byte	0x849
+ 1850 08ab 01       		.uleb128 0x1
+ 1851 08ac 50       		.byte	0x50
+ 1852 08ad 21       		.uleb128 0x21
+ 1853 08ae 73726300 		.ascii	"src\000"
+ 1854 08b2 01       		.byte	0x1
+ 1855 08b3 D6       		.byte	0xd6
+ 1856 08b4 85080000 		.4byte	0x885
+ 1857 08b8 01       		.uleb128 0x1
+ 1858 08b9 51       		.byte	0x51
+ 1859 08ba 00       		.byte	0
+ 1860 08bb 19       		.uleb128 0x19
+ 1861 08bc E1050000 		.4byte	.LASF104
+ 1862 08c0 01       		.byte	0x1
+ 1863 08c1 E2       		.byte	0xe2
+ 1864 08c2 00000000 		.4byte	.LFB79
+ 1865 08c6 28000000 		.4byte	.LFE79-.LFB79
+ 1866 08ca 01       		.uleb128 0x1
+ 1867 08cb 9C       		.byte	0x9c
+ 1868 08cc EF080000 		.4byte	0x8ef
+ 1869 08d0 22       		.uleb128 0x22
+ 1870 08d1 64737400 		.ascii	"dst\000"
+ 1871 08d5 01       		.byte	0x1
+ 1872 08d6 E2       		.byte	0xe2
+ 1873 08d7 EF080000 		.4byte	0x8ef
+ 1874 08db 1C030000 		.4byte	.LLST23
+ 1875 08df 22       		.uleb128 0x22
+ 1876 08e0 73726300 		.ascii	"src\000"
+ 1877 08e4 01       		.byte	0x1
+ 1878 08e5 E2       		.byte	0xe2
+ 1879 08e6 FF040000 		.4byte	0x4ff
+ 1880 08ea 4A030000 		.4byte	.LLST24
+ 1881 08ee 00       		.byte	0
+ 1882 08ef 05       		.uleb128 0x5
+ 1883 08f0 04       		.byte	0x4
+ 1884 08f1 0E020000 		.4byte	0x20e
+ 1885 08f5 19       		.uleb128 0x19
+ 1886 08f6 B4040000 		.4byte	.LASF105
+ 1887 08fa 01       		.byte	0x1
+ 1888 08fb EA       		.byte	0xea
+ 1889 08fc 00000000 		.4byte	.LFB80
+ 1890 0900 2E000000 		.4byte	.LFE80-.LFB80
+ 1891 0904 01       		.uleb128 0x1
+ 1892 0905 9C       		.byte	0x9c
+ 1893 0906 29090000 		.4byte	0x929
+ 1894 090a 22       		.uleb128 0x22
+ 1895 090b 64737400 		.ascii	"dst\000"
+ 1896 090f 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 39
+
+
+ 1897 0910 EA       		.byte	0xea
+ 1898 0911 FF040000 		.4byte	0x4ff
+ 1899 0915 78030000 		.4byte	.LLST25
+ 1900 0919 22       		.uleb128 0x22
+ 1901 091a 73726300 		.ascii	"src\000"
+ 1902 091e 01       		.byte	0x1
+ 1903 091f EA       		.byte	0xea
+ 1904 0920 EF080000 		.4byte	0x8ef
+ 1905 0924 A6030000 		.4byte	.LLST26
+ 1906 0928 00       		.byte	0
+ 1907 0929 0A       		.uleb128 0xa
+ 1908 092a FF040000 		.4byte	0x4ff
+ 1909 092e 39090000 		.4byte	0x939
+ 1910 0932 0B       		.uleb128 0xb
+ 1911 0933 D9000000 		.4byte	0xd9
+ 1912 0937 0F       		.byte	0xf
+ 1913 0938 00       		.byte	0
+ 1914 0939 1A       		.uleb128 0x1a
+ 1915 093a EE020000 		.4byte	.LASF106
+ 1916 093e 01       		.byte	0x1
+ 1917 093f 12       		.byte	0x12
+ 1918 0940 29090000 		.4byte	0x929
+ 1919 0944 05       		.uleb128 0x5
+ 1920 0945 03       		.byte	0x3
+ 1921 0946 00000000 		.4byte	channelMap
+ 1922 094a 23       		.uleb128 0x23
+ 1923 094b 7A070000 		.4byte	.LASF107
+ 1924 094f 01       		.byte	0x1
+ 1925 0950 14       		.byte	0x14
+ 1926 0951 CE000000 		.4byte	0xce
+ 1927 0955 0008     		.2byte	0x800
+ 1928 0957 24       		.uleb128 0x24
+ 1929 0958 15010000 		.4byte	.LASF108
+ 1930 095c 08       		.byte	0x8
+ 1931 095d 1207     		.2byte	0x712
+ 1932 095f 9A020000 		.4byte	0x29a
+ 1933 0963 25       		.uleb128 0x25
+ 1934 0964 CD050000 		.4byte	.LASF109
+ 1935 0968 09       		.byte	0x9
+ 1936 0969 1F       		.byte	0x1f
+ 1937 096a 6E090000 		.4byte	0x96e
+ 1938 096e 05       		.uleb128 0x5
+ 1939 096f 04       		.byte	0x4
+ 1940 0970 74090000 		.4byte	0x974
+ 1941 0974 07       		.uleb128 0x7
+ 1942 0975 95020000 		.4byte	0x295
+ 1943 0979 26       		.uleb128 0x26
+ 1944 097a AF030000 		.4byte	.LASF110
+ 1945 097e 06       		.byte	0x6
+ 1946 097f 59       		.byte	0x59
+ 1947 0980 8B030000 		.4byte	0x38b
+ 1948 0984 05       		.uleb128 0x5
+ 1949 0985 03       		.byte	0x3
+ 1950 0986 00000000 		.4byte	interrupter
+ 1951 098a 25       		.uleb128 0x25
+ 1952 098b 64040000 		.4byte	.LASF111
+ 1953 098f 07       		.byte	0x7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 40
+
+
+ 1954 0990 A2       		.byte	0xa2
+ 1955 0991 86040000 		.4byte	0x486
+ 1956 0995 26       		.uleb128 0x26
+ 1957 0996 6D010000 		.4byte	.LASF112
+ 1958 099a 01       		.byte	0x1
+ 1959 099b 19       		.byte	0x19
+ 1960 099c A6090000 		.4byte	0x9a6
+ 1961 09a0 05       		.uleb128 0x5
+ 1962 09a1 03       		.byte	0x3
+ 1963 09a2 00000000 		.4byte	DEFMAP
+ 1964 09a6 06       		.uleb128 0x6
+ 1965 09a7 91040000 		.4byte	0x491
+ 1966 09ab 27       		.uleb128 0x27
+ 1967 09ac 57050000 		.4byte	.LASF128
+ 1968 09b0 57050000 		.4byte	.LASF128
+ 1969 09b4 28       		.uleb128 0x28
+ 1970 09b5 9E030000 		.4byte	.LASF113
+ 1971 09b9 9E030000 		.4byte	.LASF113
+ 1972 09bd 0A       		.byte	0xa
+ 1973 09be 18       		.byte	0x18
+ 1974 09bf 28       		.uleb128 0x28
+ 1975 09c0 C5060000 		.4byte	.LASF114
+ 1976 09c4 C5060000 		.4byte	.LASF114
+ 1977 09c8 0A       		.byte	0xa
+ 1978 09c9 19       		.byte	0x19
+ 1979 09ca 28       		.uleb128 0x28
+ 1980 09cb 04030000 		.4byte	.LASF115
+ 1981 09cf 04030000 		.4byte	.LASF115
+ 1982 09d3 0A       		.byte	0xa
+ 1983 09d4 0C       		.byte	0xc
+ 1984 09d5 28       		.uleb128 0x28
+ 1985 09d6 DE060000 		.4byte	.LASF116
+ 1986 09da DE060000 		.4byte	.LASF116
+ 1987 09de 0B       		.byte	0xb
+ 1988 09df 43       		.byte	0x43
+ 1989 09e0 28       		.uleb128 0x28
+ 1990 09e1 A7060000 		.4byte	.LASF117
+ 1991 09e5 A7060000 		.4byte	.LASF117
+ 1992 09e9 0B       		.byte	0xb
+ 1993 09ea 48       		.byte	0x48
+ 1994 09eb 28       		.uleb128 0x28
+ 1995 09ec 00060000 		.4byte	.LASF118
+ 1996 09f0 00060000 		.4byte	.LASF118
+ 1997 09f4 0B       		.byte	0xb
+ 1998 09f5 45       		.byte	0x45
+ 1999 09f6 28       		.uleb128 0x28
+ 2000 09f7 DE040000 		.4byte	.LASF119
+ 2001 09fb DE040000 		.4byte	.LASF119
+ 2002 09ff 0B       		.byte	0xb
+ 2003 0a00 47       		.byte	0x47
+ 2004 0a01 28       		.uleb128 0x28
+ 2005 0a02 81040000 		.4byte	.LASF120
+ 2006 0a06 81040000 		.4byte	.LASF120
+ 2007 0a0a 0A       		.byte	0xa
+ 2008 0a0b 0D       		.byte	0xd
+ 2009 0a0c 00       		.byte	0
+ 2010              		.section	.debug_abbrev,"",%progbits
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 41
+
+
+ 2011              	.Ldebug_abbrev0:
+ 2012 0000 01       		.uleb128 0x1
+ 2013 0001 11       		.uleb128 0x11
+ 2014 0002 01       		.byte	0x1
+ 2015 0003 25       		.uleb128 0x25
+ 2016 0004 0E       		.uleb128 0xe
+ 2017 0005 13       		.uleb128 0x13
+ 2018 0006 0B       		.uleb128 0xb
+ 2019 0007 03       		.uleb128 0x3
+ 2020 0008 0E       		.uleb128 0xe
+ 2021 0009 1B       		.uleb128 0x1b
+ 2022 000a 0E       		.uleb128 0xe
+ 2023 000b 55       		.uleb128 0x55
+ 2024 000c 17       		.uleb128 0x17
+ 2025 000d 11       		.uleb128 0x11
+ 2026 000e 01       		.uleb128 0x1
+ 2027 000f 10       		.uleb128 0x10
+ 2028 0010 17       		.uleb128 0x17
+ 2029 0011 00       		.byte	0
+ 2030 0012 00       		.byte	0
+ 2031 0013 02       		.uleb128 0x2
+ 2032 0014 24       		.uleb128 0x24
+ 2033 0015 00       		.byte	0
+ 2034 0016 0B       		.uleb128 0xb
+ 2035 0017 0B       		.uleb128 0xb
+ 2036 0018 3E       		.uleb128 0x3e
+ 2037 0019 0B       		.uleb128 0xb
+ 2038 001a 03       		.uleb128 0x3
+ 2039 001b 0E       		.uleb128 0xe
+ 2040 001c 00       		.byte	0
+ 2041 001d 00       		.byte	0
+ 2042 001e 03       		.uleb128 0x3
+ 2043 001f 16       		.uleb128 0x16
+ 2044 0020 00       		.byte	0
+ 2045 0021 03       		.uleb128 0x3
+ 2046 0022 0E       		.uleb128 0xe
+ 2047 0023 3A       		.uleb128 0x3a
+ 2048 0024 0B       		.uleb128 0xb
+ 2049 0025 3B       		.uleb128 0x3b
+ 2050 0026 0B       		.uleb128 0xb
+ 2051 0027 49       		.uleb128 0x49
+ 2052 0028 13       		.uleb128 0x13
+ 2053 0029 00       		.byte	0
+ 2054 002a 00       		.byte	0
+ 2055 002b 04       		.uleb128 0x4
+ 2056 002c 24       		.uleb128 0x24
+ 2057 002d 00       		.byte	0
+ 2058 002e 0B       		.uleb128 0xb
+ 2059 002f 0B       		.uleb128 0xb
+ 2060 0030 3E       		.uleb128 0x3e
+ 2061 0031 0B       		.uleb128 0xb
+ 2062 0032 03       		.uleb128 0x3
+ 2063 0033 08       		.uleb128 0x8
+ 2064 0034 00       		.byte	0
+ 2065 0035 00       		.byte	0
+ 2066 0036 05       		.uleb128 0x5
+ 2067 0037 0F       		.uleb128 0xf
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 42
+
+
+ 2068 0038 00       		.byte	0
+ 2069 0039 0B       		.uleb128 0xb
+ 2070 003a 0B       		.uleb128 0xb
+ 2071 003b 49       		.uleb128 0x49
+ 2072 003c 13       		.uleb128 0x13
+ 2073 003d 00       		.byte	0
+ 2074 003e 00       		.byte	0
+ 2075 003f 06       		.uleb128 0x6
+ 2076 0040 26       		.uleb128 0x26
+ 2077 0041 00       		.byte	0
+ 2078 0042 49       		.uleb128 0x49
+ 2079 0043 13       		.uleb128 0x13
+ 2080 0044 00       		.byte	0
+ 2081 0045 00       		.byte	0
+ 2082 0046 07       		.uleb128 0x7
+ 2083 0047 35       		.uleb128 0x35
+ 2084 0048 00       		.byte	0
+ 2085 0049 49       		.uleb128 0x49
+ 2086 004a 13       		.uleb128 0x13
+ 2087 004b 00       		.byte	0
+ 2088 004c 00       		.byte	0
+ 2089 004d 08       		.uleb128 0x8
+ 2090 004e 13       		.uleb128 0x13
+ 2091 004f 01       		.byte	0x1
+ 2092 0050 03       		.uleb128 0x3
+ 2093 0051 0E       		.uleb128 0xe
+ 2094 0052 0B       		.uleb128 0xb
+ 2095 0053 0B       		.uleb128 0xb
+ 2096 0054 3A       		.uleb128 0x3a
+ 2097 0055 0B       		.uleb128 0xb
+ 2098 0056 3B       		.uleb128 0x3b
+ 2099 0057 0B       		.uleb128 0xb
+ 2100 0058 01       		.uleb128 0x1
+ 2101 0059 13       		.uleb128 0x13
+ 2102 005a 00       		.byte	0
+ 2103 005b 00       		.byte	0
+ 2104 005c 09       		.uleb128 0x9
+ 2105 005d 0D       		.uleb128 0xd
+ 2106 005e 00       		.byte	0
+ 2107 005f 03       		.uleb128 0x3
+ 2108 0060 0E       		.uleb128 0xe
+ 2109 0061 3A       		.uleb128 0x3a
+ 2110 0062 0B       		.uleb128 0xb
+ 2111 0063 3B       		.uleb128 0x3b
+ 2112 0064 0B       		.uleb128 0xb
+ 2113 0065 49       		.uleb128 0x49
+ 2114 0066 13       		.uleb128 0x13
+ 2115 0067 38       		.uleb128 0x38
+ 2116 0068 0B       		.uleb128 0xb
+ 2117 0069 00       		.byte	0
+ 2118 006a 00       		.byte	0
+ 2119 006b 0A       		.uleb128 0xa
+ 2120 006c 01       		.uleb128 0x1
+ 2121 006d 01       		.byte	0x1
+ 2122 006e 49       		.uleb128 0x49
+ 2123 006f 13       		.uleb128 0x13
+ 2124 0070 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 43
+
+
+ 2125 0071 13       		.uleb128 0x13
+ 2126 0072 00       		.byte	0
+ 2127 0073 00       		.byte	0
+ 2128 0074 0B       		.uleb128 0xb
+ 2129 0075 21       		.uleb128 0x21
+ 2130 0076 00       		.byte	0
+ 2131 0077 49       		.uleb128 0x49
+ 2132 0078 13       		.uleb128 0x13
+ 2133 0079 2F       		.uleb128 0x2f
+ 2134 007a 0B       		.uleb128 0xb
+ 2135 007b 00       		.byte	0
+ 2136 007c 00       		.byte	0
+ 2137 007d 0C       		.uleb128 0xc
+ 2138 007e 13       		.uleb128 0x13
+ 2139 007f 01       		.byte	0x1
+ 2140 0080 0B       		.uleb128 0xb
+ 2141 0081 0B       		.uleb128 0xb
+ 2142 0082 3A       		.uleb128 0x3a
+ 2143 0083 0B       		.uleb128 0xb
+ 2144 0084 3B       		.uleb128 0x3b
+ 2145 0085 0B       		.uleb128 0xb
+ 2146 0086 01       		.uleb128 0x1
+ 2147 0087 13       		.uleb128 0x13
+ 2148 0088 00       		.byte	0
+ 2149 0089 00       		.byte	0
+ 2150 008a 0D       		.uleb128 0xd
+ 2151 008b 13       		.uleb128 0x13
+ 2152 008c 00       		.byte	0
+ 2153 008d 03       		.uleb128 0x3
+ 2154 008e 0E       		.uleb128 0xe
+ 2155 008f 3C       		.uleb128 0x3c
+ 2156 0090 19       		.uleb128 0x19
+ 2157 0091 00       		.byte	0
+ 2158 0092 00       		.byte	0
+ 2159 0093 0E       		.uleb128 0xe
+ 2160 0094 04       		.uleb128 0x4
+ 2161 0095 01       		.byte	0x1
+ 2162 0096 03       		.uleb128 0x3
+ 2163 0097 0E       		.uleb128 0xe
+ 2164 0098 0B       		.uleb128 0xb
+ 2165 0099 0B       		.uleb128 0xb
+ 2166 009a 49       		.uleb128 0x49
+ 2167 009b 13       		.uleb128 0x13
+ 2168 009c 3A       		.uleb128 0x3a
+ 2169 009d 0B       		.uleb128 0xb
+ 2170 009e 3B       		.uleb128 0x3b
+ 2171 009f 0B       		.uleb128 0xb
+ 2172 00a0 01       		.uleb128 0x1
+ 2173 00a1 13       		.uleb128 0x13
+ 2174 00a2 00       		.byte	0
+ 2175 00a3 00       		.byte	0
+ 2176 00a4 0F       		.uleb128 0xf
+ 2177 00a5 28       		.uleb128 0x28
+ 2178 00a6 00       		.byte	0
+ 2179 00a7 03       		.uleb128 0x3
+ 2180 00a8 0E       		.uleb128 0xe
+ 2181 00a9 1C       		.uleb128 0x1c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 44
+
+
+ 2182 00aa 0B       		.uleb128 0xb
+ 2183 00ab 00       		.byte	0
+ 2184 00ac 00       		.byte	0
+ 2185 00ad 10       		.uleb128 0x10
+ 2186 00ae 0D       		.uleb128 0xd
+ 2187 00af 00       		.byte	0
+ 2188 00b0 03       		.uleb128 0x3
+ 2189 00b1 08       		.uleb128 0x8
+ 2190 00b2 3A       		.uleb128 0x3a
+ 2191 00b3 0B       		.uleb128 0xb
+ 2192 00b4 3B       		.uleb128 0x3b
+ 2193 00b5 0B       		.uleb128 0xb
+ 2194 00b6 49       		.uleb128 0x49
+ 2195 00b7 13       		.uleb128 0x13
+ 2196 00b8 38       		.uleb128 0x38
+ 2197 00b9 0B       		.uleb128 0xb
+ 2198 00ba 00       		.byte	0
+ 2199 00bb 00       		.byte	0
+ 2200 00bc 11       		.uleb128 0x11
+ 2201 00bd 2E       		.uleb128 0x2e
+ 2202 00be 01       		.byte	0x1
+ 2203 00bf 03       		.uleb128 0x3
+ 2204 00c0 0E       		.uleb128 0xe
+ 2205 00c1 3A       		.uleb128 0x3a
+ 2206 00c2 0B       		.uleb128 0xb
+ 2207 00c3 3B       		.uleb128 0x3b
+ 2208 00c4 0B       		.uleb128 0xb
+ 2209 00c5 27       		.uleb128 0x27
+ 2210 00c6 19       		.uleb128 0x19
+ 2211 00c7 11       		.uleb128 0x11
+ 2212 00c8 01       		.uleb128 0x1
+ 2213 00c9 12       		.uleb128 0x12
+ 2214 00ca 06       		.uleb128 0x6
+ 2215 00cb 40       		.uleb128 0x40
+ 2216 00cc 18       		.uleb128 0x18
+ 2217 00cd 9742     		.uleb128 0x2117
+ 2218 00cf 19       		.uleb128 0x19
+ 2219 00d0 01       		.uleb128 0x1
+ 2220 00d1 13       		.uleb128 0x13
+ 2221 00d2 00       		.byte	0
+ 2222 00d3 00       		.byte	0
+ 2223 00d4 12       		.uleb128 0x12
+ 2224 00d5 05       		.uleb128 0x5
+ 2225 00d6 00       		.byte	0
+ 2226 00d7 03       		.uleb128 0x3
+ 2227 00d8 0E       		.uleb128 0xe
+ 2228 00d9 3A       		.uleb128 0x3a
+ 2229 00da 0B       		.uleb128 0xb
+ 2230 00db 3B       		.uleb128 0x3b
+ 2231 00dc 0B       		.uleb128 0xb
+ 2232 00dd 49       		.uleb128 0x49
+ 2233 00de 13       		.uleb128 0x13
+ 2234 00df 02       		.uleb128 0x2
+ 2235 00e0 18       		.uleb128 0x18
+ 2236 00e1 00       		.byte	0
+ 2237 00e2 00       		.byte	0
+ 2238 00e3 13       		.uleb128 0x13
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 45
+
+
+ 2239 00e4 34       		.uleb128 0x34
+ 2240 00e5 00       		.byte	0
+ 2241 00e6 03       		.uleb128 0x3
+ 2242 00e7 0E       		.uleb128 0xe
+ 2243 00e8 3A       		.uleb128 0x3a
+ 2244 00e9 0B       		.uleb128 0xb
+ 2245 00ea 3B       		.uleb128 0x3b
+ 2246 00eb 0B       		.uleb128 0xb
+ 2247 00ec 49       		.uleb128 0x49
+ 2248 00ed 13       		.uleb128 0x13
+ 2249 00ee 02       		.uleb128 0x2
+ 2250 00ef 17       		.uleb128 0x17
+ 2251 00f0 00       		.byte	0
+ 2252 00f1 00       		.byte	0
+ 2253 00f2 14       		.uleb128 0x14
+ 2254 00f3 2E       		.uleb128 0x2e
+ 2255 00f4 01       		.byte	0x1
+ 2256 00f5 3F       		.uleb128 0x3f
+ 2257 00f6 19       		.uleb128 0x19
+ 2258 00f7 03       		.uleb128 0x3
+ 2259 00f8 0E       		.uleb128 0xe
+ 2260 00f9 3A       		.uleb128 0x3a
+ 2261 00fa 0B       		.uleb128 0xb
+ 2262 00fb 3B       		.uleb128 0x3b
+ 2263 00fc 0B       		.uleb128 0xb
+ 2264 00fd 11       		.uleb128 0x11
+ 2265 00fe 01       		.uleb128 0x1
+ 2266 00ff 12       		.uleb128 0x12
+ 2267 0100 06       		.uleb128 0x6
+ 2268 0101 40       		.uleb128 0x40
+ 2269 0102 18       		.uleb128 0x18
+ 2270 0103 9742     		.uleb128 0x2117
+ 2271 0105 19       		.uleb128 0x19
+ 2272 0106 01       		.uleb128 0x1
+ 2273 0107 13       		.uleb128 0x13
+ 2274 0108 00       		.byte	0
+ 2275 0109 00       		.byte	0
+ 2276 010a 15       		.uleb128 0x15
+ 2277 010b 898201   		.uleb128 0x4109
+ 2278 010e 01       		.byte	0x1
+ 2279 010f 11       		.uleb128 0x11
+ 2280 0110 01       		.uleb128 0x1
+ 2281 0111 9542     		.uleb128 0x2115
+ 2282 0113 19       		.uleb128 0x19
+ 2283 0114 31       		.uleb128 0x31
+ 2284 0115 13       		.uleb128 0x13
+ 2285 0116 00       		.byte	0
+ 2286 0117 00       		.byte	0
+ 2287 0118 16       		.uleb128 0x16
+ 2288 0119 8A8201   		.uleb128 0x410a
+ 2289 011c 00       		.byte	0
+ 2290 011d 02       		.uleb128 0x2
+ 2291 011e 18       		.uleb128 0x18
+ 2292 011f 9142     		.uleb128 0x2111
+ 2293 0121 18       		.uleb128 0x18
+ 2294 0122 00       		.byte	0
+ 2295 0123 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 46
+
+
+ 2296 0124 17       		.uleb128 0x17
+ 2297 0125 2E       		.uleb128 0x2e
+ 2298 0126 01       		.byte	0x1
+ 2299 0127 3F       		.uleb128 0x3f
+ 2300 0128 19       		.uleb128 0x19
+ 2301 0129 03       		.uleb128 0x3
+ 2302 012a 0E       		.uleb128 0xe
+ 2303 012b 3A       		.uleb128 0x3a
+ 2304 012c 0B       		.uleb128 0xb
+ 2305 012d 3B       		.uleb128 0x3b
+ 2306 012e 0B       		.uleb128 0xb
+ 2307 012f 27       		.uleb128 0x27
+ 2308 0130 19       		.uleb128 0x19
+ 2309 0131 49       		.uleb128 0x49
+ 2310 0132 13       		.uleb128 0x13
+ 2311 0133 11       		.uleb128 0x11
+ 2312 0134 01       		.uleb128 0x1
+ 2313 0135 12       		.uleb128 0x12
+ 2314 0136 06       		.uleb128 0x6
+ 2315 0137 40       		.uleb128 0x40
+ 2316 0138 18       		.uleb128 0x18
+ 2317 0139 9742     		.uleb128 0x2117
+ 2318 013b 19       		.uleb128 0x19
+ 2319 013c 01       		.uleb128 0x1
+ 2320 013d 13       		.uleb128 0x13
+ 2321 013e 00       		.byte	0
+ 2322 013f 00       		.byte	0
+ 2323 0140 18       		.uleb128 0x18
+ 2324 0141 05       		.uleb128 0x5
+ 2325 0142 00       		.byte	0
+ 2326 0143 03       		.uleb128 0x3
+ 2327 0144 0E       		.uleb128 0xe
+ 2328 0145 3A       		.uleb128 0x3a
+ 2329 0146 0B       		.uleb128 0xb
+ 2330 0147 3B       		.uleb128 0x3b
+ 2331 0148 0B       		.uleb128 0xb
+ 2332 0149 49       		.uleb128 0x49
+ 2333 014a 13       		.uleb128 0x13
+ 2334 014b 02       		.uleb128 0x2
+ 2335 014c 17       		.uleb128 0x17
+ 2336 014d 00       		.byte	0
+ 2337 014e 00       		.byte	0
+ 2338 014f 19       		.uleb128 0x19
+ 2339 0150 2E       		.uleb128 0x2e
+ 2340 0151 01       		.byte	0x1
+ 2341 0152 3F       		.uleb128 0x3f
+ 2342 0153 19       		.uleb128 0x19
+ 2343 0154 03       		.uleb128 0x3
+ 2344 0155 0E       		.uleb128 0xe
+ 2345 0156 3A       		.uleb128 0x3a
+ 2346 0157 0B       		.uleb128 0xb
+ 2347 0158 3B       		.uleb128 0x3b
+ 2348 0159 0B       		.uleb128 0xb
+ 2349 015a 27       		.uleb128 0x27
+ 2350 015b 19       		.uleb128 0x19
+ 2351 015c 11       		.uleb128 0x11
+ 2352 015d 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 47
+
+
+ 2353 015e 12       		.uleb128 0x12
+ 2354 015f 06       		.uleb128 0x6
+ 2355 0160 40       		.uleb128 0x40
+ 2356 0161 18       		.uleb128 0x18
+ 2357 0162 9742     		.uleb128 0x2117
+ 2358 0164 19       		.uleb128 0x19
+ 2359 0165 01       		.uleb128 0x1
+ 2360 0166 13       		.uleb128 0x13
+ 2361 0167 00       		.byte	0
+ 2362 0168 00       		.byte	0
+ 2363 0169 1A       		.uleb128 0x1a
+ 2364 016a 34       		.uleb128 0x34
+ 2365 016b 00       		.byte	0
+ 2366 016c 03       		.uleb128 0x3
+ 2367 016d 0E       		.uleb128 0xe
+ 2368 016e 3A       		.uleb128 0x3a
+ 2369 016f 0B       		.uleb128 0xb
+ 2370 0170 3B       		.uleb128 0x3b
+ 2371 0171 0B       		.uleb128 0xb
+ 2372 0172 49       		.uleb128 0x49
+ 2373 0173 13       		.uleb128 0x13
+ 2374 0174 02       		.uleb128 0x2
+ 2375 0175 18       		.uleb128 0x18
+ 2376 0176 00       		.byte	0
+ 2377 0177 00       		.byte	0
+ 2378 0178 1B       		.uleb128 0x1b
+ 2379 0179 0B       		.uleb128 0xb
+ 2380 017a 01       		.byte	0x1
+ 2381 017b 11       		.uleb128 0x11
+ 2382 017c 01       		.uleb128 0x1
+ 2383 017d 12       		.uleb128 0x12
+ 2384 017e 06       		.uleb128 0x6
+ 2385 017f 01       		.uleb128 0x1
+ 2386 0180 13       		.uleb128 0x13
+ 2387 0181 00       		.byte	0
+ 2388 0182 00       		.byte	0
+ 2389 0183 1C       		.uleb128 0x1c
+ 2390 0184 34       		.uleb128 0x34
+ 2391 0185 00       		.byte	0
+ 2392 0186 03       		.uleb128 0x3
+ 2393 0187 08       		.uleb128 0x8
+ 2394 0188 3A       		.uleb128 0x3a
+ 2395 0189 0B       		.uleb128 0xb
+ 2396 018a 3B       		.uleb128 0x3b
+ 2397 018b 0B       		.uleb128 0xb
+ 2398 018c 49       		.uleb128 0x49
+ 2399 018d 13       		.uleb128 0x13
+ 2400 018e 02       		.uleb128 0x2
+ 2401 018f 17       		.uleb128 0x17
+ 2402 0190 00       		.byte	0
+ 2403 0191 00       		.byte	0
+ 2404 0192 1D       		.uleb128 0x1d
+ 2405 0193 0B       		.uleb128 0xb
+ 2406 0194 01       		.byte	0x1
+ 2407 0195 55       		.uleb128 0x55
+ 2408 0196 17       		.uleb128 0x17
+ 2409 0197 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 48
+
+
+ 2410 0198 00       		.byte	0
+ 2411 0199 1E       		.uleb128 0x1e
+ 2412 019a 898201   		.uleb128 0x4109
+ 2413 019d 00       		.byte	0
+ 2414 019e 11       		.uleb128 0x11
+ 2415 019f 01       		.uleb128 0x1
+ 2416 01a0 31       		.uleb128 0x31
+ 2417 01a1 13       		.uleb128 0x13
+ 2418 01a2 00       		.byte	0
+ 2419 01a3 00       		.byte	0
+ 2420 01a4 1F       		.uleb128 0x1f
+ 2421 01a5 898201   		.uleb128 0x4109
+ 2422 01a8 01       		.byte	0x1
+ 2423 01a9 11       		.uleb128 0x11
+ 2424 01aa 01       		.uleb128 0x1
+ 2425 01ab 31       		.uleb128 0x31
+ 2426 01ac 13       		.uleb128 0x13
+ 2427 01ad 01       		.uleb128 0x1
+ 2428 01ae 13       		.uleb128 0x13
+ 2429 01af 00       		.byte	0
+ 2430 01b0 00       		.byte	0
+ 2431 01b1 20       		.uleb128 0x20
+ 2432 01b2 898201   		.uleb128 0x4109
+ 2433 01b5 01       		.byte	0x1
+ 2434 01b6 11       		.uleb128 0x11
+ 2435 01b7 01       		.uleb128 0x1
+ 2436 01b8 31       		.uleb128 0x31
+ 2437 01b9 13       		.uleb128 0x13
+ 2438 01ba 00       		.byte	0
+ 2439 01bb 00       		.byte	0
+ 2440 01bc 21       		.uleb128 0x21
+ 2441 01bd 05       		.uleb128 0x5
+ 2442 01be 00       		.byte	0
+ 2443 01bf 03       		.uleb128 0x3
+ 2444 01c0 08       		.uleb128 0x8
+ 2445 01c1 3A       		.uleb128 0x3a
+ 2446 01c2 0B       		.uleb128 0xb
+ 2447 01c3 3B       		.uleb128 0x3b
+ 2448 01c4 0B       		.uleb128 0xb
+ 2449 01c5 49       		.uleb128 0x49
+ 2450 01c6 13       		.uleb128 0x13
+ 2451 01c7 02       		.uleb128 0x2
+ 2452 01c8 18       		.uleb128 0x18
+ 2453 01c9 00       		.byte	0
+ 2454 01ca 00       		.byte	0
+ 2455 01cb 22       		.uleb128 0x22
+ 2456 01cc 05       		.uleb128 0x5
+ 2457 01cd 00       		.byte	0
+ 2458 01ce 03       		.uleb128 0x3
+ 2459 01cf 08       		.uleb128 0x8
+ 2460 01d0 3A       		.uleb128 0x3a
+ 2461 01d1 0B       		.uleb128 0xb
+ 2462 01d2 3B       		.uleb128 0x3b
+ 2463 01d3 0B       		.uleb128 0xb
+ 2464 01d4 49       		.uleb128 0x49
+ 2465 01d5 13       		.uleb128 0x13
+ 2466 01d6 02       		.uleb128 0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 49
+
+
+ 2467 01d7 17       		.uleb128 0x17
+ 2468 01d8 00       		.byte	0
+ 2469 01d9 00       		.byte	0
+ 2470 01da 23       		.uleb128 0x23
+ 2471 01db 34       		.uleb128 0x34
+ 2472 01dc 00       		.byte	0
+ 2473 01dd 03       		.uleb128 0x3
+ 2474 01de 0E       		.uleb128 0xe
+ 2475 01df 3A       		.uleb128 0x3a
+ 2476 01e0 0B       		.uleb128 0xb
+ 2477 01e1 3B       		.uleb128 0x3b
+ 2478 01e2 0B       		.uleb128 0xb
+ 2479 01e3 49       		.uleb128 0x49
+ 2480 01e4 13       		.uleb128 0x13
+ 2481 01e5 1C       		.uleb128 0x1c
+ 2482 01e6 05       		.uleb128 0x5
+ 2483 01e7 00       		.byte	0
+ 2484 01e8 00       		.byte	0
+ 2485 01e9 24       		.uleb128 0x24
+ 2486 01ea 34       		.uleb128 0x34
+ 2487 01eb 00       		.byte	0
+ 2488 01ec 03       		.uleb128 0x3
+ 2489 01ed 0E       		.uleb128 0xe
+ 2490 01ee 3A       		.uleb128 0x3a
+ 2491 01ef 0B       		.uleb128 0xb
+ 2492 01f0 3B       		.uleb128 0x3b
+ 2493 01f1 05       		.uleb128 0x5
+ 2494 01f2 49       		.uleb128 0x49
+ 2495 01f3 13       		.uleb128 0x13
+ 2496 01f4 3F       		.uleb128 0x3f
+ 2497 01f5 19       		.uleb128 0x19
+ 2498 01f6 3C       		.uleb128 0x3c
+ 2499 01f7 19       		.uleb128 0x19
+ 2500 01f8 00       		.byte	0
+ 2501 01f9 00       		.byte	0
+ 2502 01fa 25       		.uleb128 0x25
+ 2503 01fb 34       		.uleb128 0x34
+ 2504 01fc 00       		.byte	0
+ 2505 01fd 03       		.uleb128 0x3
+ 2506 01fe 0E       		.uleb128 0xe
+ 2507 01ff 3A       		.uleb128 0x3a
+ 2508 0200 0B       		.uleb128 0xb
+ 2509 0201 3B       		.uleb128 0x3b
+ 2510 0202 0B       		.uleb128 0xb
+ 2511 0203 49       		.uleb128 0x49
+ 2512 0204 13       		.uleb128 0x13
+ 2513 0205 3F       		.uleb128 0x3f
+ 2514 0206 19       		.uleb128 0x19
+ 2515 0207 3C       		.uleb128 0x3c
+ 2516 0208 19       		.uleb128 0x19
+ 2517 0209 00       		.byte	0
+ 2518 020a 00       		.byte	0
+ 2519 020b 26       		.uleb128 0x26
+ 2520 020c 34       		.uleb128 0x34
+ 2521 020d 00       		.byte	0
+ 2522 020e 03       		.uleb128 0x3
+ 2523 020f 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 50
+
+
+ 2524 0210 3A       		.uleb128 0x3a
+ 2525 0211 0B       		.uleb128 0xb
+ 2526 0212 3B       		.uleb128 0x3b
+ 2527 0213 0B       		.uleb128 0xb
+ 2528 0214 49       		.uleb128 0x49
+ 2529 0215 13       		.uleb128 0x13
+ 2530 0216 3F       		.uleb128 0x3f
+ 2531 0217 19       		.uleb128 0x19
+ 2532 0218 02       		.uleb128 0x2
+ 2533 0219 18       		.uleb128 0x18
+ 2534 021a 00       		.byte	0
+ 2535 021b 00       		.byte	0
+ 2536 021c 27       		.uleb128 0x27
+ 2537 021d 2E       		.uleb128 0x2e
+ 2538 021e 00       		.byte	0
+ 2539 021f 3F       		.uleb128 0x3f
+ 2540 0220 19       		.uleb128 0x19
+ 2541 0221 3C       		.uleb128 0x3c
+ 2542 0222 19       		.uleb128 0x19
+ 2543 0223 6E       		.uleb128 0x6e
+ 2544 0224 0E       		.uleb128 0xe
+ 2545 0225 03       		.uleb128 0x3
+ 2546 0226 0E       		.uleb128 0xe
+ 2547 0227 00       		.byte	0
+ 2548 0228 00       		.byte	0
+ 2549 0229 28       		.uleb128 0x28
+ 2550 022a 2E       		.uleb128 0x2e
+ 2551 022b 00       		.byte	0
+ 2552 022c 3F       		.uleb128 0x3f
+ 2553 022d 19       		.uleb128 0x19
+ 2554 022e 3C       		.uleb128 0x3c
+ 2555 022f 19       		.uleb128 0x19
+ 2556 0230 6E       		.uleb128 0x6e
+ 2557 0231 0E       		.uleb128 0xe
+ 2558 0232 03       		.uleb128 0x3
+ 2559 0233 0E       		.uleb128 0xe
+ 2560 0234 3A       		.uleb128 0x3a
+ 2561 0235 0B       		.uleb128 0xb
+ 2562 0236 3B       		.uleb128 0x3b
+ 2563 0237 0B       		.uleb128 0xb
+ 2564 0238 00       		.byte	0
+ 2565 0239 00       		.byte	0
+ 2566 023a 00       		.byte	0
+ 2567              		.section	.debug_loc,"",%progbits
+ 2568              	.Ldebug_loc0:
+ 2569              	.LLST0:
+ 2570 0000 06000000 		.4byte	.LVL1
+ 2571 0004 10000000 		.4byte	.LVL2
+ 2572 0008 0100     		.2byte	0x1
+ 2573 000a 56       		.byte	0x56
+ 2574 000b 10000000 		.4byte	.LVL2
+ 2575 000f 34000000 		.4byte	.LVL3
+ 2576 0013 0100     		.2byte	0x1
+ 2577 0015 52       		.byte	0x52
+ 2578 0016 46000000 		.4byte	.LVL6
+ 2579 001a 48000000 		.4byte	.LVL7
+ 2580 001e 0100     		.2byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 51
+
+
+ 2581 0020 52       		.byte	0x52
+ 2582 0021 00000000 		.4byte	0
+ 2583 0025 00000000 		.4byte	0
+ 2584              	.LLST1:
+ 2585 0029 06000000 		.4byte	.LVL1
+ 2586 002d 10000000 		.4byte	.LVL2
+ 2587 0031 0200     		.2byte	0x2
+ 2588 0033 30       		.byte	0x30
+ 2589 0034 9F       		.byte	0x9f
+ 2590 0035 10000000 		.4byte	.LVL2
+ 2591 0039 3C000000 		.4byte	.LVL4
+ 2592 003d 0100     		.2byte	0x1
+ 2593 003f 53       		.byte	0x53
+ 2594 0040 3E000000 		.4byte	.LVL5
+ 2595 0044 4C000000 		.4byte	.LVL8
+ 2596 0048 0100     		.2byte	0x1
+ 2597 004a 53       		.byte	0x53
+ 2598 004b 00000000 		.4byte	0
+ 2599 004f 00000000 		.4byte	0
+ 2600              	.LLST2:
+ 2601 0053 00000000 		.4byte	.LVL10
+ 2602 0057 06000000 		.4byte	.LVL11
+ 2603 005b 0100     		.2byte	0x1
+ 2604 005d 50       		.byte	0x50
+ 2605 005e 06000000 		.4byte	.LVL11
+ 2606 0062 24000000 		.4byte	.LFE71
+ 2607 0066 0400     		.2byte	0x4
+ 2608 0068 F3       		.byte	0xf3
+ 2609 0069 01       		.uleb128 0x1
+ 2610 006a 50       		.byte	0x50
+ 2611 006b 9F       		.byte	0x9f
+ 2612 006c 00000000 		.4byte	0
+ 2613 0070 00000000 		.4byte	0
+ 2614              	.LLST3:
+ 2615 0074 00000000 		.4byte	.LVL12
+ 2616 0078 03000000 		.4byte	.LVL13-1
+ 2617 007c 0100     		.2byte	0x1
+ 2618 007e 50       		.byte	0x50
+ 2619 007f 03000000 		.4byte	.LVL13-1
+ 2620 0083 04000000 		.4byte	.LFE72
+ 2621 0087 0400     		.2byte	0x4
+ 2622 0089 F3       		.byte	0xf3
+ 2623 008a 01       		.uleb128 0x1
+ 2624 008b 50       		.byte	0x50
+ 2625 008c 9F       		.byte	0x9f
+ 2626 008d 00000000 		.4byte	0
+ 2627 0091 00000000 		.4byte	0
+ 2628              	.LLST4:
+ 2629 0095 00000000 		.4byte	.LVL14
+ 2630 0099 03000000 		.4byte	.LVL15-1
+ 2631 009d 0100     		.2byte	0x1
+ 2632 009f 50       		.byte	0x50
+ 2633 00a0 03000000 		.4byte	.LVL15-1
+ 2634 00a4 04000000 		.4byte	.LFE73
+ 2635 00a8 0400     		.2byte	0x4
+ 2636 00aa F3       		.byte	0xf3
+ 2637 00ab 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 52
+
+
+ 2638 00ac 50       		.byte	0x50
+ 2639 00ad 9F       		.byte	0x9f
+ 2640 00ae 00000000 		.4byte	0
+ 2641 00b2 00000000 		.4byte	0
+ 2642              	.LLST5:
+ 2643 00b6 00000000 		.4byte	.LVL16
+ 2644 00ba 03000000 		.4byte	.LVL17-1
+ 2645 00be 0100     		.2byte	0x1
+ 2646 00c0 50       		.byte	0x50
+ 2647 00c1 03000000 		.4byte	.LVL17-1
+ 2648 00c5 04000000 		.4byte	.LFE74
+ 2649 00c9 0400     		.2byte	0x4
+ 2650 00cb F3       		.byte	0xf3
+ 2651 00cc 01       		.uleb128 0x1
+ 2652 00cd 50       		.byte	0x50
+ 2653 00ce 9F       		.byte	0x9f
+ 2654 00cf 00000000 		.4byte	0
+ 2655 00d3 00000000 		.4byte	0
+ 2656              	.LLST6:
+ 2657 00d7 00000000 		.4byte	.LVL16
+ 2658 00db 03000000 		.4byte	.LVL17-1
+ 2659 00df 0100     		.2byte	0x1
+ 2660 00e1 51       		.byte	0x51
+ 2661 00e2 03000000 		.4byte	.LVL17-1
+ 2662 00e6 04000000 		.4byte	.LFE74
+ 2663 00ea 0400     		.2byte	0x4
+ 2664 00ec F3       		.byte	0xf3
+ 2665 00ed 01       		.uleb128 0x1
+ 2666 00ee 51       		.byte	0x51
+ 2667 00ef 9F       		.byte	0x9f
+ 2668 00f0 00000000 		.4byte	0
+ 2669 00f4 00000000 		.4byte	0
+ 2670              	.LLST7:
+ 2671 00f8 00000000 		.4byte	.LVL16
+ 2672 00fc 03000000 		.4byte	.LVL17-1
+ 2673 0100 0100     		.2byte	0x1
+ 2674 0102 52       		.byte	0x52
+ 2675 0103 03000000 		.4byte	.LVL17-1
+ 2676 0107 04000000 		.4byte	.LFE74
+ 2677 010b 0400     		.2byte	0x4
+ 2678 010d F3       		.byte	0xf3
+ 2679 010e 01       		.uleb128 0x1
+ 2680 010f 52       		.byte	0x52
+ 2681 0110 9F       		.byte	0x9f
+ 2682 0111 00000000 		.4byte	0
+ 2683 0115 00000000 		.4byte	0
+ 2684              	.LLST8:
+ 2685 0119 00000000 		.4byte	.LVL18
+ 2686 011d 03000000 		.4byte	.LVL19-1
+ 2687 0121 0100     		.2byte	0x1
+ 2688 0123 50       		.byte	0x50
+ 2689 0124 03000000 		.4byte	.LVL19-1
+ 2690 0128 04000000 		.4byte	.LFE75
+ 2691 012c 0400     		.2byte	0x4
+ 2692 012e F3       		.byte	0xf3
+ 2693 012f 01       		.uleb128 0x1
+ 2694 0130 50       		.byte	0x50
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 53
+
+
+ 2695 0131 9F       		.byte	0x9f
+ 2696 0132 00000000 		.4byte	0
+ 2697 0136 00000000 		.4byte	0
+ 2698              	.LLST9:
+ 2699 013a 00000000 		.4byte	.LVL18
+ 2700 013e 03000000 		.4byte	.LVL19-1
+ 2701 0142 0100     		.2byte	0x1
+ 2702 0144 51       		.byte	0x51
+ 2703 0145 03000000 		.4byte	.LVL19-1
+ 2704 0149 04000000 		.4byte	.LFE75
+ 2705 014d 0400     		.2byte	0x4
+ 2706 014f F3       		.byte	0xf3
+ 2707 0150 01       		.uleb128 0x1
+ 2708 0151 51       		.byte	0x51
+ 2709 0152 9F       		.byte	0x9f
+ 2710 0153 00000000 		.4byte	0
+ 2711 0157 00000000 		.4byte	0
+ 2712              	.LLST10:
+ 2713 015b 00000000 		.4byte	.LVL20
+ 2714 015f 28000000 		.4byte	.LVL24
+ 2715 0163 0100     		.2byte	0x1
+ 2716 0165 50       		.byte	0x50
+ 2717 0166 28000000 		.4byte	.LVL24
+ 2718 016a 4C010000 		.4byte	.LVL47
+ 2719 016e 0100     		.2byte	0x1
+ 2720 0170 59       		.byte	0x59
+ 2721 0171 4C010000 		.4byte	.LVL47
+ 2722 0175 54010000 		.4byte	.LFE76
+ 2723 0179 0400     		.2byte	0x4
+ 2724 017b F3       		.byte	0xf3
+ 2725 017c 01       		.uleb128 0x1
+ 2726 017d 50       		.byte	0x50
+ 2727 017e 9F       		.byte	0x9f
+ 2728 017f 00000000 		.4byte	0
+ 2729 0183 00000000 		.4byte	0
+ 2730              	.LLST11:
+ 2731 0187 00000000 		.4byte	.LVL20
+ 2732 018b 16000000 		.4byte	.LVL23
+ 2733 018f 0100     		.2byte	0x1
+ 2734 0191 51       		.byte	0x51
+ 2735 0192 16000000 		.4byte	.LVL23
+ 2736 0196 4C010000 		.4byte	.LVL47
+ 2737 019a 0100     		.2byte	0x1
+ 2738 019c 57       		.byte	0x57
+ 2739 019d 4C010000 		.4byte	.LVL47
+ 2740 01a1 54010000 		.4byte	.LFE76
+ 2741 01a5 0400     		.2byte	0x4
+ 2742 01a7 F3       		.byte	0xf3
+ 2743 01a8 01       		.uleb128 0x1
+ 2744 01a9 51       		.byte	0x51
+ 2745 01aa 9F       		.byte	0x9f
+ 2746 01ab 00000000 		.4byte	0
+ 2747 01af 00000000 		.4byte	0
+ 2748              	.LLST12:
+ 2749 01b3 00000000 		.4byte	.LVL20
+ 2750 01b7 0E000000 		.4byte	.LVL22
+ 2751 01bb 0100     		.2byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 54
+
+
+ 2752 01bd 52       		.byte	0x52
+ 2753 01be 0E000000 		.4byte	.LVL22
+ 2754 01c2 4C010000 		.4byte	.LVL47
+ 2755 01c6 0100     		.2byte	0x1
+ 2756 01c8 58       		.byte	0x58
+ 2757 01c9 4C010000 		.4byte	.LVL47
+ 2758 01cd 54010000 		.4byte	.LFE76
+ 2759 01d1 0400     		.2byte	0x4
+ 2760 01d3 F3       		.byte	0xf3
+ 2761 01d4 01       		.uleb128 0x1
+ 2762 01d5 52       		.byte	0x52
+ 2763 01d6 9F       		.byte	0x9f
+ 2764 01d7 00000000 		.4byte	0
+ 2765 01db 00000000 		.4byte	0
+ 2766              	.LLST13:
+ 2767 01df 00000000 		.4byte	.LVL20
+ 2768 01e3 08000000 		.4byte	.LVL21
+ 2769 01e7 0100     		.2byte	0x1
+ 2770 01e9 53       		.byte	0x53
+ 2771 01ea 08000000 		.4byte	.LVL21
+ 2772 01ee 4C010000 		.4byte	.LVL47
+ 2773 01f2 0100     		.2byte	0x1
+ 2774 01f4 54       		.byte	0x54
+ 2775 01f5 4C010000 		.4byte	.LVL47
+ 2776 01f9 54010000 		.4byte	.LFE76
+ 2777 01fd 0400     		.2byte	0x4
+ 2778 01ff F3       		.byte	0xf3
+ 2779 0200 01       		.uleb128 0x1
+ 2780 0201 53       		.byte	0x53
+ 2781 0202 9F       		.byte	0x9f
+ 2782 0203 00000000 		.4byte	0
+ 2783 0207 00000000 		.4byte	0
+ 2784              	.LLST14:
+ 2785 020b 00000000 		.4byte	.LVL20
+ 2786 020f 4C010000 		.4byte	.LVL47
+ 2787 0213 0200     		.2byte	0x2
+ 2788 0215 91       		.byte	0x91
+ 2789 0216 00       		.sleb128 0
+ 2790 0217 4C010000 		.4byte	.LVL47
+ 2791 021b 54010000 		.4byte	.LFE76
+ 2792 021f 0200     		.2byte	0x2
+ 2793 0221 7D       		.byte	0x7d
+ 2794 0222 00       		.sleb128 0
+ 2795 0223 00000000 		.4byte	0
+ 2796 0227 00000000 		.4byte	0
+ 2797              	.LLST15:
+ 2798 022b 38000000 		.4byte	.LVL26
+ 2799 022f 42000000 		.4byte	.LVL28
+ 2800 0233 0100     		.2byte	0x1
+ 2801 0235 56       		.byte	0x56
+ 2802 0236 42000000 		.4byte	.LVL28
+ 2803 023a 54000000 		.4byte	.LVL29
+ 2804 023e 0300     		.2byte	0x3
+ 2805 0240 76       		.byte	0x76
+ 2806 0241 01       		.sleb128 1
+ 2807 0242 9F       		.byte	0x9f
+ 2808 0243 54000000 		.4byte	.LVL29
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 55
+
+
+ 2809 0247 4C010000 		.4byte	.LVL47
+ 2810 024b 0100     		.2byte	0x1
+ 2811 024d 56       		.byte	0x56
+ 2812 024e 00000000 		.4byte	0
+ 2813 0252 00000000 		.4byte	0
+ 2814              	.LLST16:
+ 2815 0256 3C000000 		.4byte	.LVL27
+ 2816 025a 58000000 		.4byte	.LVL31
+ 2817 025e 0100     		.2byte	0x1
+ 2818 0260 53       		.byte	0x53
+ 2819 0261 58000000 		.4byte	.LVL31
+ 2820 0265 5A000000 		.4byte	.LVL32
+ 2821 0269 0300     		.2byte	0x3
+ 2822 026b 73       		.byte	0x73
+ 2823 026c 78       		.sleb128 -8
+ 2824 026d 9F       		.byte	0x9f
+ 2825 026e 00000000 		.4byte	0
+ 2826 0272 00000000 		.4byte	0
+ 2827              	.LLST17:
+ 2828 0276 38000000 		.4byte	.LVL26
+ 2829 027a 64000000 		.4byte	.LVL33
+ 2830 027e 0100     		.2byte	0x1
+ 2831 0280 52       		.byte	0x52
+ 2832 0281 00000000 		.4byte	0
+ 2833 0285 00000000 		.4byte	0
+ 2834              	.LLST18:
+ 2835 0289 64000000 		.4byte	.LVL33
+ 2836 028d 3E010000 		.4byte	.LVL44
+ 2837 0291 0100     		.2byte	0x1
+ 2838 0293 55       		.byte	0x55
+ 2839 0294 3E010000 		.4byte	.LVL44
+ 2840 0298 42010000 		.4byte	.LVL45
+ 2841 029c 0300     		.2byte	0x3
+ 2842 029e 75       		.byte	0x75
+ 2843 029f 7F       		.sleb128 -1
+ 2844 02a0 9F       		.byte	0x9f
+ 2845 02a1 42010000 		.4byte	.LVL45
+ 2846 02a5 46010000 		.4byte	.LVL46
+ 2847 02a9 0100     		.2byte	0x1
+ 2848 02ab 55       		.byte	0x55
+ 2849 02ac 00000000 		.4byte	0
+ 2850 02b0 00000000 		.4byte	0
+ 2851              	.LLST19:
+ 2852 02b4 6A000000 		.4byte	.LVL34
+ 2853 02b8 46010000 		.4byte	.LVL46
+ 2854 02bc 0300     		.2byte	0x3
+ 2855 02be 7B       		.byte	0x7b
+ 2856 02bf 02       		.sleb128 2
+ 2857 02c0 9F       		.byte	0x9f
+ 2858 02c1 00000000 		.4byte	0
+ 2859 02c5 00000000 		.4byte	0
+ 2860              	.LLST20:
+ 2861 02c9 70000000 		.4byte	.LVL35
+ 2862 02cd 74000000 		.4byte	.LVL36
+ 2863 02d1 0100     		.2byte	0x1
+ 2864 02d3 53       		.byte	0x53
+ 2865 02d4 74000000 		.4byte	.LVL36
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 56
+
+
+ 2866 02d8 46010000 		.4byte	.LVL46
+ 2867 02dc 0300     		.2byte	0x3
+ 2868 02de 91       		.byte	0x91
+ 2869 02df B07F     		.sleb128 -80
+ 2870 02e1 00000000 		.4byte	0
+ 2871 02e5 00000000 		.4byte	0
+ 2872              	.LLST21:
+ 2873 02e9 82000000 		.4byte	.LVL37
+ 2874 02ed 84000000 		.4byte	.LVL38
+ 2875 02f1 0100     		.2byte	0x1
+ 2876 02f3 53       		.byte	0x53
+ 2877 02f4 84000000 		.4byte	.LVL38
+ 2878 02f8 46010000 		.4byte	.LVL46
+ 2879 02fc 0300     		.2byte	0x3
+ 2880 02fe 91       		.byte	0x91
+ 2881 02ff B47F     		.sleb128 -76
+ 2882 0301 00000000 		.4byte	0
+ 2883 0305 00000000 		.4byte	0
+ 2884              	.LLST22:
+ 2885 0309 04010000 		.4byte	.LVL42
+ 2886 030d 0D010000 		.4byte	.LVL43-1
+ 2887 0311 0100     		.2byte	0x1
+ 2888 0313 50       		.byte	0x50
+ 2889 0314 00000000 		.4byte	0
+ 2890 0318 00000000 		.4byte	0
+ 2891              	.LLST23:
+ 2892 031c 00000000 		.4byte	.LVL50
+ 2893 0320 08000000 		.4byte	.LVL51
+ 2894 0324 0100     		.2byte	0x1
+ 2895 0326 50       		.byte	0x50
+ 2896 0327 08000000 		.4byte	.LVL51
+ 2897 032b 16000000 		.4byte	.LVL52
+ 2898 032f 0300     		.2byte	0x3
+ 2899 0331 70       		.byte	0x70
+ 2900 0332 7E       		.sleb128 -2
+ 2901 0333 9F       		.byte	0x9f
+ 2902 0334 16000000 		.4byte	.LVL52
+ 2903 0338 28000000 		.4byte	.LFE79
+ 2904 033c 0400     		.2byte	0x4
+ 2905 033e F3       		.byte	0xf3
+ 2906 033f 01       		.uleb128 0x1
+ 2907 0340 50       		.byte	0x50
+ 2908 0341 9F       		.byte	0x9f
+ 2909 0342 00000000 		.4byte	0
+ 2910 0346 00000000 		.4byte	0
+ 2911              	.LLST24:
+ 2912 034a 00000000 		.4byte	.LVL50
+ 2913 034e 16000000 		.4byte	.LVL52
+ 2914 0352 0100     		.2byte	0x1
+ 2915 0354 51       		.byte	0x51
+ 2916 0355 16000000 		.4byte	.LVL52
+ 2917 0359 26000000 		.4byte	.LVL53
+ 2918 035d 0300     		.2byte	0x3
+ 2919 035f 71       		.byte	0x71
+ 2920 0360 6D       		.sleb128 -19
+ 2921 0361 9F       		.byte	0x9f
+ 2922 0362 26000000 		.4byte	.LVL53
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 57
+
+
+ 2923 0366 28000000 		.4byte	.LFE79
+ 2924 036a 0400     		.2byte	0x4
+ 2925 036c F3       		.byte	0xf3
+ 2926 036d 01       		.uleb128 0x1
+ 2927 036e 51       		.byte	0x51
+ 2928 036f 9F       		.byte	0x9f
+ 2929 0370 00000000 		.4byte	0
+ 2930 0374 00000000 		.4byte	0
+ 2931              	.LLST25:
+ 2932 0378 00000000 		.4byte	.LVL54
+ 2933 037c 08000000 		.4byte	.LVL55
+ 2934 0380 0100     		.2byte	0x1
+ 2935 0382 50       		.byte	0x50
+ 2936 0383 08000000 		.4byte	.LVL55
+ 2937 0387 1C000000 		.4byte	.LVL56
+ 2938 038b 0300     		.2byte	0x3
+ 2939 038d 70       		.byte	0x70
+ 2940 038e 7D       		.sleb128 -3
+ 2941 038f 9F       		.byte	0x9f
+ 2942 0390 1C000000 		.4byte	.LVL56
+ 2943 0394 2E000000 		.4byte	.LFE80
+ 2944 0398 0400     		.2byte	0x4
+ 2945 039a F3       		.byte	0xf3
+ 2946 039b 01       		.uleb128 0x1
+ 2947 039c 50       		.byte	0x50
+ 2948 039d 9F       		.byte	0x9f
+ 2949 039e 00000000 		.4byte	0
+ 2950 03a2 00000000 		.4byte	0
+ 2951              	.LLST26:
+ 2952 03a6 00000000 		.4byte	.LVL54
+ 2953 03aa 1C000000 		.4byte	.LVL56
+ 2954 03ae 0100     		.2byte	0x1
+ 2955 03b0 51       		.byte	0x51
+ 2956 03b1 1C000000 		.4byte	.LVL56
+ 2957 03b5 2C000000 		.4byte	.LVL57
+ 2958 03b9 0300     		.2byte	0x3
+ 2959 03bb 71       		.byte	0x71
+ 2960 03bc 6E       		.sleb128 -18
+ 2961 03bd 9F       		.byte	0x9f
+ 2962 03be 2C000000 		.4byte	.LVL57
+ 2963 03c2 2E000000 		.4byte	.LFE80
+ 2964 03c6 0400     		.2byte	0x4
+ 2965 03c8 F3       		.byte	0xf3
+ 2966 03c9 01       		.uleb128 0x1
+ 2967 03ca 51       		.byte	0x51
+ 2968 03cb 9F       		.byte	0x9f
+ 2969 03cc 00000000 		.4byte	0
+ 2970 03d0 00000000 		.4byte	0
+ 2971              		.section	.debug_aranges,"",%progbits
+ 2972 0000 74000000 		.4byte	0x74
+ 2973 0004 0200     		.2byte	0x2
+ 2974 0006 00000000 		.4byte	.Ldebug_info0
+ 2975 000a 04       		.byte	0x4
+ 2976 000b 00       		.byte	0
+ 2977 000c 0000     		.2byte	0
+ 2978 000e 0000     		.2byte	0
+ 2979 0010 00000000 		.4byte	.LFB70
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 58
+
+
+ 2980 0014 64000000 		.4byte	.LFE70-.LFB70
+ 2981 0018 00000000 		.4byte	.LFB68
+ 2982 001c 10000000 		.4byte	.LFE68-.LFB68
+ 2983 0020 00000000 		.4byte	.LFB71
+ 2984 0024 24000000 		.4byte	.LFE71-.LFB71
+ 2985 0028 00000000 		.4byte	.LFB72
+ 2986 002c 04000000 		.4byte	.LFE72-.LFB72
+ 2987 0030 00000000 		.4byte	.LFB73
+ 2988 0034 04000000 		.4byte	.LFE73-.LFB73
+ 2989 0038 00000000 		.4byte	.LFB74
+ 2990 003c 04000000 		.4byte	.LFE74-.LFB74
+ 2991 0040 00000000 		.4byte	.LFB75
+ 2992 0044 04000000 		.4byte	.LFE75-.LFB75
+ 2993 0048 00000000 		.4byte	.LFB76
+ 2994 004c 54010000 		.4byte	.LFE76-.LFB76
+ 2995 0050 00000000 		.4byte	.LFB77
+ 2996 0054 24000000 		.4byte	.LFE77-.LFB77
+ 2997 0058 00000000 		.4byte	.LFB78
+ 2998 005c 24000000 		.4byte	.LFE78-.LFB78
+ 2999 0060 00000000 		.4byte	.LFB79
+ 3000 0064 28000000 		.4byte	.LFE79-.LFB79
+ 3001 0068 00000000 		.4byte	.LFB80
+ 3002 006c 2E000000 		.4byte	.LFE80-.LFB80
+ 3003 0070 00000000 		.4byte	0
+ 3004 0074 00000000 		.4byte	0
+ 3005              		.section	.debug_ranges,"",%progbits
+ 3006              	.Ldebug_ranges0:
+ 3007 0000 60000000 		.4byte	.LBB4
+ 3008 0004 3C010000 		.4byte	.LBE4
+ 3009 0008 3E010000 		.4byte	.LBB6
+ 3010 000c 42010000 		.4byte	.LBE6
+ 3011 0010 00000000 		.4byte	0
+ 3012 0014 00000000 		.4byte	0
+ 3013 0018 00000000 		.4byte	.LFB70
+ 3014 001c 64000000 		.4byte	.LFE70
+ 3015 0020 00000000 		.4byte	.LFB68
+ 3016 0024 10000000 		.4byte	.LFE68
+ 3017 0028 00000000 		.4byte	.LFB71
+ 3018 002c 24000000 		.4byte	.LFE71
+ 3019 0030 00000000 		.4byte	.LFB72
+ 3020 0034 04000000 		.4byte	.LFE72
+ 3021 0038 00000000 		.4byte	.LFB73
+ 3022 003c 04000000 		.4byte	.LFE73
+ 3023 0040 00000000 		.4byte	.LFB74
+ 3024 0044 04000000 		.4byte	.LFE74
+ 3025 0048 00000000 		.4byte	.LFB75
+ 3026 004c 04000000 		.4byte	.LFE75
+ 3027 0050 00000000 		.4byte	.LFB76
+ 3028 0054 54010000 		.4byte	.LFE76
+ 3029 0058 00000000 		.4byte	.LFB77
+ 3030 005c 24000000 		.4byte	.LFE77
+ 3031 0060 00000000 		.4byte	.LFB78
+ 3032 0064 24000000 		.4byte	.LFE78
+ 3033 0068 00000000 		.4byte	.LFB79
+ 3034 006c 28000000 		.4byte	.LFE79
+ 3035 0070 00000000 		.4byte	.LFB80
+ 3036 0074 2E000000 		.4byte	.LFE80
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 59
+
+
+ 3037 0078 00000000 		.4byte	0
+ 3038 007c 00000000 		.4byte	0
+ 3039              		.section	.debug_line,"",%progbits
+ 3040              	.Ldebug_line0:
+ 3041 0000 86030000 		.section	.debug_str,"MS",%progbits,1
+ 3041      0200FE01 
+ 3041      00000201 
+ 3041      FB0E0D00 
+ 3041      01010101 
+ 3042              	.LASF91:
+ 3043 0000 4D617070 		.ascii	"Mapper_noteOnEventHandler\000"
+ 3043      65725F6E 
+ 3043      6F74654F 
+ 3043      6E457665 
+ 3043      6E744861 
+ 3044              	.LASF46:
+ 3045 001a 696E7465 		.ascii	"interrupter_DMA\000"
+ 3045      72727570 
+ 3045      7465725F 
+ 3045      444D4100 
+ 3046              	.LASF101:
+ 3047 002a 63757272 		.ascii	"currNote\000"
+ 3047      4E6F7465 
+ 3047      00
+ 3048              	.LASF75:
+ 3049 0033 62757273 		.ascii	"burst_on\000"
+ 3049      745F6F6E 
+ 3049      00
+ 3050              	.LASF24:
+ 3051 003c 6E6F7465 		.ascii	"noteFreq\000"
+ 3051      46726571 
+ 3051      00
+ 3052              	.LASF2:
+ 3053 0045 5F5F7569 		.ascii	"__uint8_t\000"
+ 3053      6E74385F 
+ 3053      7400
+ 3054              	.LASF58:
+ 3055 004f 62757273 		.ascii	"burst_state\000"
+ 3055      745F7374 
+ 3055      61746500 
+ 3056              	.LASF35:
+ 3057 005b 5F4D6170 		.ascii	"_MapHeader_\000"
+ 3057      48656164 
+ 3057      65725F00 
+ 3058              	.LASF67:
+ 3059 0067 6F666674 		.ascii	"offtime\000"
+ 3059      696D6500 
+ 3060              	.LASF124:
+ 3061 006f 746D7254 		.ascii	"tmrTimerControl\000"
+ 3061      696D6572 
+ 3061      436F6E74 
+ 3061      726F6C00 
+ 3062              	.LASF61:
+ 3063 007f 696E7465 		.ascii	"interrupter_params\000"
+ 3063      72727570 
+ 3063      7465725F 
+ 3063      70617261 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 60
+
+
+ 3063      6D7300
+ 3064              	.LASF99:
+ 3065 0092 62617365 		.ascii	"baseVolume\000"
+ 3065      566F6C75 
+ 3065      6D6500
+ 3066              	.LASF87:
+ 3067 009d 4D617070 		.ascii	"Mapper_noteOffEventHandler\000"
+ 3067      65725F6E 
+ 3067      6F74654F 
+ 3067      66664576 
+ 3067      656E7448 
+ 3068              	.LASF97:
+ 3069 00b8 74617267 		.ascii	"targetOnTime_us\000"
+ 3069      65744F6E 
+ 3069      54696D65 
+ 3069      5F757300 
+ 3070              	.LASF123:
+ 3071 00c8 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 3071      73657273 
+ 3071      5C636865 
+ 3071      6D695C55 
+ 3071      44335F51 
+ 3072              	.LASF12:
+ 3073 00ed 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 3073      206C6F6E 
+ 3073      6720756E 
+ 3073      7369676E 
+ 3073      65642069 
+ 3074              	.LASF40:
+ 3075 0104 4C656761 		.ascii	"LegayMapHeader_t\000"
+ 3075      794D6170 
+ 3075      48656164 
+ 3075      65725F74 
+ 3075      00
+ 3076              	.LASF108:
+ 3077 0115 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 3077      52784275 
+ 3077      66666572 
+ 3077      00
+ 3078              	.LASF83:
+ 3079 0122 63757272 		.ascii	"currHeader\000"
+ 3079      48656164 
+ 3079      657200
+ 3080              	.LASF15:
+ 3081 012d 696E7431 		.ascii	"int16_t\000"
+ 3081      365F7400 
+ 3082              	.LASF11:
+ 3083 0135 6C6F6E67 		.ascii	"long long int\000"
+ 3083      206C6F6E 
+ 3083      6720696E 
+ 3083      7400
+ 3084              	.LASF0:
+ 3085 0143 7369676E 		.ascii	"signed char\000"
+ 3085      65642063 
+ 3085      68617200 
+ 3086              	.LASF56:
+ 3087 014f 494E5452 		.ascii	"INTR_MOD_CUR\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 61
+
+
+ 3087      5F4D4F44 
+ 3087      5F435552 
+ 3087      00
+ 3088              	.LASF71:
+ 3089 015c 7163775F 		.ascii	"qcw_max\000"
+ 3089      6D617800 
+ 3090              	.LASF25:
+ 3091 0164 74617267 		.ascii	"targetOT\000"
+ 3091      65744F54 
+ 3091      00
+ 3092              	.LASF112:
+ 3093 016d 4445464D 		.ascii	"DEFMAP\000"
+ 3093      415000
+ 3094              	.LASF55:
+ 3095 0174 494E5452 		.ascii	"INTR_MOD_PW\000"
+ 3095      5F4D4F44 
+ 3095      5F505700 
+ 3096              	.LASF8:
+ 3097 0180 6C6F6E67 		.ascii	"long int\000"
+ 3097      20696E74 
+ 3097      00
+ 3098              	.LASF50:
+ 3099 0189 494E5452 		.ascii	"INTR_MODE_BLOCKED\000"
+ 3099      5F4D4F44 
+ 3099      455F424C 
+ 3099      4F434B45 
+ 3099      4400
+ 3100              	.LASF122:
+ 3101 019b 2E2E5C63 		.ascii	"..\\common\\vms\\NoteMapper.c\000"
+ 3101      6F6D6D6F 
+ 3101      6E5C766D 
+ 3101      735C4E6F 
+ 3101      74654D61 
+ 3102              	.LASF82:
+ 3103 01b6 70726F67 		.ascii	"programm\000"
+ 3103      72616D6D 
+ 3103      00
+ 3104              	.LASF22:
+ 3105 01bf 646F7562 		.ascii	"double\000"
+ 3105      6C6500
+ 3106              	.LASF36:
+ 3107 01c6 6C697374 		.ascii	"listEntries\000"
+ 3107      456E7472 
+ 3107      69657300 
+ 3108              	.LASF34:
+ 3109 01d2 4D415054 		.ascii	"MAPTABLE_HEADER_t\000"
+ 3109      41424C45 
+ 3109      5F484541 
+ 3109      4445525F 
+ 3109      7400
+ 3110              	.LASF65:
+ 3111 01e4 74756E65 		.ascii	"tune_pw\000"
+ 3111      5F707700 
+ 3112              	.LASF32:
+ 3113 01ec 656E644E 		.ascii	"endNote\000"
+ 3113      6F746500 
+ 3114              	.LASF90:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 62
+
+
+ 3115 01f4 4D617070 		.ascii	"Mapper_programmChangeHandler\000"
+ 3115      65725F70 
+ 3115      726F6772 
+ 3115      616D6D43 
+ 3115      68616E67 
+ 3116              	.LASF9:
+ 3117 0211 5F5F7569 		.ascii	"__uint32_t\000"
+ 3117      6E743332 
+ 3117      5F7400
+ 3118              	.LASF72:
+ 3119 021c 7163775F 		.ascii	"qcw_repeat\000"
+ 3119      72657065 
+ 3119      617400
+ 3120              	.LASF121:
+ 3121 0227 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 3121      43393920 
+ 3121      352E342E 
+ 3121      31203230 
+ 3121      31363036 
+ 3122 025a 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 3122      20726576 
+ 3122      6973696F 
+ 3122      6E203233 
+ 3122      37373135 
+ 3123 028d 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 3123      74643D67 
+ 3123      6E753939 
+ 3123      202D6666 
+ 3123      756E6374 
+ 3124              	.LASF3:
+ 3125 02c0 5F5F696E 		.ascii	"__int16_t\000"
+ 3125      7431365F 
+ 3125      7400
+ 3126              	.LASF77:
+ 3127 02ca 73796E74 		.ascii	"synth\000"
+ 3127      6800
+ 3128              	.LASF62:
+ 3129 02d0 70617261 		.ascii	"parameter_struct\000"
+ 3129      6D657465 
+ 3129      725F7374 
+ 3129      72756374 
+ 3129      00
+ 3130              	.LASF13:
+ 3131 02e1 756E7369 		.ascii	"unsigned int\000"
+ 3131      676E6564 
+ 3131      20696E74 
+ 3131      00
+ 3132              	.LASF106:
+ 3133 02ee 6368616E 		.ascii	"channelMap\000"
+ 3133      6E656C4D 
+ 3133      617000
+ 3134              	.LASF70:
+ 3135 02f9 7163775F 		.ascii	"qcw_offset\000"
+ 3135      6F666673 
+ 3135      657400
+ 3136              	.LASF115:
+ 3137 0304 564D5357 		.ascii	"VMSW_stopNote\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 63
+
+
+ 3137      5F73746F 
+ 3137      704E6F74 
+ 3137      6500
+ 3138              	.LASF88:
+ 3139 0312 6F757470 		.ascii	"output\000"
+ 3139      757400
+ 3140              	.LASF43:
+ 3141 0319 54696D65 		.ascii	"TimerHandle_t\000"
+ 3141      7248616E 
+ 3141      646C655F 
+ 3141      7400
+ 3142              	.LASF74:
+ 3143 0327 7163775F 		.ascii	"qcw_vol\000"
+ 3143      766F6C00 
+ 3144              	.LASF79:
+ 3145 032f 636C695F 		.ascii	"cli_parameter\000"
+ 3145      70617261 
+ 3145      6D657465 
+ 3145      7200
+ 3146              	.LASF23:
+ 3147 033d 4D415054 		.ascii	"MAPTABLE_DATA_t\000"
+ 3147      41424C45 
+ 3147      5F444154 
+ 3147      415F7400 
+ 3148              	.LASF76:
+ 3149 034d 62757273 		.ascii	"burst_off\000"
+ 3149      745F6F66 
+ 3149      6600
+ 3150              	.LASF86:
+ 3151 0357 4D617070 		.ascii	"Mapper_volumeChangeHandler\000"
+ 3151      65725F76 
+ 3151      6F6C756D 
+ 3151      65436861 
+ 3151      6E676548 
+ 3152              	.LASF41:
+ 3153 0372 4C656761 		.ascii	"LegayMapData_t\000"
+ 3153      794D6170 
+ 3153      44617461 
+ 3153      5F7400
+ 3154              	.LASF39:
+ 3155 0381 6E616D65 		.ascii	"name\000"
+ 3155      00
+ 3156              	.LASF33:
+ 3157 0386 64617461 		.ascii	"data\000"
+ 3157      00
+ 3158              	.LASF6:
+ 3159 038b 73686F72 		.ascii	"short unsigned int\000"
+ 3159      7420756E 
+ 3159      7369676E 
+ 3159      65642069 
+ 3159      6E7400
+ 3160              	.LASF113:
+ 3161 039e 564D5357 		.ascii	"VMSW_bendHandler\000"
+ 3161      5F62656E 
+ 3161      6448616E 
+ 3161      646C6572 
+ 3161      00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 64
+
+
+ 3162              	.LASF110:
+ 3163 03af 696E7465 		.ascii	"interrupter\000"
+ 3163      72727570 
+ 3163      74657200 
+ 3164              	.LASF100:
+ 3165 03bb 74617267 		.ascii	"targetFrequency\000"
+ 3165      65744672 
+ 3165      65717565 
+ 3165      6E637900 
+ 3166              	.LASF16:
+ 3167 03cb 75696E74 		.ascii	"uint16_t\000"
+ 3167      31365F74 
+ 3167      00
+ 3168              	.LASF102:
+ 3169 03d4 4D415050 		.ascii	"MAPPER_convertToLegayMapEntry\000"
+ 3169      45525F63 
+ 3169      6F6E7665 
+ 3169      7274546F 
+ 3169      4C656761 
+ 3170              	.LASF47:
+ 3171 03f2 696E7465 		.ascii	"interrupter_mode\000"
+ 3171      72727570 
+ 3171      7465725F 
+ 3171      6D6F6465 
+ 3171      00
+ 3172              	.LASF53:
+ 3173 0403 42555253 		.ascii	"BURST_OFF\000"
+ 3173      545F4F46 
+ 3173      4600
+ 3174              	.LASF68:
+ 3175 040d 7163775F 		.ascii	"qcw_ramp\000"
+ 3175      72616D70 
+ 3175      00
+ 3176              	.LASF60:
+ 3177 0416 78427572 		.ascii	"xBurst_Timer\000"
+ 3177      73745F54 
+ 3177      696D6572 
+ 3177      00
+ 3178              	.LASF44:
+ 3179 0423 494E5452 		.ascii	"INTR_DMA_TR\000"
+ 3179      5F444D41 
+ 3179      5F545200 
+ 3180              	.LASF94:
+ 3181 042f 656E7472 		.ascii	"entries\000"
+ 3181      69657300 
+ 3182              	.LASF54:
+ 3183 0437 696E7465 		.ascii	"interrupter_modulation\000"
+ 3183      72727570 
+ 3183      7465725F 
+ 3183      6D6F6475 
+ 3183      6C617469 
+ 3184              	.LASF19:
+ 3185 044e 73697A65 		.ascii	"sizetype\000"
+ 3185      74797065 
+ 3185      00
+ 3186              	.LASF98:
+ 3187 0457 74617267 		.ascii	"targetVolume\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 65
+
+
+ 3187      6574566F 
+ 3187      6C756D65 
+ 3187      00
+ 3188              	.LASF111:
+ 3189 0464 70617261 		.ascii	"param\000"
+ 3189      6D00
+ 3190              	.LASF48:
+ 3191 046a 494E5452 		.ascii	"INTR_MODE_OFF\000"
+ 3191      5F4D4F44 
+ 3191      455F4F46 
+ 3191      4600
+ 3192              	.LASF59:
+ 3193 0478 646D615F 		.ascii	"dma_mode\000"
+ 3193      6D6F6465 
+ 3193      00
+ 3194              	.LASF120:
+ 3195 0481 564D5357 		.ascii	"VMSW_startNote\000"
+ 3195      5F737461 
+ 3195      72744E6F 
+ 3195      746500
+ 3196              	.LASF21:
+ 3197 0490 666C6F61 		.ascii	"float\000"
+ 3197      7400
+ 3198              	.LASF92:
+ 3199 0496 76656C6F 		.ascii	"velocity\000"
+ 3199      63697479 
+ 3199      00
+ 3200              	.LASF30:
+ 3201 049f 5F4D6170 		.ascii	"_MapEntry_\000"
+ 3201      456E7472 
+ 3201      795F00
+ 3202              	.LASF95:
+ 3203 04aa 63757272 		.ascii	"currEntry\000"
+ 3203      456E7472 
+ 3203      7900
+ 3204              	.LASF105:
+ 3205 04b4 4D415050 		.ascii	"MAPPER_convertFromLegayMapHeader\000"
+ 3205      45525F63 
+ 3205      6F6E7665 
+ 3205      72744672 
+ 3205      6F6D4C65 
+ 3206              	.LASF52:
+ 3207 04d5 42555253 		.ascii	"BURST_ON\000"
+ 3207      545F4F4E 
+ 3207      00
+ 3208              	.LASF119:
+ 3209 04de 4D696469 		.ascii	"MidiProcessor_getVolume\000"
+ 3209      50726F63 
+ 3209      6573736F 
+ 3209      725F6765 
+ 3209      74566F6C 
+ 3210              	.LASF27:
+ 3211 04f6 73746172 		.ascii	"startblockID\000"
+ 3211      74626C6F 
+ 3211      636B4944 
+ 3211      00
+ 3212              	.LASF126:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 66
+
+
+ 3213 0503 4D617070 		.ascii	"Mapper_init\000"
+ 3213      65725F69 
+ 3213      6E697400 
+ 3214              	.LASF17:
+ 3215 050f 696E7433 		.ascii	"int32_t\000"
+ 3215      325F7400 
+ 3216              	.LASF1:
+ 3217 0517 756E7369 		.ascii	"unsigned char\000"
+ 3217      676E6564 
+ 3217      20636861 
+ 3217      7200
+ 3218              	.LASF89:
+ 3219 0525 6E6F7465 		.ascii	"note\000"
+ 3219      00
+ 3220              	.LASF73:
+ 3221 052a 7163775F 		.ascii	"qcw_freq\000"
+ 3221      66726571 
+ 3221      00
+ 3222              	.LASF38:
+ 3223 0533 70726F67 		.ascii	"programNumberEnd\000"
+ 3223      72616D4E 
+ 3223      756D6265 
+ 3223      72456E64 
+ 3223      00
+ 3224              	.LASF4:
+ 3225 0544 73686F72 		.ascii	"short int\000"
+ 3225      7420696E 
+ 3225      7400
+ 3226              	.LASF64:
+ 3227 054e 74756E65 		.ascii	"tune_end\000"
+ 3227      5F656E64 
+ 3227      00
+ 3228              	.LASF128:
+ 3229 0557 6D656D73 		.ascii	"memset\000"
+ 3229      657400
+ 3230              	.LASF45:
+ 3231 055e 494E5452 		.ascii	"INTR_DMA_DDS\000"
+ 3231      5F444D41 
+ 3231      5F444453 
+ 3231      00
+ 3232              	.LASF69:
+ 3233 056b 7163775F 		.ascii	"qcw_holdoff\000"
+ 3233      686F6C64 
+ 3233      6F666600 
+ 3234              	.LASF63:
+ 3235 0577 74756E65 		.ascii	"tune_start\000"
+ 3235      5F737461 
+ 3235      727400
+ 3236              	.LASF66:
+ 3237 0582 74756E65 		.ascii	"tune_delay\000"
+ 3237      5F64656C 
+ 3237      617900
+ 3238              	.LASF37:
+ 3239 058d 70726F67 		.ascii	"programNumberStart\000"
+ 3239      72616D4E 
+ 3239      756D6265 
+ 3239      72537461 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 67
+
+
+ 3239      727400
+ 3240              	.LASF81:
+ 3241 05a0 6368616E 		.ascii	"channel\000"
+ 3241      6E656C00 
+ 3242              	.LASF103:
+ 3243 05a8 4D415050 		.ascii	"MAPPER_convertFromLegayMapEntry\000"
+ 3243      45525F63 
+ 3243      6F6E7665 
+ 3243      72744672 
+ 3243      6F6D4C65 
+ 3244              	.LASF80:
+ 3245 05c8 68306530 		.ascii	"h0e0\000"
+ 3245      00
+ 3246              	.LASF109:
+ 3247 05cd 4E564D5F 		.ascii	"NVM_mapMem\000"
+ 3247      6D61704D 
+ 3247      656D00
+ 3248              	.LASF18:
+ 3249 05d8 75696E74 		.ascii	"uint32_t\000"
+ 3249      33325F74 
+ 3249      00
+ 3250              	.LASF104:
+ 3251 05e1 4D415050 		.ascii	"MAPPER_convertToLegayMapHeader\000"
+ 3251      45525F63 
+ 3251      6F6E7665 
+ 3251      7274546F 
+ 3251      4C656761 
+ 3252              	.LASF118:
+ 3253 0600 4D696469 		.ascii	"MidiProcessor_getStereoVolume\000"
+ 3253      50726F63 
+ 3253      6573736F 
+ 3253      725F6765 
+ 3253      74537465 
+ 3254              	.LASF10:
+ 3255 061e 6C6F6E67 		.ascii	"long unsigned int\000"
+ 3255      20756E73 
+ 3255      69676E65 
+ 3255      6420696E 
+ 3255      7400
+ 3256              	.LASF20:
+ 3257 0630 63686172 		.ascii	"char\000"
+ 3257      00
+ 3258              	.LASF57:
+ 3259 0635 6D6F6465 		.ascii	"mode\000"
+ 3259      00
+ 3260              	.LASF85:
+ 3261 063a 4D617070 		.ascii	"Mapper_bendHandler\000"
+ 3261      65725F62 
+ 3261      656E6448 
+ 3261      616E646C 
+ 3261      657200
+ 3262              	.LASF5:
+ 3263 064d 5F5F7569 		.ascii	"__uint16_t\000"
+ 3263      6E743136 
+ 3263      5F7400
+ 3264              	.LASF78:
+ 3265 0658 74656D70 		.ascii	"temp_duty\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 68
+
+
+ 3265      5F647574 
+ 3265      7900
+ 3266              	.LASF7:
+ 3267 0662 5F5F696E 		.ascii	"__int32_t\000"
+ 3267      7433325F 
+ 3267      7400
+ 3268              	.LASF42:
+ 3269 066c 4C656761 		.ascii	"LegayMapEntry_t\000"
+ 3269      794D6170 
+ 3269      456E7472 
+ 3269      795F7400 
+ 3270              	.LASF29:
+ 3271 067c 5F4D6170 		.ascii	"_MapData_\000"
+ 3271      44617461 
+ 3271      5F00
+ 3272              	.LASF93:
+ 3273 0686 72657175 		.ascii	"requestedVoiceCount\000"
+ 3273      65737465 
+ 3273      64566F69 
+ 3273      6365436F 
+ 3273      756E7400 
+ 3274              	.LASF49:
+ 3275 069a 494E5452 		.ascii	"INTR_MODE_TR\000"
+ 3275      5F4D4F44 
+ 3275      455F5452 
+ 3275      00
+ 3276              	.LASF117:
+ 3277 06a7 4D696469 		.ascii	"MidiProcessor_getDamperVolume\000"
+ 3277      50726F63 
+ 3277      6573736F 
+ 3277      725F6765 
+ 3277      7444616D 
+ 3278              	.LASF114:
+ 3279 06c5 564D5357 		.ascii	"VMSW_volumeChangeHandler\000"
+ 3279      5F766F6C 
+ 3279      756D6543 
+ 3279      68616E67 
+ 3279      6548616E 
+ 3280              	.LASF116:
+ 3281 06de 4D696469 		.ascii	"MidiProcessor_noteToFrequency_dHz\000"
+ 3281      50726F63 
+ 3281      6573736F 
+ 3281      725F6E6F 
+ 3281      7465546F 
+ 3282              	.LASF51:
+ 3283 0700 696E7465 		.ascii	"interrupter_burst\000"
+ 3283      72727570 
+ 3283      7465725F 
+ 3283      62757273 
+ 3283      7400
+ 3284              	.LASF28:
+ 3285 0712 4D415054 		.ascii	"MAPTABLE_ENTRY_t\000"
+ 3285      41424C45 
+ 3285      5F454E54 
+ 3285      52595F74 
+ 3285      00
+ 3286              	.LASF31:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmoxKgy.s 			page 69
+
+
+ 3287 0723 73746172 		.ascii	"startNote\000"
+ 3287      744E6F74 
+ 3287      6500
+ 3288              	.LASF14:
+ 3289 072d 75696E74 		.ascii	"uint8_t\000"
+ 3289      385F7400 
+ 3290              	.LASF125:
+ 3291 0735 6C6F6164 		.ascii	"loadNewProgramm\000"
+ 3291      4E657750 
+ 3291      726F6772 
+ 3291      616D6D00 
+ 3292              	.LASF26:
+ 3293 0745 666C6167 		.ascii	"flags\000"
+ 3293      7300
+ 3294              	.LASF96:
+ 3295 074b 63757272 		.ascii	"currEntryIdx\000"
+ 3295      456E7472 
+ 3295      79496478 
+ 3295      00
+ 3296              	.LASF84:
+ 3297 0758 63757272 		.ascii	"currOffset\000"
+ 3297      4F666673 
+ 3297      657400
+ 3298              	.LASF127:
+ 3299 0763 4D617070 		.ascii	"Mapper_getProgrammName\000"
+ 3299      65725F67 
+ 3299      65745072 
+ 3299      6F677261 
+ 3299      6D6D4E61 
+ 3300              	.LASF107:
+ 3301 077a 6D61704D 		.ascii	"mapMemorySize\000"
+ 3301      656D6F72 
+ 3301      7953697A 
+ 3301      6500
+ 3302              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

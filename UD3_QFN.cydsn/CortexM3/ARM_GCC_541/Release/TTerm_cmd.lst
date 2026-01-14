@@ -1,0 +1,3903 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"TTerm_cmd.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.CMD_testCommandHandler,"ax",%progbits
+  20              		.align	1
+  21              		.global	CMD_testCommandHandler
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	CMD_testCommandHandler, %function
+  25              	CMD_testCommandHandler:
+  26              	.LFB69:
+  27              		.file 1 "..\\common\\tterm\\TTerm_cmd.c"
+   1:..\common\tterm/TTerm_cmd.c **** /*
+   2:..\common\tterm/TTerm_cmd.c ****  * TTerm
+   3:..\common\tterm/TTerm_cmd.c ****  *
+   4:..\common\tterm/TTerm_cmd.c ****  * Copyright (c) 2020 Thorben Zethoff
+   5:..\common\tterm/TTerm_cmd.c ****  *
+   6:..\common\tterm/TTerm_cmd.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   7:..\common\tterm/TTerm_cmd.c ****  * this software and associated documentation files (the "Software"), to deal in
+   8:..\common\tterm/TTerm_cmd.c ****  * the Software without restriction, including without limitation the rights to
+   9:..\common\tterm/TTerm_cmd.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+  10:..\common\tterm/TTerm_cmd.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  11:..\common\tterm/TTerm_cmd.c ****  * subject to the following conditions:
+  12:..\common\tterm/TTerm_cmd.c ****  *
+  13:..\common\tterm/TTerm_cmd.c ****  * The above copyright notice and this permission notice shall be included in all
+  14:..\common\tterm/TTerm_cmd.c ****  * copies or substantial portions of the Software.
+  15:..\common\tterm/TTerm_cmd.c ****  *
+  16:..\common\tterm/TTerm_cmd.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  17:..\common\tterm/TTerm_cmd.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  18:..\common\tterm/TTerm_cmd.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  19:..\common\tterm/TTerm_cmd.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  20:..\common\tterm/TTerm_cmd.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  21:..\common\tterm/TTerm_cmd.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  22:..\common\tterm/TTerm_cmd.c **** */
+  23:..\common\tterm/TTerm_cmd.c **** 
+  24:..\common\tterm/TTerm_cmd.c **** #if PIC32 == 1
+  25:..\common\tterm/TTerm_cmd.c **** #include <xc.h>
+  26:..\common\tterm/TTerm_cmd.c **** #endif  
+  27:..\common\tterm/TTerm_cmd.c **** #include <stdint.h>
+  28:..\common\tterm/TTerm_cmd.c **** #include <string.h>
+  29:..\common\tterm/TTerm_cmd.c **** #include <stdarg.h>
+  30:..\common\tterm/TTerm_cmd.c **** #include <stdlib.h>
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 2
+
+
+  31:..\common\tterm/TTerm_cmd.c **** #include "FreeRTOS.h"
+  32:..\common\tterm/TTerm_cmd.c **** #include "task.h"
+  33:..\common\tterm/TTerm_cmd.c **** #include "TTerm.h"
+  34:..\common\tterm/TTerm_cmd.c **** #include "TTerm_cmd.h"
+  35:..\common\tterm/TTerm_cmd.c **** #include "semphr.h"
+  36:..\common\tterm/TTerm_cmd.c **** #include "system.h"
+  37:..\common\tterm/TTerm_cmd.c **** #include "stream_buffer.h"
+  38:..\common\tterm/TTerm_cmd.c **** #include "tasks/tsk_overlay.h"
+  39:..\common\tterm/TTerm_cmd.c **** 
+  40:..\common\tterm/TTerm_cmd.c **** uint8_t CMD_testCommandHandler(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
+  28              		.loc 1 40 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 2DE9F74F 		push	{r0, r1, r2, r4, r5, r6, r7, r8, r9, r10, fp, lr}
+  34              		.cfi_def_cfa_offset 48
+  35              		.cfi_offset 4, -36
+  36              		.cfi_offset 5, -32
+  37              		.cfi_offset 6, -28
+  38              		.cfi_offset 7, -24
+  39              		.cfi_offset 8, -20
+  40              		.cfi_offset 9, -16
+  41              		.cfi_offset 10, -12
+  42              		.cfi_offset 11, -8
+  43              		.cfi_offset 14, -4
+  41:..\common\tterm/TTerm_cmd.c ****     uint8_t currArg = 0;
+  42:..\common\tterm/TTerm_cmd.c ****     uint8_t returnCode = 0;
+  44              		.loc 1 42 0
+  45 0004 0026     		movs	r6, #0
+  40:..\common\tterm/TTerm_cmd.c ****     uint8_t currArg = 0;
+  46              		.loc 1 40 0
+  47 0006 0446     		mov	r4, r0
+  48 0008 8946     		mov	r9, r1
+  49 000a 9046     		mov	r8, r2
+  41:..\common\tterm/TTerm_cmd.c ****     uint8_t currArg = 0;
+  50              		.loc 1 41 0
+  51 000c 3546     		mov	r5, r6
+  52              	.LVL1:
+  53              	.L2:
+  43:..\common\tterm/TTerm_cmd.c ****     for(;currArg<argCount; currArg++){
+  54              		.loc 1 43 0 discriminator 1
+  55 000e 4D45     		cmp	r5, r9
+  56 0010 6FD2     		bcs	.L23
+  44:..\common\tterm/TTerm_cmd.c ****         if(strcmp(args[currArg], "-?") == 0){
+  57              		.loc 1 44 0
+  58 0012 58F825B0 		ldr	fp, [r8, r5, lsl #2]
+  59 0016 4B49     		ldr	r1, .L24
+  60 0018 5846     		mov	r0, fp
+  61 001a FFF7FEFF 		bl	strcmp
+  62              	.LVL2:
+  63 001e 40B9     		cbnz	r0, .L3
+  45:..\common\tterm/TTerm_cmd.c ****             ttprintf("This function is intended for testing. it will list all passed arguments\r\n"
+  64              		.loc 1 45 0
+  65 0020 636A     		ldr	r3, [r4, #36]
+  66 0022 4949     		ldr	r1, .L24+4
+  67 0024 6068     		ldr	r0, [r4, #4]
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 3
+
+
+  68 0026 9847     		blx	r3
+  69              	.LVL3:
+  46:..\common\tterm/TTerm_cmd.c ****             ttprintf("usage:\r\n\ttest [{option} {value}]\r\n\n\t-aa : adds an argument to the ACL\
+  70              		.loc 1 46 0
+  71 0028 636A     		ldr	r3, [r4, #36]
+  72 002a 4849     		ldr	r1, .L24+8
+  73 002c 6068     		ldr	r0, [r4, #4]
+  74 002e 9847     		blx	r3
+  75              	.LVL4:
+  76 0030 60E0     		b	.L17
+  77              	.L3:
+  47:..\common\tterm/TTerm_cmd.c ****             return TERM_CMD_EXIT_SUCCESS;
+  48:..\common\tterm/TTerm_cmd.c ****         }else if(strcmp(args[currArg], "-r") == 0){
+  78              		.loc 1 48 0
+  79 0032 4749     		ldr	r1, .L24+12
+  80 0034 5846     		mov	r0, fp
+  81 0036 FFF7FEFF 		bl	strcmp
+  82              	.LVL5:
+  83 003a 05F1010A 		add	r10, r5, #1
+  84 003e 0746     		mov	r7, r0
+  85 0040 A8B9     		cbnz	r0, .L5
+  49:..\common\tterm/TTerm_cmd.c ****             if(argCount > currArg + 1){
+  86              		.loc 1 49 0
+  87 0042 D145     		cmp	r9, r10
+  88 0044 0DDD     		ble	.L6
+  50:..\common\tterm/TTerm_cmd.c ****                 returnCode = atoi(args[currArg + 1]);
+  89              		.loc 1 50 0
+  90 0046 58F82A00 		ldr	r0, [r8, r10, lsl #2]
+  91 004a FFF7FEFF 		bl	atoi
+  92              	.LVL6:
+  93 004e C5B2     		uxtb	r5, r0
+  94              	.LVL7:
+  51:..\common\tterm/TTerm_cmd.c ****                 ttprintf("returning %d (from string \"%s\")\r\n", returnCode, args[currArg + 1]);
+  95              		.loc 1 51 0
+  96 0050 666A     		ldr	r6, [r4, #36]
+  97 0052 58F82A30 		ldr	r3, [r8, r10, lsl #2]
+  98 0056 2A46     		mov	r2, r5
+  99 0058 3E49     		ldr	r1, .L24+16
+ 100 005a 6068     		ldr	r0, [r4, #4]
+ 101 005c B047     		blx	r6
+ 102              	.LVL8:
+  52:..\common\tterm/TTerm_cmd.c ****                 currArg++;
+  53:..\common\tterm/TTerm_cmd.c ****                 return returnCode;
+ 103              		.loc 1 53 0
+ 104 005e 2846     		mov	r0, r5
+ 105 0060 6CE0     		b	.L4
+ 106              	.LVL9:
+ 107              	.L6:
+  54:..\common\tterm/TTerm_cmd.c ****             }else{
+  55:..\common\tterm/TTerm_cmd.c ****                 ttprintf("usage:\r\ntest -r [return code]\r\n");
+ 108              		.loc 1 55 0
+ 109 0062 636A     		ldr	r3, [r4, #36]
+ 110 0064 3C49     		ldr	r1, .L24+20
+ 111 0066 6068     		ldr	r0, [r4, #4]
+ 112 0068 9847     		blx	r3
+ 113              	.LVL10:
+  56:..\common\tterm/TTerm_cmd.c ****                 return 0;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 4
+
+
+ 114              		.loc 1 56 0
+ 115 006a 3846     		mov	r0, r7
+ 116 006c 66E0     		b	.L4
+ 117              	.L5:
+  57:..\common\tterm/TTerm_cmd.c ****             }
+  58:..\common\tterm/TTerm_cmd.c ****         }else if(strcmp(args[currArg], "-ra") == 0){
+ 118              		.loc 1 58 0
+ 119 006e 3B49     		ldr	r1, .L24+24
+ 120 0070 5846     		mov	r0, fp
+ 121 0072 FFF7FEFF 		bl	strcmp
+ 122              	.LVL11:
+ 123 0076 0746     		mov	r7, r0
+ 124 0078 88B9     		cbnz	r0, .L7
+ 125              	.LVL12:
+  59:..\common\tterm/TTerm_cmd.c ****             if(++currArg < argCount){
+ 126              		.loc 1 59 0
+ 127 007a 5FFA8AF5 		uxtb	r5, r10
+ 128              	.LVL13:
+ 129 007e A945     		cmp	r9, r5
+ 130 0080 0AD9     		bls	.L8
+  60:..\common\tterm/TTerm_cmd.c ****                 ACL_remove(head, args[currArg]);
+ 131              		.loc 1 60 0
+ 132 0082 374B     		ldr	r3, .L24+28
+ 133 0084 58F82510 		ldr	r1, [r8, r5, lsl #2]
+ 134 0088 1868     		ldr	r0, [r3]
+ 135 008a FFF7FEFF 		bl	ACL_remove
+ 136              	.LVL14:
+  61:..\common\tterm/TTerm_cmd.c ****                 ttprintf("removed \"%s\" from the ACL\r\n", args[currArg]);
+ 137              		.loc 1 61 0
+ 138 008e 636A     		ldr	r3, [r4, #36]
+ 139 0090 58F82520 		ldr	r2, [r8, r5, lsl #2]
+ 140 0094 3349     		ldr	r1, .L24+32
+ 141 0096 20E0     		b	.L20
+ 142              	.L8:
+  62:..\common\tterm/TTerm_cmd.c ****                 returnCode = TERM_CMD_EXIT_SUCCESS;
+  63:..\common\tterm/TTerm_cmd.c ****             }else{
+  64:..\common\tterm/TTerm_cmd.c ****                 ttprintf("missing ACL element value for option \"-ra\"\r\n");
+ 143              		.loc 1 64 0
+ 144 0098 636A     		ldr	r3, [r4, #36]
+ 145 009a 3349     		ldr	r1, .L24+36
+ 146 009c 23E0     		b	.L21
+ 147              	.LVL15:
+ 148              	.L7:
+  65:..\common\tterm/TTerm_cmd.c ****                 returnCode = TERM_CMD_EXIT_ERROR;
+  66:..\common\tterm/TTerm_cmd.c ****             }
+  67:..\common\tterm/TTerm_cmd.c ****         }else if(strcmp(args[currArg], "-aa") == 0){
+ 149              		.loc 1 67 0
+ 150 009e 3349     		ldr	r1, .L24+40
+ 151 00a0 5846     		mov	r0, fp
+ 152 00a2 FFF7FEFF 		bl	strcmp
+ 153              	.LVL16:
+ 154 00a6 0746     		mov	r7, r0
+ 155 00a8 00BB     		cbnz	r0, .L9
+ 156              	.LVL17:
+  68:..\common\tterm/TTerm_cmd.c ****             if(++currArg < argCount){
+ 157              		.loc 1 68 0
+ 158 00aa 5FFA8AF5 		uxtb	r5, r10
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 5
+
+
+ 159              	.LVL18:
+ 160 00ae A945     		cmp	r9, r5
+ 161 00b0 17D9     		bls	.L10
+ 162              	.LBB2:
+  69:..\common\tterm/TTerm_cmd.c ****                 char * newString = pvPortMalloc(strlen(args[currArg])+1);
+ 163              		.loc 1 69 0
+ 164 00b2 58F82500 		ldr	r0, [r8, r5, lsl #2]
+ 165 00b6 FFF7FEFF 		bl	strlen
+ 166              	.LVL19:
+ 167 00ba 0130     		adds	r0, r0, #1
+ 168 00bc FFF7FEFF 		bl	pvPortMalloc
+ 169              	.LVL20:
+  70:..\common\tterm/TTerm_cmd.c ****                 strcpy(newString, args[currArg]);
+ 170              		.loc 1 70 0
+ 171 00c0 58F82510 		ldr	r1, [r8, r5, lsl #2]
+ 172 00c4 FFF7FEFF 		bl	strcpy
+ 173              	.LVL21:
+  71:..\common\tterm/TTerm_cmd.c ****                 ACL_add(head, newString);
+ 174              		.loc 1 71 0
+ 175 00c8 254B     		ldr	r3, .L24+28
+ 176 00ca 0146     		mov	r1, r0
+ 177 00cc 1868     		ldr	r0, [r3]
+ 178 00ce FFF7FEFF 		bl	ACL_add
+ 179              	.LVL22:
+  72:..\common\tterm/TTerm_cmd.c ****                 ttprintf("Added \"%s\" to the ACL\r\n", args[currArg]);
+ 180              		.loc 1 72 0
+ 181 00d2 636A     		ldr	r3, [r4, #36]
+ 182 00d4 58F82520 		ldr	r2, [r8, r5, lsl #2]
+ 183 00d8 2549     		ldr	r1, .L24+44
+ 184              	.LVL23:
+ 185              	.L20:
+ 186 00da 6068     		ldr	r0, [r4, #4]
+ 187 00dc 9847     		blx	r3
+ 188              	.LVL24:
+  73:..\common\tterm/TTerm_cmd.c ****                 returnCode = TERM_CMD_EXIT_SUCCESS;
+ 189              		.loc 1 73 0
+ 190 00de FF26     		movs	r6, #255
+ 191              	.LBE2:
+ 192 00e0 04E0     		b	.L9
+ 193              	.LVL25:
+ 194              	.L10:
+  74:..\common\tterm/TTerm_cmd.c ****             }else{
+  75:..\common\tterm/TTerm_cmd.c ****                 ttprintf("missing ACL element value for option \"-aa\"\r\n");
+ 195              		.loc 1 75 0
+ 196 00e2 636A     		ldr	r3, [r4, #36]
+ 197 00e4 2349     		ldr	r1, .L24+48
+ 198              	.LVL26:
+ 199              	.L21:
+ 200 00e6 6068     		ldr	r0, [r4, #4]
+ 201 00e8 9847     		blx	r3
+ 202              	.LVL27:
+  76:..\common\tterm/TTerm_cmd.c ****                 returnCode = TERM_CMD_EXIT_ERROR;
+ 203              		.loc 1 76 0
+ 204 00ea 3E46     		mov	r6, r7
+ 205              	.LVL28:
+ 206              	.L9:
+  43:..\common\tterm/TTerm_cmd.c ****         if(strcmp(args[currArg], "-?") == 0){
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 6
+
+
+ 207              		.loc 1 43 0
+ 208 00ec 0135     		adds	r5, r5, #1
+ 209              	.LVL29:
+ 210 00ee EDB2     		uxtb	r5, r5
+ 211 00f0 8DE7     		b	.L2
+ 212              	.LVL30:
+ 213              	.L23:
+  77:..\common\tterm/TTerm_cmd.c ****             }
+  78:..\common\tterm/TTerm_cmd.c ****         }
+  79:..\common\tterm/TTerm_cmd.c ****     }
+  80:..\common\tterm/TTerm_cmd.c ****     if(returnCode != 0) return returnCode;
+ 214              		.loc 1 80 0
+ 215 00f2 0EB1     		cbz	r6, .L12
+ 216              	.L17:
+  56:..\common\tterm/TTerm_cmd.c ****             }
+ 217              		.loc 1 56 0
+ 218 00f4 FF20     		movs	r0, #255
+ 219 00f6 21E0     		b	.L4
+ 220              	.L12:
+  81:..\common\tterm/TTerm_cmd.c ****     
+  82:..\common\tterm/TTerm_cmd.c ****     ttprintf("Terminal test function called. ArgCount = %d ; Calling user = \"%s\"%s\r\n", argCount
+ 221              		.loc 1 82 0
+ 222 00f8 1F4A     		ldr	r2, .L24+52
+ 223 00fa 204B     		ldr	r3, .L24+56
+ 224 00fc 656A     		ldr	r5, [r4, #36]
+ 225 00fe B9F1000F 		cmp	r9, #0
+ 226 0102 08BF     		it	eq
+ 227 0104 1346     		moveq	r3, r2
+ 228 0106 1E49     		ldr	r1, .L24+60
+ 229 0108 0093     		str	r3, [sp]
+ 230 010a 4A46     		mov	r2, r9
+ 231 010c A36A     		ldr	r3, [r4, #40]
+ 232 010e 6068     		ldr	r0, [r4, #4]
+ 233 0110 A847     		blx	r5
+ 234              	.LVL31:
+  83:..\common\tterm/TTerm_cmd.c ****     for(currArg = 0;currArg<argCount; currArg++){
+  84:..\common\tterm/TTerm_cmd.c ****         ttprintf("%d:\"%s\"%s\r\n", currArg, args[currArg], (currArg == argCount - 1) ? "\r\n}" : "
+ 235              		.loc 1 84 0
+ 236 0112 1C4F     		ldr	r7, .L24+64
+ 237 0114 DFF874A0 		ldr	r10, .L24+72
+ 238              	.LVL32:
+ 239              	.L14:
+  83:..\common\tterm/TTerm_cmd.c ****     for(currArg = 0;currArg<argCount; currArg++){
+ 240              		.loc 1 83 0 discriminator 2
+ 241 0118 B145     		cmp	r9, r6
+ 242 011a EBD0     		beq	.L17
+ 243              		.loc 1 84 0
+ 244 011c 09F1FF33 		add	r3, r9, #-1
+ 245 0120 9E42     		cmp	r6, r3
+ 246 0122 0CBF     		ite	eq
+ 247 0124 3B46     		moveq	r3, r7
+ 248 0126 5346     		movne	r3, r10
+ 249 0128 3246     		mov	r2, r6
+ 250 012a 0093     		str	r3, [sp]
+ 251 012c 1649     		ldr	r1, .L24+68
+ 252 012e 58F82630 		ldr	r3, [r8, r6, lsl #2]
+ 253 0132 6068     		ldr	r0, [r4, #4]
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 7
+
+
+ 254 0134 656A     		ldr	r5, [r4, #36]
+ 255 0136 A847     		blx	r5
+ 256              	.LVL33:
+ 257 0138 0136     		adds	r6, r6, #1
+ 258              	.LVL34:
+ 259 013a EDE7     		b	.L14
+ 260              	.L4:
+  85:..\common\tterm/TTerm_cmd.c ****     }
+  86:..\common\tterm/TTerm_cmd.c ****     return TERM_CMD_EXIT_SUCCESS;
+  87:..\common\tterm/TTerm_cmd.c **** }
+ 261              		.loc 1 87 0
+ 262 013c 03B0     		add	sp, sp, #12
+ 263              		.cfi_def_cfa_offset 36
+ 264              		@ sp needed
+ 265 013e BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 266              	.LVL35:
+ 267              	.L25:
+ 268 0142 00BF     		.align	2
+ 269              	.L24:
+ 270 0144 17000000 		.word	.LC4
+ 271 0148 1A000000 		.word	.LC5
+ 272 014c 65000000 		.word	.LC6
+ 273 0150 FA000000 		.word	.LC7
+ 274 0154 FD000000 		.word	.LC8
+ 275 0158 1F010000 		.word	.LC9
+ 276 015c 3F010000 		.word	.LC10
+ 277 0160 00000000 		.word	head
+ 278 0164 43010000 		.word	.LC11
+ 279 0168 5F010000 		.word	.LC12
+ 280 016c 8C010000 		.word	.LC13
+ 281 0170 90010000 		.word	.LC14
+ 282 0174 A8010000 		.word	.LC15
+ 283 0178 10000000 		.word	.LC1
+ 284 017c 00000000 		.word	.LC0
+ 285 0180 D5010000 		.word	.LC16
+ 286 0184 11000000 		.word	.LC2
+ 287 0188 1C020000 		.word	.LC17
+ 288 018c 15000000 		.word	.LC3
+ 289              		.cfi_endproc
+ 290              	.LFE69:
+ 291              		.size	CMD_testCommandHandler, .-CMD_testCommandHandler
+ 292              		.section	.text.TERM_testCommandAutoCompleter,"ax",%progbits
+ 293              		.align	1
+ 294              		.global	TERM_testCommandAutoCompleter
+ 295              		.thumb
+ 296              		.thumb_func
+ 297              		.type	TERM_testCommandAutoCompleter, %function
+ 298              	TERM_testCommandAutoCompleter:
+ 299              	.LFB70:
+  88:..\common\tterm/TTerm_cmd.c **** 
+  89:..\common\tterm/TTerm_cmd.c **** uint8_t TERM_testCommandAutoCompleter(TERMINAL_HANDLE * handle, void * params){
+ 300              		.loc 1 89 0
+ 301              		.cfi_startproc
+ 302              		@ args = 0, pretend = 0, frame = 8
+ 303              		@ frame_needed = 0, uses_anonymous_args = 0
+ 304              	.LVL36:
+ 305 0000 73B5     		push	{r0, r1, r4, r5, r6, lr}
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 8
+
+
+ 306              		.cfi_def_cfa_offset 24
+ 307              		.cfi_offset 4, -16
+ 308              		.cfi_offset 5, -12
+ 309              		.cfi_offset 6, -8
+ 310              		.cfi_offset 14, -4
+ 311              		.loc 1 89 0
+ 312 0002 0446     		mov	r4, r0
+  90:..\common\tterm/TTerm_cmd.c ****     if(params == 0){ 
+ 313              		.loc 1 90 0
+ 314 0004 0D46     		mov	r5, r1
+ 315 0006 11B9     		cbnz	r1, .L27
+ 316              	.L29:
+  91:..\common\tterm/TTerm_cmd.c ****         handle->autocompleteBufferLength = 0;
+ 317              		.loc 1 91 0
+ 318 0008 0020     		movs	r0, #0
+ 319              	.LVL37:
+ 320 000a E061     		str	r0, [r4, #28]
+  92:..\common\tterm/TTerm_cmd.c ****         return 0;
+ 321              		.loc 1 92 0
+ 322 000c 24E0     		b	.L28
+ 323              	.LVL38:
+ 324              	.L27:
+  93:..\common\tterm/TTerm_cmd.c ****     }
+  94:..\common\tterm/TTerm_cmd.c ****     
+  95:..\common\tterm/TTerm_cmd.c ****     AC_LIST_HEAD * list = (AC_LIST_HEAD *) params;
+  96:..\common\tterm/TTerm_cmd.c ****     
+  97:..\common\tterm/TTerm_cmd.c ****     if(list->elementCount == 0){ 
+ 325              		.loc 1 97 0
+ 326 000e 4B68     		ldr	r3, [r1, #4]
+ 327 0010 002B     		cmp	r3, #0
+ 328 0012 F9D0     		beq	.L29
+  98:..\common\tterm/TTerm_cmd.c ****         handle->autocompleteBufferLength = 0;
+  99:..\common\tterm/TTerm_cmd.c ****         return 0;
+ 100:..\common\tterm/TTerm_cmd.c ****     }
+ 101:..\common\tterm/TTerm_cmd.c ****     
+ 102:..\common\tterm/TTerm_cmd.c ****     char * buff = pvPortMalloc(128);
+ 329              		.loc 1 102 0
+ 330 0014 8020     		movs	r0, #128
+ 331              	.LVL39:
+ 332 0016 FFF7FEFF 		bl	pvPortMalloc
+ 333              	.LVL40:
+ 334 001a 0646     		mov	r6, r0
+ 335              	.LVL41:
+ 103:..\common\tterm/TTerm_cmd.c ****     uint8_t len;
+ 104:..\common\tterm/TTerm_cmd.c ****     memset(buff, 0, 128);
+ 336              		.loc 1 104 0
+ 337 001c 8022     		movs	r2, #128
+ 338 001e 0021     		movs	r1, #0
+ 339 0020 FFF7FEFF 		bl	memset
+ 340              	.LVL42:
+ 105:..\common\tterm/TTerm_cmd.c ****     handle->autocompleteStart = TERM_findLastArg(handle, buff, &len);
+ 341              		.loc 1 105 0
+ 342 0024 0DF10702 		add	r2, sp, #7
+ 343 0028 3146     		mov	r1, r6
+ 344 002a 2046     		mov	r0, r4
+ 345 002c FFF7FEFF 		bl	TERM_findLastArg
+ 346              	.LVL43:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 9
+
+
+ 347 0030 2062     		str	r0, [r4, #32]
+ 106:..\common\tterm/TTerm_cmd.c ****     
+ 107:..\common\tterm/TTerm_cmd.c ****     //TODO use a reasonable size here
+ 108:..\common\tterm/TTerm_cmd.c ****     handle->autocompleteBuffer = pvPortMalloc(list->elementCount * sizeof(char *));
+ 348              		.loc 1 108 0
+ 349 0032 6868     		ldr	r0, [r5, #4]
+ 350 0034 8000     		lsls	r0, r0, #2
+ 351 0036 FFF7FEFF 		bl	pvPortMalloc
+ 352              	.LVL44:
+ 109:..\common\tterm/TTerm_cmd.c ****     handle->currAutocompleteCount = 0;
+ 353              		.loc 1 109 0
+ 354 003a 0022     		movs	r2, #0
+ 108:..\common\tterm/TTerm_cmd.c ****     handle->currAutocompleteCount = 0;
+ 355              		.loc 1 108 0
+ 356 003c 0346     		mov	r3, r0
+ 357 003e A061     		str	r0, [r4, #24]
+ 358              		.loc 1 109 0
+ 359 0040 2261     		str	r2, [r4, #16]
+ 110:..\common\tterm/TTerm_cmd.c ****     handle->autocompleteBufferLength = TERM_doListAC(list, buff, len, handle->autocompleteBuffer);
+ 360              		.loc 1 110 0
+ 361 0042 3146     		mov	r1, r6
+ 362 0044 9DF80720 		ldrb	r2, [sp, #7]	@ zero_extendqisi2
+ 363 0048 2846     		mov	r0, r5
+ 364 004a FFF7FEFF 		bl	TERM_doListAC
+ 365              	.LVL45:
+ 366 004e E061     		str	r0, [r4, #28]
+ 111:..\common\tterm/TTerm_cmd.c **** 
+ 112:..\common\tterm/TTerm_cmd.c ****     //UART_print("\r\ncompleting \"%s\" (len = %d, matching = %d) will delete until %d\r\n", buff, 
+ 113:..\common\tterm/TTerm_cmd.c ****         
+ 114:..\common\tterm/TTerm_cmd.c ****     vPortFree(buff);
+ 367              		.loc 1 114 0
+ 368 0050 3046     		mov	r0, r6
+ 369 0052 FFF7FEFF 		bl	vPortFree
+ 370              	.LVL46:
+ 115:..\common\tterm/TTerm_cmd.c ****     return handle->autocompleteBufferLength;
+ 371              		.loc 1 115 0
+ 372 0056 207F     		ldrb	r0, [r4, #28]	@ zero_extendqisi2
+ 373              	.LVL47:
+ 374              	.L28:
+ 116:..\common\tterm/TTerm_cmd.c **** }
+ 375              		.loc 1 116 0
+ 376 0058 02B0     		add	sp, sp, #8
+ 377              		.cfi_def_cfa_offset 16
+ 378              		@ sp needed
+ 379 005a 70BD     		pop	{r4, r5, r6, pc}
+ 380              		.cfi_endproc
+ 381              	.LFE70:
+ 382              		.size	TERM_testCommandAutoCompleter, .-TERM_testCommandAutoCompleter
+ 383              		.section	.text.CMD_help,"ax",%progbits
+ 384              		.align	1
+ 385              		.global	CMD_help
+ 386              		.thumb
+ 387              		.thumb_func
+ 388              		.type	CMD_help, %function
+ 389              	CMD_help:
+ 390              	.LFB71:
+ 117:..\common\tterm/TTerm_cmd.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 10
+
+
+ 118:..\common\tterm/TTerm_cmd.c **** 
+ 119:..\common\tterm/TTerm_cmd.c **** uint8_t CMD_help(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
+ 391              		.loc 1 119 0
+ 392              		.cfi_startproc
+ 393              		@ args = 0, pretend = 0, frame = 0
+ 394              		@ frame_needed = 0, uses_anonymous_args = 0
+ 395              	.LVL48:
+ 396 0000 F7B5     		push	{r0, r1, r2, r4, r5, r6, r7, lr}
+ 397              		.cfi_def_cfa_offset 32
+ 398              		.cfi_offset 4, -20
+ 399              		.cfi_offset 5, -16
+ 400              		.cfi_offset 6, -12
+ 401              		.cfi_offset 7, -8
+ 402              		.cfi_offset 14, -4
+ 403              		.loc 1 119 0
+ 404 0002 0446     		mov	r4, r0
+ 405 0004 1546     		mov	r5, r2
+ 406 0006 02EB8106 		add	r6, r2, r1, lsl #2
+ 407              	.LVL49:
+ 408              	.L34:
+ 120:..\common\tterm/TTerm_cmd.c ****     uint8_t currArg = 0;
+ 121:..\common\tterm/TTerm_cmd.c ****     for(;currArg<argCount; currArg++){
+ 409              		.loc 1 121 0 discriminator 1
+ 410 000a B542     		cmp	r5, r6
+ 411 000c 0BD0     		beq	.L40
+ 122:..\common\tterm/TTerm_cmd.c ****         if(strcmp(args[currArg], "-?") == 0){
+ 412              		.loc 1 122 0
+ 413 000e 1849     		ldr	r1, .L41
+ 414 0010 55F8040B 		ldr	r0, [r5], #4
+ 415 0014 FFF7FEFF 		bl	strcmp
+ 416              	.LVL50:
+ 417 0018 0028     		cmp	r0, #0
+ 418 001a F6D1     		bne	.L34
+ 123:..\common\tterm/TTerm_cmd.c ****             ttprintf("come on do you really need help with help?\r\n");
+ 419              		.loc 1 123 0
+ 420 001c 636A     		ldr	r3, [r4, #36]
+ 421 001e 1549     		ldr	r1, .L41+4
+ 422 0020 6068     		ldr	r0, [r4, #4]
+ 423 0022 9847     		blx	r3
+ 424              	.LVL51:
+ 124:..\common\tterm/TTerm_cmd.c ****             return TERM_CMD_EXIT_SUCCESS;
+ 425              		.loc 1 124 0
+ 426 0024 21E0     		b	.L35
+ 427              	.L40:
+ 125:..\common\tterm/TTerm_cmd.c ****         }
+ 126:..\common\tterm/TTerm_cmd.c ****     }
+ 127:..\common\tterm/TTerm_cmd.c ****     ttprintf("\r\nTTerm %s\r\n%d Commands available:\r\n\r\n", TERM_VERSION_STRING, handle->cmdList
+ 428              		.loc 1 127 0
+ 429 0026 D4F88C30 		ldr	r3, [r4, #140]
+ 430 002a 656A     		ldr	r5, [r4, #36]
+ 431 002c DB68     		ldr	r3, [r3, #12]
+ 432 002e 124A     		ldr	r2, .L41+8
+ 433 0030 1249     		ldr	r1, .L41+12
+ 434 0032 6068     		ldr	r0, [r4, #4]
+ 435 0034 A847     		blx	r5
+ 436              	.LVL52:
+ 128:..\common\tterm/TTerm_cmd.c ****     ttprintf("\x1b[%dC%s\r\x1b[%dC%s\r\n\r\n", 2, "Command:", 19, "Description:");
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 11
+
+
+ 437              		.loc 1 128 0
+ 438 0036 124B     		ldr	r3, .L41+16
+ 439 0038 656A     		ldr	r5, [r4, #36]
+ 440 003a 0193     		str	r3, [sp, #4]
+ 441 003c 1323     		movs	r3, #19
+ 442 003e 0093     		str	r3, [sp]
+ 443 0040 0222     		movs	r2, #2
+ 444 0042 104B     		ldr	r3, .L41+20
+ 445 0044 1049     		ldr	r1, .L41+24
+ 446 0046 6068     		ldr	r0, [r4, #4]
+ 447 0048 A847     		blx	r5
+ 448              	.LVL53:
+ 129:..\common\tterm/TTerm_cmd.c ****     TermCommandDescriptor * currCmd = handle->cmdListHead->nextCmd;
+ 449              		.loc 1 129 0
+ 450 004a D4F88C30 		ldr	r3, [r4, #140]
+ 130:..\common\tterm/TTerm_cmd.c ****     while(currCmd != 0){
+ 131:..\common\tterm/TTerm_cmd.c ****         ttprintf("\x1b[%dC%s\r\x1b[%dC%s\r\n", 3, currCmd->command, 20, currCmd->commandDescription
+ 451              		.loc 1 131 0
+ 452 004e 1426     		movs	r6, #20
+ 129:..\common\tterm/TTerm_cmd.c ****     TermCommandDescriptor * currCmd = handle->cmdListHead->nextCmd;
+ 453              		.loc 1 129 0
+ 454 0050 DD69     		ldr	r5, [r3, #28]
+ 455              	.LVL54:
+ 456              	.L37:
+ 130:..\common\tterm/TTerm_cmd.c ****     while(currCmd != 0){
+ 457              		.loc 1 130 0
+ 458 0052 55B1     		cbz	r5, .L35
+ 459              		.loc 1 131 0
+ 460 0054 AB68     		ldr	r3, [r5, #8]
+ 461 0056 0096     		str	r6, [sp]
+ 462 0058 0193     		str	r3, [sp, #4]
+ 463 005a 6B68     		ldr	r3, [r5, #4]
+ 464 005c 676A     		ldr	r7, [r4, #36]
+ 465 005e 0322     		movs	r2, #3
+ 466 0060 0A49     		ldr	r1, .L41+28
+ 467 0062 6068     		ldr	r0, [r4, #4]
+ 468 0064 B847     		blx	r7
+ 469              	.LVL55:
+ 132:..\common\tterm/TTerm_cmd.c ****         currCmd = currCmd->nextCmd;
+ 470              		.loc 1 132 0
+ 471 0066 ED69     		ldr	r5, [r5, #28]
+ 472              	.LVL56:
+ 473 0068 F3E7     		b	.L37
+ 474              	.LVL57:
+ 475              	.L35:
+ 133:..\common\tterm/TTerm_cmd.c ****     }
+ 134:..\common\tterm/TTerm_cmd.c ****     return TERM_CMD_EXIT_SUCCESS;
+ 135:..\common\tterm/TTerm_cmd.c **** }
+ 476              		.loc 1 135 0
+ 477 006a FF20     		movs	r0, #255
+ 478 006c 03B0     		add	sp, sp, #12
+ 479              		.cfi_def_cfa_offset 20
+ 480              		@ sp needed
+ 481 006e F0BD     		pop	{r4, r5, r6, r7, pc}
+ 482              	.LVL58:
+ 483              	.L42:
+ 484              		.align	2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 12
+
+
+ 485              	.L41:
+ 486 0070 17000000 		.word	.LC4
+ 487 0074 28020000 		.word	.LC18
+ 488 0078 55020000 		.word	.LC19
+ 489 007c 5A020000 		.word	.LC20
+ 490 0080 9E020000 		.word	.LC23
+ 491 0084 81020000 		.word	.LC21
+ 492 0088 8A020000 		.word	.LC22
+ 493 008c AB020000 		.word	.LC24
+ 494              		.cfi_endproc
+ 495              	.LFE71:
+ 496              		.size	CMD_help, .-CMD_help
+ 497              		.section	.text.CMD_cls,"ax",%progbits
+ 498              		.align	1
+ 499              		.global	CMD_cls
+ 500              		.thumb
+ 501              		.thumb_func
+ 502              		.type	CMD_cls, %function
+ 503              	CMD_cls:
+ 504              	.LFB72:
+ 136:..\common\tterm/TTerm_cmd.c **** 
+ 137:..\common\tterm/TTerm_cmd.c **** uint8_t CMD_cls(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
+ 505              		.loc 1 137 0
+ 506              		.cfi_startproc
+ 507              		@ args = 0, pretend = 0, frame = 0
+ 508              		@ frame_needed = 0, uses_anonymous_args = 0
+ 509              	.LVL59:
+ 510 0000 70B5     		push	{r4, r5, r6, lr}
+ 511              		.cfi_def_cfa_offset 16
+ 512              		.cfi_offset 4, -16
+ 513              		.cfi_offset 5, -12
+ 514              		.cfi_offset 6, -8
+ 515              		.cfi_offset 14, -4
+ 516              		.loc 1 137 0
+ 517 0002 0446     		mov	r4, r0
+ 518 0004 1546     		mov	r5, r2
+ 519 0006 02EB8106 		add	r6, r2, r1, lsl #2
+ 520              	.LVL60:
+ 521              	.L44:
+ 138:..\common\tterm/TTerm_cmd.c ****     uint8_t currArg = 0;
+ 139:..\common\tterm/TTerm_cmd.c ****     for(;currArg<argCount; currArg++){
+ 522              		.loc 1 139 0 discriminator 1
+ 523 000a B542     		cmp	r5, r6
+ 524 000c 0BD0     		beq	.L48
+ 140:..\common\tterm/TTerm_cmd.c ****         if(strcmp(args[currArg], "-?") == 0){
+ 525              		.loc 1 140 0
+ 526 000e 0F49     		ldr	r1, .L49
+ 527 0010 55F8040B 		ldr	r0, [r5], #4
+ 528 0014 FFF7FEFF 		bl	strcmp
+ 529              	.LVL61:
+ 530 0018 0028     		cmp	r0, #0
+ 531 001a F6D1     		bne	.L44
+ 141:..\common\tterm/TTerm_cmd.c ****             ttprintf("clears the screen\r\n");
+ 532              		.loc 1 141 0
+ 533 001c 636A     		ldr	r3, [r4, #36]
+ 534 001e 0C49     		ldr	r1, .L49+4
+ 535 0020 6068     		ldr	r0, [r4, #4]
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 13
+
+
+ 536 0022 9847     		blx	r3
+ 537              	.LVL62:
+ 142:..\common\tterm/TTerm_cmd.c ****             return TERM_CMD_EXIT_SUCCESS;
+ 538              		.loc 1 142 0
+ 539 0024 0FE0     		b	.L45
+ 540              	.L48:
+ 143:..\common\tterm/TTerm_cmd.c ****         }
+ 144:..\common\tterm/TTerm_cmd.c ****     }
+ 145:..\common\tterm/TTerm_cmd.c ****     tsk_overlay_chart_start();
+ 541              		.loc 1 145 0
+ 542 0026 FFF7FEFF 		bl	tsk_overlay_chart_start
+ 543              	.LVL63:
+ 146:..\common\tterm/TTerm_cmd.c ****     TERM_sendVT100Code(handle, _VT100_RESET, 0); TERM_sendVT100Code(handle, _VT100_CURSOR_POS1, 0);
+ 544              		.loc 1 146 0
+ 545 002a 0022     		movs	r2, #0
+ 546 002c 4FF48051 		mov	r1, #4096
+ 547 0030 2046     		mov	r0, r4
+ 548 0032 FFF7FEFF 		bl	TERM_sendVT100Code
+ 549              	.LVL64:
+ 550 0036 0022     		movs	r2, #0
+ 551 0038 2046     		mov	r0, r4
+ 552 003a 1146     		mov	r1, r2
+ 553 003c FFF7FEFF 		bl	TERM_sendVT100Code
+ 554              	.LVL65:
+ 147:..\common\tterm/TTerm_cmd.c ****     TERM_printBootMessage(handle);
+ 555              		.loc 1 147 0
+ 556 0040 2046     		mov	r0, r4
+ 557 0042 FFF7FEFF 		bl	TERM_printBootMessage
+ 558              	.LVL66:
+ 559              	.L45:
+ 148:..\common\tterm/TTerm_cmd.c ****     
+ 149:..\common\tterm/TTerm_cmd.c ****     return TERM_CMD_EXIT_SUCCESS;
+ 150:..\common\tterm/TTerm_cmd.c **** }
+ 560              		.loc 1 150 0
+ 561 0046 FF20     		movs	r0, #255
+ 562 0048 70BD     		pop	{r4, r5, r6, pc}
+ 563              	.LVL67:
+ 564              	.L50:
+ 565 004a 00BF     		.align	2
+ 566              	.L49:
+ 567 004c 17000000 		.word	.LC4
+ 568 0050 BD020000 		.word	.LC25
+ 569              		.cfi_endproc
+ 570              	.LFE72:
+ 571              		.size	CMD_cls, .-CMD_cls
+ 572              		.comm	head,4,4
+ 573              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 574              	.LC0:
+ 575 0000 3B200D0A 		.ascii	"; \015\012arguments={\000"
+ 575      61726775 
+ 575      6D656E74 
+ 575      733D7B00 
+ 576              	.LC1:
+ 577 0010 00       		.ascii	"\000"
+ 578              	.LC2:
+ 579 0011 0D0A7D00 		.ascii	"\015\012}\000"
+ 580              	.LC3:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 14
+
+
+ 581 0015 2C00     		.ascii	",\000"
+ 582              	.LC4:
+ 583 0017 2D3F00   		.ascii	"-?\000"
+ 584              	.LC5:
+ 585 001a 54686973 		.ascii	"This function is intended for testing. it will list"
+ 585      2066756E 
+ 585      6374696F 
+ 585      6E206973 
+ 585      20696E74 
+ 586 004d 20616C6C 		.ascii	" all passed arguments\015\012\000"
+ 586      20706173 
+ 586      73656420 
+ 586      61726775 
+ 586      6D656E74 
+ 587              	.LC6:
+ 588 0065 75736167 		.ascii	"usage:\015\012\011test [{option} {value}]\015\012\012"
+ 588      653A0D0A 
+ 588      09746573 
+ 588      74205B7B 
+ 588      6F707469 
+ 589 0088 092D6161 		.ascii	"\011-aa : adds an argument to the ACL\015\012\012\011"
+ 589      203A2061 
+ 589      64647320 
+ 589      616E2061 
+ 589      7267756D 
+ 590 00ae 2D726120 		.ascii	"-ra : removes an argument from the ACL\015\012\012\011"
+ 590      3A207265 
+ 590      6D6F7665 
+ 590      7320616E 
+ 590      20617267 
+ 591 00d8 2D722020 		.ascii	"-r  : returns with the given code\000"
+ 591      3A207265 
+ 591      7475726E 
+ 591      73207769 
+ 591      74682074 
+ 592              	.LC7:
+ 593 00fa 2D7200   		.ascii	"-r\000"
+ 594              	.LC8:
+ 595 00fd 72657475 		.ascii	"returning %d (from string \"%s\")\015\012\000"
+ 595      726E696E 
+ 595      67202564 
+ 595      20286672 
+ 595      6F6D2073 
+ 596              	.LC9:
+ 597 011f 75736167 		.ascii	"usage:\015\012test -r [return code]\015\012\000"
+ 597      653A0D0A 
+ 597      74657374 
+ 597      202D7220 
+ 597      5B726574 
+ 598              	.LC10:
+ 599 013f 2D726100 		.ascii	"-ra\000"
+ 600              	.LC11:
+ 601 0143 72656D6F 		.ascii	"removed \"%s\" from the ACL\015\012\000"
+ 601      76656420 
+ 601      22257322 
+ 601      2066726F 
+ 601      6D207468 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 15
+
+
+ 602              	.LC12:
+ 603 015f 6D697373 		.ascii	"missing ACL element value for option \"-ra\"\015\012"
+ 603      696E6720 
+ 603      41434C20 
+ 603      656C656D 
+ 603      656E7420 
+ 604 018b 00       		.ascii	"\000"
+ 605              	.LC13:
+ 606 018c 2D616100 		.ascii	"-aa\000"
+ 607              	.LC14:
+ 608 0190 41646465 		.ascii	"Added \"%s\" to the ACL\015\012\000"
+ 608      64202225 
+ 608      73222074 
+ 608      6F207468 
+ 608      65204143 
+ 609              	.LC15:
+ 610 01a8 6D697373 		.ascii	"missing ACL element value for option \"-aa\"\015\012"
+ 610      696E6720 
+ 610      41434C20 
+ 610      656C656D 
+ 610      656E7420 
+ 611 01d4 00       		.ascii	"\000"
+ 612              	.LC16:
+ 613 01d5 5465726D 		.ascii	"Terminal test function called. ArgCount = %d ; Call"
+ 613      696E616C 
+ 613      20746573 
+ 613      74206675 
+ 613      6E637469 
+ 614 0208 696E6720 		.ascii	"ing user = \"%s\"%s\015\012\000"
+ 614      75736572 
+ 614      203D2022 
+ 614      25732225 
+ 614      730D0A00 
+ 615              	.LC17:
+ 616 021c 25643A22 		.ascii	"%d:\"%s\"%s\015\012\000"
+ 616      25732225 
+ 616      730D0A00 
+ 617              	.LC18:
+ 618 0228 636F6D65 		.ascii	"come on do you really need help with help?\015\012\000"
+ 618      206F6E20 
+ 618      646F2079 
+ 618      6F752072 
+ 618      65616C6C 
+ 619              	.LC19:
+ 620 0255 56312E30 		.ascii	"V1.0\000"
+ 620      00
+ 621              	.LC20:
+ 622 025a 0D0A5454 		.ascii	"\015\012TTerm %s\015\012%d Commands available:\015\012"
+ 622      65726D20 
+ 622      25730D0A 
+ 622      25642043 
+ 622      6F6D6D61 
+ 623 027e 0D0A00   		.ascii	"\015\012\000"
+ 624              	.LC21:
+ 625 0281 436F6D6D 		.ascii	"Command:\000"
+ 625      616E643A 
+ 625      00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 16
+
+
+ 626              	.LC22:
+ 627 028a 1B5B2564 		.ascii	"\033[%dC%s\015\033[%dC%s\015\012\015\012\000"
+ 627      4325730D 
+ 627      1B5B2564 
+ 627      4325730D 
+ 627      0A0D0A00 
+ 628              	.LC23:
+ 629 029e 44657363 		.ascii	"Description:\000"
+ 629      72697074 
+ 629      696F6E3A 
+ 629      00
+ 630              	.LC24:
+ 631 02ab 1B5B2564 		.ascii	"\033[%dC%s\015\033[%dC%s\015\012\000"
+ 631      4325730D 
+ 631      1B5B2564 
+ 631      4325730D 
+ 631      0A00
+ 632              	.LC25:
+ 633 02bd 636C6561 		.ascii	"clears the screen\015\012\000"
+ 633      72732074 
+ 633      68652073 
+ 633      63726565 
+ 633      6E0D0A00 
+ 634              		.text
+ 635              	.Letext0:
+ 636              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 637              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 638              		.file 4 "..\\common\\rtos\\include/task.h"
+ 639              		.file 5 "..\\common\\rtos\\include/stream_buffer.h"
+ 640              		.file 6 "..\\common\\tterm\\TTerm.h"
+ 641              		.file 7 "..\\common\\tterm\\TTerm_AC.h"
+ 642              		.file 8 "Generated_Source\\PSoC5/core_cm3.h"
+ 643              		.file 9 "..\\common\\tterm\\TTerm_cmd.h"
+ 644              		.file 10 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4
+ 645              		.file 11 "..\\common\\rtos\\include/portable.h"
+ 646              		.file 12 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4
+ 647              		.file 13 "..\\common\\ud3core/tasks/tsk_overlay.h"
+ 648              		.section	.debug_info,"",%progbits
+ 649              	.Ldebug_info0:
+ 650 0000 6F0A0000 		.4byte	0xa6f
+ 651 0004 0400     		.2byte	0x4
+ 652 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 653 000a 04       		.byte	0x4
+ 654 000b 01       		.uleb128 0x1
+ 655 000c 9E020000 		.4byte	.LASF132
+ 656 0010 0C       		.byte	0xc
+ 657 0011 82020000 		.4byte	.LASF133
+ 658 0015 9C000000 		.4byte	.LASF134
+ 659 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 660 001d 00000000 		.4byte	0
+ 661 0021 00000000 		.4byte	.Ldebug_line0
+ 662 0025 02       		.uleb128 0x2
+ 663 0026 01       		.byte	0x1
+ 664 0027 06       		.byte	0x6
+ 665 0028 43010000 		.4byte	.LASF0
+ 666 002c 03       		.uleb128 0x3
+ 667 002d 53000000 		.4byte	.LASF3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 17
+
+
+ 668 0031 02       		.byte	0x2
+ 669 0032 1D       		.byte	0x1d
+ 670 0033 37000000 		.4byte	0x37
+ 671 0037 02       		.uleb128 0x2
+ 672 0038 01       		.byte	0x1
+ 673 0039 08       		.byte	0x8
+ 674 003a EF050000 		.4byte	.LASF1
+ 675 003e 02       		.uleb128 0x2
+ 676 003f 02       		.byte	0x2
+ 677 0040 05       		.byte	0x5
+ 678 0041 FD050000 		.4byte	.LASF2
+ 679 0045 03       		.uleb128 0x3
+ 680 0046 DC060000 		.4byte	.LASF4
+ 681 004a 02       		.byte	0x2
+ 682 004b 2B       		.byte	0x2b
+ 683 004c 50000000 		.4byte	0x50
+ 684 0050 02       		.uleb128 0x2
+ 685 0051 02       		.byte	0x2
+ 686 0052 07       		.byte	0x7
+ 687 0053 25040000 		.4byte	.LASF5
+ 688 0057 03       		.uleb128 0x3
+ 689 0058 28070000 		.4byte	.LASF6
+ 690 005c 02       		.byte	0x2
+ 691 005d 3F       		.byte	0x3f
+ 692 005e 62000000 		.4byte	0x62
+ 693 0062 02       		.uleb128 0x2
+ 694 0063 04       		.byte	0x4
+ 695 0064 05       		.byte	0x5
+ 696 0065 BF010000 		.4byte	.LASF7
+ 697 0069 03       		.uleb128 0x3
+ 698 006a 6C020000 		.4byte	.LASF8
+ 699 006e 02       		.byte	0x2
+ 700 006f 41       		.byte	0x41
+ 701 0070 74000000 		.4byte	0x74
+ 702 0074 02       		.uleb128 0x2
+ 703 0075 04       		.byte	0x4
+ 704 0076 07       		.byte	0x7
+ 705 0077 9C030000 		.4byte	.LASF9
+ 706 007b 02       		.uleb128 0x2
+ 707 007c 08       		.byte	0x8
+ 708 007d 05       		.byte	0x5
+ 709 007e 23020000 		.4byte	.LASF10
+ 710 0082 02       		.uleb128 0x2
+ 711 0083 08       		.byte	0x8
+ 712 0084 07       		.byte	0x7
+ 713 0085 C1000000 		.4byte	.LASF11
+ 714 0089 04       		.uleb128 0x4
+ 715 008a 04       		.byte	0x4
+ 716 008b 05       		.byte	0x5
+ 717 008c 696E7400 		.ascii	"int\000"
+ 718 0090 02       		.uleb128 0x2
+ 719 0091 04       		.byte	0x4
+ 720 0092 07       		.byte	0x7
+ 721 0093 61030000 		.4byte	.LASF12
+ 722 0097 03       		.uleb128 0x3
+ 723 0098 C7070000 		.4byte	.LASF13
+ 724 009c 03       		.byte	0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 18
+
+
+ 725 009d 18       		.byte	0x18
+ 726 009e 2C000000 		.4byte	0x2c
+ 727 00a2 03       		.uleb128 0x3
+ 728 00a3 6E030000 		.4byte	.LASF14
+ 729 00a7 03       		.byte	0x3
+ 730 00a8 24       		.byte	0x24
+ 731 00a9 45000000 		.4byte	0x45
+ 732 00ad 03       		.uleb128 0x3
+ 733 00ae E7050000 		.4byte	.LASF15
+ 734 00b2 03       		.byte	0x3
+ 735 00b3 2C       		.byte	0x2c
+ 736 00b4 57000000 		.4byte	0x57
+ 737 00b8 03       		.uleb128 0x3
+ 738 00b9 C8060000 		.4byte	.LASF16
+ 739 00bd 03       		.byte	0x3
+ 740 00be 30       		.byte	0x30
+ 741 00bf 69000000 		.4byte	0x69
+ 742 00c3 02       		.uleb128 0x2
+ 743 00c4 04       		.byte	0x4
+ 744 00c5 07       		.byte	0x7
+ 745 00c6 DE040000 		.4byte	.LASF17
+ 746 00ca 05       		.uleb128 0x5
+ 747 00cb 04       		.byte	0x4
+ 748 00cc 06       		.uleb128 0x6
+ 749 00cd 04       		.byte	0x4
+ 750 00ce D2000000 		.4byte	0xd2
+ 751 00d2 02       		.uleb128 0x2
+ 752 00d3 01       		.byte	0x1
+ 753 00d4 08       		.byte	0x8
+ 754 00d5 D7060000 		.4byte	.LASF18
+ 755 00d9 06       		.uleb128 0x6
+ 756 00da 04       		.byte	0x4
+ 757 00db DF000000 		.4byte	0xdf
+ 758 00df 07       		.uleb128 0x7
+ 759 00e0 D2000000 		.4byte	0xd2
+ 760 00e4 02       		.uleb128 0x2
+ 761 00e5 04       		.byte	0x4
+ 762 00e6 04       		.byte	0x4
+ 763 00e7 8F050000 		.4byte	.LASF19
+ 764 00eb 02       		.uleb128 0x2
+ 765 00ec 08       		.byte	0x8
+ 766 00ed 04       		.byte	0x4
+ 767 00ee 4C020000 		.4byte	.LASF20
+ 768 00f2 03       		.uleb128 0x3
+ 769 00f3 16020000 		.4byte	.LASF21
+ 770 00f7 04       		.byte	0x4
+ 771 00f8 4E       		.byte	0x4e
+ 772 00f9 FD000000 		.4byte	0xfd
+ 773 00fd 06       		.uleb128 0x6
+ 774 00fe 04       		.byte	0x4
+ 775 00ff 03010000 		.4byte	0x103
+ 776 0103 08       		.uleb128 0x8
+ 777 0104 C8010000 		.4byte	.LASF23
+ 778 0108 03       		.uleb128 0x3
+ 779 0109 10040000 		.4byte	.LASF22
+ 780 010d 05       		.byte	0x5
+ 781 010e 46       		.byte	0x46
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 19
+
+
+ 782 010f 13010000 		.4byte	0x113
+ 783 0113 06       		.uleb128 0x6
+ 784 0114 04       		.byte	0x4
+ 785 0115 19010000 		.4byte	0x119
+ 786 0119 08       		.uleb128 0x8
+ 787 011a 17080000 		.4byte	.LASF24
+ 788 011e 09       		.uleb128 0x9
+ 789 011f 87060000 		.4byte	.LASF135
+ 790 0123 01       		.byte	0x1
+ 791 0124 37000000 		.4byte	0x37
+ 792 0128 06       		.byte	0x6
+ 793 0129 35       		.byte	0x35
+ 794 012a D7010000 		.4byte	0x1d7
+ 795 012e 0A       		.uleb128 0xa
+ 796 012f CB040000 		.4byte	.LASF25
+ 797 0133 00       		.byte	0
+ 798 0134 0A       		.uleb128 0xa
+ 799 0135 B9040000 		.4byte	.LASF26
+ 800 0139 01       		.byte	0x1
+ 801 013a 0A       		.uleb128 0xa
+ 802 013b 44030000 		.4byte	.LASF27
+ 803 013f 02       		.byte	0x2
+ 804 0140 0A       		.uleb128 0xa
+ 805 0141 C0050000 		.4byte	.LASF28
+ 806 0145 03       		.byte	0x3
+ 807 0146 0A       		.uleb128 0xa
+ 808 0147 DC010000 		.4byte	.LASF29
+ 809 014b 04       		.byte	0x4
+ 810 014c 0A       		.uleb128 0xa
+ 811 014d 59060000 		.4byte	.LASF30
+ 812 0151 05       		.byte	0x5
+ 813 0152 0A       		.uleb128 0xa
+ 814 0153 3C050000 		.4byte	.LASF31
+ 815 0157 06       		.byte	0x6
+ 816 0158 0A       		.uleb128 0xa
+ 817 0159 CF070000 		.4byte	.LASF32
+ 818 015d 07       		.byte	0x7
+ 819 015e 0A       		.uleb128 0xa
+ 820 015f 7A060000 		.4byte	.LASF33
+ 821 0163 08       		.byte	0x8
+ 822 0164 0A       		.uleb128 0xa
+ 823 0165 38040000 		.4byte	.LASF34
+ 824 0169 09       		.byte	0x9
+ 825 016a 0A       		.uleb128 0xa
+ 826 016b 2D000000 		.4byte	.LASF35
+ 827 016f 0A       		.byte	0xa
+ 828 0170 0A       		.uleb128 0xa
+ 829 0171 19000000 		.4byte	.LASF36
+ 830 0175 0B       		.byte	0xb
+ 831 0176 0A       		.uleb128 0xa
+ 832 0177 00000000 		.4byte	.LASF37
+ 833 017b 0C       		.byte	0xc
+ 834 017c 0A       		.uleb128 0xa
+ 835 017d 9C060000 		.4byte	.LASF38
+ 836 0181 0D       		.byte	0xd
+ 837 0182 0A       		.uleb128 0xa
+ 838 0183 AB060000 		.4byte	.LASF39
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 20
+
+
+ 839 0187 0E       		.byte	0xe
+ 840 0188 0A       		.uleb128 0xa
+ 841 0189 F0040000 		.4byte	.LASF40
+ 842 018d 0F       		.byte	0xf
+ 843 018e 0A       		.uleb128 0xa
+ 844 018f 7B040000 		.4byte	.LASF41
+ 845 0193 10       		.byte	0x10
+ 846 0194 0A       		.uleb128 0xa
+ 847 0195 5D050000 		.4byte	.LASF42
+ 848 0199 11       		.byte	0x11
+ 849 019a 0A       		.uleb128 0xa
+ 850 019b A9010000 		.4byte	.LASF43
+ 851 019f 12       		.byte	0x12
+ 852 01a0 0A       		.uleb128 0xa
+ 853 01a1 90010000 		.4byte	.LASF44
+ 854 01a5 13       		.byte	0x13
+ 855 01a6 0A       		.uleb128 0xa
+ 856 01a7 43060000 		.4byte	.LASF45
+ 857 01ab 14       		.byte	0x14
+ 858 01ac 0A       		.uleb128 0xa
+ 859 01ad 24010000 		.4byte	.LASF46
+ 860 01b1 15       		.byte	0x15
+ 861 01b2 0A       		.uleb128 0xa
+ 862 01b3 FF040000 		.4byte	.LASF47
+ 863 01b7 16       		.byte	0x16
+ 864 01b8 0A       		.uleb128 0xa
+ 865 01b9 57010000 		.4byte	.LASF48
+ 866 01bd 17       		.byte	0x17
+ 867 01be 0A       		.uleb128 0xa
+ 868 01bf F0010000 		.4byte	.LASF49
+ 869 01c3 18       		.byte	0x18
+ 870 01c4 0A       		.uleb128 0xa
+ 871 01c5 E7060000 		.4byte	.LASF50
+ 872 01c9 19       		.byte	0x19
+ 873 01ca 0A       		.uleb128 0xa
+ 874 01cb 53020000 		.4byte	.LASF51
+ 875 01cf 1A       		.byte	0x1a
+ 876 01d0 0A       		.uleb128 0xa
+ 877 01d1 38010000 		.4byte	.LASF52
+ 878 01d5 1B       		.byte	0x1b
+ 879 01d6 00       		.byte	0
+ 880 01d7 03       		.uleb128 0x3
+ 881 01d8 9F040000 		.4byte	.LASF53
+ 882 01dc 06       		.byte	0x6
+ 883 01dd A3       		.byte	0xa3
+ 884 01de E2010000 		.4byte	0x1e2
+ 885 01e2 0B       		.uleb128 0xb
+ 886 01e3 E8000000 		.4byte	.LASF74
+ 887 01e7 94       		.byte	0x94
+ 888 01e8 06       		.byte	0x6
+ 889 01e9 C6       		.byte	0xc6
+ 890 01ea D3020000 		.4byte	0x2d3
+ 891 01ee 0C       		.uleb128 0xc
+ 892 01ef A1070000 		.4byte	.LASF54
+ 893 01f3 06       		.byte	0x6
+ 894 01f4 C7       		.byte	0xc7
+ 895 01f5 CC000000 		.4byte	0xcc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 21
+
+
+ 896 01f9 00       		.byte	0
+ 897 01fa 0C       		.uleb128 0xc
+ 898 01fb 5C030000 		.4byte	.LASF55
+ 899 01ff 06       		.byte	0x6
+ 900 0200 C9       		.byte	0xc9
+ 901 0201 CA000000 		.4byte	0xca
+ 902 0205 04       		.byte	0x4
+ 903 0206 0C       		.uleb128 0xc
+ 904 0207 67060000 		.4byte	.LASF56
+ 905 020b 06       		.byte	0x6
+ 906 020c CB       		.byte	0xcb
+ 907 020d B8000000 		.4byte	0xb8
+ 908 0211 08       		.byte	0x8
+ 909 0212 0C       		.uleb128 0xc
+ 910 0213 05020000 		.4byte	.LASF57
+ 911 0217 06       		.byte	0x6
+ 912 0218 CC       		.byte	0xcc
+ 913 0219 B8000000 		.4byte	0xb8
+ 914 021d 0C       		.byte	0xc
+ 915 021e 0C       		.uleb128 0xc
+ 916 021f 09010000 		.4byte	.LASF58
+ 917 0223 06       		.byte	0x6
+ 918 0224 CD       		.byte	0xcd
+ 919 0225 B8000000 		.4byte	0xb8
+ 920 0229 10       		.byte	0x10
+ 921 022a 0C       		.uleb128 0xc
+ 922 022b 7B010000 		.4byte	.LASF59
+ 923 022f 06       		.byte	0x6
+ 924 0230 CE       		.byte	0xce
+ 925 0231 78040000 		.4byte	0x478
+ 926 0235 14       		.byte	0x14
+ 927 0236 0C       		.uleb128 0xc
+ 928 0237 AE030000 		.4byte	.LASF60
+ 929 023b 06       		.byte	0x6
+ 930 023c CF       		.byte	0xcf
+ 931 023d 7B030000 		.4byte	0x37b
+ 932 0241 18       		.byte	0x18
+ 933 0242 0C       		.uleb128 0xc
+ 934 0243 57070000 		.4byte	.LASF61
+ 935 0247 06       		.byte	0x6
+ 936 0248 D0       		.byte	0xd0
+ 937 0249 B8000000 		.4byte	0xb8
+ 938 024d 1C       		.byte	0x1c
+ 939 024e 0C       		.uleb128 0xc
+ 940 024f D8030000 		.4byte	.LASF62
+ 941 0253 06       		.byte	0x6
+ 942 0254 D1       		.byte	0xd1
+ 943 0255 B8000000 		.4byte	0xb8
+ 944 0259 20       		.byte	0x20
+ 945 025a 0C       		.uleb128 0xc
+ 946 025b E2000000 		.4byte	.LASF63
+ 947 025f 06       		.byte	0x6
+ 948 0260 D2       		.byte	0xd2
+ 949 0261 CB030000 		.4byte	0x3cb
+ 950 0265 24       		.byte	0x24
+ 951 0266 0C       		.uleb128 0xc
+ 952 0267 FD060000 		.4byte	.LASF64
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 22
+
+
+ 953 026b 06       		.byte	0x6
+ 954 026c D3       		.byte	0xd3
+ 955 026d CC000000 		.4byte	0xcc
+ 956 0271 28       		.byte	0x28
+ 957 0272 0C       		.uleb128 0xc
+ 958 0273 93070000 		.4byte	.LASF65
+ 959 0277 06       		.byte	0x6
+ 960 0278 D4       		.byte	0xd4
+ 961 0279 7E040000 		.4byte	0x47e
+ 962 027d 2C       		.byte	0x2c
+ 963 027e 0C       		.uleb128 0xc
+ 964 027f E1070000 		.4byte	.LASF66
+ 965 0283 06       		.byte	0x6
+ 966 0284 D5       		.byte	0xd5
+ 967 0285 B8000000 		.4byte	0xb8
+ 968 0289 6C       		.byte	0x6c
+ 969 028a 0C       		.uleb128 0xc
+ 970 028b 1F060000 		.4byte	.LASF67
+ 971 028f 06       		.byte	0x6
+ 972 0290 D6       		.byte	0xd6
+ 973 0291 B8000000 		.4byte	0xb8
+ 974 0295 70       		.byte	0x70
+ 975 0296 0C       		.uleb128 0xc
+ 976 0297 BA060000 		.4byte	.LASF68
+ 977 029b 06       		.byte	0x6
+ 978 029c D7       		.byte	0xd7
+ 979 029d 97000000 		.4byte	0x97
+ 980 02a1 74       		.byte	0x74
+ 981 02a2 0C       		.uleb128 0xc
+ 982 02a3 70040000 		.4byte	.LASF69
+ 983 02a7 06       		.byte	0x6
+ 984 02a8 D8       		.byte	0xd8
+ 985 02a9 8E040000 		.4byte	0x48e
+ 986 02ad 75       		.byte	0x75
+ 987 02ae 0C       		.uleb128 0xc
+ 988 02af 7B050000 		.4byte	.LASF70
+ 989 02b3 06       		.byte	0x6
+ 990 02b4 D9       		.byte	0xd9
+ 991 02b5 90000000 		.4byte	0x90
+ 992 02b9 88       		.byte	0x88
+ 993 02ba 0C       		.uleb128 0xc
+ 994 02bb 32070000 		.4byte	.LASF71
+ 995 02bf 06       		.byte	0x6
+ 996 02c0 DA       		.byte	0xda
+ 997 02c1 72040000 		.4byte	0x472
+ 998 02c5 8C       		.byte	0x8c
+ 999 02c6 0C       		.uleb128 0xc
+ 1000 02c7 8F000000 		.4byte	.LASF72
+ 1001 02cb 06       		.byte	0x6
+ 1002 02cc DB       		.byte	0xdb
+ 1003 02cd A6030000 		.4byte	0x3a6
+ 1004 02d1 90       		.byte	0x90
+ 1005 02d2 00       		.byte	0
+ 1006 02d3 03       		.uleb128 0x3
+ 1007 02d4 A2050000 		.4byte	.LASF73
+ 1008 02d8 06       		.byte	0x6
+ 1009 02d9 A4       		.byte	0xa4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 23
+
+
+ 1010 02da DE020000 		.4byte	0x2de
+ 1011 02de 0B       		.uleb128 0xb
+ 1012 02df 5D000000 		.4byte	.LASF75
+ 1013 02e3 20       		.byte	0x20
+ 1014 02e4 06       		.byte	0x6
+ 1015 02e5 BA       		.byte	0xba
+ 1016 02e6 4B030000 		.4byte	0x34b
+ 1017 02ea 0C       		.uleb128 0xc
+ 1018 02eb 87010000 		.4byte	.LASF76
+ 1019 02ef 06       		.byte	0x6
+ 1020 02f0 BB       		.byte	0xbb
+ 1021 02f1 4B030000 		.4byte	0x34b
+ 1022 02f5 00       		.byte	0
+ 1023 02f6 0C       		.uleb128 0xc
+ 1024 02f7 7E030000 		.4byte	.LASF77
+ 1025 02fb 06       		.byte	0x6
+ 1026 02fc BC       		.byte	0xbc
+ 1027 02fd D9000000 		.4byte	0xd9
+ 1028 0301 04       		.byte	0x4
+ 1029 0302 0C       		.uleb128 0xc
+ 1030 0303 70070000 		.4byte	.LASF78
+ 1031 0307 06       		.byte	0x6
+ 1032 0308 BD       		.byte	0xbd
+ 1033 0309 D9000000 		.4byte	0xd9
+ 1034 030d 08       		.byte	0x8
+ 1035 030e 0C       		.uleb128 0xc
+ 1036 030f 2E050000 		.4byte	.LASF79
+ 1037 0313 06       		.byte	0x6
+ 1038 0314 BE       		.byte	0xbe
+ 1039 0315 B8000000 		.4byte	0xb8
+ 1040 0319 0C       		.byte	0xc
+ 1041 031a 0C       		.uleb128 0xc
+ 1042 031b B4070000 		.4byte	.LASF80
+ 1043 031f 06       		.byte	0x6
+ 1044 0320 BF       		.byte	0xbf
+ 1045 0321 97000000 		.4byte	0x97
+ 1046 0325 10       		.byte	0x10
+ 1047 0326 0C       		.uleb128 0xc
+ 1048 0327 D8050000 		.4byte	.LASF81
+ 1049 032b 06       		.byte	0x6
+ 1050 032c C0       		.byte	0xc0
+ 1051 032d F1030000 		.4byte	0x3f1
+ 1052 0331 14       		.byte	0x14
+ 1053 0332 0C       		.uleb128 0xc
+ 1054 0333 29080000 		.4byte	.LASF82
+ 1055 0337 06       		.byte	0x6
+ 1056 0338 C1       		.byte	0xc1
+ 1057 0339 CA000000 		.4byte	0xca
+ 1058 033d 18       		.byte	0x18
+ 1059 033e 0C       		.uleb128 0xc
+ 1060 033f B8050000 		.4byte	.LASF83
+ 1061 0343 06       		.byte	0x6
+ 1062 0344 C3       		.byte	0xc3
+ 1063 0345 72040000 		.4byte	0x472
+ 1064 0349 1C       		.byte	0x1c
+ 1065 034a 00       		.byte	0
+ 1066 034b 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 24
+
+
+ 1067 034c 38020000 		.4byte	.LASF84
+ 1068 0350 06       		.byte	0x6
+ 1069 0351 A6       		.byte	0xa6
+ 1070 0352 56030000 		.4byte	0x356
+ 1071 0356 06       		.uleb128 0x6
+ 1072 0357 04       		.byte	0x4
+ 1073 0358 5C030000 		.4byte	0x35c
+ 1074 035c 0D       		.uleb128 0xd
+ 1075 035d 97000000 		.4byte	0x97
+ 1076 0361 75030000 		.4byte	0x375
+ 1077 0365 0E       		.uleb128 0xe
+ 1078 0366 75030000 		.4byte	0x375
+ 1079 036a 0E       		.uleb128 0xe
+ 1080 036b 97000000 		.4byte	0x97
+ 1081 036f 0E       		.uleb128 0xe
+ 1082 0370 7B030000 		.4byte	0x37b
+ 1083 0374 00       		.byte	0
+ 1084 0375 06       		.uleb128 0x6
+ 1085 0376 04       		.byte	0x4
+ 1086 0377 D7010000 		.4byte	0x1d7
+ 1087 037b 06       		.uleb128 0x6
+ 1088 037c 04       		.byte	0x4
+ 1089 037d CC000000 		.4byte	0xcc
+ 1090 0381 03       		.uleb128 0x3
+ 1091 0382 07060000 		.4byte	.LASF85
+ 1092 0386 06       		.byte	0x6
+ 1093 0387 A7       		.byte	0xa7
+ 1094 0388 8C030000 		.4byte	0x38c
+ 1095 038c 06       		.uleb128 0x6
+ 1096 038d 04       		.byte	0x4
+ 1097 038e 92030000 		.4byte	0x392
+ 1098 0392 0D       		.uleb128 0xd
+ 1099 0393 97000000 		.4byte	0x97
+ 1100 0397 A6030000 		.4byte	0x3a6
+ 1101 039b 0E       		.uleb128 0xe
+ 1102 039c 75030000 		.4byte	0x375
+ 1103 03a0 0E       		.uleb128 0xe
+ 1104 03a1 A2000000 		.4byte	0xa2
+ 1105 03a5 00       		.byte	0
+ 1106 03a6 03       		.uleb128 0x3
+ 1107 03a7 F2030000 		.4byte	.LASF86
+ 1108 03ab 06       		.byte	0x6
+ 1109 03ac A8       		.byte	0xa8
+ 1110 03ad B1030000 		.4byte	0x3b1
+ 1111 03b1 06       		.uleb128 0x6
+ 1112 03b2 04       		.byte	0x4
+ 1113 03b3 B7030000 		.4byte	0x3b7
+ 1114 03b7 0D       		.uleb128 0xd
+ 1115 03b8 97000000 		.4byte	0x97
+ 1116 03bc CB030000 		.4byte	0x3cb
+ 1117 03c0 0E       		.uleb128 0xe
+ 1118 03c1 75030000 		.4byte	0x375
+ 1119 03c5 0E       		.uleb128 0xe
+ 1120 03c6 B8000000 		.4byte	0xb8
+ 1121 03ca 00       		.byte	0
+ 1122 03cb 03       		.uleb128 0x3
+ 1123 03cc 32080000 		.4byte	.LASF87
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 25
+
+
+ 1124 03d0 06       		.byte	0x6
+ 1125 03d1 AB       		.byte	0xab
+ 1126 03d2 D6030000 		.4byte	0x3d6
+ 1127 03d6 06       		.uleb128 0x6
+ 1128 03d7 04       		.byte	0x4
+ 1129 03d8 DC030000 		.4byte	0x3dc
+ 1130 03dc 0D       		.uleb128 0xd
+ 1131 03dd B8000000 		.4byte	0xb8
+ 1132 03e1 F1030000 		.4byte	0x3f1
+ 1133 03e5 0E       		.uleb128 0xe
+ 1134 03e6 CA000000 		.4byte	0xca
+ 1135 03ea 0E       		.uleb128 0xe
+ 1136 03eb CC000000 		.4byte	0xcc
+ 1137 03ef 0F       		.uleb128 0xf
+ 1138 03f0 00       		.byte	0
+ 1139 03f1 03       		.uleb128 0x3
+ 1140 03f2 3E070000 		.4byte	.LASF88
+ 1141 03f6 06       		.byte	0x6
+ 1142 03f7 AF       		.byte	0xaf
+ 1143 03f8 FC030000 		.4byte	0x3fc
+ 1144 03fc 06       		.uleb128 0x6
+ 1145 03fd 04       		.byte	0x4
+ 1146 03fe 02040000 		.4byte	0x402
+ 1147 0402 0D       		.uleb128 0xd
+ 1148 0403 97000000 		.4byte	0x97
+ 1149 0407 16040000 		.4byte	0x416
+ 1150 040b 0E       		.uleb128 0xe
+ 1151 040c 75030000 		.4byte	0x375
+ 1152 0410 0E       		.uleb128 0xe
+ 1153 0411 CA000000 		.4byte	0xca
+ 1154 0415 00       		.byte	0
+ 1155 0416 10       		.uleb128 0x10
+ 1156 0417 18       		.byte	0x18
+ 1157 0418 06       		.byte	0x6
+ 1158 0419 B1       		.byte	0xb1
+ 1159 041a 67040000 		.4byte	0x467
+ 1160 041e 0C       		.uleb128 0xc
+ 1161 041f 52070000 		.4byte	.LASF89
+ 1162 0423 06       		.byte	0x6
+ 1163 0424 B2       		.byte	0xb2
+ 1164 0425 F2000000 		.4byte	0xf2
+ 1165 0429 00       		.byte	0
+ 1166 042a 0C       		.uleb128 0xc
+ 1167 042b 95050000 		.4byte	.LASF90
+ 1168 042f 06       		.byte	0x6
+ 1169 0430 B3       		.byte	0xb3
+ 1170 0431 81030000 		.4byte	0x381
+ 1171 0435 04       		.byte	0x4
+ 1172 0436 0C       		.uleb128 0xc
+ 1173 0437 AF040000 		.4byte	.LASF91
+ 1174 043b 06       		.byte	0x6
+ 1175 043c B4       		.byte	0xb4
+ 1176 043d 97000000 		.4byte	0x97
+ 1177 0441 08       		.byte	0x8
+ 1178 0442 0C       		.uleb128 0xc
+ 1179 0443 57040000 		.4byte	.LASF92
+ 1180 0447 06       		.byte	0x6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 26
+
+
+ 1181 0448 B5       		.byte	0xb5
+ 1182 0449 08010000 		.4byte	0x108
+ 1183 044d 0C       		.byte	0xc
+ 1184 044e 0C       		.uleb128 0xc
+ 1185 044f 12080000 		.4byte	.LASF93
+ 1186 0453 06       		.byte	0x6
+ 1187 0454 B6       		.byte	0xb6
+ 1188 0455 7B030000 		.4byte	0x37b
+ 1189 0459 10       		.byte	0x10
+ 1190 045a 0C       		.uleb128 0xc
+ 1191 045b E7040000 		.4byte	.LASF94
+ 1192 045f 06       		.byte	0x6
+ 1193 0460 B7       		.byte	0xb7
+ 1194 0461 97000000 		.4byte	0x97
+ 1195 0465 14       		.byte	0x14
+ 1196 0466 00       		.byte	0
+ 1197 0467 03       		.uleb128 0x3
+ 1198 0468 37060000 		.4byte	.LASF95
+ 1199 046c 06       		.byte	0x6
+ 1200 046d B8       		.byte	0xb8
+ 1201 046e 16040000 		.4byte	0x416
+ 1202 0472 06       		.uleb128 0x6
+ 1203 0473 04       		.byte	0x4
+ 1204 0474 D3020000 		.4byte	0x2d3
+ 1205 0478 06       		.uleb128 0x6
+ 1206 0479 04       		.byte	0x4
+ 1207 047a 67040000 		.4byte	0x467
+ 1208 047e 11       		.uleb128 0x11
+ 1209 047f CC000000 		.4byte	0xcc
+ 1210 0483 8E040000 		.4byte	0x48e
+ 1211 0487 12       		.uleb128 0x12
+ 1212 0488 C3000000 		.4byte	0xc3
+ 1213 048c 0F       		.byte	0xf
+ 1214 048d 00       		.byte	0
+ 1215 048e 11       		.uleb128 0x11
+ 1216 048f 97000000 		.4byte	0x97
+ 1217 0493 9E040000 		.4byte	0x49e
+ 1218 0497 12       		.uleb128 0x12
+ 1219 0498 C3000000 		.4byte	0xc3
+ 1220 049c 0F       		.byte	0xf
+ 1221 049d 00       		.byte	0
+ 1222 049e 03       		.uleb128 0x3
+ 1223 049f 83070000 		.4byte	.LASF96
+ 1224 04a3 07       		.byte	0x7
+ 1225 04a4 0C       		.byte	0xc
+ 1226 04a5 A9040000 		.4byte	0x4a9
+ 1227 04a9 0B       		.uleb128 0xb
+ 1228 04aa 87050000 		.4byte	.LASF97
+ 1229 04ae 08       		.byte	0x8
+ 1230 04af 07       		.byte	0x7
+ 1231 04b0 0F       		.byte	0xf
+ 1232 04b1 CE040000 		.4byte	0x4ce
+ 1233 04b5 0C       		.uleb128 0xc
+ 1234 04b6 1F010000 		.4byte	.LASF98
+ 1235 04ba 07       		.byte	0x7
+ 1236 04bb 10       		.byte	0x10
+ 1237 04bc 0A050000 		.4byte	0x50a
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 27
+
+
+ 1238 04c0 00       		.byte	0
+ 1239 04c1 0C       		.uleb128 0xc
+ 1240 04c2 4C000000 		.4byte	.LASF99
+ 1241 04c6 07       		.byte	0x7
+ 1242 04c7 11       		.byte	0x11
+ 1243 04c8 CC000000 		.4byte	0xcc
+ 1244 04cc 04       		.byte	0x4
+ 1245 04cd 00       		.byte	0
+ 1246 04ce 03       		.uleb128 0x3
+ 1247 04cf 03040000 		.4byte	.LASF100
+ 1248 04d3 07       		.byte	0x7
+ 1249 04d4 0D       		.byte	0xd
+ 1250 04d5 D9040000 		.4byte	0x4d9
+ 1251 04d9 0B       		.uleb128 0xb
+ 1252 04da 63040000 		.4byte	.LASF101
+ 1253 04de 0C       		.byte	0xc
+ 1254 04df 07       		.byte	0x7
+ 1255 04e0 14       		.byte	0x14
+ 1256 04e1 0A050000 		.4byte	0x50a
+ 1257 04e5 0C       		.uleb128 0xc
+ 1258 04e6 FA070000 		.4byte	.LASF102
+ 1259 04ea 07       		.byte	0x7
+ 1260 04eb 15       		.byte	0x15
+ 1261 04ec 90000000 		.4byte	0x90
+ 1262 04f0 00       		.byte	0
+ 1263 04f1 0C       		.uleb128 0xc
+ 1264 04f2 8B040000 		.4byte	.LASF103
+ 1265 04f6 07       		.byte	0x7
+ 1266 04f7 16       		.byte	0x16
+ 1267 04f8 B8000000 		.4byte	0xb8
+ 1268 04fc 04       		.byte	0x4
+ 1269 04fd 0C       		.uleb128 0xc
+ 1270 04fe D1060000 		.4byte	.LASF104
+ 1271 0502 07       		.byte	0x7
+ 1272 0503 17       		.byte	0x17
+ 1273 0504 0A050000 		.4byte	0x50a
+ 1274 0508 08       		.byte	0x8
+ 1275 0509 00       		.byte	0
+ 1276 050a 06       		.uleb128 0x6
+ 1277 050b 04       		.byte	0x4
+ 1278 050c 9E040000 		.4byte	0x49e
+ 1279 0510 13       		.uleb128 0x13
+ 1280 0511 C1030000 		.4byte	.LASF109
+ 1281 0515 01       		.byte	0x1
+ 1282 0516 28       		.byte	0x28
+ 1283 0517 97000000 		.4byte	0x97
+ 1284 051b 00000000 		.4byte	.LFB69
+ 1285 051f 90010000 		.4byte	.LFE69-.LFB69
+ 1286 0523 01       		.uleb128 0x1
+ 1287 0524 9C       		.byte	0x9c
+ 1288 0525 F0060000 		.4byte	0x6f0
+ 1289 0529 14       		.uleb128 0x14
+ 1290 052a 98040000 		.4byte	.LASF105
+ 1291 052e 01       		.byte	0x1
+ 1292 052f 28       		.byte	0x28
+ 1293 0530 75030000 		.4byte	0x375
+ 1294 0534 00000000 		.4byte	.LLST0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 28
+
+
+ 1295 0538 14       		.uleb128 0x14
+ 1296 0539 E7040000 		.4byte	.LASF94
+ 1297 053d 01       		.byte	0x1
+ 1298 053e 28       		.byte	0x28
+ 1299 053f 97000000 		.4byte	0x97
+ 1300 0543 2C000000 		.4byte	.LLST1
+ 1301 0547 14       		.uleb128 0x14
+ 1302 0548 12080000 		.4byte	.LASF93
+ 1303 054c 01       		.byte	0x1
+ 1304 054d 28       		.byte	0x28
+ 1305 054e 7B030000 		.4byte	0x37b
+ 1306 0552 4D000000 		.4byte	.LLST2
+ 1307 0556 15       		.uleb128 0x15
+ 1308 0557 73050000 		.4byte	.LASF106
+ 1309 055b 01       		.byte	0x1
+ 1310 055c 29       		.byte	0x29
+ 1311 055d 97000000 		.4byte	0x97
+ 1312 0561 79000000 		.4byte	.LLST3
+ 1313 0565 15       		.uleb128 0x15
+ 1314 0566 02080000 		.4byte	.LASF107
+ 1315 056a 01       		.byte	0x1
+ 1316 056b 2A       		.byte	0x2a
+ 1317 056c 97000000 		.4byte	0x97
+ 1318 0570 F3000000 		.4byte	.LLST4
+ 1319 0574 16       		.uleb128 0x16
+ 1320 0575 B2000000 		.4byte	.LBB2
+ 1321 0579 2E000000 		.4byte	.LBE2-.LBB2
+ 1322 057d B5050000 		.4byte	0x5b5
+ 1323 0581 15       		.uleb128 0x15
+ 1324 0582 D8000000 		.4byte	.LASF108
+ 1325 0586 01       		.byte	0x1
+ 1326 0587 45       		.byte	0x45
+ 1327 0588 CC000000 		.4byte	0xcc
+ 1328 058c 2B010000 		.4byte	.LLST5
+ 1329 0590 17       		.uleb128 0x17
+ 1330 0591 BA000000 		.4byte	.LVL19
+ 1331 0595 D9090000 		.4byte	0x9d9
+ 1332 0599 17       		.uleb128 0x17
+ 1333 059a C0000000 		.4byte	.LVL20
+ 1334 059e E4090000 		.4byte	0x9e4
+ 1335 05a2 17       		.uleb128 0x17
+ 1336 05a3 C8000000 		.4byte	.LVL21
+ 1337 05a7 EF090000 		.4byte	0x9ef
+ 1338 05ab 17       		.uleb128 0x17
+ 1339 05ac D2000000 		.4byte	.LVL22
+ 1340 05b0 FA090000 		.4byte	0x9fa
+ 1341 05b4 00       		.byte	0
+ 1342 05b5 18       		.uleb128 0x18
+ 1343 05b6 1E000000 		.4byte	.LVL2
+ 1344 05ba 050A0000 		.4byte	0xa05
+ 1345 05be D2050000 		.4byte	0x5d2
+ 1346 05c2 19       		.uleb128 0x19
+ 1347 05c3 01       		.uleb128 0x1
+ 1348 05c4 50       		.byte	0x50
+ 1349 05c5 02       		.uleb128 0x2
+ 1350 05c6 7B       		.byte	0x7b
+ 1351 05c7 00       		.sleb128 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 29
+
+
+ 1352 05c8 19       		.uleb128 0x19
+ 1353 05c9 01       		.uleb128 0x1
+ 1354 05ca 51       		.byte	0x51
+ 1355 05cb 05       		.uleb128 0x5
+ 1356 05cc 03       		.byte	0x3
+ 1357 05cd 17000000 		.4byte	.LC4
+ 1358 05d1 00       		.byte	0
+ 1359 05d2 1A       		.uleb128 0x1a
+ 1360 05d3 28000000 		.4byte	.LVL3
+ 1361 05d7 E5050000 		.4byte	0x5e5
+ 1362 05db 19       		.uleb128 0x19
+ 1363 05dc 01       		.uleb128 0x1
+ 1364 05dd 51       		.byte	0x51
+ 1365 05de 05       		.uleb128 0x5
+ 1366 05df 03       		.byte	0x3
+ 1367 05e0 1A000000 		.4byte	.LC5
+ 1368 05e4 00       		.byte	0
+ 1369 05e5 1A       		.uleb128 0x1a
+ 1370 05e6 30000000 		.4byte	.LVL4
+ 1371 05ea F8050000 		.4byte	0x5f8
+ 1372 05ee 19       		.uleb128 0x19
+ 1373 05ef 01       		.uleb128 0x1
+ 1374 05f0 51       		.byte	0x51
+ 1375 05f1 05       		.uleb128 0x5
+ 1376 05f2 03       		.byte	0x3
+ 1377 05f3 65000000 		.4byte	.LC6
+ 1378 05f7 00       		.byte	0
+ 1379 05f8 18       		.uleb128 0x18
+ 1380 05f9 3A000000 		.4byte	.LVL5
+ 1381 05fd 050A0000 		.4byte	0xa05
+ 1382 0601 15060000 		.4byte	0x615
+ 1383 0605 19       		.uleb128 0x19
+ 1384 0606 01       		.uleb128 0x1
+ 1385 0607 50       		.byte	0x50
+ 1386 0608 02       		.uleb128 0x2
+ 1387 0609 7B       		.byte	0x7b
+ 1388 060a 00       		.sleb128 0
+ 1389 060b 19       		.uleb128 0x19
+ 1390 060c 01       		.uleb128 0x1
+ 1391 060d 51       		.byte	0x51
+ 1392 060e 05       		.uleb128 0x5
+ 1393 060f 03       		.byte	0x3
+ 1394 0610 FA000000 		.4byte	.LC7
+ 1395 0614 00       		.byte	0
+ 1396 0615 17       		.uleb128 0x17
+ 1397 0616 4E000000 		.4byte	.LVL6
+ 1398 061a 100A0000 		.4byte	0xa10
+ 1399 061e 1B       		.uleb128 0x1b
+ 1400 061f 5E000000 		.4byte	.LVL8
+ 1401 0623 02       		.uleb128 0x2
+ 1402 0624 76       		.byte	0x76
+ 1403 0625 00       		.sleb128 0
+ 1404 0626 3A060000 		.4byte	0x63a
+ 1405 062a 19       		.uleb128 0x19
+ 1406 062b 01       		.uleb128 0x1
+ 1407 062c 51       		.byte	0x51
+ 1408 062d 05       		.uleb128 0x5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 30
+
+
+ 1409 062e 03       		.byte	0x3
+ 1410 062f FD000000 		.4byte	.LC8
+ 1411 0633 19       		.uleb128 0x19
+ 1412 0634 01       		.uleb128 0x1
+ 1413 0635 52       		.byte	0x52
+ 1414 0636 02       		.uleb128 0x2
+ 1415 0637 75       		.byte	0x75
+ 1416 0638 00       		.sleb128 0
+ 1417 0639 00       		.byte	0
+ 1418 063a 1A       		.uleb128 0x1a
+ 1419 063b 6A000000 		.4byte	.LVL10
+ 1420 063f 4D060000 		.4byte	0x64d
+ 1421 0643 19       		.uleb128 0x19
+ 1422 0644 01       		.uleb128 0x1
+ 1423 0645 51       		.byte	0x51
+ 1424 0646 05       		.uleb128 0x5
+ 1425 0647 03       		.byte	0x3
+ 1426 0648 1F010000 		.4byte	.LC9
+ 1427 064c 00       		.byte	0
+ 1428 064d 18       		.uleb128 0x18
+ 1429 064e 76000000 		.4byte	.LVL11
+ 1430 0652 050A0000 		.4byte	0xa05
+ 1431 0656 6A060000 		.4byte	0x66a
+ 1432 065a 19       		.uleb128 0x19
+ 1433 065b 01       		.uleb128 0x1
+ 1434 065c 50       		.byte	0x50
+ 1435 065d 02       		.uleb128 0x2
+ 1436 065e 7B       		.byte	0x7b
+ 1437 065f 00       		.sleb128 0
+ 1438 0660 19       		.uleb128 0x19
+ 1439 0661 01       		.uleb128 0x1
+ 1440 0662 51       		.byte	0x51
+ 1441 0663 05       		.uleb128 0x5
+ 1442 0664 03       		.byte	0x3
+ 1443 0665 3F010000 		.4byte	.LC10
+ 1444 0669 00       		.byte	0
+ 1445 066a 17       		.uleb128 0x17
+ 1446 066b 8E000000 		.4byte	.LVL14
+ 1447 066f 1B0A0000 		.4byte	0xa1b
+ 1448 0673 18       		.uleb128 0x18
+ 1449 0674 A6000000 		.4byte	.LVL16
+ 1450 0678 050A0000 		.4byte	0xa05
+ 1451 067c 90060000 		.4byte	0x690
+ 1452 0680 19       		.uleb128 0x19
+ 1453 0681 01       		.uleb128 0x1
+ 1454 0682 50       		.byte	0x50
+ 1455 0683 02       		.uleb128 0x2
+ 1456 0684 7B       		.byte	0x7b
+ 1457 0685 00       		.sleb128 0
+ 1458 0686 19       		.uleb128 0x19
+ 1459 0687 01       		.uleb128 0x1
+ 1460 0688 51       		.byte	0x51
+ 1461 0689 05       		.uleb128 0x5
+ 1462 068a 03       		.byte	0x3
+ 1463 068b 8C010000 		.4byte	.LC13
+ 1464 068f 00       		.byte	0
+ 1465 0690 1B       		.uleb128 0x1b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 31
+
+
+ 1466 0691 12010000 		.4byte	.LVL31
+ 1467 0695 02       		.uleb128 0x2
+ 1468 0696 75       		.byte	0x75
+ 1469 0697 00       		.sleb128 0
+ 1470 0698 C4060000 		.4byte	0x6c4
+ 1471 069c 19       		.uleb128 0x19
+ 1472 069d 01       		.uleb128 0x1
+ 1473 069e 51       		.byte	0x51
+ 1474 069f 05       		.uleb128 0x5
+ 1475 06a0 03       		.byte	0x3
+ 1476 06a1 D5010000 		.4byte	.LC16
+ 1477 06a5 19       		.uleb128 0x19
+ 1478 06a6 01       		.uleb128 0x1
+ 1479 06a7 52       		.byte	0x52
+ 1480 06a8 02       		.uleb128 0x2
+ 1481 06a9 79       		.byte	0x79
+ 1482 06aa 00       		.sleb128 0
+ 1483 06ab 19       		.uleb128 0x19
+ 1484 06ac 02       		.uleb128 0x2
+ 1485 06ad 7D       		.byte	0x7d
+ 1486 06ae 00       		.sleb128 0
+ 1487 06af 13       		.uleb128 0x13
+ 1488 06b0 03       		.byte	0x3
+ 1489 06b1 00000000 		.4byte	.LC0
+ 1490 06b5 03       		.byte	0x3
+ 1491 06b6 10000000 		.4byte	.LC1
+ 1492 06ba 79       		.byte	0x79
+ 1493 06bb 00       		.sleb128 0
+ 1494 06bc 30       		.byte	0x30
+ 1495 06bd 2E       		.byte	0x2e
+ 1496 06be 28       		.byte	0x28
+ 1497 06bf 0100     		.2byte	0x1
+ 1498 06c1 16       		.byte	0x16
+ 1499 06c2 13       		.byte	0x13
+ 1500 06c3 00       		.byte	0
+ 1501 06c4 1C       		.uleb128 0x1c
+ 1502 06c5 38010000 		.4byte	.LVL33
+ 1503 06c9 02       		.uleb128 0x2
+ 1504 06ca 75       		.byte	0x75
+ 1505 06cb 00       		.sleb128 0
+ 1506 06cc 19       		.uleb128 0x19
+ 1507 06cd 01       		.uleb128 0x1
+ 1508 06ce 51       		.byte	0x51
+ 1509 06cf 05       		.uleb128 0x5
+ 1510 06d0 03       		.byte	0x3
+ 1511 06d1 1C020000 		.4byte	.LC17
+ 1512 06d5 19       		.uleb128 0x19
+ 1513 06d6 01       		.uleb128 0x1
+ 1514 06d7 52       		.byte	0x52
+ 1515 06d8 02       		.uleb128 0x2
+ 1516 06d9 76       		.byte	0x76
+ 1517 06da 00       		.sleb128 0
+ 1518 06db 19       		.uleb128 0x19
+ 1519 06dc 02       		.uleb128 0x2
+ 1520 06dd 7D       		.byte	0x7d
+ 1521 06de 00       		.sleb128 0
+ 1522 06df 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 32
+
+
+ 1523 06e0 77       		.byte	0x77
+ 1524 06e1 00       		.sleb128 0
+ 1525 06e2 7A       		.byte	0x7a
+ 1526 06e3 00       		.sleb128 0
+ 1527 06e4 76       		.byte	0x76
+ 1528 06e5 00       		.sleb128 0
+ 1529 06e6 79       		.byte	0x79
+ 1530 06e7 7F       		.sleb128 -1
+ 1531 06e8 29       		.byte	0x29
+ 1532 06e9 28       		.byte	0x28
+ 1533 06ea 0100     		.2byte	0x1
+ 1534 06ec 16       		.byte	0x16
+ 1535 06ed 13       		.byte	0x13
+ 1536 06ee 00       		.byte	0
+ 1537 06ef 00       		.byte	0
+ 1538 06f0 1D       		.uleb128 0x1d
+ 1539 06f1 0A070000 		.4byte	.LASF110
+ 1540 06f5 01       		.byte	0x1
+ 1541 06f6 59       		.byte	0x59
+ 1542 06f7 97000000 		.4byte	0x97
+ 1543 06fb 00000000 		.4byte	.LFB70
+ 1544 06ff 5C000000 		.4byte	.LFE70-.LFB70
+ 1545 0703 01       		.uleb128 0x1
+ 1546 0704 9C       		.byte	0x9c
+ 1547 0705 DA070000 		.4byte	0x7da
+ 1548 0709 14       		.uleb128 0x14
+ 1549 070a 98040000 		.4byte	.LASF105
+ 1550 070e 01       		.byte	0x1
+ 1551 070f 59       		.byte	0x59
+ 1552 0710 75030000 		.4byte	0x375
+ 1553 0714 3E010000 		.4byte	.LLST6
+ 1554 0718 14       		.uleb128 0x14
+ 1555 0719 31020000 		.4byte	.LASF111
+ 1556 071d 01       		.byte	0x1
+ 1557 071e 59       		.byte	0x59
+ 1558 071f CA000000 		.4byte	0xca
+ 1559 0723 72010000 		.4byte	.LLST7
+ 1560 0727 15       		.uleb128 0x15
+ 1561 0728 0D080000 		.4byte	.LASF112
+ 1562 072c 01       		.byte	0x1
+ 1563 072d 5F       		.byte	0x5f
+ 1564 072e DA070000 		.4byte	0x7da
+ 1565 0732 90010000 		.4byte	.LLST8
+ 1566 0736 15       		.uleb128 0x15
+ 1567 0737 76010000 		.4byte	.LASF113
+ 1568 073b 01       		.byte	0x1
+ 1569 073c 66       		.byte	0x66
+ 1570 073d CC000000 		.4byte	0xcc
+ 1571 0741 AE010000 		.4byte	.LLST9
+ 1572 0745 1E       		.uleb128 0x1e
+ 1573 0746 6C656E00 		.ascii	"len\000"
+ 1574 074a 01       		.byte	0x1
+ 1575 074b 67       		.byte	0x67
+ 1576 074c 97000000 		.4byte	0x97
+ 1577 0750 02       		.uleb128 0x2
+ 1578 0751 91       		.byte	0x91
+ 1579 0752 6F       		.sleb128 -17
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 33
+
+
+ 1580 0753 18       		.uleb128 0x18
+ 1581 0754 1A000000 		.4byte	.LVL40
+ 1582 0758 E4090000 		.4byte	0x9e4
+ 1583 075c 67070000 		.4byte	0x767
+ 1584 0760 19       		.uleb128 0x19
+ 1585 0761 01       		.uleb128 0x1
+ 1586 0762 50       		.byte	0x50
+ 1587 0763 02       		.uleb128 0x2
+ 1588 0764 08       		.byte	0x8
+ 1589 0765 80       		.byte	0x80
+ 1590 0766 00       		.byte	0
+ 1591 0767 18       		.uleb128 0x18
+ 1592 0768 24000000 		.4byte	.LVL42
+ 1593 076c 260A0000 		.4byte	0xa26
+ 1594 0770 86070000 		.4byte	0x786
+ 1595 0774 19       		.uleb128 0x19
+ 1596 0775 01       		.uleb128 0x1
+ 1597 0776 50       		.byte	0x50
+ 1598 0777 02       		.uleb128 0x2
+ 1599 0778 76       		.byte	0x76
+ 1600 0779 00       		.sleb128 0
+ 1601 077a 19       		.uleb128 0x19
+ 1602 077b 01       		.uleb128 0x1
+ 1603 077c 51       		.byte	0x51
+ 1604 077d 01       		.uleb128 0x1
+ 1605 077e 30       		.byte	0x30
+ 1606 077f 19       		.uleb128 0x19
+ 1607 0780 01       		.uleb128 0x1
+ 1608 0781 52       		.byte	0x52
+ 1609 0782 02       		.uleb128 0x2
+ 1610 0783 08       		.byte	0x8
+ 1611 0784 80       		.byte	0x80
+ 1612 0785 00       		.byte	0
+ 1613 0786 18       		.uleb128 0x18
+ 1614 0787 30000000 		.4byte	.LVL43
+ 1615 078b 2F0A0000 		.4byte	0xa2f
+ 1616 078f A6070000 		.4byte	0x7a6
+ 1617 0793 19       		.uleb128 0x19
+ 1618 0794 01       		.uleb128 0x1
+ 1619 0795 50       		.byte	0x50
+ 1620 0796 02       		.uleb128 0x2
+ 1621 0797 74       		.byte	0x74
+ 1622 0798 00       		.sleb128 0
+ 1623 0799 19       		.uleb128 0x19
+ 1624 079a 01       		.uleb128 0x1
+ 1625 079b 51       		.byte	0x51
+ 1626 079c 02       		.uleb128 0x2
+ 1627 079d 76       		.byte	0x76
+ 1628 079e 00       		.sleb128 0
+ 1629 079f 19       		.uleb128 0x19
+ 1630 07a0 01       		.uleb128 0x1
+ 1631 07a1 52       		.byte	0x52
+ 1632 07a2 02       		.uleb128 0x2
+ 1633 07a3 91       		.byte	0x91
+ 1634 07a4 6F       		.sleb128 -17
+ 1635 07a5 00       		.byte	0
+ 1636 07a6 17       		.uleb128 0x17
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 34
+
+
+ 1637 07a7 3A000000 		.4byte	.LVL44
+ 1638 07ab E4090000 		.4byte	0x9e4
+ 1639 07af 18       		.uleb128 0x18
+ 1640 07b0 4E000000 		.4byte	.LVL45
+ 1641 07b4 3B0A0000 		.4byte	0xa3b
+ 1642 07b8 C9070000 		.4byte	0x7c9
+ 1643 07bc 19       		.uleb128 0x19
+ 1644 07bd 01       		.uleb128 0x1
+ 1645 07be 50       		.byte	0x50
+ 1646 07bf 02       		.uleb128 0x2
+ 1647 07c0 75       		.byte	0x75
+ 1648 07c1 00       		.sleb128 0
+ 1649 07c2 19       		.uleb128 0x19
+ 1650 07c3 01       		.uleb128 0x1
+ 1651 07c4 51       		.byte	0x51
+ 1652 07c5 02       		.uleb128 0x2
+ 1653 07c6 76       		.byte	0x76
+ 1654 07c7 00       		.sleb128 0
+ 1655 07c8 00       		.byte	0
+ 1656 07c9 1F       		.uleb128 0x1f
+ 1657 07ca 56000000 		.4byte	.LVL46
+ 1658 07ce 460A0000 		.4byte	0xa46
+ 1659 07d2 19       		.uleb128 0x19
+ 1660 07d3 01       		.uleb128 0x1
+ 1661 07d4 50       		.byte	0x50
+ 1662 07d5 02       		.uleb128 0x2
+ 1663 07d6 76       		.byte	0x76
+ 1664 07d7 00       		.sleb128 0
+ 1665 07d8 00       		.byte	0
+ 1666 07d9 00       		.byte	0
+ 1667 07da 06       		.uleb128 0x6
+ 1668 07db 04       		.byte	0x4
+ 1669 07dc CE040000 		.4byte	0x4ce
+ 1670 07e0 1D       		.uleb128 0x1d
+ 1671 07e1 47040000 		.4byte	.LASF114
+ 1672 07e5 01       		.byte	0x1
+ 1673 07e6 77       		.byte	0x77
+ 1674 07e7 97000000 		.4byte	0x97
+ 1675 07eb 00000000 		.4byte	.LFB71
+ 1676 07ef 90000000 		.4byte	.LFE71-.LFB71
+ 1677 07f3 01       		.uleb128 0x1
+ 1678 07f4 9C       		.byte	0x9c
+ 1679 07f5 E0080000 		.4byte	0x8e0
+ 1680 07f9 14       		.uleb128 0x14
+ 1681 07fa 98040000 		.4byte	.LASF105
+ 1682 07fe 01       		.byte	0x1
+ 1683 07ff 77       		.byte	0x77
+ 1684 0800 75030000 		.4byte	0x375
+ 1685 0804 CC010000 		.4byte	.LLST10
+ 1686 0808 14       		.uleb128 0x14
+ 1687 0809 E7040000 		.4byte	.LASF94
+ 1688 080d 01       		.byte	0x1
+ 1689 080e 77       		.byte	0x77
+ 1690 080f 97000000 		.4byte	0x97
+ 1691 0813 F8010000 		.4byte	.LLST11
+ 1692 0817 14       		.uleb128 0x14
+ 1693 0818 12080000 		.4byte	.LASF93
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 35
+
+
+ 1694 081c 01       		.byte	0x1
+ 1695 081d 77       		.byte	0x77
+ 1696 081e 7B030000 		.4byte	0x37b
+ 1697 0822 19020000 		.4byte	.LLST12
+ 1698 0826 15       		.uleb128 0x15
+ 1699 0827 73050000 		.4byte	.LASF106
+ 1700 082b 01       		.byte	0x1
+ 1701 082c 78       		.byte	0x78
+ 1702 082d 97000000 		.4byte	0x97
+ 1703 0831 3A020000 		.4byte	.LLST13
+ 1704 0835 15       		.uleb128 0x15
+ 1705 0836 47050000 		.4byte	.LASF115
+ 1706 083a 01       		.byte	0x1
+ 1707 083b 81       		.byte	0x81
+ 1708 083c 72040000 		.4byte	0x472
+ 1709 0840 4E020000 		.4byte	.LLST14
+ 1710 0844 18       		.uleb128 0x18
+ 1711 0845 18000000 		.4byte	.LVL50
+ 1712 0849 050A0000 		.4byte	0xa05
+ 1713 084d 5B080000 		.4byte	0x85b
+ 1714 0851 19       		.uleb128 0x19
+ 1715 0852 01       		.uleb128 0x1
+ 1716 0853 51       		.byte	0x51
+ 1717 0854 05       		.uleb128 0x5
+ 1718 0855 03       		.byte	0x3
+ 1719 0856 17000000 		.4byte	.LC4
+ 1720 085a 00       		.byte	0
+ 1721 085b 1A       		.uleb128 0x1a
+ 1722 085c 24000000 		.4byte	.LVL51
+ 1723 0860 6E080000 		.4byte	0x86e
+ 1724 0864 19       		.uleb128 0x19
+ 1725 0865 01       		.uleb128 0x1
+ 1726 0866 51       		.byte	0x51
+ 1727 0867 05       		.uleb128 0x5
+ 1728 0868 03       		.byte	0x3
+ 1729 0869 28020000 		.4byte	.LC18
+ 1730 086d 00       		.byte	0
+ 1731 086e 1B       		.uleb128 0x1b
+ 1732 086f 36000000 		.4byte	.LVL52
+ 1733 0873 02       		.uleb128 0x2
+ 1734 0874 75       		.byte	0x75
+ 1735 0875 00       		.sleb128 0
+ 1736 0876 8D080000 		.4byte	0x88d
+ 1737 087a 19       		.uleb128 0x19
+ 1738 087b 01       		.uleb128 0x1
+ 1739 087c 51       		.byte	0x51
+ 1740 087d 05       		.uleb128 0x5
+ 1741 087e 03       		.byte	0x3
+ 1742 087f 5A020000 		.4byte	.LC20
+ 1743 0883 19       		.uleb128 0x19
+ 1744 0884 01       		.uleb128 0x1
+ 1745 0885 52       		.byte	0x52
+ 1746 0886 05       		.uleb128 0x5
+ 1747 0887 03       		.byte	0x3
+ 1748 0888 55020000 		.4byte	.LC19
+ 1749 088c 00       		.byte	0
+ 1750 088d 1B       		.uleb128 0x1b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 36
+
+
+ 1751 088e 4A000000 		.4byte	.LVL53
+ 1752 0892 02       		.uleb128 0x2
+ 1753 0893 75       		.byte	0x75
+ 1754 0894 00       		.sleb128 0
+ 1755 0895 C1080000 		.4byte	0x8c1
+ 1756 0899 19       		.uleb128 0x19
+ 1757 089a 01       		.uleb128 0x1
+ 1758 089b 51       		.byte	0x51
+ 1759 089c 05       		.uleb128 0x5
+ 1760 089d 03       		.byte	0x3
+ 1761 089e 8A020000 		.4byte	.LC22
+ 1762 08a2 19       		.uleb128 0x19
+ 1763 08a3 01       		.uleb128 0x1
+ 1764 08a4 52       		.byte	0x52
+ 1765 08a5 01       		.uleb128 0x1
+ 1766 08a6 32       		.byte	0x32
+ 1767 08a7 19       		.uleb128 0x19
+ 1768 08a8 01       		.uleb128 0x1
+ 1769 08a9 53       		.byte	0x53
+ 1770 08aa 05       		.uleb128 0x5
+ 1771 08ab 03       		.byte	0x3
+ 1772 08ac 81020000 		.4byte	.LC21
+ 1773 08b0 19       		.uleb128 0x19
+ 1774 08b1 02       		.uleb128 0x2
+ 1775 08b2 7D       		.byte	0x7d
+ 1776 08b3 00       		.sleb128 0
+ 1777 08b4 01       		.uleb128 0x1
+ 1778 08b5 43       		.byte	0x43
+ 1779 08b6 19       		.uleb128 0x19
+ 1780 08b7 02       		.uleb128 0x2
+ 1781 08b8 7D       		.byte	0x7d
+ 1782 08b9 04       		.sleb128 4
+ 1783 08ba 05       		.uleb128 0x5
+ 1784 08bb 03       		.byte	0x3
+ 1785 08bc 9E020000 		.4byte	.LC23
+ 1786 08c0 00       		.byte	0
+ 1787 08c1 1C       		.uleb128 0x1c
+ 1788 08c2 66000000 		.4byte	.LVL55
+ 1789 08c6 02       		.uleb128 0x2
+ 1790 08c7 77       		.byte	0x77
+ 1791 08c8 00       		.sleb128 0
+ 1792 08c9 19       		.uleb128 0x19
+ 1793 08ca 01       		.uleb128 0x1
+ 1794 08cb 51       		.byte	0x51
+ 1795 08cc 05       		.uleb128 0x5
+ 1796 08cd 03       		.byte	0x3
+ 1797 08ce AB020000 		.4byte	.LC24
+ 1798 08d2 19       		.uleb128 0x19
+ 1799 08d3 01       		.uleb128 0x1
+ 1800 08d4 52       		.byte	0x52
+ 1801 08d5 01       		.uleb128 0x1
+ 1802 08d6 33       		.byte	0x33
+ 1803 08d7 19       		.uleb128 0x19
+ 1804 08d8 02       		.uleb128 0x2
+ 1805 08d9 7D       		.byte	0x7d
+ 1806 08da 00       		.sleb128 0
+ 1807 08db 02       		.uleb128 0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 37
+
+
+ 1808 08dc 76       		.byte	0x76
+ 1809 08dd 00       		.sleb128 0
+ 1810 08de 00       		.byte	0
+ 1811 08df 00       		.byte	0
+ 1812 08e0 1D       		.uleb128 0x1d
+ 1813 08e1 EA030000 		.4byte	.LASF116
+ 1814 08e5 01       		.byte	0x1
+ 1815 08e6 89       		.byte	0x89
+ 1816 08e7 97000000 		.4byte	0x97
+ 1817 08eb 00000000 		.4byte	.LFB72
+ 1818 08ef 54000000 		.4byte	.LFE72-.LFB72
+ 1819 08f3 01       		.uleb128 0x1
+ 1820 08f4 9C       		.byte	0x9c
+ 1821 08f5 B7090000 		.4byte	0x9b7
+ 1822 08f9 14       		.uleb128 0x14
+ 1823 08fa 98040000 		.4byte	.LASF105
+ 1824 08fe 01       		.byte	0x1
+ 1825 08ff 89       		.byte	0x89
+ 1826 0900 75030000 		.4byte	0x375
+ 1827 0904 61020000 		.4byte	.LLST15
+ 1828 0908 14       		.uleb128 0x14
+ 1829 0909 E7040000 		.4byte	.LASF94
+ 1830 090d 01       		.byte	0x1
+ 1831 090e 89       		.byte	0x89
+ 1832 090f 97000000 		.4byte	0x97
+ 1833 0913 8D020000 		.4byte	.LLST16
+ 1834 0917 14       		.uleb128 0x14
+ 1835 0918 12080000 		.4byte	.LASF93
+ 1836 091c 01       		.byte	0x1
+ 1837 091d 89       		.byte	0x89
+ 1838 091e 7B030000 		.4byte	0x37b
+ 1839 0922 AE020000 		.4byte	.LLST17
+ 1840 0926 15       		.uleb128 0x15
+ 1841 0927 73050000 		.4byte	.LASF106
+ 1842 092b 01       		.byte	0x1
+ 1843 092c 8A       		.byte	0x8a
+ 1844 092d 97000000 		.4byte	0x97
+ 1845 0931 CF020000 		.4byte	.LLST18
+ 1846 0935 18       		.uleb128 0x18
+ 1847 0936 18000000 		.4byte	.LVL61
+ 1848 093a 050A0000 		.4byte	0xa05
+ 1849 093e 4C090000 		.4byte	0x94c
+ 1850 0942 19       		.uleb128 0x19
+ 1851 0943 01       		.uleb128 0x1
+ 1852 0944 51       		.byte	0x51
+ 1853 0945 05       		.uleb128 0x5
+ 1854 0946 03       		.byte	0x3
+ 1855 0947 17000000 		.4byte	.LC4
+ 1856 094b 00       		.byte	0
+ 1857 094c 1A       		.uleb128 0x1a
+ 1858 094d 24000000 		.4byte	.LVL62
+ 1859 0951 5F090000 		.4byte	0x95f
+ 1860 0955 19       		.uleb128 0x19
+ 1861 0956 01       		.uleb128 0x1
+ 1862 0957 51       		.byte	0x51
+ 1863 0958 05       		.uleb128 0x5
+ 1864 0959 03       		.byte	0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 38
+
+
+ 1865 095a BD020000 		.4byte	.LC25
+ 1866 095e 00       		.byte	0
+ 1867 095f 17       		.uleb128 0x17
+ 1868 0960 2A000000 		.4byte	.LVL63
+ 1869 0964 510A0000 		.4byte	0xa51
+ 1870 0968 18       		.uleb128 0x18
+ 1871 0969 36000000 		.4byte	.LVL64
+ 1872 096d 5C0A0000 		.4byte	0xa5c
+ 1873 0971 88090000 		.4byte	0x988
+ 1874 0975 19       		.uleb128 0x19
+ 1875 0976 01       		.uleb128 0x1
+ 1876 0977 50       		.byte	0x50
+ 1877 0978 02       		.uleb128 0x2
+ 1878 0979 74       		.byte	0x74
+ 1879 097a 00       		.sleb128 0
+ 1880 097b 19       		.uleb128 0x19
+ 1881 097c 01       		.uleb128 0x1
+ 1882 097d 51       		.byte	0x51
+ 1883 097e 03       		.uleb128 0x3
+ 1884 097f 0A       		.byte	0xa
+ 1885 0980 0010     		.2byte	0x1000
+ 1886 0982 19       		.uleb128 0x19
+ 1887 0983 01       		.uleb128 0x1
+ 1888 0984 52       		.byte	0x52
+ 1889 0985 01       		.uleb128 0x1
+ 1890 0986 30       		.byte	0x30
+ 1891 0987 00       		.byte	0
+ 1892 0988 18       		.uleb128 0x18
+ 1893 0989 40000000 		.4byte	.LVL65
+ 1894 098d 5C0A0000 		.4byte	0xa5c
+ 1895 0991 A6090000 		.4byte	0x9a6
+ 1896 0995 19       		.uleb128 0x19
+ 1897 0996 01       		.uleb128 0x1
+ 1898 0997 50       		.byte	0x50
+ 1899 0998 02       		.uleb128 0x2
+ 1900 0999 74       		.byte	0x74
+ 1901 099a 00       		.sleb128 0
+ 1902 099b 19       		.uleb128 0x19
+ 1903 099c 01       		.uleb128 0x1
+ 1904 099d 51       		.byte	0x51
+ 1905 099e 01       		.uleb128 0x1
+ 1906 099f 30       		.byte	0x30
+ 1907 09a0 19       		.uleb128 0x19
+ 1908 09a1 01       		.uleb128 0x1
+ 1909 09a2 52       		.byte	0x52
+ 1910 09a3 01       		.uleb128 0x1
+ 1911 09a4 30       		.byte	0x30
+ 1912 09a5 00       		.byte	0
+ 1913 09a6 1F       		.uleb128 0x1f
+ 1914 09a7 46000000 		.4byte	.LVL66
+ 1915 09ab 670A0000 		.4byte	0xa67
+ 1916 09af 19       		.uleb128 0x19
+ 1917 09b0 01       		.uleb128 0x1
+ 1918 09b1 50       		.byte	0x50
+ 1919 09b2 02       		.uleb128 0x2
+ 1920 09b3 74       		.byte	0x74
+ 1921 09b4 00       		.sleb128 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 39
+
+
+ 1922 09b5 00       		.byte	0
+ 1923 09b6 00       		.byte	0
+ 1924 09b7 20       		.uleb128 0x20
+ 1925 09b8 FC000000 		.4byte	.LASF117
+ 1926 09bc 08       		.byte	0x8
+ 1927 09bd 1207     		.2byte	0x712
+ 1928 09bf C3090000 		.4byte	0x9c3
+ 1929 09c3 21       		.uleb128 0x21
+ 1930 09c4 AD000000 		.4byte	0xad
+ 1931 09c8 22       		.uleb128 0x22
+ 1932 09c9 97060000 		.4byte	.LASF118
+ 1933 09cd 09       		.byte	0x9
+ 1934 09ce 0B       		.byte	0xb
+ 1935 09cf DA070000 		.4byte	0x7da
+ 1936 09d3 05       		.uleb128 0x5
+ 1937 09d4 03       		.byte	0x3
+ 1938 09d5 00000000 		.4byte	head
+ 1939 09d9 23       		.uleb128 0x23
+ 1940 09da 77030000 		.4byte	.LASF119
+ 1941 09de 77030000 		.4byte	.LASF119
+ 1942 09e2 0A       		.byte	0xa
+ 1943 09e3 21       		.byte	0x21
+ 1944 09e4 23       		.uleb128 0x23
+ 1945 09e5 37030000 		.4byte	.LASF120
+ 1946 09e9 37030000 		.4byte	.LASF120
+ 1947 09ed 0B       		.byte	0xb
+ 1948 09ee B0       		.byte	0xb0
+ 1949 09ef 23       		.uleb128 0x23
+ 1950 09f0 50040000 		.4byte	.LASF121
+ 1951 09f4 50040000 		.4byte	.LASF121
+ 1952 09f8 0A       		.byte	0xa
+ 1953 09f9 1E       		.byte	0x1e
+ 1954 09fa 23       		.uleb128 0x23
+ 1955 09fb 4F010000 		.4byte	.LASF122
+ 1956 09ff 4F010000 		.4byte	.LASF122
+ 1957 0a03 07       		.byte	0x7
+ 1958 0a04 23       		.byte	0x23
+ 1959 0a05 23       		.uleb128 0x23
+ 1960 0a06 12000000 		.4byte	.LASF123
+ 1961 0a0a 12000000 		.4byte	.LASF123
+ 1962 0a0e 0A       		.byte	0xa
+ 1963 0a0f 1C       		.byte	0x1c
+ 1964 0a10 23       		.uleb128 0x23
+ 1965 0a11 E2050000 		.4byte	.LASF124
+ 1966 0a15 E2050000 		.4byte	.LASF124
+ 1967 0a19 0C       		.byte	0xc
+ 1968 0a1a 4D       		.byte	0x4d
+ 1969 0a1b 23       		.uleb128 0x23
+ 1970 0a1c 77020000 		.4byte	.LASF125
+ 1971 0a20 77020000 		.4byte	.LASF125
+ 1972 0a24 07       		.byte	0x7
+ 1973 0a25 22       		.byte	0x22
+ 1974 0a26 24       		.uleb128 0x24
+ 1975 0a27 AD070000 		.4byte	.LASF136
+ 1976 0a2b AD070000 		.4byte	.LASF136
+ 1977 0a2f 25       		.uleb128 0x25
+ 1978 0a30 3B000000 		.4byte	.LASF126
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 40
+
+
+ 1979 0a34 3B000000 		.4byte	.LASF126
+ 1980 0a38 06       		.byte	0x6
+ 1981 0a39 0901     		.2byte	0x109
+ 1982 0a3b 23       		.uleb128 0x23
+ 1983 0a3c 4F050000 		.4byte	.LASF127
+ 1984 0a40 4F050000 		.4byte	.LASF127
+ 1985 0a44 07       		.byte	0x7
+ 1986 0a45 1F       		.byte	0x1f
+ 1987 0a46 23       		.uleb128 0x23
+ 1988 0a47 8D060000 		.4byte	.LASF128
+ 1989 0a4b 8D060000 		.4byte	.LASF128
+ 1990 0a4f 0B       		.byte	0xb
+ 1991 0a50 B1       		.byte	0xb1
+ 1992 0a51 23       		.uleb128 0x23
+ 1993 0a52 77000000 		.4byte	.LASF129
+ 1994 0a56 77000000 		.4byte	.LASF129
+ 1995 0a5a 0D       		.byte	0xd
+ 1996 0a5b 2B       		.byte	0x2b
+ 1997 0a5c 23       		.uleb128 0x23
+ 1998 0a5d 1B050000 		.4byte	.LASF130
+ 1999 0a61 1B050000 		.4byte	.LASF130
+ 2000 0a65 06       		.byte	0x6
+ 2001 0a66 FC       		.byte	0xfc
+ 2002 0a67 23       		.uleb128 0x23
+ 2003 0a68 86030000 		.4byte	.LASF131
+ 2004 0a6c 86030000 		.4byte	.LASF131
+ 2005 0a70 06       		.byte	0x6
+ 2006 0a71 F4       		.byte	0xf4
+ 2007 0a72 00       		.byte	0
+ 2008              		.section	.debug_abbrev,"",%progbits
+ 2009              	.Ldebug_abbrev0:
+ 2010 0000 01       		.uleb128 0x1
+ 2011 0001 11       		.uleb128 0x11
+ 2012 0002 01       		.byte	0x1
+ 2013 0003 25       		.uleb128 0x25
+ 2014 0004 0E       		.uleb128 0xe
+ 2015 0005 13       		.uleb128 0x13
+ 2016 0006 0B       		.uleb128 0xb
+ 2017 0007 03       		.uleb128 0x3
+ 2018 0008 0E       		.uleb128 0xe
+ 2019 0009 1B       		.uleb128 0x1b
+ 2020 000a 0E       		.uleb128 0xe
+ 2021 000b 55       		.uleb128 0x55
+ 2022 000c 17       		.uleb128 0x17
+ 2023 000d 11       		.uleb128 0x11
+ 2024 000e 01       		.uleb128 0x1
+ 2025 000f 10       		.uleb128 0x10
+ 2026 0010 17       		.uleb128 0x17
+ 2027 0011 00       		.byte	0
+ 2028 0012 00       		.byte	0
+ 2029 0013 02       		.uleb128 0x2
+ 2030 0014 24       		.uleb128 0x24
+ 2031 0015 00       		.byte	0
+ 2032 0016 0B       		.uleb128 0xb
+ 2033 0017 0B       		.uleb128 0xb
+ 2034 0018 3E       		.uleb128 0x3e
+ 2035 0019 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 41
+
+
+ 2036 001a 03       		.uleb128 0x3
+ 2037 001b 0E       		.uleb128 0xe
+ 2038 001c 00       		.byte	0
+ 2039 001d 00       		.byte	0
+ 2040 001e 03       		.uleb128 0x3
+ 2041 001f 16       		.uleb128 0x16
+ 2042 0020 00       		.byte	0
+ 2043 0021 03       		.uleb128 0x3
+ 2044 0022 0E       		.uleb128 0xe
+ 2045 0023 3A       		.uleb128 0x3a
+ 2046 0024 0B       		.uleb128 0xb
+ 2047 0025 3B       		.uleb128 0x3b
+ 2048 0026 0B       		.uleb128 0xb
+ 2049 0027 49       		.uleb128 0x49
+ 2050 0028 13       		.uleb128 0x13
+ 2051 0029 00       		.byte	0
+ 2052 002a 00       		.byte	0
+ 2053 002b 04       		.uleb128 0x4
+ 2054 002c 24       		.uleb128 0x24
+ 2055 002d 00       		.byte	0
+ 2056 002e 0B       		.uleb128 0xb
+ 2057 002f 0B       		.uleb128 0xb
+ 2058 0030 3E       		.uleb128 0x3e
+ 2059 0031 0B       		.uleb128 0xb
+ 2060 0032 03       		.uleb128 0x3
+ 2061 0033 08       		.uleb128 0x8
+ 2062 0034 00       		.byte	0
+ 2063 0035 00       		.byte	0
+ 2064 0036 05       		.uleb128 0x5
+ 2065 0037 0F       		.uleb128 0xf
+ 2066 0038 00       		.byte	0
+ 2067 0039 0B       		.uleb128 0xb
+ 2068 003a 0B       		.uleb128 0xb
+ 2069 003b 00       		.byte	0
+ 2070 003c 00       		.byte	0
+ 2071 003d 06       		.uleb128 0x6
+ 2072 003e 0F       		.uleb128 0xf
+ 2073 003f 00       		.byte	0
+ 2074 0040 0B       		.uleb128 0xb
+ 2075 0041 0B       		.uleb128 0xb
+ 2076 0042 49       		.uleb128 0x49
+ 2077 0043 13       		.uleb128 0x13
+ 2078 0044 00       		.byte	0
+ 2079 0045 00       		.byte	0
+ 2080 0046 07       		.uleb128 0x7
+ 2081 0047 26       		.uleb128 0x26
+ 2082 0048 00       		.byte	0
+ 2083 0049 49       		.uleb128 0x49
+ 2084 004a 13       		.uleb128 0x13
+ 2085 004b 00       		.byte	0
+ 2086 004c 00       		.byte	0
+ 2087 004d 08       		.uleb128 0x8
+ 2088 004e 13       		.uleb128 0x13
+ 2089 004f 00       		.byte	0
+ 2090 0050 03       		.uleb128 0x3
+ 2091 0051 0E       		.uleb128 0xe
+ 2092 0052 3C       		.uleb128 0x3c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 42
+
+
+ 2093 0053 19       		.uleb128 0x19
+ 2094 0054 00       		.byte	0
+ 2095 0055 00       		.byte	0
+ 2096 0056 09       		.uleb128 0x9
+ 2097 0057 04       		.uleb128 0x4
+ 2098 0058 01       		.byte	0x1
+ 2099 0059 03       		.uleb128 0x3
+ 2100 005a 0E       		.uleb128 0xe
+ 2101 005b 0B       		.uleb128 0xb
+ 2102 005c 0B       		.uleb128 0xb
+ 2103 005d 49       		.uleb128 0x49
+ 2104 005e 13       		.uleb128 0x13
+ 2105 005f 3A       		.uleb128 0x3a
+ 2106 0060 0B       		.uleb128 0xb
+ 2107 0061 3B       		.uleb128 0x3b
+ 2108 0062 0B       		.uleb128 0xb
+ 2109 0063 01       		.uleb128 0x1
+ 2110 0064 13       		.uleb128 0x13
+ 2111 0065 00       		.byte	0
+ 2112 0066 00       		.byte	0
+ 2113 0067 0A       		.uleb128 0xa
+ 2114 0068 28       		.uleb128 0x28
+ 2115 0069 00       		.byte	0
+ 2116 006a 03       		.uleb128 0x3
+ 2117 006b 0E       		.uleb128 0xe
+ 2118 006c 1C       		.uleb128 0x1c
+ 2119 006d 0B       		.uleb128 0xb
+ 2120 006e 00       		.byte	0
+ 2121 006f 00       		.byte	0
+ 2122 0070 0B       		.uleb128 0xb
+ 2123 0071 13       		.uleb128 0x13
+ 2124 0072 01       		.byte	0x1
+ 2125 0073 03       		.uleb128 0x3
+ 2126 0074 0E       		.uleb128 0xe
+ 2127 0075 0B       		.uleb128 0xb
+ 2128 0076 0B       		.uleb128 0xb
+ 2129 0077 3A       		.uleb128 0x3a
+ 2130 0078 0B       		.uleb128 0xb
+ 2131 0079 3B       		.uleb128 0x3b
+ 2132 007a 0B       		.uleb128 0xb
+ 2133 007b 01       		.uleb128 0x1
+ 2134 007c 13       		.uleb128 0x13
+ 2135 007d 00       		.byte	0
+ 2136 007e 00       		.byte	0
+ 2137 007f 0C       		.uleb128 0xc
+ 2138 0080 0D       		.uleb128 0xd
+ 2139 0081 00       		.byte	0
+ 2140 0082 03       		.uleb128 0x3
+ 2141 0083 0E       		.uleb128 0xe
+ 2142 0084 3A       		.uleb128 0x3a
+ 2143 0085 0B       		.uleb128 0xb
+ 2144 0086 3B       		.uleb128 0x3b
+ 2145 0087 0B       		.uleb128 0xb
+ 2146 0088 49       		.uleb128 0x49
+ 2147 0089 13       		.uleb128 0x13
+ 2148 008a 38       		.uleb128 0x38
+ 2149 008b 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 43
+
+
+ 2150 008c 00       		.byte	0
+ 2151 008d 00       		.byte	0
+ 2152 008e 0D       		.uleb128 0xd
+ 2153 008f 15       		.uleb128 0x15
+ 2154 0090 01       		.byte	0x1
+ 2155 0091 27       		.uleb128 0x27
+ 2156 0092 19       		.uleb128 0x19
+ 2157 0093 49       		.uleb128 0x49
+ 2158 0094 13       		.uleb128 0x13
+ 2159 0095 01       		.uleb128 0x1
+ 2160 0096 13       		.uleb128 0x13
+ 2161 0097 00       		.byte	0
+ 2162 0098 00       		.byte	0
+ 2163 0099 0E       		.uleb128 0xe
+ 2164 009a 05       		.uleb128 0x5
+ 2165 009b 00       		.byte	0
+ 2166 009c 49       		.uleb128 0x49
+ 2167 009d 13       		.uleb128 0x13
+ 2168 009e 00       		.byte	0
+ 2169 009f 00       		.byte	0
+ 2170 00a0 0F       		.uleb128 0xf
+ 2171 00a1 18       		.uleb128 0x18
+ 2172 00a2 00       		.byte	0
+ 2173 00a3 00       		.byte	0
+ 2174 00a4 00       		.byte	0
+ 2175 00a5 10       		.uleb128 0x10
+ 2176 00a6 13       		.uleb128 0x13
+ 2177 00a7 01       		.byte	0x1
+ 2178 00a8 0B       		.uleb128 0xb
+ 2179 00a9 0B       		.uleb128 0xb
+ 2180 00aa 3A       		.uleb128 0x3a
+ 2181 00ab 0B       		.uleb128 0xb
+ 2182 00ac 3B       		.uleb128 0x3b
+ 2183 00ad 0B       		.uleb128 0xb
+ 2184 00ae 01       		.uleb128 0x1
+ 2185 00af 13       		.uleb128 0x13
+ 2186 00b0 00       		.byte	0
+ 2187 00b1 00       		.byte	0
+ 2188 00b2 11       		.uleb128 0x11
+ 2189 00b3 01       		.uleb128 0x1
+ 2190 00b4 01       		.byte	0x1
+ 2191 00b5 49       		.uleb128 0x49
+ 2192 00b6 13       		.uleb128 0x13
+ 2193 00b7 01       		.uleb128 0x1
+ 2194 00b8 13       		.uleb128 0x13
+ 2195 00b9 00       		.byte	0
+ 2196 00ba 00       		.byte	0
+ 2197 00bb 12       		.uleb128 0x12
+ 2198 00bc 21       		.uleb128 0x21
+ 2199 00bd 00       		.byte	0
+ 2200 00be 49       		.uleb128 0x49
+ 2201 00bf 13       		.uleb128 0x13
+ 2202 00c0 2F       		.uleb128 0x2f
+ 2203 00c1 0B       		.uleb128 0xb
+ 2204 00c2 00       		.byte	0
+ 2205 00c3 00       		.byte	0
+ 2206 00c4 13       		.uleb128 0x13
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 44
+
+
+ 2207 00c5 2E       		.uleb128 0x2e
+ 2208 00c6 01       		.byte	0x1
+ 2209 00c7 3F       		.uleb128 0x3f
+ 2210 00c8 19       		.uleb128 0x19
+ 2211 00c9 03       		.uleb128 0x3
+ 2212 00ca 0E       		.uleb128 0xe
+ 2213 00cb 3A       		.uleb128 0x3a
+ 2214 00cc 0B       		.uleb128 0xb
+ 2215 00cd 3B       		.uleb128 0x3b
+ 2216 00ce 0B       		.uleb128 0xb
+ 2217 00cf 27       		.uleb128 0x27
+ 2218 00d0 19       		.uleb128 0x19
+ 2219 00d1 49       		.uleb128 0x49
+ 2220 00d2 13       		.uleb128 0x13
+ 2221 00d3 11       		.uleb128 0x11
+ 2222 00d4 01       		.uleb128 0x1
+ 2223 00d5 12       		.uleb128 0x12
+ 2224 00d6 06       		.uleb128 0x6
+ 2225 00d7 40       		.uleb128 0x40
+ 2226 00d8 18       		.uleb128 0x18
+ 2227 00d9 9642     		.uleb128 0x2116
+ 2228 00db 19       		.uleb128 0x19
+ 2229 00dc 01       		.uleb128 0x1
+ 2230 00dd 13       		.uleb128 0x13
+ 2231 00de 00       		.byte	0
+ 2232 00df 00       		.byte	0
+ 2233 00e0 14       		.uleb128 0x14
+ 2234 00e1 05       		.uleb128 0x5
+ 2235 00e2 00       		.byte	0
+ 2236 00e3 03       		.uleb128 0x3
+ 2237 00e4 0E       		.uleb128 0xe
+ 2238 00e5 3A       		.uleb128 0x3a
+ 2239 00e6 0B       		.uleb128 0xb
+ 2240 00e7 3B       		.uleb128 0x3b
+ 2241 00e8 0B       		.uleb128 0xb
+ 2242 00e9 49       		.uleb128 0x49
+ 2243 00ea 13       		.uleb128 0x13
+ 2244 00eb 02       		.uleb128 0x2
+ 2245 00ec 17       		.uleb128 0x17
+ 2246 00ed 00       		.byte	0
+ 2247 00ee 00       		.byte	0
+ 2248 00ef 15       		.uleb128 0x15
+ 2249 00f0 34       		.uleb128 0x34
+ 2250 00f1 00       		.byte	0
+ 2251 00f2 03       		.uleb128 0x3
+ 2252 00f3 0E       		.uleb128 0xe
+ 2253 00f4 3A       		.uleb128 0x3a
+ 2254 00f5 0B       		.uleb128 0xb
+ 2255 00f6 3B       		.uleb128 0x3b
+ 2256 00f7 0B       		.uleb128 0xb
+ 2257 00f8 49       		.uleb128 0x49
+ 2258 00f9 13       		.uleb128 0x13
+ 2259 00fa 02       		.uleb128 0x2
+ 2260 00fb 17       		.uleb128 0x17
+ 2261 00fc 00       		.byte	0
+ 2262 00fd 00       		.byte	0
+ 2263 00fe 16       		.uleb128 0x16
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 45
+
+
+ 2264 00ff 0B       		.uleb128 0xb
+ 2265 0100 01       		.byte	0x1
+ 2266 0101 11       		.uleb128 0x11
+ 2267 0102 01       		.uleb128 0x1
+ 2268 0103 12       		.uleb128 0x12
+ 2269 0104 06       		.uleb128 0x6
+ 2270 0105 01       		.uleb128 0x1
+ 2271 0106 13       		.uleb128 0x13
+ 2272 0107 00       		.byte	0
+ 2273 0108 00       		.byte	0
+ 2274 0109 17       		.uleb128 0x17
+ 2275 010a 898201   		.uleb128 0x4109
+ 2276 010d 00       		.byte	0
+ 2277 010e 11       		.uleb128 0x11
+ 2278 010f 01       		.uleb128 0x1
+ 2279 0110 31       		.uleb128 0x31
+ 2280 0111 13       		.uleb128 0x13
+ 2281 0112 00       		.byte	0
+ 2282 0113 00       		.byte	0
+ 2283 0114 18       		.uleb128 0x18
+ 2284 0115 898201   		.uleb128 0x4109
+ 2285 0118 01       		.byte	0x1
+ 2286 0119 11       		.uleb128 0x11
+ 2287 011a 01       		.uleb128 0x1
+ 2288 011b 31       		.uleb128 0x31
+ 2289 011c 13       		.uleb128 0x13
+ 2290 011d 01       		.uleb128 0x1
+ 2291 011e 13       		.uleb128 0x13
+ 2292 011f 00       		.byte	0
+ 2293 0120 00       		.byte	0
+ 2294 0121 19       		.uleb128 0x19
+ 2295 0122 8A8201   		.uleb128 0x410a
+ 2296 0125 00       		.byte	0
+ 2297 0126 02       		.uleb128 0x2
+ 2298 0127 18       		.uleb128 0x18
+ 2299 0128 9142     		.uleb128 0x2111
+ 2300 012a 18       		.uleb128 0x18
+ 2301 012b 00       		.byte	0
+ 2302 012c 00       		.byte	0
+ 2303 012d 1A       		.uleb128 0x1a
+ 2304 012e 898201   		.uleb128 0x4109
+ 2305 0131 01       		.byte	0x1
+ 2306 0132 11       		.uleb128 0x11
+ 2307 0133 01       		.uleb128 0x1
+ 2308 0134 01       		.uleb128 0x1
+ 2309 0135 13       		.uleb128 0x13
+ 2310 0136 00       		.byte	0
+ 2311 0137 00       		.byte	0
+ 2312 0138 1B       		.uleb128 0x1b
+ 2313 0139 898201   		.uleb128 0x4109
+ 2314 013c 01       		.byte	0x1
+ 2315 013d 11       		.uleb128 0x11
+ 2316 013e 01       		.uleb128 0x1
+ 2317 013f 9342     		.uleb128 0x2113
+ 2318 0141 18       		.uleb128 0x18
+ 2319 0142 01       		.uleb128 0x1
+ 2320 0143 13       		.uleb128 0x13
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 46
+
+
+ 2321 0144 00       		.byte	0
+ 2322 0145 00       		.byte	0
+ 2323 0146 1C       		.uleb128 0x1c
+ 2324 0147 898201   		.uleb128 0x4109
+ 2325 014a 01       		.byte	0x1
+ 2326 014b 11       		.uleb128 0x11
+ 2327 014c 01       		.uleb128 0x1
+ 2328 014d 9342     		.uleb128 0x2113
+ 2329 014f 18       		.uleb128 0x18
+ 2330 0150 00       		.byte	0
+ 2331 0151 00       		.byte	0
+ 2332 0152 1D       		.uleb128 0x1d
+ 2333 0153 2E       		.uleb128 0x2e
+ 2334 0154 01       		.byte	0x1
+ 2335 0155 3F       		.uleb128 0x3f
+ 2336 0156 19       		.uleb128 0x19
+ 2337 0157 03       		.uleb128 0x3
+ 2338 0158 0E       		.uleb128 0xe
+ 2339 0159 3A       		.uleb128 0x3a
+ 2340 015a 0B       		.uleb128 0xb
+ 2341 015b 3B       		.uleb128 0x3b
+ 2342 015c 0B       		.uleb128 0xb
+ 2343 015d 27       		.uleb128 0x27
+ 2344 015e 19       		.uleb128 0x19
+ 2345 015f 49       		.uleb128 0x49
+ 2346 0160 13       		.uleb128 0x13
+ 2347 0161 11       		.uleb128 0x11
+ 2348 0162 01       		.uleb128 0x1
+ 2349 0163 12       		.uleb128 0x12
+ 2350 0164 06       		.uleb128 0x6
+ 2351 0165 40       		.uleb128 0x40
+ 2352 0166 18       		.uleb128 0x18
+ 2353 0167 9742     		.uleb128 0x2117
+ 2354 0169 19       		.uleb128 0x19
+ 2355 016a 01       		.uleb128 0x1
+ 2356 016b 13       		.uleb128 0x13
+ 2357 016c 00       		.byte	0
+ 2358 016d 00       		.byte	0
+ 2359 016e 1E       		.uleb128 0x1e
+ 2360 016f 34       		.uleb128 0x34
+ 2361 0170 00       		.byte	0
+ 2362 0171 03       		.uleb128 0x3
+ 2363 0172 08       		.uleb128 0x8
+ 2364 0173 3A       		.uleb128 0x3a
+ 2365 0174 0B       		.uleb128 0xb
+ 2366 0175 3B       		.uleb128 0x3b
+ 2367 0176 0B       		.uleb128 0xb
+ 2368 0177 49       		.uleb128 0x49
+ 2369 0178 13       		.uleb128 0x13
+ 2370 0179 02       		.uleb128 0x2
+ 2371 017a 18       		.uleb128 0x18
+ 2372 017b 00       		.byte	0
+ 2373 017c 00       		.byte	0
+ 2374 017d 1F       		.uleb128 0x1f
+ 2375 017e 898201   		.uleb128 0x4109
+ 2376 0181 01       		.byte	0x1
+ 2377 0182 11       		.uleb128 0x11
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 47
+
+
+ 2378 0183 01       		.uleb128 0x1
+ 2379 0184 31       		.uleb128 0x31
+ 2380 0185 13       		.uleb128 0x13
+ 2381 0186 00       		.byte	0
+ 2382 0187 00       		.byte	0
+ 2383 0188 20       		.uleb128 0x20
+ 2384 0189 34       		.uleb128 0x34
+ 2385 018a 00       		.byte	0
+ 2386 018b 03       		.uleb128 0x3
+ 2387 018c 0E       		.uleb128 0xe
+ 2388 018d 3A       		.uleb128 0x3a
+ 2389 018e 0B       		.uleb128 0xb
+ 2390 018f 3B       		.uleb128 0x3b
+ 2391 0190 05       		.uleb128 0x5
+ 2392 0191 49       		.uleb128 0x49
+ 2393 0192 13       		.uleb128 0x13
+ 2394 0193 3F       		.uleb128 0x3f
+ 2395 0194 19       		.uleb128 0x19
+ 2396 0195 3C       		.uleb128 0x3c
+ 2397 0196 19       		.uleb128 0x19
+ 2398 0197 00       		.byte	0
+ 2399 0198 00       		.byte	0
+ 2400 0199 21       		.uleb128 0x21
+ 2401 019a 35       		.uleb128 0x35
+ 2402 019b 00       		.byte	0
+ 2403 019c 49       		.uleb128 0x49
+ 2404 019d 13       		.uleb128 0x13
+ 2405 019e 00       		.byte	0
+ 2406 019f 00       		.byte	0
+ 2407 01a0 22       		.uleb128 0x22
+ 2408 01a1 34       		.uleb128 0x34
+ 2409 01a2 00       		.byte	0
+ 2410 01a3 03       		.uleb128 0x3
+ 2411 01a4 0E       		.uleb128 0xe
+ 2412 01a5 3A       		.uleb128 0x3a
+ 2413 01a6 0B       		.uleb128 0xb
+ 2414 01a7 3B       		.uleb128 0x3b
+ 2415 01a8 0B       		.uleb128 0xb
+ 2416 01a9 49       		.uleb128 0x49
+ 2417 01aa 13       		.uleb128 0x13
+ 2418 01ab 3F       		.uleb128 0x3f
+ 2419 01ac 19       		.uleb128 0x19
+ 2420 01ad 02       		.uleb128 0x2
+ 2421 01ae 18       		.uleb128 0x18
+ 2422 01af 00       		.byte	0
+ 2423 01b0 00       		.byte	0
+ 2424 01b1 23       		.uleb128 0x23
+ 2425 01b2 2E       		.uleb128 0x2e
+ 2426 01b3 00       		.byte	0
+ 2427 01b4 3F       		.uleb128 0x3f
+ 2428 01b5 19       		.uleb128 0x19
+ 2429 01b6 3C       		.uleb128 0x3c
+ 2430 01b7 19       		.uleb128 0x19
+ 2431 01b8 6E       		.uleb128 0x6e
+ 2432 01b9 0E       		.uleb128 0xe
+ 2433 01ba 03       		.uleb128 0x3
+ 2434 01bb 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 48
+
+
+ 2435 01bc 3A       		.uleb128 0x3a
+ 2436 01bd 0B       		.uleb128 0xb
+ 2437 01be 3B       		.uleb128 0x3b
+ 2438 01bf 0B       		.uleb128 0xb
+ 2439 01c0 00       		.byte	0
+ 2440 01c1 00       		.byte	0
+ 2441 01c2 24       		.uleb128 0x24
+ 2442 01c3 2E       		.uleb128 0x2e
+ 2443 01c4 00       		.byte	0
+ 2444 01c5 3F       		.uleb128 0x3f
+ 2445 01c6 19       		.uleb128 0x19
+ 2446 01c7 3C       		.uleb128 0x3c
+ 2447 01c8 19       		.uleb128 0x19
+ 2448 01c9 6E       		.uleb128 0x6e
+ 2449 01ca 0E       		.uleb128 0xe
+ 2450 01cb 03       		.uleb128 0x3
+ 2451 01cc 0E       		.uleb128 0xe
+ 2452 01cd 00       		.byte	0
+ 2453 01ce 00       		.byte	0
+ 2454 01cf 25       		.uleb128 0x25
+ 2455 01d0 2E       		.uleb128 0x2e
+ 2456 01d1 00       		.byte	0
+ 2457 01d2 3F       		.uleb128 0x3f
+ 2458 01d3 19       		.uleb128 0x19
+ 2459 01d4 3C       		.uleb128 0x3c
+ 2460 01d5 19       		.uleb128 0x19
+ 2461 01d6 6E       		.uleb128 0x6e
+ 2462 01d7 0E       		.uleb128 0xe
+ 2463 01d8 03       		.uleb128 0x3
+ 2464 01d9 0E       		.uleb128 0xe
+ 2465 01da 3A       		.uleb128 0x3a
+ 2466 01db 0B       		.uleb128 0xb
+ 2467 01dc 3B       		.uleb128 0x3b
+ 2468 01dd 05       		.uleb128 0x5
+ 2469 01de 00       		.byte	0
+ 2470 01df 00       		.byte	0
+ 2471 01e0 00       		.byte	0
+ 2472              		.section	.debug_loc,"",%progbits
+ 2473              	.Ldebug_loc0:
+ 2474              	.LLST0:
+ 2475 0000 00000000 		.4byte	.LVL0
+ 2476 0004 0E000000 		.4byte	.LVL1
+ 2477 0008 0100     		.2byte	0x1
+ 2478 000a 50       		.byte	0x50
+ 2479 000b 0E000000 		.4byte	.LVL1
+ 2480 000f 42010000 		.4byte	.LVL35
+ 2481 0013 0100     		.2byte	0x1
+ 2482 0015 54       		.byte	0x54
+ 2483 0016 42010000 		.4byte	.LVL35
+ 2484 001a 90010000 		.4byte	.LFE69
+ 2485 001e 0400     		.2byte	0x4
+ 2486 0020 F3       		.byte	0xf3
+ 2487 0021 01       		.uleb128 0x1
+ 2488 0022 50       		.byte	0x50
+ 2489 0023 9F       		.byte	0x9f
+ 2490 0024 00000000 		.4byte	0
+ 2491 0028 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 49
+
+
+ 2492              	.LLST1:
+ 2493 002c 00000000 		.4byte	.LVL0
+ 2494 0030 0E000000 		.4byte	.LVL1
+ 2495 0034 0100     		.2byte	0x1
+ 2496 0036 51       		.byte	0x51
+ 2497 0037 0E000000 		.4byte	.LVL1
+ 2498 003b 90010000 		.4byte	.LFE69
+ 2499 003f 0400     		.2byte	0x4
+ 2500 0041 F3       		.byte	0xf3
+ 2501 0042 01       		.uleb128 0x1
+ 2502 0043 51       		.byte	0x51
+ 2503 0044 9F       		.byte	0x9f
+ 2504 0045 00000000 		.4byte	0
+ 2505 0049 00000000 		.4byte	0
+ 2506              	.LLST2:
+ 2507 004d 00000000 		.4byte	.LVL0
+ 2508 0051 0E000000 		.4byte	.LVL1
+ 2509 0055 0100     		.2byte	0x1
+ 2510 0057 52       		.byte	0x52
+ 2511 0058 0E000000 		.4byte	.LVL1
+ 2512 005c 42010000 		.4byte	.LVL35
+ 2513 0060 0100     		.2byte	0x1
+ 2514 0062 58       		.byte	0x58
+ 2515 0063 42010000 		.4byte	.LVL35
+ 2516 0067 90010000 		.4byte	.LFE69
+ 2517 006b 0400     		.2byte	0x4
+ 2518 006d F3       		.byte	0xf3
+ 2519 006e 01       		.uleb128 0x1
+ 2520 006f 52       		.byte	0x52
+ 2521 0070 9F       		.byte	0x9f
+ 2522 0071 00000000 		.4byte	0
+ 2523 0075 00000000 		.4byte	0
+ 2524              	.LLST3:
+ 2525 0079 00000000 		.4byte	.LVL0
+ 2526 007d 0E000000 		.4byte	.LVL1
+ 2527 0081 0200     		.2byte	0x2
+ 2528 0083 30       		.byte	0x30
+ 2529 0084 9F       		.byte	0x9f
+ 2530 0085 7A000000 		.4byte	.LVL12
+ 2531 0089 7E000000 		.4byte	.LVL13
+ 2532 008d 0100     		.2byte	0x1
+ 2533 008f 5A       		.byte	0x5a
+ 2534 0090 7E000000 		.4byte	.LVL13
+ 2535 0094 9E000000 		.4byte	.LVL15
+ 2536 0098 0100     		.2byte	0x1
+ 2537 009a 55       		.byte	0x55
+ 2538 009b AA000000 		.4byte	.LVL17
+ 2539 009f AE000000 		.4byte	.LVL18
+ 2540 00a3 0100     		.2byte	0x1
+ 2541 00a5 5A       		.byte	0x5a
+ 2542 00a6 AE000000 		.4byte	.LVL18
+ 2543 00aa DA000000 		.4byte	.LVL23
+ 2544 00ae 0100     		.2byte	0x1
+ 2545 00b0 55       		.byte	0x55
+ 2546 00b1 E2000000 		.4byte	.LVL25
+ 2547 00b5 E6000000 		.4byte	.LVL26
+ 2548 00b9 0100     		.2byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 50
+
+
+ 2549 00bb 55       		.byte	0x55
+ 2550 00bc EE000000 		.4byte	.LVL29
+ 2551 00c0 F2000000 		.4byte	.LVL30
+ 2552 00c4 0100     		.2byte	0x1
+ 2553 00c6 55       		.byte	0x55
+ 2554 00c7 12010000 		.4byte	.LVL31
+ 2555 00cb 18010000 		.4byte	.LVL32
+ 2556 00cf 0200     		.2byte	0x2
+ 2557 00d1 30       		.byte	0x30
+ 2558 00d2 9F       		.byte	0x9f
+ 2559 00d3 18010000 		.4byte	.LVL32
+ 2560 00d7 38010000 		.4byte	.LVL33
+ 2561 00db 0100     		.2byte	0x1
+ 2562 00dd 56       		.byte	0x56
+ 2563 00de 38010000 		.4byte	.LVL33
+ 2564 00e2 3A010000 		.4byte	.LVL34
+ 2565 00e6 0300     		.2byte	0x3
+ 2566 00e8 76       		.byte	0x76
+ 2567 00e9 01       		.sleb128 1
+ 2568 00ea 9F       		.byte	0x9f
+ 2569 00eb 00000000 		.4byte	0
+ 2570 00ef 00000000 		.4byte	0
+ 2571              	.LLST4:
+ 2572 00f3 00000000 		.4byte	.LVL0
+ 2573 00f7 0E000000 		.4byte	.LVL1
+ 2574 00fb 0200     		.2byte	0x2
+ 2575 00fd 30       		.byte	0x30
+ 2576 00fe 9F       		.byte	0x9f
+ 2577 00ff 50000000 		.4byte	.LVL7
+ 2578 0103 62000000 		.4byte	.LVL9
+ 2579 0107 0100     		.2byte	0x1
+ 2580 0109 55       		.byte	0x55
+ 2581 010a DE000000 		.4byte	.LVL24
+ 2582 010e E2000000 		.4byte	.LVL25
+ 2583 0112 0300     		.2byte	0x3
+ 2584 0114 09       		.byte	0x9
+ 2585 0115 FF       		.byte	0xff
+ 2586 0116 9F       		.byte	0x9f
+ 2587 0117 EA000000 		.4byte	.LVL27
+ 2588 011b EC000000 		.4byte	.LVL28
+ 2589 011f 0200     		.2byte	0x2
+ 2590 0121 30       		.byte	0x30
+ 2591 0122 9F       		.byte	0x9f
+ 2592 0123 00000000 		.4byte	0
+ 2593 0127 00000000 		.4byte	0
+ 2594              	.LLST5:
+ 2595 012b C0000000 		.4byte	.LVL20
+ 2596 012f C7000000 		.4byte	.LVL21-1
+ 2597 0133 0100     		.2byte	0x1
+ 2598 0135 50       		.byte	0x50
+ 2599 0136 00000000 		.4byte	0
+ 2600 013a 00000000 		.4byte	0
+ 2601              	.LLST6:
+ 2602 013e 00000000 		.4byte	.LVL36
+ 2603 0142 0A000000 		.4byte	.LVL37
+ 2604 0146 0100     		.2byte	0x1
+ 2605 0148 50       		.byte	0x50
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 51
+
+
+ 2606 0149 0A000000 		.4byte	.LVL37
+ 2607 014d 0E000000 		.4byte	.LVL38
+ 2608 0151 0100     		.2byte	0x1
+ 2609 0153 54       		.byte	0x54
+ 2610 0154 0E000000 		.4byte	.LVL38
+ 2611 0158 16000000 		.4byte	.LVL39
+ 2612 015c 0100     		.2byte	0x1
+ 2613 015e 50       		.byte	0x50
+ 2614 015f 16000000 		.4byte	.LVL39
+ 2615 0163 5C000000 		.4byte	.LFE70
+ 2616 0167 0100     		.2byte	0x1
+ 2617 0169 54       		.byte	0x54
+ 2618 016a 00000000 		.4byte	0
+ 2619 016e 00000000 		.4byte	0
+ 2620              	.LLST7:
+ 2621 0172 00000000 		.4byte	.LVL36
+ 2622 0176 19000000 		.4byte	.LVL40-1
+ 2623 017a 0100     		.2byte	0x1
+ 2624 017c 51       		.byte	0x51
+ 2625 017d 19000000 		.4byte	.LVL40-1
+ 2626 0181 5C000000 		.4byte	.LFE70
+ 2627 0185 0100     		.2byte	0x1
+ 2628 0187 55       		.byte	0x55
+ 2629 0188 00000000 		.4byte	0
+ 2630 018c 00000000 		.4byte	0
+ 2631              	.LLST8:
+ 2632 0190 0E000000 		.4byte	.LVL38
+ 2633 0194 19000000 		.4byte	.LVL40-1
+ 2634 0198 0100     		.2byte	0x1
+ 2635 019a 51       		.byte	0x51
+ 2636 019b 19000000 		.4byte	.LVL40-1
+ 2637 019f 58000000 		.4byte	.LVL47
+ 2638 01a3 0100     		.2byte	0x1
+ 2639 01a5 55       		.byte	0x55
+ 2640 01a6 00000000 		.4byte	0
+ 2641 01aa 00000000 		.4byte	0
+ 2642              	.LLST9:
+ 2643 01ae 1C000000 		.4byte	.LVL41
+ 2644 01b2 23000000 		.4byte	.LVL42-1
+ 2645 01b6 0100     		.2byte	0x1
+ 2646 01b8 50       		.byte	0x50
+ 2647 01b9 23000000 		.4byte	.LVL42-1
+ 2648 01bd 58000000 		.4byte	.LVL47
+ 2649 01c1 0100     		.2byte	0x1
+ 2650 01c3 56       		.byte	0x56
+ 2651 01c4 00000000 		.4byte	0
+ 2652 01c8 00000000 		.4byte	0
+ 2653              	.LLST10:
+ 2654 01cc 00000000 		.4byte	.LVL48
+ 2655 01d0 0A000000 		.4byte	.LVL49
+ 2656 01d4 0100     		.2byte	0x1
+ 2657 01d6 50       		.byte	0x50
+ 2658 01d7 0A000000 		.4byte	.LVL49
+ 2659 01db 70000000 		.4byte	.LVL58
+ 2660 01df 0100     		.2byte	0x1
+ 2661 01e1 54       		.byte	0x54
+ 2662 01e2 70000000 		.4byte	.LVL58
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 52
+
+
+ 2663 01e6 90000000 		.4byte	.LFE71
+ 2664 01ea 0400     		.2byte	0x4
+ 2665 01ec F3       		.byte	0xf3
+ 2666 01ed 01       		.uleb128 0x1
+ 2667 01ee 50       		.byte	0x50
+ 2668 01ef 9F       		.byte	0x9f
+ 2669 01f0 00000000 		.4byte	0
+ 2670 01f4 00000000 		.4byte	0
+ 2671              	.LLST11:
+ 2672 01f8 00000000 		.4byte	.LVL48
+ 2673 01fc 0A000000 		.4byte	.LVL49
+ 2674 0200 0100     		.2byte	0x1
+ 2675 0202 51       		.byte	0x51
+ 2676 0203 0A000000 		.4byte	.LVL49
+ 2677 0207 90000000 		.4byte	.LFE71
+ 2678 020b 0400     		.2byte	0x4
+ 2679 020d F3       		.byte	0xf3
+ 2680 020e 01       		.uleb128 0x1
+ 2681 020f 51       		.byte	0x51
+ 2682 0210 9F       		.byte	0x9f
+ 2683 0211 00000000 		.4byte	0
+ 2684 0215 00000000 		.4byte	0
+ 2685              	.LLST12:
+ 2686 0219 00000000 		.4byte	.LVL48
+ 2687 021d 0A000000 		.4byte	.LVL49
+ 2688 0221 0100     		.2byte	0x1
+ 2689 0223 52       		.byte	0x52
+ 2690 0224 0A000000 		.4byte	.LVL49
+ 2691 0228 90000000 		.4byte	.LFE71
+ 2692 022c 0400     		.2byte	0x4
+ 2693 022e F3       		.byte	0xf3
+ 2694 022f 01       		.uleb128 0x1
+ 2695 0230 52       		.byte	0x52
+ 2696 0231 9F       		.byte	0x9f
+ 2697 0232 00000000 		.4byte	0
+ 2698 0236 00000000 		.4byte	0
+ 2699              	.LLST13:
+ 2700 023a 00000000 		.4byte	.LVL48
+ 2701 023e 0A000000 		.4byte	.LVL49
+ 2702 0242 0200     		.2byte	0x2
+ 2703 0244 30       		.byte	0x30
+ 2704 0245 9F       		.byte	0x9f
+ 2705 0246 00000000 		.4byte	0
+ 2706 024a 00000000 		.4byte	0
+ 2707              	.LLST14:
+ 2708 024e 52000000 		.4byte	.LVL54
+ 2709 0252 6A000000 		.4byte	.LVL57
+ 2710 0256 0100     		.2byte	0x1
+ 2711 0258 55       		.byte	0x55
+ 2712 0259 00000000 		.4byte	0
+ 2713 025d 00000000 		.4byte	0
+ 2714              	.LLST15:
+ 2715 0261 00000000 		.4byte	.LVL59
+ 2716 0265 0A000000 		.4byte	.LVL60
+ 2717 0269 0100     		.2byte	0x1
+ 2718 026b 50       		.byte	0x50
+ 2719 026c 0A000000 		.4byte	.LVL60
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 53
+
+
+ 2720 0270 4A000000 		.4byte	.LVL67
+ 2721 0274 0100     		.2byte	0x1
+ 2722 0276 54       		.byte	0x54
+ 2723 0277 4A000000 		.4byte	.LVL67
+ 2724 027b 54000000 		.4byte	.LFE72
+ 2725 027f 0400     		.2byte	0x4
+ 2726 0281 F3       		.byte	0xf3
+ 2727 0282 01       		.uleb128 0x1
+ 2728 0283 50       		.byte	0x50
+ 2729 0284 9F       		.byte	0x9f
+ 2730 0285 00000000 		.4byte	0
+ 2731 0289 00000000 		.4byte	0
+ 2732              	.LLST16:
+ 2733 028d 00000000 		.4byte	.LVL59
+ 2734 0291 0A000000 		.4byte	.LVL60
+ 2735 0295 0100     		.2byte	0x1
+ 2736 0297 51       		.byte	0x51
+ 2737 0298 0A000000 		.4byte	.LVL60
+ 2738 029c 54000000 		.4byte	.LFE72
+ 2739 02a0 0400     		.2byte	0x4
+ 2740 02a2 F3       		.byte	0xf3
+ 2741 02a3 01       		.uleb128 0x1
+ 2742 02a4 51       		.byte	0x51
+ 2743 02a5 9F       		.byte	0x9f
+ 2744 02a6 00000000 		.4byte	0
+ 2745 02aa 00000000 		.4byte	0
+ 2746              	.LLST17:
+ 2747 02ae 00000000 		.4byte	.LVL59
+ 2748 02b2 0A000000 		.4byte	.LVL60
+ 2749 02b6 0100     		.2byte	0x1
+ 2750 02b8 52       		.byte	0x52
+ 2751 02b9 0A000000 		.4byte	.LVL60
+ 2752 02bd 54000000 		.4byte	.LFE72
+ 2753 02c1 0400     		.2byte	0x4
+ 2754 02c3 F3       		.byte	0xf3
+ 2755 02c4 01       		.uleb128 0x1
+ 2756 02c5 52       		.byte	0x52
+ 2757 02c6 9F       		.byte	0x9f
+ 2758 02c7 00000000 		.4byte	0
+ 2759 02cb 00000000 		.4byte	0
+ 2760              	.LLST18:
+ 2761 02cf 00000000 		.4byte	.LVL59
+ 2762 02d3 0A000000 		.4byte	.LVL60
+ 2763 02d7 0200     		.2byte	0x2
+ 2764 02d9 30       		.byte	0x30
+ 2765 02da 9F       		.byte	0x9f
+ 2766 02db 00000000 		.4byte	0
+ 2767 02df 00000000 		.4byte	0
+ 2768              		.section	.debug_aranges,"",%progbits
+ 2769 0000 34000000 		.4byte	0x34
+ 2770 0004 0200     		.2byte	0x2
+ 2771 0006 00000000 		.4byte	.Ldebug_info0
+ 2772 000a 04       		.byte	0x4
+ 2773 000b 00       		.byte	0
+ 2774 000c 0000     		.2byte	0
+ 2775 000e 0000     		.2byte	0
+ 2776 0010 00000000 		.4byte	.LFB69
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 54
+
+
+ 2777 0014 90010000 		.4byte	.LFE69-.LFB69
+ 2778 0018 00000000 		.4byte	.LFB70
+ 2779 001c 5C000000 		.4byte	.LFE70-.LFB70
+ 2780 0020 00000000 		.4byte	.LFB71
+ 2781 0024 90000000 		.4byte	.LFE71-.LFB71
+ 2782 0028 00000000 		.4byte	.LFB72
+ 2783 002c 54000000 		.4byte	.LFE72-.LFB72
+ 2784 0030 00000000 		.4byte	0
+ 2785 0034 00000000 		.4byte	0
+ 2786              		.section	.debug_ranges,"",%progbits
+ 2787              	.Ldebug_ranges0:
+ 2788 0000 00000000 		.4byte	.LFB69
+ 2789 0004 90010000 		.4byte	.LFE69
+ 2790 0008 00000000 		.4byte	.LFB70
+ 2791 000c 5C000000 		.4byte	.LFE70
+ 2792 0010 00000000 		.4byte	.LFB71
+ 2793 0014 90000000 		.4byte	.LFE71
+ 2794 0018 00000000 		.4byte	.LFB72
+ 2795 001c 54000000 		.4byte	.LFE72
+ 2796 0020 00000000 		.4byte	0
+ 2797 0024 00000000 		.4byte	0
+ 2798              		.section	.debug_line,"",%progbits
+ 2799              	.Ldebug_line0:
+ 2800 0000 0F030000 		.section	.debug_str,"MS",%progbits,1
+ 2800      02006702 
+ 2800      00000201 
+ 2800      FB0E0D00 
+ 2800      01010101 
+ 2801              	.LASF37:
+ 2802 0000 5F565431 		.ascii	"_VT100_ERASE_LINE\000"
+ 2802      30305F45 
+ 2802      52415345 
+ 2802      5F4C494E 
+ 2802      4500
+ 2803              	.LASF123:
+ 2804 0012 73747263 		.ascii	"strcmp\000"
+ 2804      6D7000
+ 2805              	.LASF36:
+ 2806 0019 5F565431 		.ascii	"_VT100_ERASE_SCREEN\000"
+ 2806      30305F45 
+ 2806      52415345 
+ 2806      5F534352 
+ 2806      45454E00 
+ 2807              	.LASF35:
+ 2808 002d 5F565431 		.ascii	"_VT100_HIDDEN\000"
+ 2808      30305F48 
+ 2808      49444445 
+ 2808      4E00
+ 2809              	.LASF126:
+ 2810 003b 5445524D 		.ascii	"TERM_findLastArg\000"
+ 2810      5F66696E 
+ 2810      644C6173 
+ 2810      74417267 
+ 2810      00
+ 2811              	.LASF99:
+ 2812 004c 73747269 		.ascii	"string\000"
+ 2812      6E6700
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 55
+
+
+ 2813              	.LASF3:
+ 2814 0053 5F5F7569 		.ascii	"__uint8_t\000"
+ 2814      6E74385F 
+ 2814      7400
+ 2815              	.LASF75:
+ 2816 005d 5F5F5465 		.ascii	"__TermCommandDescriptor__\000"
+ 2816      726D436F 
+ 2816      6D6D616E 
+ 2816      64446573 
+ 2816      63726970 
+ 2817              	.LASF129:
+ 2818 0077 74736B5F 		.ascii	"tsk_overlay_chart_start\000"
+ 2818      6F766572 
+ 2818      6C61795F 
+ 2818      63686172 
+ 2818      745F7374 
+ 2819              	.LASF72:
+ 2820 008f 6572726F 		.ascii	"errorPrinter\000"
+ 2820      72507269 
+ 2820      6E746572 
+ 2820      00
+ 2821              	.LASF134:
+ 2822 009c 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 2822      73657273 
+ 2822      5C636865 
+ 2822      6D695C55 
+ 2822      44335F51 
+ 2823              	.LASF11:
+ 2824 00c1 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2824      206C6F6E 
+ 2824      6720756E 
+ 2824      7369676E 
+ 2824      65642069 
+ 2825              	.LASF108:
+ 2826 00d8 6E657753 		.ascii	"newString\000"
+ 2826      7472696E 
+ 2826      6700
+ 2827              	.LASF63:
+ 2828 00e2 7072696E 		.ascii	"print\000"
+ 2828      7400
+ 2829              	.LASF74:
+ 2830 00e8 5F5F5445 		.ascii	"__TERMINAL_HANDLE__\000"
+ 2830      524D494E 
+ 2830      414C5F48 
+ 2830      414E444C 
+ 2830      455F5F00 
+ 2831              	.LASF117:
+ 2832 00fc 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 2832      52784275 
+ 2832      66666572 
+ 2832      00
+ 2833              	.LASF58:
+ 2834 0109 63757272 		.ascii	"currAutocompleteCount\000"
+ 2834      4175746F 
+ 2834      636F6D70 
+ 2834      6C657465 
+ 2834      436F756E 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 56
+
+
+ 2835              	.LASF98:
+ 2836 011f 6E657874 		.ascii	"next\000"
+ 2836      00
+ 2837              	.LASF46:
+ 2838 0124 5F565431 		.ascii	"_VT100_CURSOR_UP_BY\000"
+ 2838      30305F43 
+ 2838      5552534F 
+ 2838      525F5550 
+ 2838      5F425900 
+ 2839              	.LASF52:
+ 2840 0138 5F565431 		.ascii	"_VT100_CLS\000"
+ 2840      30305F43 
+ 2840      4C5300
+ 2841              	.LASF0:
+ 2842 0143 7369676E 		.ascii	"signed char\000"
+ 2842      65642063 
+ 2842      68617200 
+ 2843              	.LASF122:
+ 2844 014f 41434C5F 		.ascii	"ACL_add\000"
+ 2844      61646400 
+ 2845              	.LASF48:
+ 2846 0157 5F565431 		.ascii	"_VT100_CURSOR_RESTORE_POSITION\000"
+ 2846      30305F43 
+ 2846      5552534F 
+ 2846      525F5245 
+ 2846      53544F52 
+ 2847              	.LASF113:
+ 2848 0176 62756666 		.ascii	"buff\000"
+ 2848      00
+ 2849              	.LASF59:
+ 2850 017b 63757272 		.ascii	"currProgram\000"
+ 2850      50726F67 
+ 2850      72616D00 
+ 2851              	.LASF76:
+ 2852 0187 66756E63 		.ascii	"function\000"
+ 2852      74696F6E 
+ 2852      00
+ 2853              	.LASF44:
+ 2854 0190 5F565431 		.ascii	"_VT100_CURSOR_FORWARD_BY\000"
+ 2854      30305F43 
+ 2854      5552534F 
+ 2854      525F464F 
+ 2854      52574152 
+ 2855              	.LASF43:
+ 2856 01a9 5F565431 		.ascii	"_VT100_CURSOR_BACK_BY\000"
+ 2856      30305F43 
+ 2856      5552534F 
+ 2856      525F4241 
+ 2856      434B5F42 
+ 2857              	.LASF7:
+ 2858 01bf 6C6F6E67 		.ascii	"long int\000"
+ 2858      20696E74 
+ 2858      00
+ 2859              	.LASF23:
+ 2860 01c8 74736B54 		.ascii	"tskTaskControlBlock\000"
+ 2860      61736B43 
+ 2860      6F6E7472 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 57
+
+
+ 2860      6F6C426C 
+ 2860      6F636B00 
+ 2861              	.LASF29:
+ 2862 01dc 5F565431 		.ascii	"_VT100_RESET_ATTRIB\000"
+ 2862      30305F52 
+ 2862      45534554 
+ 2862      5F415454 
+ 2862      52494200 
+ 2863              	.LASF49:
+ 2864 01f0 5F565431 		.ascii	"_VT100_CURSOR_ENABLE\000"
+ 2864      30305F43 
+ 2864      5552534F 
+ 2864      525F454E 
+ 2864      41424C45 
+ 2865              	.LASF57:
+ 2866 0205 63757272 		.ascii	"currBufferLength\000"
+ 2866      42756666 
+ 2866      65724C65 
+ 2866      6E677468 
+ 2866      00
+ 2867              	.LASF21:
+ 2868 0216 5461736B 		.ascii	"TaskHandle_t\000"
+ 2868      48616E64 
+ 2868      6C655F74 
+ 2868      00
+ 2869              	.LASF10:
+ 2870 0223 6C6F6E67 		.ascii	"long long int\000"
+ 2870      206C6F6E 
+ 2870      6720696E 
+ 2870      7400
+ 2871              	.LASF111:
+ 2872 0231 70617261 		.ascii	"params\000"
+ 2872      6D7300
+ 2873              	.LASF84:
+ 2874 0238 5465726D 		.ascii	"TermCommandFunction\000"
+ 2874      436F6D6D 
+ 2874      616E6446 
+ 2874      756E6374 
+ 2874      696F6E00 
+ 2875              	.LASF20:
+ 2876 024c 646F7562 		.ascii	"double\000"
+ 2876      6C6500
+ 2877              	.LASF51:
+ 2878 0253 5F565431 		.ascii	"_VT100_CURSOR_SET_COLUMN\000"
+ 2878      30305F43 
+ 2878      5552534F 
+ 2878      525F5345 
+ 2878      545F434F 
+ 2879              	.LASF8:
+ 2880 026c 5F5F7569 		.ascii	"__uint32_t\000"
+ 2880      6E743332 
+ 2880      5F7400
+ 2881              	.LASF125:
+ 2882 0277 41434C5F 		.ascii	"ACL_remove\000"
+ 2882      72656D6F 
+ 2882      766500
+ 2883              	.LASF133:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 58
+
+
+ 2884 0282 2E2E5C63 		.ascii	"..\\common\\tterm\\TTerm_cmd.c\000"
+ 2884      6F6D6D6F 
+ 2884      6E5C7474 
+ 2884      65726D5C 
+ 2884      54546572 
+ 2885              	.LASF132:
+ 2886 029e 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2886      43393920 
+ 2886      352E342E 
+ 2886      31203230 
+ 2886      31363036 
+ 2887 02d1 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2887      20726576 
+ 2887      6973696F 
+ 2887      6E203233 
+ 2887      37373135 
+ 2888 0304 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 2888      74643D67 
+ 2888      6E753939 
+ 2888      202D6666 
+ 2888      756E6374 
+ 2889              	.LASF120:
+ 2890 0337 7076506F 		.ascii	"pvPortMalloc\000"
+ 2890      72744D61 
+ 2890      6C6C6F63 
+ 2890      00
+ 2891              	.LASF27:
+ 2892 0344 5F565431 		.ascii	"_VT100_FOREGROUND_COLOR\000"
+ 2892      30305F46 
+ 2892      4F524547 
+ 2892      524F554E 
+ 2892      445F434F 
+ 2893              	.LASF55:
+ 2894 035c 706F7274 		.ascii	"port\000"
+ 2894      00
+ 2895              	.LASF12:
+ 2896 0361 756E7369 		.ascii	"unsigned int\000"
+ 2896      676E6564 
+ 2896      20696E74 
+ 2896      00
+ 2897              	.LASF14:
+ 2898 036e 75696E74 		.ascii	"uint16_t\000"
+ 2898      31365F74 
+ 2898      00
+ 2899              	.LASF119:
+ 2900 0377 7374726C 		.ascii	"strlen\000"
+ 2900      656E00
+ 2901              	.LASF77:
+ 2902 037e 636F6D6D 		.ascii	"command\000"
+ 2902      616E6400 
+ 2903              	.LASF131:
+ 2904 0386 5445524D 		.ascii	"TERM_printBootMessage\000"
+ 2904      5F707269 
+ 2904      6E74426F 
+ 2904      6F744D65 
+ 2904      73736167 
+ 2905              	.LASF9:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 59
+
+
+ 2906 039c 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2906      20756E73 
+ 2906      69676E65 
+ 2906      6420696E 
+ 2906      7400
+ 2907              	.LASF60:
+ 2908 03ae 6175746F 		.ascii	"autocompleteBuffer\000"
+ 2908      636F6D70 
+ 2908      6C657465 
+ 2908      42756666 
+ 2908      657200
+ 2909              	.LASF109:
+ 2910 03c1 434D445F 		.ascii	"CMD_testCommandHandler\000"
+ 2910      74657374 
+ 2910      436F6D6D 
+ 2910      616E6448 
+ 2910      616E646C 
+ 2911              	.LASF62:
+ 2912 03d8 6175746F 		.ascii	"autocompleteStart\000"
+ 2912      636F6D70 
+ 2912      6C657465 
+ 2912      53746172 
+ 2912      7400
+ 2913              	.LASF116:
+ 2914 03ea 434D445F 		.ascii	"CMD_cls\000"
+ 2914      636C7300 
+ 2915              	.LASF86:
+ 2916 03f2 5465726D 		.ascii	"TermErrorPrinter\000"
+ 2916      4572726F 
+ 2916      72507269 
+ 2916      6E746572 
+ 2916      00
+ 2917              	.LASF100:
+ 2918 0403 41435F4C 		.ascii	"AC_LIST_HEAD\000"
+ 2918      4953545F 
+ 2918      48454144 
+ 2918      00
+ 2919              	.LASF22:
+ 2920 0410 53747265 		.ascii	"StreamBufferHandle_t\000"
+ 2920      616D4275 
+ 2920      66666572 
+ 2920      48616E64 
+ 2920      6C655F74 
+ 2921              	.LASF5:
+ 2922 0425 73686F72 		.ascii	"short unsigned int\000"
+ 2922      7420756E 
+ 2922      7369676E 
+ 2922      65642069 
+ 2922      6E7400
+ 2923              	.LASF34:
+ 2924 0438 5F565431 		.ascii	"_VT100_REVERSE\000"
+ 2924      30305F52 
+ 2924      45564552 
+ 2924      534500
+ 2925              	.LASF114:
+ 2926 0447 434D445F 		.ascii	"CMD_help\000"
+ 2926      68656C70 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 60
+
+
+ 2926      00
+ 2927              	.LASF121:
+ 2928 0450 73747263 		.ascii	"strcpy\000"
+ 2928      707900
+ 2929              	.LASF92:
+ 2930 0457 696E7075 		.ascii	"inputStream\000"
+ 2930      74537472 
+ 2930      65616D00 
+ 2931              	.LASF101:
+ 2932 0463 5F5F4143 		.ascii	"__ACL_HEAD__\000"
+ 2932      4C5F4845 
+ 2932      41445F5F 
+ 2932      00
+ 2933              	.LASF69:
+ 2934 0470 65736353 		.ascii	"escSeqBuff\000"
+ 2934      65714275 
+ 2934      666600
+ 2935              	.LASF41:
+ 2936 047b 5F565431 		.ascii	"_VT100_WRAP_OFF\000"
+ 2936      30305F57 
+ 2936      5241505F 
+ 2936      4F464600 
+ 2937              	.LASF103:
+ 2938 048b 656C656D 		.ascii	"elementCount\000"
+ 2938      656E7443 
+ 2938      6F756E74 
+ 2938      00
+ 2939              	.LASF105:
+ 2940 0498 68616E64 		.ascii	"handle\000"
+ 2940      6C6500
+ 2941              	.LASF53:
+ 2942 049f 5445524D 		.ascii	"TERMINAL_HANDLE\000"
+ 2942      494E414C 
+ 2942      5F48414E 
+ 2942      444C4500 
+ 2943              	.LASF91:
+ 2944 04af 7261775F 		.ascii	"raw_input\000"
+ 2944      696E7075 
+ 2944      7400
+ 2945              	.LASF26:
+ 2946 04b9 5F565431 		.ascii	"_VT100_CURSOR_END\000"
+ 2946      30305F43 
+ 2946      5552534F 
+ 2946      525F454E 
+ 2946      4400
+ 2947              	.LASF25:
+ 2948 04cb 5F565431 		.ascii	"_VT100_CURSOR_POS1\000"
+ 2948      30305F43 
+ 2948      5552534F 
+ 2948      525F504F 
+ 2948      533100
+ 2949              	.LASF17:
+ 2950 04de 73697A65 		.ascii	"sizetype\000"
+ 2950      74797065 
+ 2950      00
+ 2951              	.LASF94:
+ 2952 04e7 61726743 		.ascii	"argCount\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 61
+
+
+ 2952      6F756E74 
+ 2952      00
+ 2953              	.LASF40:
+ 2954 04f0 5F565431 		.ascii	"_VT100_WRAP_ON\000"
+ 2954      30305F57 
+ 2954      5241505F 
+ 2954      4F4E00
+ 2955              	.LASF47:
+ 2956 04ff 5F565431 		.ascii	"_VT100_CURSOR_SAVE_POSITION\000"
+ 2956      30305F43 
+ 2956      5552534F 
+ 2956      525F5341 
+ 2956      56455F50 
+ 2957              	.LASF130:
+ 2958 051b 5445524D 		.ascii	"TERM_sendVT100Code\000"
+ 2958      5F73656E 
+ 2958      64565431 
+ 2958      3030436F 
+ 2958      646500
+ 2959              	.LASF79:
+ 2960 052e 636F6D6D 		.ascii	"commandLength\000"
+ 2960      616E644C 
+ 2960      656E6774 
+ 2960      6800
+ 2961              	.LASF31:
+ 2962 053c 5F565431 		.ascii	"_VT100_DIM\000"
+ 2962      30305F44 
+ 2962      494D00
+ 2963              	.LASF115:
+ 2964 0547 63757272 		.ascii	"currCmd\000"
+ 2964      436D6400 
+ 2965              	.LASF127:
+ 2966 054f 5445524D 		.ascii	"TERM_doListAC\000"
+ 2966      5F646F4C 
+ 2966      69737441 
+ 2966      4300
+ 2967              	.LASF42:
+ 2968 055d 5F565431 		.ascii	"_VT100_ERASE_LINE_END\000"
+ 2968      30305F45 
+ 2968      52415345 
+ 2968      5F4C494E 
+ 2968      455F454E 
+ 2969              	.LASF106:
+ 2970 0573 63757272 		.ascii	"currArg\000"
+ 2970      41726700 
+ 2971              	.LASF70:
+ 2972 057b 6563686F 		.ascii	"echoEnabled\000"
+ 2972      456E6162 
+ 2972      6C656400 
+ 2973              	.LASF97:
+ 2974 0587 5F5F4143 		.ascii	"__ACL__\000"
+ 2974      4C5F5F00 
+ 2975              	.LASF19:
+ 2976 058f 666C6F61 		.ascii	"float\000"
+ 2976      7400
+ 2977              	.LASF90:
+ 2978 0595 696E7075 		.ascii	"inputHandler\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 62
+
+
+ 2978      7448616E 
+ 2978      646C6572 
+ 2978      00
+ 2979              	.LASF73:
+ 2980 05a2 5465726D 		.ascii	"TermCommandDescriptor\000"
+ 2980      436F6D6D 
+ 2980      616E6444 
+ 2980      65736372 
+ 2980      6970746F 
+ 2981              	.LASF83:
+ 2982 05b8 6E657874 		.ascii	"nextCmd\000"
+ 2982      436D6400 
+ 2983              	.LASF28:
+ 2984 05c0 5F565431 		.ascii	"_VT100_BACKGROUND_COLOR\000"
+ 2984      30305F42 
+ 2984      41434B47 
+ 2984      524F554E 
+ 2984      445F434F 
+ 2985              	.LASF81:
+ 2986 05d8 41434861 		.ascii	"ACHandler\000"
+ 2986      6E646C65 
+ 2986      7200
+ 2987              	.LASF124:
+ 2988 05e2 61746F69 		.ascii	"atoi\000"
+ 2988      00
+ 2989              	.LASF15:
+ 2990 05e7 696E7433 		.ascii	"int32_t\000"
+ 2990      325F7400 
+ 2991              	.LASF1:
+ 2992 05ef 756E7369 		.ascii	"unsigned char\000"
+ 2992      676E6564 
+ 2992      20636861 
+ 2992      7200
+ 2993              	.LASF2:
+ 2994 05fd 73686F72 		.ascii	"short int\000"
+ 2994      7420696E 
+ 2994      7400
+ 2995              	.LASF85:
+ 2996 0607 5465726D 		.ascii	"TermCommandInputHandler\000"
+ 2996      436F6D6D 
+ 2996      616E6449 
+ 2996      6E707574 
+ 2996      48616E64 
+ 2997              	.LASF67:
+ 2998 061f 63757272 		.ascii	"currHistoryReadPosition\000"
+ 2998      48697374 
+ 2998      6F727952 
+ 2998      65616450 
+ 2998      6F736974 
+ 2999              	.LASF95:
+ 3000 0637 5465726D 		.ascii	"TermProgram\000"
+ 3000      50726F67 
+ 3000      72616D00 
+ 3001              	.LASF45:
+ 3002 0643 5F565431 		.ascii	"_VT100_CURSOR_DOWN_BY\000"
+ 3002      30305F43 
+ 3002      5552534F 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 63
+
+
+ 3002      525F444F 
+ 3002      574E5F42 
+ 3003              	.LASF30:
+ 3004 0659 5F565431 		.ascii	"_VT100_BRIGHT\000"
+ 3004      30305F42 
+ 3004      52494748 
+ 3004      5400
+ 3005              	.LASF56:
+ 3006 0667 63757272 		.ascii	"currBufferPosition\000"
+ 3006      42756666 
+ 3006      6572506F 
+ 3006      73697469 
+ 3006      6F6E00
+ 3007              	.LASF33:
+ 3008 067a 5F565431 		.ascii	"_VT100_BLINK\000"
+ 3008      30305F42 
+ 3008      4C494E4B 
+ 3008      00
+ 3009              	.LASF135:
+ 3010 0687 76743130 		.ascii	"vt100\000"
+ 3010      3000
+ 3011              	.LASF128:
+ 3012 068d 76506F72 		.ascii	"vPortFree\000"
+ 3012      74467265 
+ 3012      6500
+ 3013              	.LASF118:
+ 3014 0697 68656164 		.ascii	"head\000"
+ 3014      00
+ 3015              	.LASF38:
+ 3016 069c 5F565431 		.ascii	"_VT100_FONT_G0\000"
+ 3016      30305F46 
+ 3016      4F4E545F 
+ 3016      473000
+ 3017              	.LASF39:
+ 3018 06ab 5F565431 		.ascii	"_VT100_FONT_G1\000"
+ 3018      30305F46 
+ 3018      4F4E545F 
+ 3018      473100
+ 3019              	.LASF68:
+ 3020 06ba 63757272 		.ascii	"currEscSeqPos\000"
+ 3020      45736353 
+ 3020      6571506F 
+ 3020      7300
+ 3021              	.LASF16:
+ 3022 06c8 75696E74 		.ascii	"uint32_t\000"
+ 3022      33325F74 
+ 3022      00
+ 3023              	.LASF104:
+ 3024 06d1 66697273 		.ascii	"first\000"
+ 3024      7400
+ 3025              	.LASF18:
+ 3026 06d7 63686172 		.ascii	"char\000"
+ 3026      00
+ 3027              	.LASF4:
+ 3028 06dc 5F5F7569 		.ascii	"__uint16_t\000"
+ 3028      6E743136 
+ 3028      5F7400
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 64
+
+
+ 3029              	.LASF50:
+ 3030 06e7 5F565431 		.ascii	"_VT100_CURSOR_DISABLE\000"
+ 3030      30305F43 
+ 3030      5552534F 
+ 3030      525F4449 
+ 3030      5341424C 
+ 3031              	.LASF64:
+ 3032 06fd 63757272 		.ascii	"currUserName\000"
+ 3032      55736572 
+ 3032      4E616D65 
+ 3032      00
+ 3033              	.LASF110:
+ 3034 070a 5445524D 		.ascii	"TERM_testCommandAutoCompleter\000"
+ 3034      5F746573 
+ 3034      74436F6D 
+ 3034      6D616E64 
+ 3034      4175746F 
+ 3035              	.LASF6:
+ 3036 0728 5F5F696E 		.ascii	"__int32_t\000"
+ 3036      7433325F 
+ 3036      7400
+ 3037              	.LASF71:
+ 3038 0732 636D644C 		.ascii	"cmdListHead\000"
+ 3038      69737448 
+ 3038      65616400 
+ 3039              	.LASF88:
+ 3040 073e 5465726D 		.ascii	"TermAutoCompHandler\000"
+ 3040      4175746F 
+ 3040      436F6D70 
+ 3040      48616E64 
+ 3040      6C657200 
+ 3041              	.LASF89:
+ 3042 0752 7461736B 		.ascii	"task\000"
+ 3042      00
+ 3043              	.LASF61:
+ 3044 0757 6175746F 		.ascii	"autocompleteBufferLength\000"
+ 3044      636F6D70 
+ 3044      6C657465 
+ 3044      42756666 
+ 3044      65724C65 
+ 3045              	.LASF78:
+ 3046 0770 636F6D6D 		.ascii	"commandDescription\000"
+ 3046      616E6444 
+ 3046      65736372 
+ 3046      69707469 
+ 3046      6F6E00
+ 3047              	.LASF96:
+ 3048 0783 41435F4C 		.ascii	"AC_LIST_ELEMENT\000"
+ 3048      4953545F 
+ 3048      454C454D 
+ 3048      454E5400 
+ 3049              	.LASF65:
+ 3050 0793 68697374 		.ascii	"historyBuffer\000"
+ 3050      6F727942 
+ 3050      75666665 
+ 3050      7200
+ 3051              	.LASF54:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 65
+
+
+ 3052 07a1 696E7075 		.ascii	"inputBuffer\000"
+ 3052      74427566 
+ 3052      66657200 
+ 3053              	.LASF136:
+ 3054 07ad 6D656D73 		.ascii	"memset\000"
+ 3054      657400
+ 3055              	.LASF80:
+ 3056 07b4 6D696E50 		.ascii	"minPermissionLevel\000"
+ 3056      65726D69 
+ 3056      7373696F 
+ 3056      6E4C6576 
+ 3056      656C00
+ 3057              	.LASF13:
+ 3058 07c7 75696E74 		.ascii	"uint8_t\000"
+ 3058      385F7400 
+ 3059              	.LASF32:
+ 3060 07cf 5F565431 		.ascii	"_VT100_UNDERSCORE\000"
+ 3060      30305F55 
+ 3060      4E444552 
+ 3060      53434F52 
+ 3060      4500
+ 3061              	.LASF66:
+ 3062 07e1 63757272 		.ascii	"currHistoryWritePosition\000"
+ 3062      48697374 
+ 3062      6F727957 
+ 3062      72697465 
+ 3062      506F7369 
+ 3063              	.LASF102:
+ 3064 07fa 6973436F 		.ascii	"isConst\000"
+ 3064      6E737400 
+ 3065              	.LASF107:
+ 3066 0802 72657475 		.ascii	"returnCode\000"
+ 3066      726E436F 
+ 3066      646500
+ 3067              	.LASF112:
+ 3068 080d 6C697374 		.ascii	"list\000"
+ 3068      00
+ 3069              	.LASF93:
+ 3070 0812 61726773 		.ascii	"args\000"
+ 3070      00
+ 3071              	.LASF24:
+ 3072 0817 53747265 		.ascii	"StreamBufferDef_t\000"
+ 3072      616D4275 
+ 3072      66666572 
+ 3072      4465665F 
+ 3072      7400
+ 3073              	.LASF82:
+ 3074 0829 41435061 		.ascii	"ACParams\000"
+ 3074      72616D73 
+ 3074      00
+ 3075              	.LASF87:
+ 3076 0832 5465726D 		.ascii	"TermPrintHandler\000"
+ 3076      5072696E 
+ 3076      7448616E 
+ 3076      646C6572 
+ 3076      00
+ 3077              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFEwbcK.s 			page 66
+
+

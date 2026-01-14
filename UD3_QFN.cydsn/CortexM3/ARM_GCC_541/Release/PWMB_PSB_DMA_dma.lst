@@ -1,0 +1,956 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"PWMB_PSB_DMA_dma.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.PWMB_PSB_DMA_DmaInitialize,"ax",%progbits
+  20              		.align	1
+  21              		.global	PWMB_PSB_DMA_DmaInitialize
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	PWMB_PSB_DMA_DmaInitialize, %function
+  25              	PWMB_PSB_DMA_DmaInitialize:
+  26              	.LFB0:
+  27              		.file 1 "Generated_Source\\PSoC5\\PWMB_PSB_DMA_dma.c"
+   1:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** /***************************************************************************
+   2:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * File Name: PWMB_PSB_DMA_dma.c  
+   3:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * Version 1.70
+   4:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+   5:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *  Description:
+   6:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   Provides an API for the DMAC component. The API includes functions
+   7:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   for the DMA controller, DMA channels and Transfer Descriptors.
+   8:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+   9:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+  10:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   Note:
+  11:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *     This module requires the developer to finish or fill in the auto
+  12:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *     generated funcions and setup the dma channel and TD's.
+  13:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+  14:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** ********************************************************************************
+  15:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * Copyright 2008-2010, Cypress Semiconductor Corporation.  All rights reserved.
+  16:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * You may use this file only in accordance with the license, terms, conditions, 
+  17:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * disclaimers, and limitations in the end user license agreement accompanying 
+  18:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * the software package with which this file was provided.
+  19:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** ********************************************************************************/
+  20:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** #include <CYLIB.H>
+  21:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** #include <CYDMAC.H>
+  22:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** #include <PWMB_PSB_DMA_dma.H>
+  23:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** 
+  24:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** 
+  25:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** 
+  26:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** /****************************************************************************
+  27:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  28:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * The following defines are available in Cyfitter.h
+  29:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  30:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 2
+
+
+  31:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  32:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * PWMB_PSB_DMA__DRQ_CTL_REG
+  33:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  34:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  35:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * PWMB_PSB_DMA__DRQ_NUMBER
+  36:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  37:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * Number of TD's used by this channel.
+  38:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * PWMB_PSB_DMA__NUMBEROF_TDS
+  39:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  40:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * Priority of this channel.
+  41:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * PWMB_PSB_DMA__PRIORITY
+  42:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  43:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * True if PWMB_PSB_DMA_TERMIN_SEL is used.
+  44:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * PWMB_PSB_DMA__TERMIN_EN
+  45:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  46:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * TERMIN interrupt line to signal terminate.
+  47:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * PWMB_PSB_DMA__TERMIN_SEL
+  48:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  49:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  50:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * True if PWMB_PSB_DMA_TERMOUT0_SEL is used.
+  51:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * PWMB_PSB_DMA__TERMOUT0_EN
+  52:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  53:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  54:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * TERMOUT0 interrupt line to signal completion.
+  55:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * PWMB_PSB_DMA__TERMOUT0_SEL
+  56:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  57:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  58:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * True if PWMB_PSB_DMA_TERMOUT1_SEL is used.
+  59:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * PWMB_PSB_DMA__TERMOUT1_EN
+  60:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  61:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  62:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * TERMOUT1 interrupt line to signal completion.
+  63:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * PWMB_PSB_DMA__TERMOUT1_SEL
+  64:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * 
+  65:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** ****************************************************************************/
+  66:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** 
+  67:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** 
+  68:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** /* Zero based index of PWMB_PSB_DMA dma channel */
+  69:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** uint8 PWMB_PSB_DMA_DmaHandle = DMA_INVALID_CHANNEL;
+  70:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** 
+  71:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** /*********************************************************************
+  72:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * Function Name: uint8 PWMB_PSB_DMA_DmaInitalize
+  73:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** **********************************************************************
+  74:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * Summary:
+  75:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   Allocates and initialises a channel of the DMAC to be used by the
+  76:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   caller.
+  77:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+  78:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * Parameters:
+  79:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   BurstCount.
+  80:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *       
+  81:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *       
+  82:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   ReqestPerBurst.
+  83:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *       
+  84:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *       
+  85:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   UpperSrcAddress.
+  86:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *       
+  87:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *       
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 3
+
+
+  88:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   UpperDestAddress.
+  89:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *       
+  90:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+  91:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * Return:
+  92:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   The channel that can be used by the caller for DMA activity.
+  93:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   DMA_INVALID_CHANNEL (0xFF) if there are no channels left. 
+  94:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+  95:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+  96:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *******************************************************************/
+  97:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** uint8 PWMB_PSB_DMA_DmaInitialize(uint8 BurstCount, uint8 ReqestPerBurst, uint16 UpperSrcAddress, ui
+  98:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** {
+  28              		.loc 1 98 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 73B5     		push	{r0, r1, r4, r5, r6, lr}
+  34              		.cfi_def_cfa_offset 24
+  35              		.cfi_offset 4, -16
+  36              		.cfi_offset 5, -12
+  37              		.cfi_offset 6, -8
+  38              		.cfi_offset 14, -4
+  39              		.loc 1 98 0
+  40 0002 1546     		mov	r5, r2
+  41 0004 1E46     		mov	r6, r3
+  99:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** 
+ 100:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****     /* Allocate a DMA channel. */
+ 101:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****     PWMB_PSB_DMA_DmaHandle = (uint8)PWMB_PSB_DMA__DRQ_NUMBER;
+  42              		.loc 1 101 0
+  43 0006 0B4C     		ldr	r4, .L2
+  44 0008 0623     		movs	r3, #6
+  45              	.LVL1:
+ 102:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** 
+ 103:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****     /* Configure the channel. */
+ 104:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****     (void)CyDmaChSetConfiguration(PWMB_PSB_DMA_DmaHandle,
+  46              		.loc 1 104 0
+  47 000a 0022     		movs	r2, #0
+  48              	.LVL2:
+  49 000c 0192     		str	r2, [sp, #4]
+  50 000e 0092     		str	r2, [sp]
+  51 0010 0A46     		mov	r2, r1
+  52 0012 0146     		mov	r1, r0
+  53              	.LVL3:
+  54 0014 1846     		mov	r0, r3
+  55              	.LVL4:
+ 101:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** 
+  56              		.loc 1 101 0
+  57 0016 2370     		strb	r3, [r4]
+  58              		.loc 1 104 0
+  59 0018 FFF7FEFF 		bl	CyDmaChSetConfiguration
+  60              	.LVL5:
+ 105:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****                                   BurstCount,
+ 106:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****                                   ReqestPerBurst,
+ 107:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****                                   (uint8)PWMB_PSB_DMA__TERMOUT0_SEL,
+ 108:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****                                   (uint8)PWMB_PSB_DMA__TERMOUT1_SEL,
+ 109:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****                                   (uint8)PWMB_PSB_DMA__TERMIN_SEL);
+ 110:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 4
+
+
+ 111:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****     /* Set the extended address for the transfers */
+ 112:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****     (void)CyDmaChSetExtendedAddress(PWMB_PSB_DMA_DmaHandle, UpperSrcAddress, UpperDestAddress);
+  61              		.loc 1 112 0
+  62 001c 3246     		mov	r2, r6
+  63 001e 2946     		mov	r1, r5
+  64 0020 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+  65 0022 FFF7FEFF 		bl	CyDmaChSetExtendedAddress
+  66              	.LVL6:
+ 113:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** 
+ 114:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****     /* Set the priority for this channel */
+ 115:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****     (void)CyDmaChPriority(PWMB_PSB_DMA_DmaHandle, (uint8)PWMB_PSB_DMA__PRIORITY);
+  67              		.loc 1 115 0
+  68 0026 0221     		movs	r1, #2
+  69 0028 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+  70 002a FFF7FEFF 		bl	CyDmaChPriority
+  71              	.LVL7:
+ 116:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****     
+ 117:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****     return PWMB_PSB_DMA_DmaHandle;
+ 118:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** }
+  72              		.loc 1 118 0
+  73 002e 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+  74 0030 02B0     		add	sp, sp, #8
+  75              		.cfi_def_cfa_offset 16
+  76              		@ sp needed
+  77 0032 70BD     		pop	{r4, r5, r6, pc}
+  78              	.L3:
+  79              		.align	2
+  80              	.L2:
+  81 0034 00000000 		.word	.LANCHOR0
+  82              		.cfi_endproc
+  83              	.LFE0:
+  84              		.size	PWMB_PSB_DMA_DmaInitialize, .-PWMB_PSB_DMA_DmaInitialize
+  85              		.section	.text.PWMB_PSB_DMA_DmaRelease,"ax",%progbits
+  86              		.align	1
+  87              		.global	PWMB_PSB_DMA_DmaRelease
+  88              		.thumb
+  89              		.thumb_func
+  90              		.type	PWMB_PSB_DMA_DmaRelease, %function
+  91              	PWMB_PSB_DMA_DmaRelease:
+  92              	.LFB1:
+ 119:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** 
+ 120:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** /*********************************************************************
+ 121:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * Function Name: void PWMB_PSB_DMA_DmaRelease
+ 122:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** **********************************************************************
+ 123:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * Summary:
+ 124:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   Frees the channel associated with PWMB_PSB_DMA.
+ 125:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+ 126:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+ 127:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * Parameters:
+ 128:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   void.
+ 129:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+ 130:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+ 131:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+ 132:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** * Return:
+ 133:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *   void.
+ 134:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *
+ 135:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** *******************************************************************/
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 5
+
+
+ 136:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** void PWMB_PSB_DMA_DmaRelease(void) 
+ 137:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c **** {
+  93              		.loc 1 137 0
+  94              		.cfi_startproc
+  95              		@ args = 0, pretend = 0, frame = 0
+  96              		@ frame_needed = 0, uses_anonymous_args = 0
+  97              		@ link register save eliminated.
+ 138:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****     /* Disable the channel */
+ 139:Generated_Source\PSoC5/PWMB_PSB_DMA_dma.c ****     (void)CyDmaChDisable(PWMB_PSB_DMA_DmaHandle);
+  98              		.loc 1 139 0
+  99 0000 014B     		ldr	r3, .L5
+ 100 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 101 0004 FFF7FEBF 		b	CyDmaChDisable
+ 102              	.LVL8:
+ 103              	.L6:
+ 104              		.align	2
+ 105              	.L5:
+ 106 0008 00000000 		.word	.LANCHOR0
+ 107              		.cfi_endproc
+ 108              	.LFE1:
+ 109              		.size	PWMB_PSB_DMA_DmaRelease, .-PWMB_PSB_DMA_DmaRelease
+ 110              		.global	PWMB_PSB_DMA_DmaHandle
+ 111              		.data
+ 112              		.set	.LANCHOR0,. + 0
+ 113              		.type	PWMB_PSB_DMA_DmaHandle, %object
+ 114              		.size	PWMB_PSB_DMA_DmaHandle, 1
+ 115              	PWMB_PSB_DMA_DmaHandle:
+ 116 0000 FF       		.byte	-1
+ 117              		.text
+ 118              	.Letext0:
+ 119              		.file 2 "Generated_Source\\PSoC5/cytypes.h"
+ 120              		.file 3 "Generated_Source\\PSoC5/CYDMAC.H"
+ 121              		.section	.debug_info,"",%progbits
+ 122              	.Ldebug_info0:
+ 123 0000 9B010000 		.4byte	0x19b
+ 124 0004 0400     		.2byte	0x4
+ 125 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 126 000a 04       		.byte	0x4
+ 127 000b 01       		.uleb128 0x1
+ 128 000c 51000000 		.4byte	.LASF23
+ 129 0010 0C       		.byte	0xc
+ 130 0011 49010000 		.4byte	.LASF24
+ 131 0015 93010000 		.4byte	.LASF25
+ 132 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 133 001d 00000000 		.4byte	0
+ 134 0021 00000000 		.4byte	.Ldebug_line0
+ 135 0025 02       		.uleb128 0x2
+ 136 0026 04       		.byte	0x4
+ 137 0027 05       		.byte	0x5
+ 138 0028 696E7400 		.ascii	"int\000"
+ 139 002c 03       		.uleb128 0x3
+ 140 002d 04       		.byte	0x4
+ 141 002e 07       		.byte	0x7
+ 142 002f 1E000000 		.4byte	.LASF0
+ 143 0033 03       		.uleb128 0x3
+ 144 0034 01       		.byte	0x1
+ 145 0035 06       		.byte	0x6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 6
+
+
+ 146 0036 FD010000 		.4byte	.LASF1
+ 147 003a 03       		.uleb128 0x3
+ 148 003b 01       		.byte	0x1
+ 149 003c 08       		.byte	0x8
+ 150 003d 43000000 		.4byte	.LASF2
+ 151 0041 03       		.uleb128 0x3
+ 152 0042 02       		.byte	0x2
+ 153 0043 05       		.byte	0x5
+ 154 0044 4A020000 		.4byte	.LASF3
+ 155 0048 03       		.uleb128 0x3
+ 156 0049 02       		.byte	0x2
+ 157 004a 07       		.byte	0x7
+ 158 004b EA010000 		.4byte	.LASF4
+ 159 004f 03       		.uleb128 0x3
+ 160 0050 04       		.byte	0x4
+ 161 0051 05       		.byte	0x5
+ 162 0052 B8010000 		.4byte	.LASF5
+ 163 0056 03       		.uleb128 0x3
+ 164 0057 04       		.byte	0x4
+ 165 0058 07       		.byte	0x7
+ 166 0059 00010000 		.4byte	.LASF6
+ 167 005d 03       		.uleb128 0x3
+ 168 005e 08       		.byte	0x8
+ 169 005f 05       		.byte	0x5
+ 170 0060 00000000 		.4byte	.LASF7
+ 171 0064 03       		.uleb128 0x3
+ 172 0065 08       		.byte	0x8
+ 173 0066 07       		.byte	0x7
+ 174 0067 12010000 		.4byte	.LASF8
+ 175 006b 03       		.uleb128 0x3
+ 176 006c 04       		.byte	0x4
+ 177 006d 07       		.byte	0x7
+ 178 006e 30020000 		.4byte	.LASF9
+ 179 0072 03       		.uleb128 0x3
+ 180 0073 01       		.byte	0x1
+ 181 0074 08       		.byte	0x8
+ 182 0075 8E010000 		.4byte	.LASF10
+ 183 0079 04       		.uleb128 0x4
+ 184 007a FA000000 		.4byte	.LASF11
+ 185 007e 02       		.byte	0x2
+ 186 007f 9201     		.2byte	0x192
+ 187 0081 3A000000 		.4byte	0x3a
+ 188 0085 04       		.uleb128 0x4
+ 189 0086 54020000 		.4byte	.LASF12
+ 190 008a 02       		.byte	0x2
+ 191 008b 9301     		.2byte	0x193
+ 192 008d 48000000 		.4byte	0x48
+ 193 0091 03       		.uleb128 0x3
+ 194 0092 04       		.byte	0x4
+ 195 0093 04       		.byte	0x4
+ 196 0094 29010000 		.4byte	.LASF13
+ 197 0098 03       		.uleb128 0x3
+ 198 0099 08       		.byte	0x8
+ 199 009a 04       		.byte	0x4
+ 200 009b C1010000 		.4byte	.LASF14
+ 201 009f 05       		.uleb128 0x5
+ 202 00a0 73010000 		.4byte	.LASF26
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 7
+
+
+ 203 00a4 01       		.byte	0x1
+ 204 00a5 61       		.byte	0x61
+ 205 00a6 79000000 		.4byte	0x79
+ 206 00aa 00000000 		.4byte	.LFB0
+ 207 00ae 38000000 		.4byte	.LFE0-.LFB0
+ 208 00b2 01       		.uleb128 0x1
+ 209 00b3 9C       		.byte	0x9c
+ 210 00b4 42010000 		.4byte	0x142
+ 211 00b8 06       		.uleb128 0x6
+ 212 00b9 DF010000 		.4byte	.LASF15
+ 213 00bd 01       		.byte	0x1
+ 214 00be 61       		.byte	0x61
+ 215 00bf 79000000 		.4byte	0x79
+ 216 00c3 00000000 		.4byte	.LLST0
+ 217 00c7 06       		.uleb128 0x6
+ 218 00c8 09020000 		.4byte	.LASF16
+ 219 00cc 01       		.byte	0x1
+ 220 00cd 61       		.byte	0x61
+ 221 00ce 79000000 		.4byte	0x79
+ 222 00d2 21000000 		.4byte	.LLST1
+ 223 00d6 06       		.uleb128 0x6
+ 224 00d7 0E000000 		.4byte	.LASF17
+ 225 00db 01       		.byte	0x1
+ 226 00dc 61       		.byte	0x61
+ 227 00dd 85000000 		.4byte	0x85
+ 228 00e1 42000000 		.4byte	.LLST2
+ 229 00e5 06       		.uleb128 0x6
+ 230 00e6 39020000 		.4byte	.LASF18
+ 231 00ea 01       		.byte	0x1
+ 232 00eb 61       		.byte	0x61
+ 233 00ec 85000000 		.4byte	0x85
+ 234 00f0 63000000 		.4byte	.LLST3
+ 235 00f4 07       		.uleb128 0x7
+ 236 00f5 1C000000 		.4byte	.LVL5
+ 237 00f9 72010000 		.4byte	0x172
+ 238 00fd 18010000 		.4byte	0x118
+ 239 0101 08       		.uleb128 0x8
+ 240 0102 01       		.uleb128 0x1
+ 241 0103 50       		.byte	0x50
+ 242 0104 01       		.uleb128 0x1
+ 243 0105 36       		.byte	0x36
+ 244 0106 08       		.uleb128 0x8
+ 245 0107 01       		.uleb128 0x1
+ 246 0108 53       		.byte	0x53
+ 247 0109 01       		.uleb128 0x1
+ 248 010a 36       		.byte	0x36
+ 249 010b 08       		.uleb128 0x8
+ 250 010c 02       		.uleb128 0x2
+ 251 010d 7D       		.byte	0x7d
+ 252 010e 00       		.sleb128 0
+ 253 010f 01       		.uleb128 0x1
+ 254 0110 30       		.byte	0x30
+ 255 0111 08       		.uleb128 0x8
+ 256 0112 02       		.uleb128 0x2
+ 257 0113 7D       		.byte	0x7d
+ 258 0114 04       		.sleb128 4
+ 259 0115 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 8
+
+
+ 260 0116 30       		.byte	0x30
+ 261 0117 00       		.byte	0
+ 262 0118 07       		.uleb128 0x7
+ 263 0119 26000000 		.4byte	.LVL6
+ 264 011d 7D010000 		.4byte	0x17d
+ 265 0121 32010000 		.4byte	0x132
+ 266 0125 08       		.uleb128 0x8
+ 267 0126 01       		.uleb128 0x1
+ 268 0127 51       		.byte	0x51
+ 269 0128 02       		.uleb128 0x2
+ 270 0129 75       		.byte	0x75
+ 271 012a 00       		.sleb128 0
+ 272 012b 08       		.uleb128 0x8
+ 273 012c 01       		.uleb128 0x1
+ 274 012d 52       		.byte	0x52
+ 275 012e 02       		.uleb128 0x2
+ 276 012f 76       		.byte	0x76
+ 277 0130 00       		.sleb128 0
+ 278 0131 00       		.byte	0
+ 279 0132 09       		.uleb128 0x9
+ 280 0133 2E000000 		.4byte	.LVL7
+ 281 0137 88010000 		.4byte	0x188
+ 282 013b 08       		.uleb128 0x8
+ 283 013c 01       		.uleb128 0x1
+ 284 013d 51       		.byte	0x51
+ 285 013e 01       		.uleb128 0x1
+ 286 013f 32       		.byte	0x32
+ 287 0140 00       		.byte	0
+ 288 0141 00       		.byte	0
+ 289 0142 0A       		.uleb128 0xa
+ 290 0143 2B000000 		.4byte	.LASF27
+ 291 0147 01       		.byte	0x1
+ 292 0148 88       		.byte	0x88
+ 293 0149 00000000 		.4byte	.LFB1
+ 294 014d 0C000000 		.4byte	.LFE1-.LFB1
+ 295 0151 01       		.uleb128 0x1
+ 296 0152 9C       		.byte	0x9c
+ 297 0153 61010000 		.4byte	0x161
+ 298 0157 0B       		.uleb128 0xb
+ 299 0158 08000000 		.4byte	.LVL8
+ 300 015c 93010000 		.4byte	0x193
+ 301 0160 00       		.byte	0
+ 302 0161 0C       		.uleb128 0xc
+ 303 0162 C8010000 		.4byte	.LASF28
+ 304 0166 01       		.byte	0x1
+ 305 0167 45       		.byte	0x45
+ 306 0168 79000000 		.4byte	0x79
+ 307 016c 05       		.uleb128 0x5
+ 308 016d 03       		.byte	0x3
+ 309 016e 00000000 		.4byte	PWMB_PSB_DMA_DmaHandle
+ 310 0172 0D       		.uleb128 0xd
+ 311 0173 18020000 		.4byte	.LASF19
+ 312 0177 18020000 		.4byte	.LASF19
+ 313 017b 03       		.byte	0x3
+ 314 017c 33       		.byte	0x33
+ 315 017d 0D       		.uleb128 0xd
+ 316 017e 2F010000 		.4byte	.LASF20
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 9
+
+
+ 317 0182 2F010000 		.4byte	.LASF20
+ 318 0186 03       		.byte	0x3
+ 319 0187 2D       		.byte	0x2d
+ 320 0188 0D       		.uleb128 0xd
+ 321 0189 EA000000 		.4byte	.LASF21
+ 322 018d EA000000 		.4byte	.LASF21
+ 323 0191 03       		.byte	0x3
+ 324 0192 2C       		.byte	0x2c
+ 325 0193 0D       		.uleb128 0xd
+ 326 0194 5B020000 		.4byte	.LASF22
+ 327 0198 5B020000 		.4byte	.LASF22
+ 328 019c 03       		.byte	0x3
+ 329 019d 2A       		.byte	0x2a
+ 330 019e 00       		.byte	0
+ 331              		.section	.debug_abbrev,"",%progbits
+ 332              	.Ldebug_abbrev0:
+ 333 0000 01       		.uleb128 0x1
+ 334 0001 11       		.uleb128 0x11
+ 335 0002 01       		.byte	0x1
+ 336 0003 25       		.uleb128 0x25
+ 337 0004 0E       		.uleb128 0xe
+ 338 0005 13       		.uleb128 0x13
+ 339 0006 0B       		.uleb128 0xb
+ 340 0007 03       		.uleb128 0x3
+ 341 0008 0E       		.uleb128 0xe
+ 342 0009 1B       		.uleb128 0x1b
+ 343 000a 0E       		.uleb128 0xe
+ 344 000b 55       		.uleb128 0x55
+ 345 000c 17       		.uleb128 0x17
+ 346 000d 11       		.uleb128 0x11
+ 347 000e 01       		.uleb128 0x1
+ 348 000f 10       		.uleb128 0x10
+ 349 0010 17       		.uleb128 0x17
+ 350 0011 00       		.byte	0
+ 351 0012 00       		.byte	0
+ 352 0013 02       		.uleb128 0x2
+ 353 0014 24       		.uleb128 0x24
+ 354 0015 00       		.byte	0
+ 355 0016 0B       		.uleb128 0xb
+ 356 0017 0B       		.uleb128 0xb
+ 357 0018 3E       		.uleb128 0x3e
+ 358 0019 0B       		.uleb128 0xb
+ 359 001a 03       		.uleb128 0x3
+ 360 001b 08       		.uleb128 0x8
+ 361 001c 00       		.byte	0
+ 362 001d 00       		.byte	0
+ 363 001e 03       		.uleb128 0x3
+ 364 001f 24       		.uleb128 0x24
+ 365 0020 00       		.byte	0
+ 366 0021 0B       		.uleb128 0xb
+ 367 0022 0B       		.uleb128 0xb
+ 368 0023 3E       		.uleb128 0x3e
+ 369 0024 0B       		.uleb128 0xb
+ 370 0025 03       		.uleb128 0x3
+ 371 0026 0E       		.uleb128 0xe
+ 372 0027 00       		.byte	0
+ 373 0028 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 10
+
+
+ 374 0029 04       		.uleb128 0x4
+ 375 002a 16       		.uleb128 0x16
+ 376 002b 00       		.byte	0
+ 377 002c 03       		.uleb128 0x3
+ 378 002d 0E       		.uleb128 0xe
+ 379 002e 3A       		.uleb128 0x3a
+ 380 002f 0B       		.uleb128 0xb
+ 381 0030 3B       		.uleb128 0x3b
+ 382 0031 05       		.uleb128 0x5
+ 383 0032 49       		.uleb128 0x49
+ 384 0033 13       		.uleb128 0x13
+ 385 0034 00       		.byte	0
+ 386 0035 00       		.byte	0
+ 387 0036 05       		.uleb128 0x5
+ 388 0037 2E       		.uleb128 0x2e
+ 389 0038 01       		.byte	0x1
+ 390 0039 3F       		.uleb128 0x3f
+ 391 003a 19       		.uleb128 0x19
+ 392 003b 03       		.uleb128 0x3
+ 393 003c 0E       		.uleb128 0xe
+ 394 003d 3A       		.uleb128 0x3a
+ 395 003e 0B       		.uleb128 0xb
+ 396 003f 3B       		.uleb128 0x3b
+ 397 0040 0B       		.uleb128 0xb
+ 398 0041 27       		.uleb128 0x27
+ 399 0042 19       		.uleb128 0x19
+ 400 0043 49       		.uleb128 0x49
+ 401 0044 13       		.uleb128 0x13
+ 402 0045 11       		.uleb128 0x11
+ 403 0046 01       		.uleb128 0x1
+ 404 0047 12       		.uleb128 0x12
+ 405 0048 06       		.uleb128 0x6
+ 406 0049 40       		.uleb128 0x40
+ 407 004a 18       		.uleb128 0x18
+ 408 004b 9742     		.uleb128 0x2117
+ 409 004d 19       		.uleb128 0x19
+ 410 004e 01       		.uleb128 0x1
+ 411 004f 13       		.uleb128 0x13
+ 412 0050 00       		.byte	0
+ 413 0051 00       		.byte	0
+ 414 0052 06       		.uleb128 0x6
+ 415 0053 05       		.uleb128 0x5
+ 416 0054 00       		.byte	0
+ 417 0055 03       		.uleb128 0x3
+ 418 0056 0E       		.uleb128 0xe
+ 419 0057 3A       		.uleb128 0x3a
+ 420 0058 0B       		.uleb128 0xb
+ 421 0059 3B       		.uleb128 0x3b
+ 422 005a 0B       		.uleb128 0xb
+ 423 005b 49       		.uleb128 0x49
+ 424 005c 13       		.uleb128 0x13
+ 425 005d 02       		.uleb128 0x2
+ 426 005e 17       		.uleb128 0x17
+ 427 005f 00       		.byte	0
+ 428 0060 00       		.byte	0
+ 429 0061 07       		.uleb128 0x7
+ 430 0062 898201   		.uleb128 0x4109
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 11
+
+
+ 431 0065 01       		.byte	0x1
+ 432 0066 11       		.uleb128 0x11
+ 433 0067 01       		.uleb128 0x1
+ 434 0068 31       		.uleb128 0x31
+ 435 0069 13       		.uleb128 0x13
+ 436 006a 01       		.uleb128 0x1
+ 437 006b 13       		.uleb128 0x13
+ 438 006c 00       		.byte	0
+ 439 006d 00       		.byte	0
+ 440 006e 08       		.uleb128 0x8
+ 441 006f 8A8201   		.uleb128 0x410a
+ 442 0072 00       		.byte	0
+ 443 0073 02       		.uleb128 0x2
+ 444 0074 18       		.uleb128 0x18
+ 445 0075 9142     		.uleb128 0x2111
+ 446 0077 18       		.uleb128 0x18
+ 447 0078 00       		.byte	0
+ 448 0079 00       		.byte	0
+ 449 007a 09       		.uleb128 0x9
+ 450 007b 898201   		.uleb128 0x4109
+ 451 007e 01       		.byte	0x1
+ 452 007f 11       		.uleb128 0x11
+ 453 0080 01       		.uleb128 0x1
+ 454 0081 31       		.uleb128 0x31
+ 455 0082 13       		.uleb128 0x13
+ 456 0083 00       		.byte	0
+ 457 0084 00       		.byte	0
+ 458 0085 0A       		.uleb128 0xa
+ 459 0086 2E       		.uleb128 0x2e
+ 460 0087 01       		.byte	0x1
+ 461 0088 3F       		.uleb128 0x3f
+ 462 0089 19       		.uleb128 0x19
+ 463 008a 03       		.uleb128 0x3
+ 464 008b 0E       		.uleb128 0xe
+ 465 008c 3A       		.uleb128 0x3a
+ 466 008d 0B       		.uleb128 0xb
+ 467 008e 3B       		.uleb128 0x3b
+ 468 008f 0B       		.uleb128 0xb
+ 469 0090 27       		.uleb128 0x27
+ 470 0091 19       		.uleb128 0x19
+ 471 0092 11       		.uleb128 0x11
+ 472 0093 01       		.uleb128 0x1
+ 473 0094 12       		.uleb128 0x12
+ 474 0095 06       		.uleb128 0x6
+ 475 0096 40       		.uleb128 0x40
+ 476 0097 18       		.uleb128 0x18
+ 477 0098 9742     		.uleb128 0x2117
+ 478 009a 19       		.uleb128 0x19
+ 479 009b 01       		.uleb128 0x1
+ 480 009c 13       		.uleb128 0x13
+ 481 009d 00       		.byte	0
+ 482 009e 00       		.byte	0
+ 483 009f 0B       		.uleb128 0xb
+ 484 00a0 898201   		.uleb128 0x4109
+ 485 00a3 00       		.byte	0
+ 486 00a4 11       		.uleb128 0x11
+ 487 00a5 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 12
+
+
+ 488 00a6 9542     		.uleb128 0x2115
+ 489 00a8 19       		.uleb128 0x19
+ 490 00a9 31       		.uleb128 0x31
+ 491 00aa 13       		.uleb128 0x13
+ 492 00ab 00       		.byte	0
+ 493 00ac 00       		.byte	0
+ 494 00ad 0C       		.uleb128 0xc
+ 495 00ae 34       		.uleb128 0x34
+ 496 00af 00       		.byte	0
+ 497 00b0 03       		.uleb128 0x3
+ 498 00b1 0E       		.uleb128 0xe
+ 499 00b2 3A       		.uleb128 0x3a
+ 500 00b3 0B       		.uleb128 0xb
+ 501 00b4 3B       		.uleb128 0x3b
+ 502 00b5 0B       		.uleb128 0xb
+ 503 00b6 49       		.uleb128 0x49
+ 504 00b7 13       		.uleb128 0x13
+ 505 00b8 3F       		.uleb128 0x3f
+ 506 00b9 19       		.uleb128 0x19
+ 507 00ba 02       		.uleb128 0x2
+ 508 00bb 18       		.uleb128 0x18
+ 509 00bc 00       		.byte	0
+ 510 00bd 00       		.byte	0
+ 511 00be 0D       		.uleb128 0xd
+ 512 00bf 2E       		.uleb128 0x2e
+ 513 00c0 00       		.byte	0
+ 514 00c1 3F       		.uleb128 0x3f
+ 515 00c2 19       		.uleb128 0x19
+ 516 00c3 3C       		.uleb128 0x3c
+ 517 00c4 19       		.uleb128 0x19
+ 518 00c5 6E       		.uleb128 0x6e
+ 519 00c6 0E       		.uleb128 0xe
+ 520 00c7 03       		.uleb128 0x3
+ 521 00c8 0E       		.uleb128 0xe
+ 522 00c9 3A       		.uleb128 0x3a
+ 523 00ca 0B       		.uleb128 0xb
+ 524 00cb 3B       		.uleb128 0x3b
+ 525 00cc 0B       		.uleb128 0xb
+ 526 00cd 00       		.byte	0
+ 527 00ce 00       		.byte	0
+ 528 00cf 00       		.byte	0
+ 529              		.section	.debug_loc,"",%progbits
+ 530              	.Ldebug_loc0:
+ 531              	.LLST0:
+ 532 0000 00000000 		.4byte	.LVL0
+ 533 0004 16000000 		.4byte	.LVL4
+ 534 0008 0100     		.2byte	0x1
+ 535 000a 50       		.byte	0x50
+ 536 000b 16000000 		.4byte	.LVL4
+ 537 000f 38000000 		.4byte	.LFE0
+ 538 0013 0400     		.2byte	0x4
+ 539 0015 F3       		.byte	0xf3
+ 540 0016 01       		.uleb128 0x1
+ 541 0017 50       		.byte	0x50
+ 542 0018 9F       		.byte	0x9f
+ 543 0019 00000000 		.4byte	0
+ 544 001d 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 13
+
+
+ 545              	.LLST1:
+ 546 0021 00000000 		.4byte	.LVL0
+ 547 0025 14000000 		.4byte	.LVL3
+ 548 0029 0100     		.2byte	0x1
+ 549 002b 51       		.byte	0x51
+ 550 002c 14000000 		.4byte	.LVL3
+ 551 0030 38000000 		.4byte	.LFE0
+ 552 0034 0400     		.2byte	0x4
+ 553 0036 F3       		.byte	0xf3
+ 554 0037 01       		.uleb128 0x1
+ 555 0038 51       		.byte	0x51
+ 556 0039 9F       		.byte	0x9f
+ 557 003a 00000000 		.4byte	0
+ 558 003e 00000000 		.4byte	0
+ 559              	.LLST2:
+ 560 0042 00000000 		.4byte	.LVL0
+ 561 0046 0C000000 		.4byte	.LVL2
+ 562 004a 0100     		.2byte	0x1
+ 563 004c 52       		.byte	0x52
+ 564 004d 0C000000 		.4byte	.LVL2
+ 565 0051 38000000 		.4byte	.LFE0
+ 566 0055 0400     		.2byte	0x4
+ 567 0057 F3       		.byte	0xf3
+ 568 0058 01       		.uleb128 0x1
+ 569 0059 52       		.byte	0x52
+ 570 005a 9F       		.byte	0x9f
+ 571 005b 00000000 		.4byte	0
+ 572 005f 00000000 		.4byte	0
+ 573              	.LLST3:
+ 574 0063 00000000 		.4byte	.LVL0
+ 575 0067 0A000000 		.4byte	.LVL1
+ 576 006b 0100     		.2byte	0x1
+ 577 006d 53       		.byte	0x53
+ 578 006e 0A000000 		.4byte	.LVL1
+ 579 0072 38000000 		.4byte	.LFE0
+ 580 0076 0400     		.2byte	0x4
+ 581 0078 F3       		.byte	0xf3
+ 582 0079 01       		.uleb128 0x1
+ 583 007a 53       		.byte	0x53
+ 584 007b 9F       		.byte	0x9f
+ 585 007c 00000000 		.4byte	0
+ 586 0080 00000000 		.4byte	0
+ 587              		.section	.debug_aranges,"",%progbits
+ 588 0000 24000000 		.4byte	0x24
+ 589 0004 0200     		.2byte	0x2
+ 590 0006 00000000 		.4byte	.Ldebug_info0
+ 591 000a 04       		.byte	0x4
+ 592 000b 00       		.byte	0
+ 593 000c 0000     		.2byte	0
+ 594 000e 0000     		.2byte	0
+ 595 0010 00000000 		.4byte	.LFB0
+ 596 0014 38000000 		.4byte	.LFE0-.LFB0
+ 597 0018 00000000 		.4byte	.LFB1
+ 598 001c 0C000000 		.4byte	.LFE1-.LFB1
+ 599 0020 00000000 		.4byte	0
+ 600 0024 00000000 		.4byte	0
+ 601              		.section	.debug_ranges,"",%progbits
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 14
+
+
+ 602              	.Ldebug_ranges0:
+ 603 0000 00000000 		.4byte	.LFB0
+ 604 0004 38000000 		.4byte	.LFE0
+ 605 0008 00000000 		.4byte	.LFB1
+ 606 000c 0C000000 		.4byte	.LFE1
+ 607 0010 00000000 		.4byte	0
+ 608 0014 00000000 		.4byte	0
+ 609              		.section	.debug_line,"",%progbits
+ 610              	.Ldebug_line0:
+ 611 0000 88000000 		.section	.debug_str,"MS",%progbits,1
+ 611      02005900 
+ 611      00000201 
+ 611      FB0E0D00 
+ 611      01010101 
+ 612              	.LASF7:
+ 613 0000 6C6F6E67 		.ascii	"long long int\000"
+ 613      206C6F6E 
+ 613      6720696E 
+ 613      7400
+ 614              	.LASF17:
+ 615 000e 55707065 		.ascii	"UpperSrcAddress\000"
+ 615      72537263 
+ 615      41646472 
+ 615      65737300 
+ 616              	.LASF0:
+ 617 001e 756E7369 		.ascii	"unsigned int\000"
+ 617      676E6564 
+ 617      20696E74 
+ 617      00
+ 618              	.LASF27:
+ 619 002b 50574D42 		.ascii	"PWMB_PSB_DMA_DmaRelease\000"
+ 619      5F505342 
+ 619      5F444D41 
+ 619      5F446D61 
+ 619      52656C65 
+ 620              	.LASF2:
+ 621 0043 756E7369 		.ascii	"unsigned char\000"
+ 621      676E6564 
+ 621      20636861 
+ 621      7200
+ 622              	.LASF23:
+ 623 0051 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 623      43393920 
+ 623      352E342E 
+ 623      31203230 
+ 623      31363036 
+ 624 0084 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 624      20726576 
+ 624      6973696F 
+ 624      6E203233 
+ 624      37373135 
+ 625 00b7 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 625      74643D67 
+ 625      6E753939 
+ 625      202D6666 
+ 625      756E6374 
+ 626              	.LASF21:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 15
+
+
+ 627 00ea 4379446D 		.ascii	"CyDmaChPriority\000"
+ 627      61436850 
+ 627      72696F72 
+ 627      69747900 
+ 628              	.LASF11:
+ 629 00fa 75696E74 		.ascii	"uint8\000"
+ 629      3800
+ 630              	.LASF6:
+ 631 0100 6C6F6E67 		.ascii	"long unsigned int\000"
+ 631      20756E73 
+ 631      69676E65 
+ 631      6420696E 
+ 631      7400
+ 632              	.LASF8:
+ 633 0112 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 633      206C6F6E 
+ 633      6720756E 
+ 633      7369676E 
+ 633      65642069 
+ 634              	.LASF13:
+ 635 0129 666C6F61 		.ascii	"float\000"
+ 635      7400
+ 636              	.LASF20:
+ 637 012f 4379446D 		.ascii	"CyDmaChSetExtendedAddress\000"
+ 637      61436853 
+ 637      65744578 
+ 637      74656E64 
+ 637      65644164 
+ 638              	.LASF24:
+ 639 0149 47656E65 		.ascii	"Generated_Source\\PSoC5\\PWMB_PSB_DMA_dma.c\000"
+ 639      72617465 
+ 639      645F536F 
+ 639      75726365 
+ 639      5C50536F 
+ 640              	.LASF26:
+ 641 0173 50574D42 		.ascii	"PWMB_PSB_DMA_DmaInitialize\000"
+ 641      5F505342 
+ 641      5F444D41 
+ 641      5F446D61 
+ 641      496E6974 
+ 642              	.LASF10:
+ 643 018e 63686172 		.ascii	"char\000"
+ 643      00
+ 644              	.LASF25:
+ 645 0193 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 645      73657273 
+ 645      5C636865 
+ 645      6D695C55 
+ 645      44335F51 
+ 646              	.LASF5:
+ 647 01b8 6C6F6E67 		.ascii	"long int\000"
+ 647      20696E74 
+ 647      00
+ 648              	.LASF14:
+ 649 01c1 646F7562 		.ascii	"double\000"
+ 649      6C6500
+ 650              	.LASF28:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccaiyOKN.s 			page 16
+
+
+ 651 01c8 50574D42 		.ascii	"PWMB_PSB_DMA_DmaHandle\000"
+ 651      5F505342 
+ 651      5F444D41 
+ 651      5F446D61 
+ 651      48616E64 
+ 652              	.LASF15:
+ 653 01df 42757273 		.ascii	"BurstCount\000"
+ 653      74436F75 
+ 653      6E7400
+ 654              	.LASF4:
+ 655 01ea 73686F72 		.ascii	"short unsigned int\000"
+ 655      7420756E 
+ 655      7369676E 
+ 655      65642069 
+ 655      6E7400
+ 656              	.LASF1:
+ 657 01fd 7369676E 		.ascii	"signed char\000"
+ 657      65642063 
+ 657      68617200 
+ 658              	.LASF16:
+ 659 0209 52657165 		.ascii	"ReqestPerBurst\000"
+ 659      73745065 
+ 659      72427572 
+ 659      737400
+ 660              	.LASF19:
+ 661 0218 4379446D 		.ascii	"CyDmaChSetConfiguration\000"
+ 661      61436853 
+ 661      6574436F 
+ 661      6E666967 
+ 661      75726174 
+ 662              	.LASF9:
+ 663 0230 73697A65 		.ascii	"sizetype\000"
+ 663      74797065 
+ 663      00
+ 664              	.LASF18:
+ 665 0239 55707065 		.ascii	"UpperDestAddress\000"
+ 665      72446573 
+ 665      74416464 
+ 665      72657373 
+ 665      00
+ 666              	.LASF3:
+ 667 024a 73686F72 		.ascii	"short int\000"
+ 667      7420696E 
+ 667      7400
+ 668              	.LASF12:
+ 669 0254 75696E74 		.ascii	"uint16\000"
+ 669      313600
+ 670              	.LASF22:
+ 671 025b 4379446D 		.ascii	"CyDmaChDisable\000"
+ 671      61436844 
+ 671      69736162 
+ 671      6C6500
+ 672              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

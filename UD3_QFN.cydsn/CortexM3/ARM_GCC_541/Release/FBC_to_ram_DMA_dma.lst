@@ -1,0 +1,964 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"FBC_to_ram_DMA_dma.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.FBC_to_ram_DMA_DmaInitialize,"ax",%progbits
+  20              		.align	1
+  21              		.global	FBC_to_ram_DMA_DmaInitialize
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	FBC_to_ram_DMA_DmaInitialize, %function
+  25              	FBC_to_ram_DMA_DmaInitialize:
+  26              	.LFB0:
+  27              		.file 1 "Generated_Source\\PSoC5\\FBC_to_ram_DMA_dma.c"
+   1:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** /***************************************************************************
+   2:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * File Name: FBC_to_ram_DMA_dma.c  
+   3:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * Version 1.70
+   4:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+   5:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *  Description:
+   6:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   Provides an API for the DMAC component. The API includes functions
+   7:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   for the DMA controller, DMA channels and Transfer Descriptors.
+   8:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+   9:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+  10:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   Note:
+  11:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *     This module requires the developer to finish or fill in the auto
+  12:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *     generated funcions and setup the dma channel and TD's.
+  13:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+  14:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** ********************************************************************************
+  15:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * Copyright 2008-2010, Cypress Semiconductor Corporation.  All rights reserved.
+  16:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * You may use this file only in accordance with the license, terms, conditions, 
+  17:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * disclaimers, and limitations in the end user license agreement accompanying 
+  18:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * the software package with which this file was provided.
+  19:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** ********************************************************************************/
+  20:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** #include <CYLIB.H>
+  21:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** #include <CYDMAC.H>
+  22:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** #include <FBC_to_ram_DMA_dma.H>
+  23:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** 
+  24:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** 
+  25:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** 
+  26:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** /****************************************************************************
+  27:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  28:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * The following defines are available in Cyfitter.h
+  29:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  30:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 2
+
+
+  31:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  32:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * FBC_to_ram_DMA__DRQ_CTL_REG
+  33:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  34:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  35:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * FBC_to_ram_DMA__DRQ_NUMBER
+  36:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  37:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * Number of TD's used by this channel.
+  38:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * FBC_to_ram_DMA__NUMBEROF_TDS
+  39:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  40:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * Priority of this channel.
+  41:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * FBC_to_ram_DMA__PRIORITY
+  42:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  43:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * True if FBC_to_ram_DMA_TERMIN_SEL is used.
+  44:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * FBC_to_ram_DMA__TERMIN_EN
+  45:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  46:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * TERMIN interrupt line to signal terminate.
+  47:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * FBC_to_ram_DMA__TERMIN_SEL
+  48:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  49:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  50:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * True if FBC_to_ram_DMA_TERMOUT0_SEL is used.
+  51:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * FBC_to_ram_DMA__TERMOUT0_EN
+  52:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  53:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  54:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * TERMOUT0 interrupt line to signal completion.
+  55:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * FBC_to_ram_DMA__TERMOUT0_SEL
+  56:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  57:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  58:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * True if FBC_to_ram_DMA_TERMOUT1_SEL is used.
+  59:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * FBC_to_ram_DMA__TERMOUT1_EN
+  60:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  61:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  62:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * TERMOUT1 interrupt line to signal completion.
+  63:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * FBC_to_ram_DMA__TERMOUT1_SEL
+  64:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * 
+  65:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** ****************************************************************************/
+  66:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** 
+  67:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** 
+  68:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** /* Zero based index of FBC_to_ram_DMA dma channel */
+  69:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** uint8 FBC_to_ram_DMA_DmaHandle = DMA_INVALID_CHANNEL;
+  70:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** 
+  71:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** /*********************************************************************
+  72:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * Function Name: uint8 FBC_to_ram_DMA_DmaInitalize
+  73:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** **********************************************************************
+  74:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * Summary:
+  75:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   Allocates and initialises a channel of the DMAC to be used by the
+  76:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   caller.
+  77:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+  78:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * Parameters:
+  79:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   BurstCount.
+  80:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *       
+  81:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *       
+  82:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   ReqestPerBurst.
+  83:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *       
+  84:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *       
+  85:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   UpperSrcAddress.
+  86:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *       
+  87:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *       
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 3
+
+
+  88:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   UpperDestAddress.
+  89:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *       
+  90:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+  91:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * Return:
+  92:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   The channel that can be used by the caller for DMA activity.
+  93:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   DMA_INVALID_CHANNEL (0xFF) if there are no channels left. 
+  94:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+  95:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+  96:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *******************************************************************/
+  97:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** uint8 FBC_to_ram_DMA_DmaInitialize(uint8 BurstCount, uint8 ReqestPerBurst, uint16 UpperSrcAddress, 
+  98:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** {
+  28              		.loc 1 98 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 F7B5     		push	{r0, r1, r2, r4, r5, r6, r7, lr}
+  34              		.cfi_def_cfa_offset 32
+  35              		.cfi_offset 4, -20
+  36              		.cfi_offset 5, -16
+  37              		.cfi_offset 6, -12
+  38              		.cfi_offset 7, -8
+  39              		.cfi_offset 14, -4
+  40              		.loc 1 98 0
+  41 0002 1646     		mov	r6, r2
+  42 0004 1F46     		mov	r7, r3
+  99:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** 
+ 100:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****     /* Allocate a DMA channel. */
+ 101:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****     FBC_to_ram_DMA_DmaHandle = (uint8)FBC_to_ram_DMA__DRQ_NUMBER;
+  43              		.loc 1 101 0
+  44 0006 0C4C     		ldr	r4, .L2
+  45 0008 0225     		movs	r5, #2
+ 102:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** 
+ 103:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****     /* Configure the channel. */
+ 104:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****     (void)CyDmaChSetConfiguration(FBC_to_ram_DMA_DmaHandle,
+  46              		.loc 1 104 0
+  47 000a 0023     		movs	r3, #0
+  48              	.LVL1:
+  49 000c 0193     		str	r3, [sp, #4]
+  50 000e 0093     		str	r3, [sp]
+  51 0010 0A46     		mov	r2, r1
+  52              	.LVL2:
+  53 0012 2B46     		mov	r3, r5
+  54 0014 0146     		mov	r1, r0
+  55              	.LVL3:
+  56 0016 2846     		mov	r0, r5
+  57              	.LVL4:
+ 101:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** 
+  58              		.loc 1 101 0
+  59 0018 2570     		strb	r5, [r4]
+  60              		.loc 1 104 0
+  61 001a FFF7FEFF 		bl	CyDmaChSetConfiguration
+  62              	.LVL5:
+ 105:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****                                   BurstCount,
+ 106:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****                                   ReqestPerBurst,
+ 107:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****                                   (uint8)FBC_to_ram_DMA__TERMOUT0_SEL,
+ 108:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****                                   (uint8)FBC_to_ram_DMA__TERMOUT1_SEL,
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 4
+
+
+ 109:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****                                   (uint8)FBC_to_ram_DMA__TERMIN_SEL);
+ 110:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** 
+ 111:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****     /* Set the extended address for the transfers */
+ 112:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****     (void)CyDmaChSetExtendedAddress(FBC_to_ram_DMA_DmaHandle, UpperSrcAddress, UpperDestAddress);
+  63              		.loc 1 112 0
+  64 001e 3A46     		mov	r2, r7
+  65 0020 3146     		mov	r1, r6
+  66 0022 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+  67 0024 FFF7FEFF 		bl	CyDmaChSetExtendedAddress
+  68              	.LVL6:
+ 113:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** 
+ 114:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****     /* Set the priority for this channel */
+ 115:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****     (void)CyDmaChPriority(FBC_to_ram_DMA_DmaHandle, (uint8)FBC_to_ram_DMA__PRIORITY);
+  69              		.loc 1 115 0
+  70 0028 2946     		mov	r1, r5
+  71 002a 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+  72 002c FFF7FEFF 		bl	CyDmaChPriority
+  73              	.LVL7:
+ 116:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****     
+ 117:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****     return FBC_to_ram_DMA_DmaHandle;
+ 118:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** }
+  74              		.loc 1 118 0
+  75 0030 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+  76 0032 03B0     		add	sp, sp, #12
+  77              		.cfi_def_cfa_offset 20
+  78              		@ sp needed
+  79 0034 F0BD     		pop	{r4, r5, r6, r7, pc}
+  80              	.L3:
+  81 0036 00BF     		.align	2
+  82              	.L2:
+  83 0038 00000000 		.word	.LANCHOR0
+  84              		.cfi_endproc
+  85              	.LFE0:
+  86              		.size	FBC_to_ram_DMA_DmaInitialize, .-FBC_to_ram_DMA_DmaInitialize
+  87              		.section	.text.FBC_to_ram_DMA_DmaRelease,"ax",%progbits
+  88              		.align	1
+  89              		.global	FBC_to_ram_DMA_DmaRelease
+  90              		.thumb
+  91              		.thumb_func
+  92              		.type	FBC_to_ram_DMA_DmaRelease, %function
+  93              	FBC_to_ram_DMA_DmaRelease:
+  94              	.LFB1:
+ 119:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** 
+ 120:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** /*********************************************************************
+ 121:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * Function Name: void FBC_to_ram_DMA_DmaRelease
+ 122:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** **********************************************************************
+ 123:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * Summary:
+ 124:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   Frees the channel associated with FBC_to_ram_DMA.
+ 125:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+ 126:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+ 127:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * Parameters:
+ 128:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   void.
+ 129:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+ 130:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+ 131:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+ 132:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** * Return:
+ 133:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *   void.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 5
+
+
+ 134:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *
+ 135:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** *******************************************************************/
+ 136:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** void FBC_to_ram_DMA_DmaRelease(void) 
+ 137:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c **** {
+  95              		.loc 1 137 0
+  96              		.cfi_startproc
+  97              		@ args = 0, pretend = 0, frame = 0
+  98              		@ frame_needed = 0, uses_anonymous_args = 0
+  99              		@ link register save eliminated.
+ 138:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****     /* Disable the channel */
+ 139:Generated_Source\PSoC5/FBC_to_ram_DMA_dma.c ****     (void)CyDmaChDisable(FBC_to_ram_DMA_DmaHandle);
+ 100              		.loc 1 139 0
+ 101 0000 014B     		ldr	r3, .L5
+ 102 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 103 0004 FFF7FEBF 		b	CyDmaChDisable
+ 104              	.LVL8:
+ 105              	.L6:
+ 106              		.align	2
+ 107              	.L5:
+ 108 0008 00000000 		.word	.LANCHOR0
+ 109              		.cfi_endproc
+ 110              	.LFE1:
+ 111              		.size	FBC_to_ram_DMA_DmaRelease, .-FBC_to_ram_DMA_DmaRelease
+ 112              		.global	FBC_to_ram_DMA_DmaHandle
+ 113              		.data
+ 114              		.set	.LANCHOR0,. + 0
+ 115              		.type	FBC_to_ram_DMA_DmaHandle, %object
+ 116              		.size	FBC_to_ram_DMA_DmaHandle, 1
+ 117              	FBC_to_ram_DMA_DmaHandle:
+ 118 0000 FF       		.byte	-1
+ 119              		.text
+ 120              	.Letext0:
+ 121              		.file 2 "Generated_Source\\PSoC5/cytypes.h"
+ 122              		.file 3 "Generated_Source\\PSoC5/CYDMAC.H"
+ 123              		.section	.debug_info,"",%progbits
+ 124              	.Ldebug_info0:
+ 125 0000 9E010000 		.4byte	0x19e
+ 126 0004 0400     		.2byte	0x4
+ 127 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 128 000a 04       		.byte	0x4
+ 129 000b 01       		.uleb128 0x1
+ 130 000c 5D000000 		.4byte	.LASF23
+ 131 0010 0C       		.byte	0xc
+ 132 0011 0C020000 		.4byte	.LASF24
+ 133 0015 77010000 		.4byte	.LASF25
+ 134 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 135 001d 00000000 		.4byte	0
+ 136 0021 00000000 		.4byte	.Ldebug_line0
+ 137 0025 02       		.uleb128 0x2
+ 138 0026 04       		.byte	0x4
+ 139 0027 05       		.byte	0x5
+ 140 0028 696E7400 		.ascii	"int\000"
+ 141 002c 03       		.uleb128 0x3
+ 142 002d 04       		.byte	0x4
+ 143 002e 07       		.byte	0x7
+ 144 002f 1E000000 		.4byte	.LASF0
+ 145 0033 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 6
+
+
+ 146 0034 01       		.byte	0x1
+ 147 0035 06       		.byte	0x6
+ 148 0036 CA010000 		.4byte	.LASF1
+ 149 003a 03       		.uleb128 0x3
+ 150 003b 01       		.byte	0x1
+ 151 003c 08       		.byte	0x8
+ 152 003d 64010000 		.4byte	.LASF2
+ 153 0041 03       		.uleb128 0x3
+ 154 0042 02       		.byte	0x2
+ 155 0043 05       		.byte	0x5
+ 156 0044 52020000 		.4byte	.LASF3
+ 157 0048 03       		.uleb128 0x3
+ 158 0049 02       		.byte	0x2
+ 159 004a 07       		.byte	0x7
+ 160 004b B7010000 		.4byte	.LASF4
+ 161 004f 03       		.uleb128 0x3
+ 162 0050 04       		.byte	0x4
+ 163 0051 05       		.byte	0x5
+ 164 0052 9C010000 		.4byte	.LASF5
+ 165 0056 03       		.uleb128 0x3
+ 166 0057 04       		.byte	0x4
+ 167 0058 07       		.byte	0x7
+ 168 0059 0C010000 		.4byte	.LASF6
+ 169 005d 03       		.uleb128 0x3
+ 170 005e 08       		.byte	0x8
+ 171 005f 05       		.byte	0x5
+ 172 0060 00000000 		.4byte	.LASF7
+ 173 0064 03       		.uleb128 0x3
+ 174 0065 08       		.byte	0x8
+ 175 0066 07       		.byte	0x7
+ 176 0067 2D010000 		.4byte	.LASF8
+ 177 006b 03       		.uleb128 0x3
+ 178 006c 04       		.byte	0x4
+ 179 006d 07       		.byte	0x7
+ 180 006e 38020000 		.4byte	.LASF9
+ 181 0072 03       		.uleb128 0x3
+ 182 0073 01       		.byte	0x1
+ 183 0074 08       		.byte	0x8
+ 184 0075 72010000 		.4byte	.LASF10
+ 185 0079 04       		.uleb128 0x4
+ 186 007a 06010000 		.4byte	.LASF11
+ 187 007e 02       		.byte	0x2
+ 188 007f 9201     		.2byte	0x192
+ 189 0081 3A000000 		.4byte	0x3a
+ 190 0085 04       		.uleb128 0x4
+ 191 0086 5C020000 		.4byte	.LASF12
+ 192 008a 02       		.byte	0x2
+ 193 008b 9301     		.2byte	0x193
+ 194 008d 48000000 		.4byte	0x48
+ 195 0091 03       		.uleb128 0x3
+ 196 0092 04       		.byte	0x4
+ 197 0093 04       		.byte	0x4
+ 198 0094 44010000 		.4byte	.LASF13
+ 199 0098 03       		.uleb128 0x3
+ 200 0099 08       		.byte	0x8
+ 201 009a 04       		.byte	0x4
+ 202 009b A5010000 		.4byte	.LASF14
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 7
+
+
+ 203 009f 05       		.uleb128 0x5
+ 204 00a0 D6010000 		.4byte	.LASF26
+ 205 00a4 01       		.byte	0x1
+ 206 00a5 61       		.byte	0x61
+ 207 00a6 79000000 		.4byte	0x79
+ 208 00aa 00000000 		.4byte	.LFB0
+ 209 00ae 3C000000 		.4byte	.LFE0-.LFB0
+ 210 00b2 01       		.uleb128 0x1
+ 211 00b3 9C       		.byte	0x9c
+ 212 00b4 45010000 		.4byte	0x145
+ 213 00b8 06       		.uleb128 0x6
+ 214 00b9 AC010000 		.4byte	.LASF15
+ 215 00bd 01       		.byte	0x1
+ 216 00be 61       		.byte	0x61
+ 217 00bf 79000000 		.4byte	0x79
+ 218 00c3 00000000 		.4byte	.LLST0
+ 219 00c7 06       		.uleb128 0x6
+ 220 00c8 1E010000 		.4byte	.LASF16
+ 221 00cc 01       		.byte	0x1
+ 222 00cd 61       		.byte	0x61
+ 223 00ce 79000000 		.4byte	0x79
+ 224 00d2 21000000 		.4byte	.LLST1
+ 225 00d6 06       		.uleb128 0x6
+ 226 00d7 0E000000 		.4byte	.LASF17
+ 227 00db 01       		.byte	0x1
+ 228 00dc 61       		.byte	0x61
+ 229 00dd 85000000 		.4byte	0x85
+ 230 00e1 42000000 		.4byte	.LLST2
+ 231 00e5 06       		.uleb128 0x6
+ 232 00e6 41020000 		.4byte	.LASF18
+ 233 00ea 01       		.byte	0x1
+ 234 00eb 61       		.byte	0x61
+ 235 00ec 85000000 		.4byte	0x85
+ 236 00f0 63000000 		.4byte	.LLST3
+ 237 00f4 07       		.uleb128 0x7
+ 238 00f5 1E000000 		.4byte	.LVL5
+ 239 00f9 75010000 		.4byte	0x175
+ 240 00fd 1A010000 		.4byte	0x11a
+ 241 0101 08       		.uleb128 0x8
+ 242 0102 01       		.uleb128 0x1
+ 243 0103 50       		.byte	0x50
+ 244 0104 02       		.uleb128 0x2
+ 245 0105 75       		.byte	0x75
+ 246 0106 00       		.sleb128 0
+ 247 0107 08       		.uleb128 0x8
+ 248 0108 01       		.uleb128 0x1
+ 249 0109 53       		.byte	0x53
+ 250 010a 02       		.uleb128 0x2
+ 251 010b 75       		.byte	0x75
+ 252 010c 00       		.sleb128 0
+ 253 010d 08       		.uleb128 0x8
+ 254 010e 02       		.uleb128 0x2
+ 255 010f 7D       		.byte	0x7d
+ 256 0110 00       		.sleb128 0
+ 257 0111 01       		.uleb128 0x1
+ 258 0112 30       		.byte	0x30
+ 259 0113 08       		.uleb128 0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 8
+
+
+ 260 0114 02       		.uleb128 0x2
+ 261 0115 7D       		.byte	0x7d
+ 262 0116 04       		.sleb128 4
+ 263 0117 01       		.uleb128 0x1
+ 264 0118 30       		.byte	0x30
+ 265 0119 00       		.byte	0
+ 266 011a 07       		.uleb128 0x7
+ 267 011b 28000000 		.4byte	.LVL6
+ 268 011f 80010000 		.4byte	0x180
+ 269 0123 34010000 		.4byte	0x134
+ 270 0127 08       		.uleb128 0x8
+ 271 0128 01       		.uleb128 0x1
+ 272 0129 51       		.byte	0x51
+ 273 012a 02       		.uleb128 0x2
+ 274 012b 76       		.byte	0x76
+ 275 012c 00       		.sleb128 0
+ 276 012d 08       		.uleb128 0x8
+ 277 012e 01       		.uleb128 0x1
+ 278 012f 52       		.byte	0x52
+ 279 0130 02       		.uleb128 0x2
+ 280 0131 77       		.byte	0x77
+ 281 0132 00       		.sleb128 0
+ 282 0133 00       		.byte	0
+ 283 0134 09       		.uleb128 0x9
+ 284 0135 30000000 		.4byte	.LVL7
+ 285 0139 8B010000 		.4byte	0x18b
+ 286 013d 08       		.uleb128 0x8
+ 287 013e 01       		.uleb128 0x1
+ 288 013f 51       		.byte	0x51
+ 289 0140 02       		.uleb128 0x2
+ 290 0141 75       		.byte	0x75
+ 291 0142 00       		.sleb128 0
+ 292 0143 00       		.byte	0
+ 293 0144 00       		.byte	0
+ 294 0145 0A       		.uleb128 0xa
+ 295 0146 43000000 		.4byte	.LASF27
+ 296 014a 01       		.byte	0x1
+ 297 014b 88       		.byte	0x88
+ 298 014c 00000000 		.4byte	.LFB1
+ 299 0150 0C000000 		.4byte	.LFE1-.LFB1
+ 300 0154 01       		.uleb128 0x1
+ 301 0155 9C       		.byte	0x9c
+ 302 0156 64010000 		.4byte	0x164
+ 303 015a 0B       		.uleb128 0xb
+ 304 015b 08000000 		.4byte	.LVL8
+ 305 015f 96010000 		.4byte	0x196
+ 306 0163 00       		.byte	0
+ 307 0164 0C       		.uleb128 0xc
+ 308 0165 F3010000 		.4byte	.LASF28
+ 309 0169 01       		.byte	0x1
+ 310 016a 45       		.byte	0x45
+ 311 016b 79000000 		.4byte	0x79
+ 312 016f 05       		.uleb128 0x5
+ 313 0170 03       		.byte	0x3
+ 314 0171 00000000 		.4byte	FBC_to_ram_DMA_DmaHandle
+ 315 0175 0D       		.uleb128 0xd
+ 316 0176 2B000000 		.4byte	.LASF19
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 9
+
+
+ 317 017a 2B000000 		.4byte	.LASF19
+ 318 017e 03       		.byte	0x3
+ 319 017f 33       		.byte	0x33
+ 320 0180 0D       		.uleb128 0xd
+ 321 0181 4A010000 		.4byte	.LASF20
+ 322 0185 4A010000 		.4byte	.LASF20
+ 323 0189 03       		.byte	0x3
+ 324 018a 2D       		.byte	0x2d
+ 325 018b 0D       		.uleb128 0xd
+ 326 018c F6000000 		.4byte	.LASF21
+ 327 0190 F6000000 		.4byte	.LASF21
+ 328 0194 03       		.byte	0x3
+ 329 0195 2C       		.byte	0x2c
+ 330 0196 0D       		.uleb128 0xd
+ 331 0197 63020000 		.4byte	.LASF22
+ 332 019b 63020000 		.4byte	.LASF22
+ 333 019f 03       		.byte	0x3
+ 334 01a0 2A       		.byte	0x2a
+ 335 01a1 00       		.byte	0
+ 336              		.section	.debug_abbrev,"",%progbits
+ 337              	.Ldebug_abbrev0:
+ 338 0000 01       		.uleb128 0x1
+ 339 0001 11       		.uleb128 0x11
+ 340 0002 01       		.byte	0x1
+ 341 0003 25       		.uleb128 0x25
+ 342 0004 0E       		.uleb128 0xe
+ 343 0005 13       		.uleb128 0x13
+ 344 0006 0B       		.uleb128 0xb
+ 345 0007 03       		.uleb128 0x3
+ 346 0008 0E       		.uleb128 0xe
+ 347 0009 1B       		.uleb128 0x1b
+ 348 000a 0E       		.uleb128 0xe
+ 349 000b 55       		.uleb128 0x55
+ 350 000c 17       		.uleb128 0x17
+ 351 000d 11       		.uleb128 0x11
+ 352 000e 01       		.uleb128 0x1
+ 353 000f 10       		.uleb128 0x10
+ 354 0010 17       		.uleb128 0x17
+ 355 0011 00       		.byte	0
+ 356 0012 00       		.byte	0
+ 357 0013 02       		.uleb128 0x2
+ 358 0014 24       		.uleb128 0x24
+ 359 0015 00       		.byte	0
+ 360 0016 0B       		.uleb128 0xb
+ 361 0017 0B       		.uleb128 0xb
+ 362 0018 3E       		.uleb128 0x3e
+ 363 0019 0B       		.uleb128 0xb
+ 364 001a 03       		.uleb128 0x3
+ 365 001b 08       		.uleb128 0x8
+ 366 001c 00       		.byte	0
+ 367 001d 00       		.byte	0
+ 368 001e 03       		.uleb128 0x3
+ 369 001f 24       		.uleb128 0x24
+ 370 0020 00       		.byte	0
+ 371 0021 0B       		.uleb128 0xb
+ 372 0022 0B       		.uleb128 0xb
+ 373 0023 3E       		.uleb128 0x3e
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 10
+
+
+ 374 0024 0B       		.uleb128 0xb
+ 375 0025 03       		.uleb128 0x3
+ 376 0026 0E       		.uleb128 0xe
+ 377 0027 00       		.byte	0
+ 378 0028 00       		.byte	0
+ 379 0029 04       		.uleb128 0x4
+ 380 002a 16       		.uleb128 0x16
+ 381 002b 00       		.byte	0
+ 382 002c 03       		.uleb128 0x3
+ 383 002d 0E       		.uleb128 0xe
+ 384 002e 3A       		.uleb128 0x3a
+ 385 002f 0B       		.uleb128 0xb
+ 386 0030 3B       		.uleb128 0x3b
+ 387 0031 05       		.uleb128 0x5
+ 388 0032 49       		.uleb128 0x49
+ 389 0033 13       		.uleb128 0x13
+ 390 0034 00       		.byte	0
+ 391 0035 00       		.byte	0
+ 392 0036 05       		.uleb128 0x5
+ 393 0037 2E       		.uleb128 0x2e
+ 394 0038 01       		.byte	0x1
+ 395 0039 3F       		.uleb128 0x3f
+ 396 003a 19       		.uleb128 0x19
+ 397 003b 03       		.uleb128 0x3
+ 398 003c 0E       		.uleb128 0xe
+ 399 003d 3A       		.uleb128 0x3a
+ 400 003e 0B       		.uleb128 0xb
+ 401 003f 3B       		.uleb128 0x3b
+ 402 0040 0B       		.uleb128 0xb
+ 403 0041 27       		.uleb128 0x27
+ 404 0042 19       		.uleb128 0x19
+ 405 0043 49       		.uleb128 0x49
+ 406 0044 13       		.uleb128 0x13
+ 407 0045 11       		.uleb128 0x11
+ 408 0046 01       		.uleb128 0x1
+ 409 0047 12       		.uleb128 0x12
+ 410 0048 06       		.uleb128 0x6
+ 411 0049 40       		.uleb128 0x40
+ 412 004a 18       		.uleb128 0x18
+ 413 004b 9742     		.uleb128 0x2117
+ 414 004d 19       		.uleb128 0x19
+ 415 004e 01       		.uleb128 0x1
+ 416 004f 13       		.uleb128 0x13
+ 417 0050 00       		.byte	0
+ 418 0051 00       		.byte	0
+ 419 0052 06       		.uleb128 0x6
+ 420 0053 05       		.uleb128 0x5
+ 421 0054 00       		.byte	0
+ 422 0055 03       		.uleb128 0x3
+ 423 0056 0E       		.uleb128 0xe
+ 424 0057 3A       		.uleb128 0x3a
+ 425 0058 0B       		.uleb128 0xb
+ 426 0059 3B       		.uleb128 0x3b
+ 427 005a 0B       		.uleb128 0xb
+ 428 005b 49       		.uleb128 0x49
+ 429 005c 13       		.uleb128 0x13
+ 430 005d 02       		.uleb128 0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 11
+
+
+ 431 005e 17       		.uleb128 0x17
+ 432 005f 00       		.byte	0
+ 433 0060 00       		.byte	0
+ 434 0061 07       		.uleb128 0x7
+ 435 0062 898201   		.uleb128 0x4109
+ 436 0065 01       		.byte	0x1
+ 437 0066 11       		.uleb128 0x11
+ 438 0067 01       		.uleb128 0x1
+ 439 0068 31       		.uleb128 0x31
+ 440 0069 13       		.uleb128 0x13
+ 441 006a 01       		.uleb128 0x1
+ 442 006b 13       		.uleb128 0x13
+ 443 006c 00       		.byte	0
+ 444 006d 00       		.byte	0
+ 445 006e 08       		.uleb128 0x8
+ 446 006f 8A8201   		.uleb128 0x410a
+ 447 0072 00       		.byte	0
+ 448 0073 02       		.uleb128 0x2
+ 449 0074 18       		.uleb128 0x18
+ 450 0075 9142     		.uleb128 0x2111
+ 451 0077 18       		.uleb128 0x18
+ 452 0078 00       		.byte	0
+ 453 0079 00       		.byte	0
+ 454 007a 09       		.uleb128 0x9
+ 455 007b 898201   		.uleb128 0x4109
+ 456 007e 01       		.byte	0x1
+ 457 007f 11       		.uleb128 0x11
+ 458 0080 01       		.uleb128 0x1
+ 459 0081 31       		.uleb128 0x31
+ 460 0082 13       		.uleb128 0x13
+ 461 0083 00       		.byte	0
+ 462 0084 00       		.byte	0
+ 463 0085 0A       		.uleb128 0xa
+ 464 0086 2E       		.uleb128 0x2e
+ 465 0087 01       		.byte	0x1
+ 466 0088 3F       		.uleb128 0x3f
+ 467 0089 19       		.uleb128 0x19
+ 468 008a 03       		.uleb128 0x3
+ 469 008b 0E       		.uleb128 0xe
+ 470 008c 3A       		.uleb128 0x3a
+ 471 008d 0B       		.uleb128 0xb
+ 472 008e 3B       		.uleb128 0x3b
+ 473 008f 0B       		.uleb128 0xb
+ 474 0090 27       		.uleb128 0x27
+ 475 0091 19       		.uleb128 0x19
+ 476 0092 11       		.uleb128 0x11
+ 477 0093 01       		.uleb128 0x1
+ 478 0094 12       		.uleb128 0x12
+ 479 0095 06       		.uleb128 0x6
+ 480 0096 40       		.uleb128 0x40
+ 481 0097 18       		.uleb128 0x18
+ 482 0098 9742     		.uleb128 0x2117
+ 483 009a 19       		.uleb128 0x19
+ 484 009b 01       		.uleb128 0x1
+ 485 009c 13       		.uleb128 0x13
+ 486 009d 00       		.byte	0
+ 487 009e 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 12
+
+
+ 488 009f 0B       		.uleb128 0xb
+ 489 00a0 898201   		.uleb128 0x4109
+ 490 00a3 00       		.byte	0
+ 491 00a4 11       		.uleb128 0x11
+ 492 00a5 01       		.uleb128 0x1
+ 493 00a6 9542     		.uleb128 0x2115
+ 494 00a8 19       		.uleb128 0x19
+ 495 00a9 31       		.uleb128 0x31
+ 496 00aa 13       		.uleb128 0x13
+ 497 00ab 00       		.byte	0
+ 498 00ac 00       		.byte	0
+ 499 00ad 0C       		.uleb128 0xc
+ 500 00ae 34       		.uleb128 0x34
+ 501 00af 00       		.byte	0
+ 502 00b0 03       		.uleb128 0x3
+ 503 00b1 0E       		.uleb128 0xe
+ 504 00b2 3A       		.uleb128 0x3a
+ 505 00b3 0B       		.uleb128 0xb
+ 506 00b4 3B       		.uleb128 0x3b
+ 507 00b5 0B       		.uleb128 0xb
+ 508 00b6 49       		.uleb128 0x49
+ 509 00b7 13       		.uleb128 0x13
+ 510 00b8 3F       		.uleb128 0x3f
+ 511 00b9 19       		.uleb128 0x19
+ 512 00ba 02       		.uleb128 0x2
+ 513 00bb 18       		.uleb128 0x18
+ 514 00bc 00       		.byte	0
+ 515 00bd 00       		.byte	0
+ 516 00be 0D       		.uleb128 0xd
+ 517 00bf 2E       		.uleb128 0x2e
+ 518 00c0 00       		.byte	0
+ 519 00c1 3F       		.uleb128 0x3f
+ 520 00c2 19       		.uleb128 0x19
+ 521 00c3 3C       		.uleb128 0x3c
+ 522 00c4 19       		.uleb128 0x19
+ 523 00c5 6E       		.uleb128 0x6e
+ 524 00c6 0E       		.uleb128 0xe
+ 525 00c7 03       		.uleb128 0x3
+ 526 00c8 0E       		.uleb128 0xe
+ 527 00c9 3A       		.uleb128 0x3a
+ 528 00ca 0B       		.uleb128 0xb
+ 529 00cb 3B       		.uleb128 0x3b
+ 530 00cc 0B       		.uleb128 0xb
+ 531 00cd 00       		.byte	0
+ 532 00ce 00       		.byte	0
+ 533 00cf 00       		.byte	0
+ 534              		.section	.debug_loc,"",%progbits
+ 535              	.Ldebug_loc0:
+ 536              	.LLST0:
+ 537 0000 00000000 		.4byte	.LVL0
+ 538 0004 18000000 		.4byte	.LVL4
+ 539 0008 0100     		.2byte	0x1
+ 540 000a 50       		.byte	0x50
+ 541 000b 18000000 		.4byte	.LVL4
+ 542 000f 3C000000 		.4byte	.LFE0
+ 543 0013 0400     		.2byte	0x4
+ 544 0015 F3       		.byte	0xf3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 13
+
+
+ 545 0016 01       		.uleb128 0x1
+ 546 0017 50       		.byte	0x50
+ 547 0018 9F       		.byte	0x9f
+ 548 0019 00000000 		.4byte	0
+ 549 001d 00000000 		.4byte	0
+ 550              	.LLST1:
+ 551 0021 00000000 		.4byte	.LVL0
+ 552 0025 16000000 		.4byte	.LVL3
+ 553 0029 0100     		.2byte	0x1
+ 554 002b 51       		.byte	0x51
+ 555 002c 16000000 		.4byte	.LVL3
+ 556 0030 3C000000 		.4byte	.LFE0
+ 557 0034 0400     		.2byte	0x4
+ 558 0036 F3       		.byte	0xf3
+ 559 0037 01       		.uleb128 0x1
+ 560 0038 51       		.byte	0x51
+ 561 0039 9F       		.byte	0x9f
+ 562 003a 00000000 		.4byte	0
+ 563 003e 00000000 		.4byte	0
+ 564              	.LLST2:
+ 565 0042 00000000 		.4byte	.LVL0
+ 566 0046 12000000 		.4byte	.LVL2
+ 567 004a 0100     		.2byte	0x1
+ 568 004c 52       		.byte	0x52
+ 569 004d 12000000 		.4byte	.LVL2
+ 570 0051 3C000000 		.4byte	.LFE0
+ 571 0055 0400     		.2byte	0x4
+ 572 0057 F3       		.byte	0xf3
+ 573 0058 01       		.uleb128 0x1
+ 574 0059 52       		.byte	0x52
+ 575 005a 9F       		.byte	0x9f
+ 576 005b 00000000 		.4byte	0
+ 577 005f 00000000 		.4byte	0
+ 578              	.LLST3:
+ 579 0063 00000000 		.4byte	.LVL0
+ 580 0067 0C000000 		.4byte	.LVL1
+ 581 006b 0100     		.2byte	0x1
+ 582 006d 53       		.byte	0x53
+ 583 006e 0C000000 		.4byte	.LVL1
+ 584 0072 3C000000 		.4byte	.LFE0
+ 585 0076 0400     		.2byte	0x4
+ 586 0078 F3       		.byte	0xf3
+ 587 0079 01       		.uleb128 0x1
+ 588 007a 53       		.byte	0x53
+ 589 007b 9F       		.byte	0x9f
+ 590 007c 00000000 		.4byte	0
+ 591 0080 00000000 		.4byte	0
+ 592              		.section	.debug_aranges,"",%progbits
+ 593 0000 24000000 		.4byte	0x24
+ 594 0004 0200     		.2byte	0x2
+ 595 0006 00000000 		.4byte	.Ldebug_info0
+ 596 000a 04       		.byte	0x4
+ 597 000b 00       		.byte	0
+ 598 000c 0000     		.2byte	0
+ 599 000e 0000     		.2byte	0
+ 600 0010 00000000 		.4byte	.LFB0
+ 601 0014 3C000000 		.4byte	.LFE0-.LFB0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 14
+
+
+ 602 0018 00000000 		.4byte	.LFB1
+ 603 001c 0C000000 		.4byte	.LFE1-.LFB1
+ 604 0020 00000000 		.4byte	0
+ 605 0024 00000000 		.4byte	0
+ 606              		.section	.debug_ranges,"",%progbits
+ 607              	.Ldebug_ranges0:
+ 608 0000 00000000 		.4byte	.LFB0
+ 609 0004 3C000000 		.4byte	.LFE0
+ 610 0008 00000000 		.4byte	.LFB1
+ 611 000c 0C000000 		.4byte	.LFE1
+ 612 0010 00000000 		.4byte	0
+ 613 0014 00000000 		.4byte	0
+ 614              		.section	.debug_line,"",%progbits
+ 615              	.Ldebug_line0:
+ 616 0000 8A000000 		.section	.debug_str,"MS",%progbits,1
+ 616      02005B00 
+ 616      00000201 
+ 616      FB0E0D00 
+ 616      01010101 
+ 617              	.LASF7:
+ 618 0000 6C6F6E67 		.ascii	"long long int\000"
+ 618      206C6F6E 
+ 618      6720696E 
+ 618      7400
+ 619              	.LASF17:
+ 620 000e 55707065 		.ascii	"UpperSrcAddress\000"
+ 620      72537263 
+ 620      41646472 
+ 620      65737300 
+ 621              	.LASF0:
+ 622 001e 756E7369 		.ascii	"unsigned int\000"
+ 622      676E6564 
+ 622      20696E74 
+ 622      00
+ 623              	.LASF19:
+ 624 002b 4379446D 		.ascii	"CyDmaChSetConfiguration\000"
+ 624      61436853 
+ 624      6574436F 
+ 624      6E666967 
+ 624      75726174 
+ 625              	.LASF27:
+ 626 0043 4642435F 		.ascii	"FBC_to_ram_DMA_DmaRelease\000"
+ 626      746F5F72 
+ 626      616D5F44 
+ 626      4D415F44 
+ 626      6D615265 
+ 627              	.LASF23:
+ 628 005d 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 628      43393920 
+ 628      352E342E 
+ 628      31203230 
+ 628      31363036 
+ 629 0090 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 629      20726576 
+ 629      6973696F 
+ 629      6E203233 
+ 629      37373135 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 15
+
+
+ 630 00c3 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 630      74643D67 
+ 630      6E753939 
+ 630      202D6666 
+ 630      756E6374 
+ 631              	.LASF21:
+ 632 00f6 4379446D 		.ascii	"CyDmaChPriority\000"
+ 632      61436850 
+ 632      72696F72 
+ 632      69747900 
+ 633              	.LASF11:
+ 634 0106 75696E74 		.ascii	"uint8\000"
+ 634      3800
+ 635              	.LASF6:
+ 636 010c 6C6F6E67 		.ascii	"long unsigned int\000"
+ 636      20756E73 
+ 636      69676E65 
+ 636      6420696E 
+ 636      7400
+ 637              	.LASF16:
+ 638 011e 52657165 		.ascii	"ReqestPerBurst\000"
+ 638      73745065 
+ 638      72427572 
+ 638      737400
+ 639              	.LASF8:
+ 640 012d 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 640      206C6F6E 
+ 640      6720756E 
+ 640      7369676E 
+ 640      65642069 
+ 641              	.LASF13:
+ 642 0144 666C6F61 		.ascii	"float\000"
+ 642      7400
+ 643              	.LASF20:
+ 644 014a 4379446D 		.ascii	"CyDmaChSetExtendedAddress\000"
+ 644      61436853 
+ 644      65744578 
+ 644      74656E64 
+ 644      65644164 
+ 645              	.LASF2:
+ 646 0164 756E7369 		.ascii	"unsigned char\000"
+ 646      676E6564 
+ 646      20636861 
+ 646      7200
+ 647              	.LASF10:
+ 648 0172 63686172 		.ascii	"char\000"
+ 648      00
+ 649              	.LASF25:
+ 650 0177 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 650      73657273 
+ 650      5C636865 
+ 650      6D695C55 
+ 650      44335F51 
+ 651              	.LASF5:
+ 652 019c 6C6F6E67 		.ascii	"long int\000"
+ 652      20696E74 
+ 652      00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 16
+
+
+ 653              	.LASF14:
+ 654 01a5 646F7562 		.ascii	"double\000"
+ 654      6C6500
+ 655              	.LASF15:
+ 656 01ac 42757273 		.ascii	"BurstCount\000"
+ 656      74436F75 
+ 656      6E7400
+ 657              	.LASF4:
+ 658 01b7 73686F72 		.ascii	"short unsigned int\000"
+ 658      7420756E 
+ 658      7369676E 
+ 658      65642069 
+ 658      6E7400
+ 659              	.LASF1:
+ 660 01ca 7369676E 		.ascii	"signed char\000"
+ 660      65642063 
+ 660      68617200 
+ 661              	.LASF26:
+ 662 01d6 4642435F 		.ascii	"FBC_to_ram_DMA_DmaInitialize\000"
+ 662      746F5F72 
+ 662      616D5F44 
+ 662      4D415F44 
+ 662      6D61496E 
+ 663              	.LASF28:
+ 664 01f3 4642435F 		.ascii	"FBC_to_ram_DMA_DmaHandle\000"
+ 664      746F5F72 
+ 664      616D5F44 
+ 664      4D415F44 
+ 664      6D614861 
+ 665              	.LASF24:
+ 666 020c 47656E65 		.ascii	"Generated_Source\\PSoC5\\FBC_to_ram_DMA_dma.c\000"
+ 666      72617465 
+ 666      645F536F 
+ 666      75726365 
+ 666      5C50536F 
+ 667              	.LASF9:
+ 668 0238 73697A65 		.ascii	"sizetype\000"
+ 668      74797065 
+ 668      00
+ 669              	.LASF18:
+ 670 0241 55707065 		.ascii	"UpperDestAddress\000"
+ 670      72446573 
+ 670      74416464 
+ 670      72657373 
+ 670      00
+ 671              	.LASF3:
+ 672 0252 73686F72 		.ascii	"short int\000"
+ 672      7420696E 
+ 672      7400
+ 673              	.LASF12:
+ 674 025c 75696E74 		.ascii	"uint16\000"
+ 674      313600
+ 675              	.LASF22:
+ 676 0263 4379446D 		.ascii	"CyDmaChDisable\000"
+ 676      61436844 
+ 676      69736162 
+ 676      6C6500
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc3IH51F.s 			page 17
+
+
+ 677              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

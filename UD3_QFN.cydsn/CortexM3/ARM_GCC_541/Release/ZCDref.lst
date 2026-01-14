@@ -1,0 +1,1491 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"ZCDref.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.ZCDref_Enable,"ax",%progbits
+  20              		.align	1
+  21              		.global	ZCDref_Enable
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	ZCDref_Enable, %function
+  25              	ZCDref_Enable:
+  26              	.LFB1:
+  27              		.file 1 "Generated_Source\\PSoC5\\ZCDref.c"
+   1:Generated_Source\PSoC5/ZCDref.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/ZCDref.c **** * File Name: ZCDref.c  
+   3:Generated_Source\PSoC5/ZCDref.c **** * Version 1.90
+   4:Generated_Source\PSoC5/ZCDref.c **** *
+   5:Generated_Source\PSoC5/ZCDref.c **** * Description:
+   6:Generated_Source\PSoC5/ZCDref.c **** *  This file provides the source code to the API for the 8-bit Voltage DAC 
+   7:Generated_Source\PSoC5/ZCDref.c **** *  (VDAC8) User Module.
+   8:Generated_Source\PSoC5/ZCDref.c **** *
+   9:Generated_Source\PSoC5/ZCDref.c **** * Note:
+  10:Generated_Source\PSoC5/ZCDref.c **** *  Any unusual or non-standard behavior should be noted here. Other-
+  11:Generated_Source\PSoC5/ZCDref.c **** *  wise, this section should remain blank.
+  12:Generated_Source\PSoC5/ZCDref.c **** *
+  13:Generated_Source\PSoC5/ZCDref.c **** ********************************************************************************
+  14:Generated_Source\PSoC5/ZCDref.c **** * Copyright 2008-2012, Cypress Semiconductor Corporation.  All rights reserved.
+  15:Generated_Source\PSoC5/ZCDref.c **** * You may use this file only in accordance with the license, terms, conditions, 
+  16:Generated_Source\PSoC5/ZCDref.c **** * disclaimers, and limitations in the end user license agreement accompanying 
+  17:Generated_Source\PSoC5/ZCDref.c **** * the software package with which this file was provided.
+  18:Generated_Source\PSoC5/ZCDref.c **** *******************************************************************************/
+  19:Generated_Source\PSoC5/ZCDref.c **** 
+  20:Generated_Source\PSoC5/ZCDref.c **** #include "cytypes.h"
+  21:Generated_Source\PSoC5/ZCDref.c **** #include "ZCDref.h"
+  22:Generated_Source\PSoC5/ZCDref.c **** 
+  23:Generated_Source\PSoC5/ZCDref.c **** #if (CY_PSOC5A)
+  24:Generated_Source\PSoC5/ZCDref.c **** #include <CyLib.h>
+  25:Generated_Source\PSoC5/ZCDref.c **** #endif /* CY_PSOC5A */
+  26:Generated_Source\PSoC5/ZCDref.c **** 
+  27:Generated_Source\PSoC5/ZCDref.c **** uint8 ZCDref_initVar = 0u;
+  28:Generated_Source\PSoC5/ZCDref.c **** 
+  29:Generated_Source\PSoC5/ZCDref.c **** #if (CY_PSOC5A)
+  30:Generated_Source\PSoC5/ZCDref.c ****     static uint8 ZCDref_restoreVal = 0u;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 2
+
+
+  31:Generated_Source\PSoC5/ZCDref.c **** #endif /* CY_PSOC5A */
+  32:Generated_Source\PSoC5/ZCDref.c **** 
+  33:Generated_Source\PSoC5/ZCDref.c **** #if (CY_PSOC5A)
+  34:Generated_Source\PSoC5/ZCDref.c ****     static ZCDref_backupStruct ZCDref_backup;
+  35:Generated_Source\PSoC5/ZCDref.c **** #endif /* CY_PSOC5A */
+  36:Generated_Source\PSoC5/ZCDref.c **** 
+  37:Generated_Source\PSoC5/ZCDref.c **** 
+  38:Generated_Source\PSoC5/ZCDref.c **** /*******************************************************************************
+  39:Generated_Source\PSoC5/ZCDref.c **** * Function Name: ZCDref_Init
+  40:Generated_Source\PSoC5/ZCDref.c **** ********************************************************************************
+  41:Generated_Source\PSoC5/ZCDref.c **** * Summary:
+  42:Generated_Source\PSoC5/ZCDref.c **** *  Initialize to the schematic state.
+  43:Generated_Source\PSoC5/ZCDref.c **** * 
+  44:Generated_Source\PSoC5/ZCDref.c **** * Parameters:
+  45:Generated_Source\PSoC5/ZCDref.c **** *  void:
+  46:Generated_Source\PSoC5/ZCDref.c **** *
+  47:Generated_Source\PSoC5/ZCDref.c **** * Return:
+  48:Generated_Source\PSoC5/ZCDref.c **** *  void
+  49:Generated_Source\PSoC5/ZCDref.c **** *
+  50:Generated_Source\PSoC5/ZCDref.c **** * Theory:
+  51:Generated_Source\PSoC5/ZCDref.c **** *
+  52:Generated_Source\PSoC5/ZCDref.c **** * Side Effects:
+  53:Generated_Source\PSoC5/ZCDref.c **** *
+  54:Generated_Source\PSoC5/ZCDref.c **** *******************************************************************************/
+  55:Generated_Source\PSoC5/ZCDref.c **** void ZCDref_Init(void) 
+  56:Generated_Source\PSoC5/ZCDref.c **** {
+  57:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_CR0 = (ZCDref_MODE_V );
+  58:Generated_Source\PSoC5/ZCDref.c **** 
+  59:Generated_Source\PSoC5/ZCDref.c ****     /* Set default data source */
+  60:Generated_Source\PSoC5/ZCDref.c ****     #if(ZCDref_DEFAULT_DATA_SRC != 0 )
+  61:Generated_Source\PSoC5/ZCDref.c ****         ZCDref_CR1 = (ZCDref_DEFAULT_CNTL | ZCDref_DACBUS_ENABLE) ;
+  62:Generated_Source\PSoC5/ZCDref.c ****     #else
+  63:Generated_Source\PSoC5/ZCDref.c ****         ZCDref_CR1 = (ZCDref_DEFAULT_CNTL | ZCDref_DACBUS_DISABLE) ;
+  64:Generated_Source\PSoC5/ZCDref.c ****     #endif /* (ZCDref_DEFAULT_DATA_SRC != 0 ) */
+  65:Generated_Source\PSoC5/ZCDref.c **** 
+  66:Generated_Source\PSoC5/ZCDref.c ****     /* Set default strobe mode */
+  67:Generated_Source\PSoC5/ZCDref.c ****     #if(ZCDref_DEFAULT_STRB != 0)
+  68:Generated_Source\PSoC5/ZCDref.c ****         ZCDref_Strobe |= ZCDref_STRB_EN ;
+  69:Generated_Source\PSoC5/ZCDref.c ****     #endif/* (ZCDref_DEFAULT_STRB != 0) */
+  70:Generated_Source\PSoC5/ZCDref.c **** 
+  71:Generated_Source\PSoC5/ZCDref.c ****     /* Set default range */
+  72:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_SetRange(ZCDref_DEFAULT_RANGE); 
+  73:Generated_Source\PSoC5/ZCDref.c **** 
+  74:Generated_Source\PSoC5/ZCDref.c ****     /* Set default speed */
+  75:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_SetSpeed(ZCDref_DEFAULT_SPEED);
+  76:Generated_Source\PSoC5/ZCDref.c **** }
+  77:Generated_Source\PSoC5/ZCDref.c **** 
+  78:Generated_Source\PSoC5/ZCDref.c **** 
+  79:Generated_Source\PSoC5/ZCDref.c **** /*******************************************************************************
+  80:Generated_Source\PSoC5/ZCDref.c **** * Function Name: ZCDref_Enable
+  81:Generated_Source\PSoC5/ZCDref.c **** ********************************************************************************
+  82:Generated_Source\PSoC5/ZCDref.c **** * Summary:
+  83:Generated_Source\PSoC5/ZCDref.c **** *  Enable the VDAC8
+  84:Generated_Source\PSoC5/ZCDref.c **** * 
+  85:Generated_Source\PSoC5/ZCDref.c **** * Parameters:
+  86:Generated_Source\PSoC5/ZCDref.c **** *  void
+  87:Generated_Source\PSoC5/ZCDref.c **** *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 3
+
+
+  88:Generated_Source\PSoC5/ZCDref.c **** * Return:
+  89:Generated_Source\PSoC5/ZCDref.c **** *  void
+  90:Generated_Source\PSoC5/ZCDref.c **** *
+  91:Generated_Source\PSoC5/ZCDref.c **** * Theory:
+  92:Generated_Source\PSoC5/ZCDref.c **** *
+  93:Generated_Source\PSoC5/ZCDref.c **** * Side Effects:
+  94:Generated_Source\PSoC5/ZCDref.c **** *
+  95:Generated_Source\PSoC5/ZCDref.c **** *******************************************************************************/
+  96:Generated_Source\PSoC5/ZCDref.c **** void ZCDref_Enable(void) 
+  97:Generated_Source\PSoC5/ZCDref.c **** {
+  28              		.loc 1 97 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  98:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_PWRMGR |= ZCDref_ACT_PWR_EN;
+  33              		.loc 1 98 0
+  34 0000 044A     		ldr	r2, .L2
+  35 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  36 0004 43F00203 		orr	r3, r3, #2
+  37 0008 1370     		strb	r3, [r2]
+  99:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_STBY_PWRMGR |= ZCDref_STBY_PWR_EN;
+  38              		.loc 1 99 0
+  39 000a 137C     		ldrb	r3, [r2, #16]	@ zero_extendqisi2
+  40 000c 43F00203 		orr	r3, r3, #2
+  41 0010 1374     		strb	r3, [r2, #16]
+  42 0012 7047     		bx	lr
+  43              	.L3:
+  44              		.align	2
+  45              	.L2:
+  46 0014 A8430040 		.word	1073759144
+  47              		.cfi_endproc
+  48              	.LFE1:
+  49              		.size	ZCDref_Enable, .-ZCDref_Enable
+  50              		.section	.text.ZCDref_Stop,"ax",%progbits
+  51              		.align	1
+  52              		.global	ZCDref_Stop
+  53              		.thumb
+  54              		.thumb_func
+  55              		.type	ZCDref_Stop, %function
+  56              	ZCDref_Stop:
+  57              	.LFB3:
+ 100:Generated_Source\PSoC5/ZCDref.c **** 
+ 101:Generated_Source\PSoC5/ZCDref.c ****     /*This is to restore the value of register CR0 ,
+ 102:Generated_Source\PSoC5/ZCDref.c ****     which is modified  in Stop API , this prevents misbehaviour of VDAC */
+ 103:Generated_Source\PSoC5/ZCDref.c ****     #if (CY_PSOC5A)
+ 104:Generated_Source\PSoC5/ZCDref.c ****         if(ZCDref_restoreVal == 1u) 
+ 105:Generated_Source\PSoC5/ZCDref.c ****         {
+ 106:Generated_Source\PSoC5/ZCDref.c ****              ZCDref_CR0 = ZCDref_backup.data_value;
+ 107:Generated_Source\PSoC5/ZCDref.c ****              ZCDref_restoreVal = 0u;
+ 108:Generated_Source\PSoC5/ZCDref.c ****         }
+ 109:Generated_Source\PSoC5/ZCDref.c ****     #endif /* CY_PSOC5A */
+ 110:Generated_Source\PSoC5/ZCDref.c **** }
+ 111:Generated_Source\PSoC5/ZCDref.c **** 
+ 112:Generated_Source\PSoC5/ZCDref.c **** 
+ 113:Generated_Source\PSoC5/ZCDref.c **** /*******************************************************************************
+ 114:Generated_Source\PSoC5/ZCDref.c **** * Function Name: ZCDref_Start
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 4
+
+
+ 115:Generated_Source\PSoC5/ZCDref.c **** ********************************************************************************
+ 116:Generated_Source\PSoC5/ZCDref.c **** *
+ 117:Generated_Source\PSoC5/ZCDref.c **** * Summary:
+ 118:Generated_Source\PSoC5/ZCDref.c **** *  The start function initializes the voltage DAC with the default values, 
+ 119:Generated_Source\PSoC5/ZCDref.c **** *  and sets the power to the given level.  A power level of 0, is the same as
+ 120:Generated_Source\PSoC5/ZCDref.c **** *  executing the stop function.
+ 121:Generated_Source\PSoC5/ZCDref.c **** *
+ 122:Generated_Source\PSoC5/ZCDref.c **** * Parameters:
+ 123:Generated_Source\PSoC5/ZCDref.c **** *  Power: Sets power level between off (0) and (3) high power
+ 124:Generated_Source\PSoC5/ZCDref.c **** *
+ 125:Generated_Source\PSoC5/ZCDref.c **** * Return:
+ 126:Generated_Source\PSoC5/ZCDref.c **** *  void 
+ 127:Generated_Source\PSoC5/ZCDref.c **** *
+ 128:Generated_Source\PSoC5/ZCDref.c **** * Global variables:
+ 129:Generated_Source\PSoC5/ZCDref.c **** *  ZCDref_initVar: Is modified when this function is called for the 
+ 130:Generated_Source\PSoC5/ZCDref.c **** *  first time. Is used to ensure that initialization happens only once.
+ 131:Generated_Source\PSoC5/ZCDref.c **** *
+ 132:Generated_Source\PSoC5/ZCDref.c **** *******************************************************************************/
+ 133:Generated_Source\PSoC5/ZCDref.c **** void ZCDref_Start(void)  
+ 134:Generated_Source\PSoC5/ZCDref.c **** {
+ 135:Generated_Source\PSoC5/ZCDref.c ****     /* Hardware initiazation only needs to occure the first time */
+ 136:Generated_Source\PSoC5/ZCDref.c ****     if(ZCDref_initVar == 0u)
+ 137:Generated_Source\PSoC5/ZCDref.c ****     { 
+ 138:Generated_Source\PSoC5/ZCDref.c ****         ZCDref_Init();
+ 139:Generated_Source\PSoC5/ZCDref.c ****         ZCDref_initVar = 1u;
+ 140:Generated_Source\PSoC5/ZCDref.c ****     }
+ 141:Generated_Source\PSoC5/ZCDref.c **** 
+ 142:Generated_Source\PSoC5/ZCDref.c ****     /* Enable power to DAC */
+ 143:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_Enable();
+ 144:Generated_Source\PSoC5/ZCDref.c **** 
+ 145:Generated_Source\PSoC5/ZCDref.c ****     /* Set default value */
+ 146:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_SetValue(ZCDref_DEFAULT_DATA); 
+ 147:Generated_Source\PSoC5/ZCDref.c **** }
+ 148:Generated_Source\PSoC5/ZCDref.c **** 
+ 149:Generated_Source\PSoC5/ZCDref.c **** 
+ 150:Generated_Source\PSoC5/ZCDref.c **** /*******************************************************************************
+ 151:Generated_Source\PSoC5/ZCDref.c **** * Function Name: ZCDref_Stop
+ 152:Generated_Source\PSoC5/ZCDref.c **** ********************************************************************************
+ 153:Generated_Source\PSoC5/ZCDref.c **** *
+ 154:Generated_Source\PSoC5/ZCDref.c **** * Summary:
+ 155:Generated_Source\PSoC5/ZCDref.c **** *  Powers down DAC to lowest power state.
+ 156:Generated_Source\PSoC5/ZCDref.c **** *
+ 157:Generated_Source\PSoC5/ZCDref.c **** * Parameters:
+ 158:Generated_Source\PSoC5/ZCDref.c **** *  void
+ 159:Generated_Source\PSoC5/ZCDref.c **** *
+ 160:Generated_Source\PSoC5/ZCDref.c **** * Return:
+ 161:Generated_Source\PSoC5/ZCDref.c **** *  void
+ 162:Generated_Source\PSoC5/ZCDref.c **** *
+ 163:Generated_Source\PSoC5/ZCDref.c **** * Theory:
+ 164:Generated_Source\PSoC5/ZCDref.c **** *
+ 165:Generated_Source\PSoC5/ZCDref.c **** * Side Effects:
+ 166:Generated_Source\PSoC5/ZCDref.c **** *
+ 167:Generated_Source\PSoC5/ZCDref.c **** *******************************************************************************/
+ 168:Generated_Source\PSoC5/ZCDref.c **** void ZCDref_Stop(void) 
+ 169:Generated_Source\PSoC5/ZCDref.c **** {
+  58              		.loc 1 169 0
+  59              		.cfi_startproc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 5
+
+
+  60              		@ args = 0, pretend = 0, frame = 0
+  61              		@ frame_needed = 0, uses_anonymous_args = 0
+  62              		@ link register save eliminated.
+ 170:Generated_Source\PSoC5/ZCDref.c ****     /* Disble power to DAC */
+ 171:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_PWRMGR &= (uint8)(~ZCDref_ACT_PWR_EN);
+  63              		.loc 1 171 0
+  64 0000 044A     		ldr	r2, .L5
+  65 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  66 0004 03F0FD03 		and	r3, r3, #253
+  67 0008 1370     		strb	r3, [r2]
+ 172:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_STBY_PWRMGR &= (uint8)(~ZCDref_STBY_PWR_EN);
+  68              		.loc 1 172 0
+  69 000a 137C     		ldrb	r3, [r2, #16]	@ zero_extendqisi2
+  70 000c 03F0FD03 		and	r3, r3, #253
+  71 0010 1374     		strb	r3, [r2, #16]
+  72 0012 7047     		bx	lr
+  73              	.L6:
+  74              		.align	2
+  75              	.L5:
+  76 0014 A8430040 		.word	1073759144
+  77              		.cfi_endproc
+  78              	.LFE3:
+  79              		.size	ZCDref_Stop, .-ZCDref_Stop
+  80              		.section	.text.ZCDref_SetSpeed,"ax",%progbits
+  81              		.align	1
+  82              		.global	ZCDref_SetSpeed
+  83              		.thumb
+  84              		.thumb_func
+  85              		.type	ZCDref_SetSpeed, %function
+  86              	ZCDref_SetSpeed:
+  87              	.LFB4:
+ 173:Generated_Source\PSoC5/ZCDref.c **** 
+ 174:Generated_Source\PSoC5/ZCDref.c ****     /* This is a work around for PSoC5A  ,
+ 175:Generated_Source\PSoC5/ZCDref.c ****     this sets VDAC to current mode with output off */
+ 176:Generated_Source\PSoC5/ZCDref.c ****     #if (CY_PSOC5A)
+ 177:Generated_Source\PSoC5/ZCDref.c ****         ZCDref_backup.data_value = ZCDref_CR0;
+ 178:Generated_Source\PSoC5/ZCDref.c ****         ZCDref_CR0 = ZCDref_CUR_MODE_OUT_OFF;
+ 179:Generated_Source\PSoC5/ZCDref.c ****         ZCDref_restoreVal = 1u;
+ 180:Generated_Source\PSoC5/ZCDref.c ****     #endif /* CY_PSOC5A */
+ 181:Generated_Source\PSoC5/ZCDref.c **** }
+ 182:Generated_Source\PSoC5/ZCDref.c **** 
+ 183:Generated_Source\PSoC5/ZCDref.c **** 
+ 184:Generated_Source\PSoC5/ZCDref.c **** /*******************************************************************************
+ 185:Generated_Source\PSoC5/ZCDref.c **** * Function Name: ZCDref_SetSpeed
+ 186:Generated_Source\PSoC5/ZCDref.c **** ********************************************************************************
+ 187:Generated_Source\PSoC5/ZCDref.c **** *
+ 188:Generated_Source\PSoC5/ZCDref.c **** * Summary:
+ 189:Generated_Source\PSoC5/ZCDref.c **** *  Set DAC speed
+ 190:Generated_Source\PSoC5/ZCDref.c **** *
+ 191:Generated_Source\PSoC5/ZCDref.c **** * Parameters:
+ 192:Generated_Source\PSoC5/ZCDref.c **** *  power: Sets speed value
+ 193:Generated_Source\PSoC5/ZCDref.c **** *
+ 194:Generated_Source\PSoC5/ZCDref.c **** * Return:
+ 195:Generated_Source\PSoC5/ZCDref.c **** *  void
+ 196:Generated_Source\PSoC5/ZCDref.c **** *
+ 197:Generated_Source\PSoC5/ZCDref.c **** * Theory:
+ 198:Generated_Source\PSoC5/ZCDref.c **** *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 6
+
+
+ 199:Generated_Source\PSoC5/ZCDref.c **** * Side Effects:
+ 200:Generated_Source\PSoC5/ZCDref.c **** *
+ 201:Generated_Source\PSoC5/ZCDref.c **** *******************************************************************************/
+ 202:Generated_Source\PSoC5/ZCDref.c **** void ZCDref_SetSpeed(uint8 speed) 
+ 203:Generated_Source\PSoC5/ZCDref.c **** {
+  88              		.loc 1 203 0
+  89              		.cfi_startproc
+  90              		@ args = 0, pretend = 0, frame = 0
+  91              		@ frame_needed = 0, uses_anonymous_args = 0
+  92              		@ link register save eliminated.
+  93              	.LVL0:
+ 204:Generated_Source\PSoC5/ZCDref.c ****     /* Clear power mask then write in new value */
+ 205:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_CR0 &= (uint8)(~ZCDref_HS_MASK);
+  94              		.loc 1 205 0
+  95 0000 054B     		ldr	r3, .L8
+ 206:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_CR0 |=  (speed & ZCDref_HS_MASK);
+  96              		.loc 1 206 0
+  97 0002 00F00200 		and	r0, r0, #2
+  98              	.LVL1:
+ 205:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_CR0 |=  (speed & ZCDref_HS_MASK);
+  99              		.loc 1 205 0
+ 100 0006 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 101 0008 02F0FD02 		and	r2, r2, #253
+ 102 000c 1A70     		strb	r2, [r3]
+ 103              		.loc 1 206 0
+ 104 000e 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 105 0010 1043     		orrs	r0, r0, r2
+ 106 0012 1870     		strb	r0, [r3]
+ 107 0014 7047     		bx	lr
+ 108              	.L9:
+ 109 0016 00BF     		.align	2
+ 110              	.L8:
+ 111 0018 24580040 		.word	1073764388
+ 112              		.cfi_endproc
+ 113              	.LFE4:
+ 114              		.size	ZCDref_SetSpeed, .-ZCDref_SetSpeed
+ 115              		.section	.text.ZCDref_SetValue,"ax",%progbits
+ 116              		.align	1
+ 117              		.global	ZCDref_SetValue
+ 118              		.thumb
+ 119              		.thumb_func
+ 120              		.type	ZCDref_SetValue, %function
+ 121              	ZCDref_SetValue:
+ 122              	.LFB6:
+ 207:Generated_Source\PSoC5/ZCDref.c **** }
+ 208:Generated_Source\PSoC5/ZCDref.c **** 
+ 209:Generated_Source\PSoC5/ZCDref.c **** 
+ 210:Generated_Source\PSoC5/ZCDref.c **** /*******************************************************************************
+ 211:Generated_Source\PSoC5/ZCDref.c **** * Function Name: ZCDref_SetRange
+ 212:Generated_Source\PSoC5/ZCDref.c **** ********************************************************************************
+ 213:Generated_Source\PSoC5/ZCDref.c **** *
+ 214:Generated_Source\PSoC5/ZCDref.c **** * Summary:
+ 215:Generated_Source\PSoC5/ZCDref.c **** *  Set one of three current ranges.
+ 216:Generated_Source\PSoC5/ZCDref.c **** *
+ 217:Generated_Source\PSoC5/ZCDref.c **** * Parameters:
+ 218:Generated_Source\PSoC5/ZCDref.c **** *  Range: Sets one of Three valid ranges.
+ 219:Generated_Source\PSoC5/ZCDref.c **** *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 7
+
+
+ 220:Generated_Source\PSoC5/ZCDref.c **** * Return:
+ 221:Generated_Source\PSoC5/ZCDref.c **** *  void 
+ 222:Generated_Source\PSoC5/ZCDref.c **** *
+ 223:Generated_Source\PSoC5/ZCDref.c **** * Theory:
+ 224:Generated_Source\PSoC5/ZCDref.c **** *
+ 225:Generated_Source\PSoC5/ZCDref.c **** * Side Effects:
+ 226:Generated_Source\PSoC5/ZCDref.c **** *
+ 227:Generated_Source\PSoC5/ZCDref.c **** *******************************************************************************/
+ 228:Generated_Source\PSoC5/ZCDref.c **** void ZCDref_SetRange(uint8 range) 
+ 229:Generated_Source\PSoC5/ZCDref.c **** {
+ 230:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_CR0 &= (uint8)(~ZCDref_RANGE_MASK);      /* Clear existing mode */
+ 231:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_CR0 |= (range & ZCDref_RANGE_MASK);      /*  Set Range  */
+ 232:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_DacTrim();
+ 233:Generated_Source\PSoC5/ZCDref.c **** }
+ 234:Generated_Source\PSoC5/ZCDref.c **** 
+ 235:Generated_Source\PSoC5/ZCDref.c **** 
+ 236:Generated_Source\PSoC5/ZCDref.c **** /*******************************************************************************
+ 237:Generated_Source\PSoC5/ZCDref.c **** * Function Name: ZCDref_SetValue
+ 238:Generated_Source\PSoC5/ZCDref.c **** ********************************************************************************
+ 239:Generated_Source\PSoC5/ZCDref.c **** *
+ 240:Generated_Source\PSoC5/ZCDref.c **** * Summary:
+ 241:Generated_Source\PSoC5/ZCDref.c **** *  Set 8-bit DAC value
+ 242:Generated_Source\PSoC5/ZCDref.c **** *
+ 243:Generated_Source\PSoC5/ZCDref.c **** * Parameters:  
+ 244:Generated_Source\PSoC5/ZCDref.c **** *  value:  Sets DAC value between 0 and 255.
+ 245:Generated_Source\PSoC5/ZCDref.c **** *
+ 246:Generated_Source\PSoC5/ZCDref.c **** * Return: 
+ 247:Generated_Source\PSoC5/ZCDref.c **** *  void 
+ 248:Generated_Source\PSoC5/ZCDref.c **** *
+ 249:Generated_Source\PSoC5/ZCDref.c **** * Theory: 
+ 250:Generated_Source\PSoC5/ZCDref.c **** *
+ 251:Generated_Source\PSoC5/ZCDref.c **** * Side Effects:
+ 252:Generated_Source\PSoC5/ZCDref.c **** *
+ 253:Generated_Source\PSoC5/ZCDref.c **** *******************************************************************************/
+ 254:Generated_Source\PSoC5/ZCDref.c **** void ZCDref_SetValue(uint8 value) 
+ 255:Generated_Source\PSoC5/ZCDref.c **** {
+ 123              		.loc 1 255 0
+ 124              		.cfi_startproc
+ 125              		@ args = 0, pretend = 0, frame = 0
+ 126              		@ frame_needed = 0, uses_anonymous_args = 0
+ 127              		@ link register save eliminated.
+ 128              	.LVL2:
+ 256:Generated_Source\PSoC5/ZCDref.c ****     #if (CY_PSOC5A)
+ 257:Generated_Source\PSoC5/ZCDref.c ****         uint8 ZCDref_intrStatus = CyEnterCriticalSection();
+ 258:Generated_Source\PSoC5/ZCDref.c ****     #endif /* CY_PSOC5A */
+ 259:Generated_Source\PSoC5/ZCDref.c **** 
+ 260:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_Data = value;                /*  Set Value  */
+ 129              		.loc 1 260 0
+ 130 0000 014B     		ldr	r3, .L11
+ 131 0002 1870     		strb	r0, [r3]
+ 132 0004 7047     		bx	lr
+ 133              	.L12:
+ 134 0006 00BF     		.align	2
+ 135              	.L11:
+ 136 0008 815B0040 		.word	1073765249
+ 137              		.cfi_endproc
+ 138              	.LFE6:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 8
+
+
+ 139              		.size	ZCDref_SetValue, .-ZCDref_SetValue
+ 140              		.section	.text.ZCDref_DacTrim,"ax",%progbits
+ 141              		.align	1
+ 142              		.global	ZCDref_DacTrim
+ 143              		.thumb
+ 144              		.thumb_func
+ 145              		.type	ZCDref_DacTrim, %function
+ 146              	ZCDref_DacTrim:
+ 147              	.LFB7:
+ 261:Generated_Source\PSoC5/ZCDref.c **** 
+ 262:Generated_Source\PSoC5/ZCDref.c ****     /* PSOC5A requires a double write */
+ 263:Generated_Source\PSoC5/ZCDref.c ****     /* Exit Critical Section */
+ 264:Generated_Source\PSoC5/ZCDref.c ****     #if (CY_PSOC5A)
+ 265:Generated_Source\PSoC5/ZCDref.c ****         ZCDref_Data = value;
+ 266:Generated_Source\PSoC5/ZCDref.c ****         CyExitCriticalSection(ZCDref_intrStatus);
+ 267:Generated_Source\PSoC5/ZCDref.c ****     #endif /* CY_PSOC5A */
+ 268:Generated_Source\PSoC5/ZCDref.c **** }
+ 269:Generated_Source\PSoC5/ZCDref.c **** 
+ 270:Generated_Source\PSoC5/ZCDref.c **** 
+ 271:Generated_Source\PSoC5/ZCDref.c **** /*******************************************************************************
+ 272:Generated_Source\PSoC5/ZCDref.c **** * Function Name: ZCDref_DacTrim
+ 273:Generated_Source\PSoC5/ZCDref.c **** ********************************************************************************
+ 274:Generated_Source\PSoC5/ZCDref.c **** *
+ 275:Generated_Source\PSoC5/ZCDref.c **** * Summary:
+ 276:Generated_Source\PSoC5/ZCDref.c **** *  Set the trim value for the given range.
+ 277:Generated_Source\PSoC5/ZCDref.c **** *
+ 278:Generated_Source\PSoC5/ZCDref.c **** * Parameters:
+ 279:Generated_Source\PSoC5/ZCDref.c **** *  range:  1V or 4V range.  See constants.
+ 280:Generated_Source\PSoC5/ZCDref.c **** *
+ 281:Generated_Source\PSoC5/ZCDref.c **** * Return:
+ 282:Generated_Source\PSoC5/ZCDref.c **** *  void
+ 283:Generated_Source\PSoC5/ZCDref.c **** *
+ 284:Generated_Source\PSoC5/ZCDref.c **** * Theory: 
+ 285:Generated_Source\PSoC5/ZCDref.c **** *
+ 286:Generated_Source\PSoC5/ZCDref.c **** * Side Effects:
+ 287:Generated_Source\PSoC5/ZCDref.c **** *
+ 288:Generated_Source\PSoC5/ZCDref.c **** *******************************************************************************/
+ 289:Generated_Source\PSoC5/ZCDref.c **** void ZCDref_DacTrim(void) 
+ 290:Generated_Source\PSoC5/ZCDref.c **** {
+ 148              		.loc 1 290 0
+ 149              		.cfi_startproc
+ 150              		@ args = 0, pretend = 0, frame = 0
+ 151              		@ frame_needed = 0, uses_anonymous_args = 0
+ 152              		@ link register save eliminated.
+ 291:Generated_Source\PSoC5/ZCDref.c ****     uint8 mode;
+ 292:Generated_Source\PSoC5/ZCDref.c **** 
+ 293:Generated_Source\PSoC5/ZCDref.c ****     mode = (uint8)((ZCDref_CR0 & ZCDref_RANGE_MASK) >> 2) + ZCDref_TRIM_M7_1V_RNG_OFFSET;
+ 153              		.loc 1 293 0
+ 154 0000 064B     		ldr	r3, .L14
+ 294:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_TR = CY_GET_XTND_REG8((uint8 *)(ZCDref_DAC_TRIM_BASE + mode));
+ 155              		.loc 1 294 0
+ 156 0002 074A     		ldr	r2, .L14+4
+ 293:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_TR = CY_GET_XTND_REG8((uint8 *)(ZCDref_DAC_TRIM_BASE + mode));
+ 157              		.loc 1 293 0
+ 158 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 159              	.LVL3:
+ 160              		.loc 1 294 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 9
+
+
+ 161 0006 C3F38103 		ubfx	r3, r3, #2, #2
+ 162              	.LVL4:
+ 163 000a 03F19243 		add	r3, r3, #1224736768
+ 164 000e 0633     		adds	r3, r3, #6
+ 165 0010 93F83031 		ldrb	r3, [r3, #304]	@ zero_extendqisi2
+ 166 0014 DBB2     		uxtb	r3, r3
+ 167 0016 1370     		strb	r3, [r2]
+ 168 0018 7047     		bx	lr
+ 169              	.L15:
+ 170 001a 00BF     		.align	2
+ 171              	.L14:
+ 172 001c 24580040 		.word	1073764388
+ 173 0020 09460040 		.word	1073759753
+ 174              		.cfi_endproc
+ 175              	.LFE7:
+ 176              		.size	ZCDref_DacTrim, .-ZCDref_DacTrim
+ 177              		.section	.text.ZCDref_SetRange,"ax",%progbits
+ 178              		.align	1
+ 179              		.global	ZCDref_SetRange
+ 180              		.thumb
+ 181              		.thumb_func
+ 182              		.type	ZCDref_SetRange, %function
+ 183              	ZCDref_SetRange:
+ 184              	.LFB5:
+ 229:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_CR0 &= (uint8)(~ZCDref_RANGE_MASK);      /* Clear existing mode */
+ 185              		.loc 1 229 0
+ 186              		.cfi_startproc
+ 187              		@ args = 0, pretend = 0, frame = 0
+ 188              		@ frame_needed = 0, uses_anonymous_args = 0
+ 189              		@ link register save eliminated.
+ 190              	.LVL5:
+ 230:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_CR0 |= (range & ZCDref_RANGE_MASK);      /*  Set Range  */
+ 191              		.loc 1 230 0
+ 192 0000 054B     		ldr	r3, .L17
+ 231:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_DacTrim();
+ 193              		.loc 1 231 0
+ 194 0002 00F00C00 		and	r0, r0, #12
+ 195              	.LVL6:
+ 230:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_CR0 |= (range & ZCDref_RANGE_MASK);      /*  Set Range  */
+ 196              		.loc 1 230 0
+ 197 0006 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 198 0008 02F0F302 		and	r2, r2, #243
+ 199 000c 1A70     		strb	r2, [r3]
+ 231:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_DacTrim();
+ 200              		.loc 1 231 0
+ 201 000e 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 202 0010 1043     		orrs	r0, r0, r2
+ 203 0012 1870     		strb	r0, [r3]
+ 232:Generated_Source\PSoC5/ZCDref.c **** }
+ 204              		.loc 1 232 0
+ 205 0014 FFF7FEBF 		b	ZCDref_DacTrim
+ 206              	.LVL7:
+ 207              	.L18:
+ 208              		.align	2
+ 209              	.L17:
+ 210 0018 24580040 		.word	1073764388
+ 211              		.cfi_endproc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 10
+
+
+ 212              	.LFE5:
+ 213              		.size	ZCDref_SetRange, .-ZCDref_SetRange
+ 214              		.section	.text.ZCDref_Init,"ax",%progbits
+ 215              		.align	1
+ 216              		.global	ZCDref_Init
+ 217              		.thumb
+ 218              		.thumb_func
+ 219              		.type	ZCDref_Init, %function
+ 220              	ZCDref_Init:
+ 221              	.LFB0:
+  56:Generated_Source\PSoC5/ZCDref.c ****     ZCDref_CR0 = (ZCDref_MODE_V );
+ 222              		.loc 1 56 0
+ 223              		.cfi_startproc
+ 224              		@ args = 0, pretend = 0, frame = 0
+ 225              		@ frame_needed = 0, uses_anonymous_args = 0
+ 226 0000 08B5     		push	{r3, lr}
+ 227              		.cfi_def_cfa_offset 8
+ 228              		.cfi_offset 3, -8
+ 229              		.cfi_offset 14, -4
+  57:Generated_Source\PSoC5/ZCDref.c **** 
+ 230              		.loc 1 57 0
+ 231 0002 064B     		ldr	r3, .L20
+ 232 0004 0021     		movs	r1, #0
+ 233 0006 1970     		strb	r1, [r3]
+  72:Generated_Source\PSoC5/ZCDref.c **** 
+ 234              		.loc 1 72 0
+ 235 0008 0846     		mov	r0, r1
+  63:Generated_Source\PSoC5/ZCDref.c ****     #endif /* (ZCDref_DEFAULT_DATA_SRC != 0 ) */
+ 236              		.loc 1 63 0
+ 237 000a 5970     		strb	r1, [r3, #1]
+  72:Generated_Source\PSoC5/ZCDref.c **** 
+ 238              		.loc 1 72 0
+ 239 000c FFF7FEFF 		bl	ZCDref_SetRange
+ 240              	.LVL8:
+  76:Generated_Source\PSoC5/ZCDref.c **** 
+ 241              		.loc 1 76 0
+ 242 0010 BDE80840 		pop	{r3, lr}
+ 243              		.cfi_restore 14
+ 244              		.cfi_restore 3
+ 245              		.cfi_def_cfa_offset 0
+  75:Generated_Source\PSoC5/ZCDref.c **** }
+ 246              		.loc 1 75 0
+ 247 0014 0846     		mov	r0, r1
+ 248 0016 FFF7FEBF 		b	ZCDref_SetSpeed
+ 249              	.LVL9:
+ 250              	.L21:
+ 251 001a 00BF     		.align	2
+ 252              	.L20:
+ 253 001c 24580040 		.word	1073764388
+ 254              		.cfi_endproc
+ 255              	.LFE0:
+ 256              		.size	ZCDref_Init, .-ZCDref_Init
+ 257              		.section	.text.ZCDref_Start,"ax",%progbits
+ 258              		.align	1
+ 259              		.global	ZCDref_Start
+ 260              		.thumb
+ 261              		.thumb_func
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 11
+
+
+ 262              		.type	ZCDref_Start, %function
+ 263              	ZCDref_Start:
+ 264              	.LFB2:
+ 134:Generated_Source\PSoC5/ZCDref.c ****     /* Hardware initiazation only needs to occure the first time */
+ 265              		.loc 1 134 0
+ 266              		.cfi_startproc
+ 267              		@ args = 0, pretend = 0, frame = 0
+ 268              		@ frame_needed = 0, uses_anonymous_args = 0
+ 269 0000 10B5     		push	{r4, lr}
+ 270              		.cfi_def_cfa_offset 8
+ 271              		.cfi_offset 4, -8
+ 272              		.cfi_offset 14, -4
+ 136:Generated_Source\PSoC5/ZCDref.c ****     { 
+ 273              		.loc 1 136 0
+ 274 0002 064C     		ldr	r4, .L25
+ 275 0004 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 276 0006 1BB9     		cbnz	r3, .L23
+ 138:Generated_Source\PSoC5/ZCDref.c ****         ZCDref_initVar = 1u;
+ 277              		.loc 1 138 0
+ 278 0008 FFF7FEFF 		bl	ZCDref_Init
+ 279              	.LVL10:
+ 139:Generated_Source\PSoC5/ZCDref.c ****     }
+ 280              		.loc 1 139 0
+ 281 000c 0123     		movs	r3, #1
+ 282 000e 2370     		strb	r3, [r4]
+ 283              	.L23:
+ 143:Generated_Source\PSoC5/ZCDref.c **** 
+ 284              		.loc 1 143 0
+ 285 0010 FFF7FEFF 		bl	ZCDref_Enable
+ 286              	.LVL11:
+ 287              	.LBB4:
+ 288              	.LBB5:
+ 260:Generated_Source\PSoC5/ZCDref.c **** 
+ 289              		.loc 1 260 0
+ 290 0014 024B     		ldr	r3, .L25+4
+ 291 0016 6422     		movs	r2, #100
+ 292 0018 1A70     		strb	r2, [r3]
+ 293              	.LVL12:
+ 294 001a 10BD     		pop	{r4, pc}
+ 295              	.L26:
+ 296              		.align	2
+ 297              	.L25:
+ 298 001c 00000000 		.word	.LANCHOR0
+ 299 0020 815B0040 		.word	1073765249
+ 300              	.LBE5:
+ 301              	.LBE4:
+ 302              		.cfi_endproc
+ 303              	.LFE2:
+ 304              		.size	ZCDref_Start, .-ZCDref_Start
+ 305              		.global	ZCDref_initVar
+ 306              		.bss
+ 307              		.set	.LANCHOR0,. + 0
+ 308              		.type	ZCDref_initVar, %object
+ 309              		.size	ZCDref_initVar, 1
+ 310              	ZCDref_initVar:
+ 311 0000 00       		.space	1
+ 312              		.text
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 12
+
+
+ 313              	.Letext0:
+ 314              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+ 315              		.section	.debug_info,"",%progbits
+ 316              	.Ldebug_info0:
+ 317 0000 F1010000 		.4byte	0x1f1
+ 318 0004 0400     		.2byte	0x4
+ 319 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 320 000a 04       		.byte	0x4
+ 321 000b 01       		.uleb128 0x1
+ 322 000c 81000000 		.4byte	.LASF23
+ 323 0010 0C       		.byte	0xc
+ 324 0011 30000000 		.4byte	.LASF24
+ 325 0015 DD010000 		.4byte	.LASF25
+ 326 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 327 001d 00000000 		.4byte	0
+ 328 0021 00000000 		.4byte	.Ldebug_line0
+ 329 0025 02       		.uleb128 0x2
+ 330 0026 01       		.byte	0x1
+ 331 0027 06       		.byte	0x6
+ 332 0028 0B020000 		.4byte	.LASF0
+ 333 002c 02       		.uleb128 0x2
+ 334 002d 01       		.byte	0x1
+ 335 002e 08       		.byte	0x8
+ 336 002f 50000000 		.4byte	.LASF1
+ 337 0033 02       		.uleb128 0x2
+ 338 0034 02       		.byte	0x2
+ 339 0035 05       		.byte	0x5
+ 340 0036 BD010000 		.4byte	.LASF2
+ 341 003a 02       		.uleb128 0x2
+ 342 003b 02       		.byte	0x2
+ 343 003c 07       		.byte	0x7
+ 344 003d 1A010000 		.4byte	.LASF3
+ 345 0041 02       		.uleb128 0x2
+ 346 0042 04       		.byte	0x4
+ 347 0043 05       		.byte	0x5
+ 348 0044 02020000 		.4byte	.LASF4
+ 349 0048 02       		.uleb128 0x2
+ 350 0049 04       		.byte	0x4
+ 351 004a 07       		.byte	0x7
+ 352 004b 6F000000 		.4byte	.LASF5
+ 353 004f 02       		.uleb128 0x2
+ 354 0050 08       		.byte	0x8
+ 355 0051 05       		.byte	0x5
+ 356 0052 AA010000 		.4byte	.LASF6
+ 357 0056 02       		.uleb128 0x2
+ 358 0057 08       		.byte	0x8
+ 359 0058 07       		.byte	0x7
+ 360 0059 63010000 		.4byte	.LASF7
+ 361 005d 03       		.uleb128 0x3
+ 362 005e 04       		.byte	0x4
+ 363 005f 05       		.byte	0x5
+ 364 0060 696E7400 		.ascii	"int\000"
+ 365 0064 02       		.uleb128 0x2
+ 366 0065 04       		.byte	0x4
+ 367 0066 07       		.byte	0x7
+ 368 0067 49010000 		.4byte	.LASF8
+ 369 006b 04       		.uleb128 0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 13
+
+
+ 370 006c D7010000 		.4byte	.LASF12
+ 371 0070 02       		.byte	0x2
+ 372 0071 9201     		.2byte	0x192
+ 373 0073 2C000000 		.4byte	0x2c
+ 374 0077 02       		.uleb128 0x2
+ 375 0078 04       		.byte	0x4
+ 376 0079 04       		.byte	0x4
+ 377 007a 06000000 		.4byte	.LASF9
+ 378 007e 02       		.uleb128 0x2
+ 379 007f 08       		.byte	0x8
+ 380 0080 04       		.byte	0x4
+ 381 0081 42010000 		.4byte	.LASF10
+ 382 0085 02       		.uleb128 0x2
+ 383 0086 01       		.byte	0x1
+ 384 0087 08       		.byte	0x8
+ 385 0088 B8010000 		.4byte	.LASF11
+ 386 008c 04       		.uleb128 0x4
+ 387 008d 5E000000 		.4byte	.LASF13
+ 388 0091 02       		.byte	0x2
+ 389 0092 3C02     		.2byte	0x23c
+ 390 0094 98000000 		.4byte	0x98
+ 391 0098 05       		.uleb128 0x5
+ 392 0099 6B000000 		.4byte	0x6b
+ 393 009d 06       		.uleb128 0x6
+ 394 009e 20000000 		.4byte	.LASF26
+ 395 00a2 01       		.byte	0x1
+ 396 00a3 FE       		.byte	0xfe
+ 397 00a4 01       		.byte	0x1
+ 398 00a5 B5000000 		.4byte	0xb5
+ 399 00a9 07       		.uleb128 0x7
+ 400 00aa 0C000000 		.4byte	.LASF27
+ 401 00ae 01       		.byte	0x1
+ 402 00af FE       		.byte	0xfe
+ 403 00b0 6B000000 		.4byte	0x6b
+ 404 00b4 00       		.byte	0
+ 405 00b5 08       		.uleb128 0x8
+ 406 00b6 12000000 		.4byte	.LASF14
+ 407 00ba 01       		.byte	0x1
+ 408 00bb 60       		.byte	0x60
+ 409 00bc 00000000 		.4byte	.LFB1
+ 410 00c0 18000000 		.4byte	.LFE1-.LFB1
+ 411 00c4 01       		.uleb128 0x1
+ 412 00c5 9C       		.byte	0x9c
+ 413 00c6 08       		.uleb128 0x8
+ 414 00c7 99010000 		.4byte	.LASF15
+ 415 00cb 01       		.byte	0x1
+ 416 00cc A8       		.byte	0xa8
+ 417 00cd 00000000 		.4byte	.LFB3
+ 418 00d1 18000000 		.4byte	.LFE3-.LFB3
+ 419 00d5 01       		.uleb128 0x1
+ 420 00d6 9C       		.byte	0x9c
+ 421 00d7 09       		.uleb128 0x9
+ 422 00d8 C7010000 		.4byte	.LASF16
+ 423 00dc 01       		.byte	0x1
+ 424 00dd CA       		.byte	0xca
+ 425 00de 00000000 		.4byte	.LFB4
+ 426 00e2 1C000000 		.4byte	.LFE4-.LFB4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 14
+
+
+ 427 00e6 01       		.uleb128 0x1
+ 428 00e7 9C       		.byte	0x9c
+ 429 00e8 FC000000 		.4byte	0xfc
+ 430 00ec 0A       		.uleb128 0xa
+ 431 00ed 00000000 		.4byte	.LASF19
+ 432 00f1 01       		.byte	0x1
+ 433 00f2 CA       		.byte	0xca
+ 434 00f3 6B000000 		.4byte	0x6b
+ 435 00f7 00000000 		.4byte	.LLST0
+ 436 00fb 00       		.byte	0
+ 437 00fc 0B       		.uleb128 0xb
+ 438 00fd 9D000000 		.4byte	0x9d
+ 439 0101 00000000 		.4byte	.LFB6
+ 440 0105 0C000000 		.4byte	.LFE6-.LFB6
+ 441 0109 01       		.uleb128 0x1
+ 442 010a 9C       		.byte	0x9c
+ 443 010b 17010000 		.4byte	0x117
+ 444 010f 0C       		.uleb128 0xc
+ 445 0110 A9000000 		.4byte	0xa9
+ 446 0114 01       		.uleb128 0x1
+ 447 0115 50       		.byte	0x50
+ 448 0116 00       		.byte	0
+ 449 0117 0D       		.uleb128 0xd
+ 450 0118 7A010000 		.4byte	.LASF17
+ 451 011c 01       		.byte	0x1
+ 452 011d 2101     		.2byte	0x121
+ 453 011f 00000000 		.4byte	.LFB7
+ 454 0123 24000000 		.4byte	.LFE7-.LFB7
+ 455 0127 01       		.uleb128 0x1
+ 456 0128 9C       		.byte	0x9c
+ 457 0129 3E010000 		.4byte	0x13e
+ 458 012d 0E       		.uleb128 0xe
+ 459 012e A5010000 		.4byte	.LASF28
+ 460 0132 01       		.byte	0x1
+ 461 0133 2301     		.2byte	0x123
+ 462 0135 6B000000 		.4byte	0x6b
+ 463 0139 21000000 		.4byte	.LLST1
+ 464 013d 00       		.byte	0
+ 465 013e 09       		.uleb128 0x9
+ 466 013f 89010000 		.4byte	.LASF18
+ 467 0143 01       		.byte	0x1
+ 468 0144 E4       		.byte	0xe4
+ 469 0145 00000000 		.4byte	.LFB5
+ 470 0149 1C000000 		.4byte	.LFE5-.LFB5
+ 471 014d 01       		.uleb128 0x1
+ 472 014e 9C       		.byte	0x9c
+ 473 014f 6C010000 		.4byte	0x16c
+ 474 0153 0A       		.uleb128 0xa
+ 475 0154 3C010000 		.4byte	.LASF20
+ 476 0158 01       		.byte	0x1
+ 477 0159 E4       		.byte	0xe4
+ 478 015a 6B000000 		.4byte	0x6b
+ 479 015e 3C000000 		.4byte	.LLST2
+ 480 0162 0F       		.uleb128 0xf
+ 481 0163 18000000 		.4byte	.LVL7
+ 482 0167 17010000 		.4byte	0x117
+ 483 016b 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 15
+
+
+ 484 016c 09       		.uleb128 0x9
+ 485 016d 63000000 		.4byte	.LASF21
+ 486 0171 01       		.byte	0x1
+ 487 0172 37       		.byte	0x37
+ 488 0173 00000000 		.4byte	.LFB0
+ 489 0177 20000000 		.4byte	.LFE0-.LFB0
+ 490 017b 01       		.uleb128 0x1
+ 491 017c 9C       		.byte	0x9c
+ 492 017d 9E010000 		.4byte	0x19e
+ 493 0181 10       		.uleb128 0x10
+ 494 0182 10000000 		.4byte	.LVL8
+ 495 0186 3E010000 		.4byte	0x13e
+ 496 018a 94010000 		.4byte	0x194
+ 497 018e 11       		.uleb128 0x11
+ 498 018f 01       		.uleb128 0x1
+ 499 0190 50       		.byte	0x50
+ 500 0191 01       		.uleb128 0x1
+ 501 0192 30       		.byte	0x30
+ 502 0193 00       		.byte	0
+ 503 0194 0F       		.uleb128 0xf
+ 504 0195 1A000000 		.4byte	.LVL9
+ 505 0199 D7000000 		.4byte	0xd7
+ 506 019d 00       		.byte	0
+ 507 019e 09       		.uleb128 0x9
+ 508 019f 56010000 		.4byte	.LASF22
+ 509 01a3 01       		.byte	0x1
+ 510 01a4 85       		.byte	0x85
+ 511 01a5 00000000 		.4byte	.LFB2
+ 512 01a9 24000000 		.4byte	.LFE2-.LFB2
+ 513 01ad 01       		.uleb128 0x1
+ 514 01ae 9C       		.byte	0x9c
+ 515 01af E3010000 		.4byte	0x1e3
+ 516 01b3 12       		.uleb128 0x12
+ 517 01b4 9D000000 		.4byte	0x9d
+ 518 01b8 14000000 		.4byte	.LBB4
+ 519 01bc 10000000 		.4byte	.LBE4-.LBB4
+ 520 01c0 01       		.byte	0x1
+ 521 01c1 92       		.byte	0x92
+ 522 01c2 D0010000 		.4byte	0x1d0
+ 523 01c6 13       		.uleb128 0x13
+ 524 01c7 A9000000 		.4byte	0xa9
+ 525 01cb 5D000000 		.4byte	.LLST3
+ 526 01cf 00       		.byte	0
+ 527 01d0 14       		.uleb128 0x14
+ 528 01d1 0C000000 		.4byte	.LVL10
+ 529 01d5 6C010000 		.4byte	0x16c
+ 530 01d9 14       		.uleb128 0x14
+ 531 01da 14000000 		.4byte	.LVL11
+ 532 01de B5000000 		.4byte	0xb5
+ 533 01e2 00       		.byte	0
+ 534 01e3 15       		.uleb128 0x15
+ 535 01e4 2D010000 		.4byte	.LASF29
+ 536 01e8 01       		.byte	0x1
+ 537 01e9 1B       		.byte	0x1b
+ 538 01ea 6B000000 		.4byte	0x6b
+ 539 01ee 05       		.uleb128 0x5
+ 540 01ef 03       		.byte	0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 16
+
+
+ 541 01f0 00000000 		.4byte	ZCDref_initVar
+ 542 01f4 00       		.byte	0
+ 543              		.section	.debug_abbrev,"",%progbits
+ 544              	.Ldebug_abbrev0:
+ 545 0000 01       		.uleb128 0x1
+ 546 0001 11       		.uleb128 0x11
+ 547 0002 01       		.byte	0x1
+ 548 0003 25       		.uleb128 0x25
+ 549 0004 0E       		.uleb128 0xe
+ 550 0005 13       		.uleb128 0x13
+ 551 0006 0B       		.uleb128 0xb
+ 552 0007 03       		.uleb128 0x3
+ 553 0008 0E       		.uleb128 0xe
+ 554 0009 1B       		.uleb128 0x1b
+ 555 000a 0E       		.uleb128 0xe
+ 556 000b 55       		.uleb128 0x55
+ 557 000c 17       		.uleb128 0x17
+ 558 000d 11       		.uleb128 0x11
+ 559 000e 01       		.uleb128 0x1
+ 560 000f 10       		.uleb128 0x10
+ 561 0010 17       		.uleb128 0x17
+ 562 0011 00       		.byte	0
+ 563 0012 00       		.byte	0
+ 564 0013 02       		.uleb128 0x2
+ 565 0014 24       		.uleb128 0x24
+ 566 0015 00       		.byte	0
+ 567 0016 0B       		.uleb128 0xb
+ 568 0017 0B       		.uleb128 0xb
+ 569 0018 3E       		.uleb128 0x3e
+ 570 0019 0B       		.uleb128 0xb
+ 571 001a 03       		.uleb128 0x3
+ 572 001b 0E       		.uleb128 0xe
+ 573 001c 00       		.byte	0
+ 574 001d 00       		.byte	0
+ 575 001e 03       		.uleb128 0x3
+ 576 001f 24       		.uleb128 0x24
+ 577 0020 00       		.byte	0
+ 578 0021 0B       		.uleb128 0xb
+ 579 0022 0B       		.uleb128 0xb
+ 580 0023 3E       		.uleb128 0x3e
+ 581 0024 0B       		.uleb128 0xb
+ 582 0025 03       		.uleb128 0x3
+ 583 0026 08       		.uleb128 0x8
+ 584 0027 00       		.byte	0
+ 585 0028 00       		.byte	0
+ 586 0029 04       		.uleb128 0x4
+ 587 002a 16       		.uleb128 0x16
+ 588 002b 00       		.byte	0
+ 589 002c 03       		.uleb128 0x3
+ 590 002d 0E       		.uleb128 0xe
+ 591 002e 3A       		.uleb128 0x3a
+ 592 002f 0B       		.uleb128 0xb
+ 593 0030 3B       		.uleb128 0x3b
+ 594 0031 05       		.uleb128 0x5
+ 595 0032 49       		.uleb128 0x49
+ 596 0033 13       		.uleb128 0x13
+ 597 0034 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 17
+
+
+ 598 0035 00       		.byte	0
+ 599 0036 05       		.uleb128 0x5
+ 600 0037 35       		.uleb128 0x35
+ 601 0038 00       		.byte	0
+ 602 0039 49       		.uleb128 0x49
+ 603 003a 13       		.uleb128 0x13
+ 604 003b 00       		.byte	0
+ 605 003c 00       		.byte	0
+ 606 003d 06       		.uleb128 0x6
+ 607 003e 2E       		.uleb128 0x2e
+ 608 003f 01       		.byte	0x1
+ 609 0040 3F       		.uleb128 0x3f
+ 610 0041 19       		.uleb128 0x19
+ 611 0042 03       		.uleb128 0x3
+ 612 0043 0E       		.uleb128 0xe
+ 613 0044 3A       		.uleb128 0x3a
+ 614 0045 0B       		.uleb128 0xb
+ 615 0046 3B       		.uleb128 0x3b
+ 616 0047 0B       		.uleb128 0xb
+ 617 0048 27       		.uleb128 0x27
+ 618 0049 19       		.uleb128 0x19
+ 619 004a 20       		.uleb128 0x20
+ 620 004b 0B       		.uleb128 0xb
+ 621 004c 01       		.uleb128 0x1
+ 622 004d 13       		.uleb128 0x13
+ 623 004e 00       		.byte	0
+ 624 004f 00       		.byte	0
+ 625 0050 07       		.uleb128 0x7
+ 626 0051 05       		.uleb128 0x5
+ 627 0052 00       		.byte	0
+ 628 0053 03       		.uleb128 0x3
+ 629 0054 0E       		.uleb128 0xe
+ 630 0055 3A       		.uleb128 0x3a
+ 631 0056 0B       		.uleb128 0xb
+ 632 0057 3B       		.uleb128 0x3b
+ 633 0058 0B       		.uleb128 0xb
+ 634 0059 49       		.uleb128 0x49
+ 635 005a 13       		.uleb128 0x13
+ 636 005b 00       		.byte	0
+ 637 005c 00       		.byte	0
+ 638 005d 08       		.uleb128 0x8
+ 639 005e 2E       		.uleb128 0x2e
+ 640 005f 00       		.byte	0
+ 641 0060 3F       		.uleb128 0x3f
+ 642 0061 19       		.uleb128 0x19
+ 643 0062 03       		.uleb128 0x3
+ 644 0063 0E       		.uleb128 0xe
+ 645 0064 3A       		.uleb128 0x3a
+ 646 0065 0B       		.uleb128 0xb
+ 647 0066 3B       		.uleb128 0x3b
+ 648 0067 0B       		.uleb128 0xb
+ 649 0068 27       		.uleb128 0x27
+ 650 0069 19       		.uleb128 0x19
+ 651 006a 11       		.uleb128 0x11
+ 652 006b 01       		.uleb128 0x1
+ 653 006c 12       		.uleb128 0x12
+ 654 006d 06       		.uleb128 0x6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 18
+
+
+ 655 006e 40       		.uleb128 0x40
+ 656 006f 18       		.uleb128 0x18
+ 657 0070 9742     		.uleb128 0x2117
+ 658 0072 19       		.uleb128 0x19
+ 659 0073 00       		.byte	0
+ 660 0074 00       		.byte	0
+ 661 0075 09       		.uleb128 0x9
+ 662 0076 2E       		.uleb128 0x2e
+ 663 0077 01       		.byte	0x1
+ 664 0078 3F       		.uleb128 0x3f
+ 665 0079 19       		.uleb128 0x19
+ 666 007a 03       		.uleb128 0x3
+ 667 007b 0E       		.uleb128 0xe
+ 668 007c 3A       		.uleb128 0x3a
+ 669 007d 0B       		.uleb128 0xb
+ 670 007e 3B       		.uleb128 0x3b
+ 671 007f 0B       		.uleb128 0xb
+ 672 0080 27       		.uleb128 0x27
+ 673 0081 19       		.uleb128 0x19
+ 674 0082 11       		.uleb128 0x11
+ 675 0083 01       		.uleb128 0x1
+ 676 0084 12       		.uleb128 0x12
+ 677 0085 06       		.uleb128 0x6
+ 678 0086 40       		.uleb128 0x40
+ 679 0087 18       		.uleb128 0x18
+ 680 0088 9742     		.uleb128 0x2117
+ 681 008a 19       		.uleb128 0x19
+ 682 008b 01       		.uleb128 0x1
+ 683 008c 13       		.uleb128 0x13
+ 684 008d 00       		.byte	0
+ 685 008e 00       		.byte	0
+ 686 008f 0A       		.uleb128 0xa
+ 687 0090 05       		.uleb128 0x5
+ 688 0091 00       		.byte	0
+ 689 0092 03       		.uleb128 0x3
+ 690 0093 0E       		.uleb128 0xe
+ 691 0094 3A       		.uleb128 0x3a
+ 692 0095 0B       		.uleb128 0xb
+ 693 0096 3B       		.uleb128 0x3b
+ 694 0097 0B       		.uleb128 0xb
+ 695 0098 49       		.uleb128 0x49
+ 696 0099 13       		.uleb128 0x13
+ 697 009a 02       		.uleb128 0x2
+ 698 009b 17       		.uleb128 0x17
+ 699 009c 00       		.byte	0
+ 700 009d 00       		.byte	0
+ 701 009e 0B       		.uleb128 0xb
+ 702 009f 2E       		.uleb128 0x2e
+ 703 00a0 01       		.byte	0x1
+ 704 00a1 31       		.uleb128 0x31
+ 705 00a2 13       		.uleb128 0x13
+ 706 00a3 11       		.uleb128 0x11
+ 707 00a4 01       		.uleb128 0x1
+ 708 00a5 12       		.uleb128 0x12
+ 709 00a6 06       		.uleb128 0x6
+ 710 00a7 40       		.uleb128 0x40
+ 711 00a8 18       		.uleb128 0x18
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 19
+
+
+ 712 00a9 9742     		.uleb128 0x2117
+ 713 00ab 19       		.uleb128 0x19
+ 714 00ac 01       		.uleb128 0x1
+ 715 00ad 13       		.uleb128 0x13
+ 716 00ae 00       		.byte	0
+ 717 00af 00       		.byte	0
+ 718 00b0 0C       		.uleb128 0xc
+ 719 00b1 05       		.uleb128 0x5
+ 720 00b2 00       		.byte	0
+ 721 00b3 31       		.uleb128 0x31
+ 722 00b4 13       		.uleb128 0x13
+ 723 00b5 02       		.uleb128 0x2
+ 724 00b6 18       		.uleb128 0x18
+ 725 00b7 00       		.byte	0
+ 726 00b8 00       		.byte	0
+ 727 00b9 0D       		.uleb128 0xd
+ 728 00ba 2E       		.uleb128 0x2e
+ 729 00bb 01       		.byte	0x1
+ 730 00bc 3F       		.uleb128 0x3f
+ 731 00bd 19       		.uleb128 0x19
+ 732 00be 03       		.uleb128 0x3
+ 733 00bf 0E       		.uleb128 0xe
+ 734 00c0 3A       		.uleb128 0x3a
+ 735 00c1 0B       		.uleb128 0xb
+ 736 00c2 3B       		.uleb128 0x3b
+ 737 00c3 05       		.uleb128 0x5
+ 738 00c4 27       		.uleb128 0x27
+ 739 00c5 19       		.uleb128 0x19
+ 740 00c6 11       		.uleb128 0x11
+ 741 00c7 01       		.uleb128 0x1
+ 742 00c8 12       		.uleb128 0x12
+ 743 00c9 06       		.uleb128 0x6
+ 744 00ca 40       		.uleb128 0x40
+ 745 00cb 18       		.uleb128 0x18
+ 746 00cc 9742     		.uleb128 0x2117
+ 747 00ce 19       		.uleb128 0x19
+ 748 00cf 01       		.uleb128 0x1
+ 749 00d0 13       		.uleb128 0x13
+ 750 00d1 00       		.byte	0
+ 751 00d2 00       		.byte	0
+ 752 00d3 0E       		.uleb128 0xe
+ 753 00d4 34       		.uleb128 0x34
+ 754 00d5 00       		.byte	0
+ 755 00d6 03       		.uleb128 0x3
+ 756 00d7 0E       		.uleb128 0xe
+ 757 00d8 3A       		.uleb128 0x3a
+ 758 00d9 0B       		.uleb128 0xb
+ 759 00da 3B       		.uleb128 0x3b
+ 760 00db 05       		.uleb128 0x5
+ 761 00dc 49       		.uleb128 0x49
+ 762 00dd 13       		.uleb128 0x13
+ 763 00de 02       		.uleb128 0x2
+ 764 00df 17       		.uleb128 0x17
+ 765 00e0 00       		.byte	0
+ 766 00e1 00       		.byte	0
+ 767 00e2 0F       		.uleb128 0xf
+ 768 00e3 898201   		.uleb128 0x4109
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 20
+
+
+ 769 00e6 00       		.byte	0
+ 770 00e7 11       		.uleb128 0x11
+ 771 00e8 01       		.uleb128 0x1
+ 772 00e9 9542     		.uleb128 0x2115
+ 773 00eb 19       		.uleb128 0x19
+ 774 00ec 31       		.uleb128 0x31
+ 775 00ed 13       		.uleb128 0x13
+ 776 00ee 00       		.byte	0
+ 777 00ef 00       		.byte	0
+ 778 00f0 10       		.uleb128 0x10
+ 779 00f1 898201   		.uleb128 0x4109
+ 780 00f4 01       		.byte	0x1
+ 781 00f5 11       		.uleb128 0x11
+ 782 00f6 01       		.uleb128 0x1
+ 783 00f7 31       		.uleb128 0x31
+ 784 00f8 13       		.uleb128 0x13
+ 785 00f9 01       		.uleb128 0x1
+ 786 00fa 13       		.uleb128 0x13
+ 787 00fb 00       		.byte	0
+ 788 00fc 00       		.byte	0
+ 789 00fd 11       		.uleb128 0x11
+ 790 00fe 8A8201   		.uleb128 0x410a
+ 791 0101 00       		.byte	0
+ 792 0102 02       		.uleb128 0x2
+ 793 0103 18       		.uleb128 0x18
+ 794 0104 9142     		.uleb128 0x2111
+ 795 0106 18       		.uleb128 0x18
+ 796 0107 00       		.byte	0
+ 797 0108 00       		.byte	0
+ 798 0109 12       		.uleb128 0x12
+ 799 010a 1D       		.uleb128 0x1d
+ 800 010b 01       		.byte	0x1
+ 801 010c 31       		.uleb128 0x31
+ 802 010d 13       		.uleb128 0x13
+ 803 010e 11       		.uleb128 0x11
+ 804 010f 01       		.uleb128 0x1
+ 805 0110 12       		.uleb128 0x12
+ 806 0111 06       		.uleb128 0x6
+ 807 0112 58       		.uleb128 0x58
+ 808 0113 0B       		.uleb128 0xb
+ 809 0114 59       		.uleb128 0x59
+ 810 0115 0B       		.uleb128 0xb
+ 811 0116 01       		.uleb128 0x1
+ 812 0117 13       		.uleb128 0x13
+ 813 0118 00       		.byte	0
+ 814 0119 00       		.byte	0
+ 815 011a 13       		.uleb128 0x13
+ 816 011b 05       		.uleb128 0x5
+ 817 011c 00       		.byte	0
+ 818 011d 31       		.uleb128 0x31
+ 819 011e 13       		.uleb128 0x13
+ 820 011f 02       		.uleb128 0x2
+ 821 0120 17       		.uleb128 0x17
+ 822 0121 00       		.byte	0
+ 823 0122 00       		.byte	0
+ 824 0123 14       		.uleb128 0x14
+ 825 0124 898201   		.uleb128 0x4109
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 21
+
+
+ 826 0127 00       		.byte	0
+ 827 0128 11       		.uleb128 0x11
+ 828 0129 01       		.uleb128 0x1
+ 829 012a 31       		.uleb128 0x31
+ 830 012b 13       		.uleb128 0x13
+ 831 012c 00       		.byte	0
+ 832 012d 00       		.byte	0
+ 833 012e 15       		.uleb128 0x15
+ 834 012f 34       		.uleb128 0x34
+ 835 0130 00       		.byte	0
+ 836 0131 03       		.uleb128 0x3
+ 837 0132 0E       		.uleb128 0xe
+ 838 0133 3A       		.uleb128 0x3a
+ 839 0134 0B       		.uleb128 0xb
+ 840 0135 3B       		.uleb128 0x3b
+ 841 0136 0B       		.uleb128 0xb
+ 842 0137 49       		.uleb128 0x49
+ 843 0138 13       		.uleb128 0x13
+ 844 0139 3F       		.uleb128 0x3f
+ 845 013a 19       		.uleb128 0x19
+ 846 013b 02       		.uleb128 0x2
+ 847 013c 18       		.uleb128 0x18
+ 848 013d 00       		.byte	0
+ 849 013e 00       		.byte	0
+ 850 013f 00       		.byte	0
+ 851              		.section	.debug_loc,"",%progbits
+ 852              	.Ldebug_loc0:
+ 853              	.LLST0:
+ 854 0000 00000000 		.4byte	.LVL0
+ 855 0004 06000000 		.4byte	.LVL1
+ 856 0008 0100     		.2byte	0x1
+ 857 000a 50       		.byte	0x50
+ 858 000b 06000000 		.4byte	.LVL1
+ 859 000f 1C000000 		.4byte	.LFE4
+ 860 0013 0400     		.2byte	0x4
+ 861 0015 F3       		.byte	0xf3
+ 862 0016 01       		.uleb128 0x1
+ 863 0017 50       		.byte	0x50
+ 864 0018 9F       		.byte	0x9f
+ 865 0019 00000000 		.4byte	0
+ 866 001d 00000000 		.4byte	0
+ 867              	.LLST1:
+ 868 0021 06000000 		.4byte	.LVL3
+ 869 0025 0A000000 		.4byte	.LVL4
+ 870 0029 0900     		.2byte	0x9
+ 871 002b 73       		.byte	0x73
+ 872 002c 00       		.sleb128 0
+ 873 002d 3C       		.byte	0x3c
+ 874 002e 1A       		.byte	0x1a
+ 875 002f 32       		.byte	0x32
+ 876 0030 25       		.byte	0x25
+ 877 0031 23       		.byte	0x23
+ 878 0032 06       		.uleb128 0x6
+ 879 0033 9F       		.byte	0x9f
+ 880 0034 00000000 		.4byte	0
+ 881 0038 00000000 		.4byte	0
+ 882              	.LLST2:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 22
+
+
+ 883 003c 00000000 		.4byte	.LVL5
+ 884 0040 06000000 		.4byte	.LVL6
+ 885 0044 0100     		.2byte	0x1
+ 886 0046 50       		.byte	0x50
+ 887 0047 06000000 		.4byte	.LVL6
+ 888 004b 1C000000 		.4byte	.LFE5
+ 889 004f 0400     		.2byte	0x4
+ 890 0051 F3       		.byte	0xf3
+ 891 0052 01       		.uleb128 0x1
+ 892 0053 50       		.byte	0x50
+ 893 0054 9F       		.byte	0x9f
+ 894 0055 00000000 		.4byte	0
+ 895 0059 00000000 		.4byte	0
+ 896              	.LLST3:
+ 897 005d 14000000 		.4byte	.LVL11
+ 898 0061 1A000000 		.4byte	.LVL12
+ 899 0065 0300     		.2byte	0x3
+ 900 0067 08       		.byte	0x8
+ 901 0068 64       		.byte	0x64
+ 902 0069 9F       		.byte	0x9f
+ 903 006a 00000000 		.4byte	0
+ 904 006e 00000000 		.4byte	0
+ 905              		.section	.debug_aranges,"",%progbits
+ 906 0000 54000000 		.4byte	0x54
+ 907 0004 0200     		.2byte	0x2
+ 908 0006 00000000 		.4byte	.Ldebug_info0
+ 909 000a 04       		.byte	0x4
+ 910 000b 00       		.byte	0
+ 911 000c 0000     		.2byte	0
+ 912 000e 0000     		.2byte	0
+ 913 0010 00000000 		.4byte	.LFB1
+ 914 0014 18000000 		.4byte	.LFE1-.LFB1
+ 915 0018 00000000 		.4byte	.LFB3
+ 916 001c 18000000 		.4byte	.LFE3-.LFB3
+ 917 0020 00000000 		.4byte	.LFB4
+ 918 0024 1C000000 		.4byte	.LFE4-.LFB4
+ 919 0028 00000000 		.4byte	.LFB6
+ 920 002c 0C000000 		.4byte	.LFE6-.LFB6
+ 921 0030 00000000 		.4byte	.LFB7
+ 922 0034 24000000 		.4byte	.LFE7-.LFB7
+ 923 0038 00000000 		.4byte	.LFB5
+ 924 003c 1C000000 		.4byte	.LFE5-.LFB5
+ 925 0040 00000000 		.4byte	.LFB0
+ 926 0044 20000000 		.4byte	.LFE0-.LFB0
+ 927 0048 00000000 		.4byte	.LFB2
+ 928 004c 24000000 		.4byte	.LFE2-.LFB2
+ 929 0050 00000000 		.4byte	0
+ 930 0054 00000000 		.4byte	0
+ 931              		.section	.debug_ranges,"",%progbits
+ 932              	.Ldebug_ranges0:
+ 933 0000 00000000 		.4byte	.LFB1
+ 934 0004 18000000 		.4byte	.LFE1
+ 935 0008 00000000 		.4byte	.LFB3
+ 936 000c 18000000 		.4byte	.LFE3
+ 937 0010 00000000 		.4byte	.LFB4
+ 938 0014 1C000000 		.4byte	.LFE4
+ 939 0018 00000000 		.4byte	.LFB6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 23
+
+
+ 940 001c 0C000000 		.4byte	.LFE6
+ 941 0020 00000000 		.4byte	.LFB7
+ 942 0024 24000000 		.4byte	.LFE7
+ 943 0028 00000000 		.4byte	.LFB5
+ 944 002c 1C000000 		.4byte	.LFE5
+ 945 0030 00000000 		.4byte	.LFB0
+ 946 0034 20000000 		.4byte	.LFE0
+ 947 0038 00000000 		.4byte	.LFB2
+ 948 003c 24000000 		.4byte	.LFE2
+ 949 0040 00000000 		.4byte	0
+ 950 0044 00000000 		.4byte	0
+ 951              		.section	.debug_line,"",%progbits
+ 952              	.Ldebug_line0:
+ 953 0000 EE000000 		.section	.debug_str,"MS",%progbits,1
+ 953      02004300 
+ 953      00000201 
+ 953      FB0E0D00 
+ 953      01010101 
+ 954              	.LASF19:
+ 955 0000 73706565 		.ascii	"speed\000"
+ 955      6400
+ 956              	.LASF9:
+ 957 0006 666C6F61 		.ascii	"float\000"
+ 957      7400
+ 958              	.LASF27:
+ 959 000c 76616C75 		.ascii	"value\000"
+ 959      6500
+ 960              	.LASF14:
+ 961 0012 5A434472 		.ascii	"ZCDref_Enable\000"
+ 961      65665F45 
+ 961      6E61626C 
+ 961      6500
+ 962              	.LASF26:
+ 963 0020 5A434472 		.ascii	"ZCDref_SetValue\000"
+ 963      65665F53 
+ 963      65745661 
+ 963      6C756500 
+ 964              	.LASF24:
+ 965 0030 47656E65 		.ascii	"Generated_Source\\PSoC5\\ZCDref.c\000"
+ 965      72617465 
+ 965      645F536F 
+ 965      75726365 
+ 965      5C50536F 
+ 966              	.LASF1:
+ 967 0050 756E7369 		.ascii	"unsigned char\000"
+ 967      676E6564 
+ 967      20636861 
+ 967      7200
+ 968              	.LASF13:
+ 969 005e 72656738 		.ascii	"reg8\000"
+ 969      00
+ 970              	.LASF21:
+ 971 0063 5A434472 		.ascii	"ZCDref_Init\000"
+ 971      65665F49 
+ 971      6E697400 
+ 972              	.LASF5:
+ 973 006f 6C6F6E67 		.ascii	"long unsigned int\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 24
+
+
+ 973      20756E73 
+ 973      69676E65 
+ 973      6420696E 
+ 973      7400
+ 974              	.LASF23:
+ 975 0081 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 975      43393920 
+ 975      352E342E 
+ 975      31203230 
+ 975      31363036 
+ 976 00b4 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 976      20726576 
+ 976      6973696F 
+ 976      6E203233 
+ 976      37373135 
+ 977 00e7 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 977      74643D67 
+ 977      6E753939 
+ 977      202D6666 
+ 977      756E6374 
+ 978              	.LASF3:
+ 979 011a 73686F72 		.ascii	"short unsigned int\000"
+ 979      7420756E 
+ 979      7369676E 
+ 979      65642069 
+ 979      6E7400
+ 980              	.LASF29:
+ 981 012d 5A434472 		.ascii	"ZCDref_initVar\000"
+ 981      65665F69 
+ 981      6E697456 
+ 981      617200
+ 982              	.LASF20:
+ 983 013c 72616E67 		.ascii	"range\000"
+ 983      6500
+ 984              	.LASF10:
+ 985 0142 646F7562 		.ascii	"double\000"
+ 985      6C6500
+ 986              	.LASF8:
+ 987 0149 756E7369 		.ascii	"unsigned int\000"
+ 987      676E6564 
+ 987      20696E74 
+ 987      00
+ 988              	.LASF22:
+ 989 0156 5A434472 		.ascii	"ZCDref_Start\000"
+ 989      65665F53 
+ 989      74617274 
+ 989      00
+ 990              	.LASF7:
+ 991 0163 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 991      206C6F6E 
+ 991      6720756E 
+ 991      7369676E 
+ 991      65642069 
+ 992              	.LASF17:
+ 993 017a 5A434472 		.ascii	"ZCDref_DacTrim\000"
+ 993      65665F44 
+ 993      61635472 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc7PxASp.s 			page 25
+
+
+ 993      696D00
+ 994              	.LASF18:
+ 995 0189 5A434472 		.ascii	"ZCDref_SetRange\000"
+ 995      65665F53 
+ 995      65745261 
+ 995      6E676500 
+ 996              	.LASF15:
+ 997 0199 5A434472 		.ascii	"ZCDref_Stop\000"
+ 997      65665F53 
+ 997      746F7000 
+ 998              	.LASF28:
+ 999 01a5 6D6F6465 		.ascii	"mode\000"
+ 999      00
+ 1000              	.LASF6:
+ 1001 01aa 6C6F6E67 		.ascii	"long long int\000"
+ 1001      206C6F6E 
+ 1001      6720696E 
+ 1001      7400
+ 1002              	.LASF11:
+ 1003 01b8 63686172 		.ascii	"char\000"
+ 1003      00
+ 1004              	.LASF2:
+ 1005 01bd 73686F72 		.ascii	"short int\000"
+ 1005      7420696E 
+ 1005      7400
+ 1006              	.LASF16:
+ 1007 01c7 5A434472 		.ascii	"ZCDref_SetSpeed\000"
+ 1007      65665F53 
+ 1007      65745370 
+ 1007      65656400 
+ 1008              	.LASF12:
+ 1009 01d7 75696E74 		.ascii	"uint8\000"
+ 1009      3800
+ 1010              	.LASF25:
+ 1011 01dd 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 1011      73657273 
+ 1011      5C636865 
+ 1011      6D695C55 
+ 1011      44335F51 
+ 1012              	.LASF4:
+ 1013 0202 6C6F6E67 		.ascii	"long int\000"
+ 1013      20696E74 
+ 1013      00
+ 1014              	.LASF0:
+ 1015 020b 7369676E 		.ascii	"signed char\000"
+ 1015      65642063 
+ 1015      68617200 
+ 1016              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

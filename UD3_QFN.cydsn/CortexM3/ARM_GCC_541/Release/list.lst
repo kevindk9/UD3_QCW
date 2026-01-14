@@ -1,0 +1,1446 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"list.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.vListInitialise,"ax",%progbits
+  20              		.align	1
+  21              		.global	vListInitialise
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	vListInitialise, %function
+  25              	vListInitialise:
+  26              	.LFB68:
+  27              		.file 1 "..\\common\\rtos\\list.c"
+   1:..\common\rtos/list.c **** /*
+   2:..\common\rtos/list.c ****  * FreeRTOS Kernel V10.4.1
+   3:..\common\rtos/list.c ****  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:..\common\rtos/list.c ****  *
+   5:..\common\rtos/list.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:..\common\rtos/list.c ****  * this software and associated documentation files (the "Software"), to deal in
+   7:..\common\rtos/list.c ****  * the Software without restriction, including without limitation the rights to
+   8:..\common\rtos/list.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:..\common\rtos/list.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:..\common\rtos/list.c ****  * subject to the following conditions:
+  11:..\common\rtos/list.c ****  *
+  12:..\common\rtos/list.c ****  * The above copyright notice and this permission notice shall be included in all
+  13:..\common\rtos/list.c ****  * copies or substantial portions of the Software.
+  14:..\common\rtos/list.c ****  *
+  15:..\common\rtos/list.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  16:..\common\rtos/list.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  17:..\common\rtos/list.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  18:..\common\rtos/list.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  19:..\common\rtos/list.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  20:..\common\rtos/list.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  21:..\common\rtos/list.c ****  *
+  22:..\common\rtos/list.c ****  * https://www.FreeRTOS.org
+  23:..\common\rtos/list.c ****  * https://github.com/FreeRTOS
+  24:..\common\rtos/list.c ****  *
+  25:..\common\rtos/list.c ****  */
+  26:..\common\rtos/list.c **** 
+  27:..\common\rtos/list.c **** 
+  28:..\common\rtos/list.c **** #include <stdlib.h>
+  29:..\common\rtos/list.c **** 
+  30:..\common\rtos/list.c **** /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 2
+
+
+  31:..\common\rtos/list.c ****  * all the API functions to use the MPU wrappers.  That should only be done when
+  32:..\common\rtos/list.c ****  * task.h is included from an application file. */
+  33:..\common\rtos/list.c **** #define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+  34:..\common\rtos/list.c **** 
+  35:..\common\rtos/list.c **** #include "FreeRTOS.h"
+  36:..\common\rtos/list.c **** #include "list.h"
+  37:..\common\rtos/list.c **** 
+  38:..\common\rtos/list.c **** /* Lint e9021, e961 and e750 are suppressed as a MISRA exception justified
+  39:..\common\rtos/list.c ****  * because the MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be
+  40:..\common\rtos/list.c ****  * defined for the header files above, but not in this file, in order to
+  41:..\common\rtos/list.c ****  * generate the correct privileged Vs unprivileged linkage and placement. */
+  42:..\common\rtos/list.c **** #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE /*lint !e961 !e750 !e9021. */
+  43:..\common\rtos/list.c **** 
+  44:..\common\rtos/list.c **** /*-----------------------------------------------------------
+  45:..\common\rtos/list.c **** * PUBLIC LIST API documented in list.h
+  46:..\common\rtos/list.c **** *----------------------------------------------------------*/
+  47:..\common\rtos/list.c **** 
+  48:..\common\rtos/list.c **** void vListInitialise( List_t * const pxList )
+  49:..\common\rtos/list.c **** {
+  28              		.loc 1 49 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33              	.LVL0:
+  50:..\common\rtos/list.c ****     /* The list structure contains a list item which is used to mark the
+  51:..\common\rtos/list.c ****      * end of the list.  To initialise the list the list end is inserted
+  52:..\common\rtos/list.c ****      * as the only list entry. */
+  53:..\common\rtos/list.c ****     pxList->pxIndex = ( ListItem_t * ) &( pxList->xListEnd ); /*lint !e826 !e740 !e9087 The mini li
+  34              		.loc 1 53 0
+  35 0000 00F10803 		add	r3, r0, #8
+  36 0004 4360     		str	r3, [r0, #4]
+  54:..\common\rtos/list.c **** 
+  55:..\common\rtos/list.c ****     /* The list end value is the highest possible value in the list to
+  56:..\common\rtos/list.c ****      * ensure it remains at the end of the list. */
+  57:..\common\rtos/list.c ****     pxList->xListEnd.xItemValue = portMAX_DELAY;
+  37              		.loc 1 57 0
+  38 0006 4FF0FF32 		mov	r2, #-1
+  58:..\common\rtos/list.c **** 
+  59:..\common\rtos/list.c ****     /* The list end next and previous pointers point to itself so we know
+  60:..\common\rtos/list.c ****      * when the list is empty. */
+  61:..\common\rtos/list.c ****     pxList->xListEnd.pxNext = ( ListItem_t * ) &( pxList->xListEnd );     /*lint !e826 !e740 !e9087
+  39              		.loc 1 61 0
+  40 000a C360     		str	r3, [r0, #12]
+  62:..\common\rtos/list.c ****     pxList->xListEnd.pxPrevious = ( ListItem_t * ) &( pxList->xListEnd ); /*lint !e826 !e740 !e9087
+  41              		.loc 1 62 0
+  42 000c 0361     		str	r3, [r0, #16]
+  63:..\common\rtos/list.c **** 
+  64:..\common\rtos/list.c ****     pxList->uxNumberOfItems = ( UBaseType_t ) 0U;
+  43              		.loc 1 64 0
+  44 000e 0023     		movs	r3, #0
+  57:..\common\rtos/list.c **** 
+  45              		.loc 1 57 0
+  46 0010 8260     		str	r2, [r0, #8]
+  47              		.loc 1 64 0
+  48 0012 0360     		str	r3, [r0]
+  49 0014 7047     		bx	lr
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 3
+
+
+  50              		.cfi_endproc
+  51              	.LFE68:
+  52              		.size	vListInitialise, .-vListInitialise
+  53              		.section	.text.vListInitialiseItem,"ax",%progbits
+  54              		.align	1
+  55              		.global	vListInitialiseItem
+  56              		.thumb
+  57              		.thumb_func
+  58              		.type	vListInitialiseItem, %function
+  59              	vListInitialiseItem:
+  60              	.LFB69:
+  65:..\common\rtos/list.c **** 
+  66:..\common\rtos/list.c ****     /* Write known values into the list if
+  67:..\common\rtos/list.c ****      * configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
+  68:..\common\rtos/list.c ****     listSET_LIST_INTEGRITY_CHECK_1_VALUE( pxList );
+  69:..\common\rtos/list.c ****     listSET_LIST_INTEGRITY_CHECK_2_VALUE( pxList );
+  70:..\common\rtos/list.c **** }
+  71:..\common\rtos/list.c **** /*-----------------------------------------------------------*/
+  72:..\common\rtos/list.c **** 
+  73:..\common\rtos/list.c **** void vListInitialiseItem( ListItem_t * const pxItem )
+  74:..\common\rtos/list.c **** {
+  61              		.loc 1 74 0
+  62              		.cfi_startproc
+  63              		@ args = 0, pretend = 0, frame = 0
+  64              		@ frame_needed = 0, uses_anonymous_args = 0
+  65              		@ link register save eliminated.
+  66              	.LVL1:
+  75:..\common\rtos/list.c ****     /* Make sure the list item is not recorded as being on a list. */
+  76:..\common\rtos/list.c ****     pxItem->pxContainer = NULL;
+  67              		.loc 1 76 0
+  68 0000 0023     		movs	r3, #0
+  69 0002 0361     		str	r3, [r0, #16]
+  70 0004 7047     		bx	lr
+  71              		.cfi_endproc
+  72              	.LFE69:
+  73              		.size	vListInitialiseItem, .-vListInitialiseItem
+  74              		.section	.text.vListInsertEnd,"ax",%progbits
+  75              		.align	1
+  76              		.global	vListInsertEnd
+  77              		.thumb
+  78              		.thumb_func
+  79              		.type	vListInsertEnd, %function
+  80              	vListInsertEnd:
+  81              	.LFB70:
+  77:..\common\rtos/list.c **** 
+  78:..\common\rtos/list.c ****     /* Write known values into the list item if
+  79:..\common\rtos/list.c ****      * configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
+  80:..\common\rtos/list.c ****     listSET_FIRST_LIST_ITEM_INTEGRITY_CHECK_VALUE( pxItem );
+  81:..\common\rtos/list.c ****     listSET_SECOND_LIST_ITEM_INTEGRITY_CHECK_VALUE( pxItem );
+  82:..\common\rtos/list.c **** }
+  83:..\common\rtos/list.c **** /*-----------------------------------------------------------*/
+  84:..\common\rtos/list.c **** 
+  85:..\common\rtos/list.c **** void vListInsertEnd( List_t * const pxList,
+  86:..\common\rtos/list.c ****                      ListItem_t * const pxNewListItem )
+  87:..\common\rtos/list.c **** {
+  82              		.loc 1 87 0
+  83              		.cfi_startproc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 4
+
+
+  84              		@ args = 0, pretend = 0, frame = 0
+  85              		@ frame_needed = 0, uses_anonymous_args = 0
+  86              		@ link register save eliminated.
+  87              	.LVL2:
+  88:..\common\rtos/list.c ****     ListItem_t * const pxIndex = pxList->pxIndex;
+  88              		.loc 1 88 0
+  89 0000 4368     		ldr	r3, [r0, #4]
+  90              	.LVL3:
+  89:..\common\rtos/list.c **** 
+  90:..\common\rtos/list.c ****     /* Only effective when configASSERT() is also defined, these tests may catch
+  91:..\common\rtos/list.c ****      * the list data structures being overwritten in memory.  They will not catch
+  92:..\common\rtos/list.c ****      * data errors caused by incorrect configuration or use of FreeRTOS. */
+  93:..\common\rtos/list.c ****     listTEST_LIST_INTEGRITY( pxList );
+  94:..\common\rtos/list.c ****     listTEST_LIST_ITEM_INTEGRITY( pxNewListItem );
+  95:..\common\rtos/list.c **** 
+  96:..\common\rtos/list.c ****     /* Insert a new list item into pxList, but rather than sort the list,
+  97:..\common\rtos/list.c ****      * makes the new list item the last item to be removed by a call to
+  98:..\common\rtos/list.c ****      * listGET_OWNER_OF_NEXT_ENTRY(). */
+  99:..\common\rtos/list.c ****     pxNewListItem->pxNext = pxIndex;
+ 100:..\common\rtos/list.c ****     pxNewListItem->pxPrevious = pxIndex->pxPrevious;
+  91              		.loc 1 100 0
+  92 0002 9A68     		ldr	r2, [r3, #8]
+  99:..\common\rtos/list.c ****     pxNewListItem->pxPrevious = pxIndex->pxPrevious;
+  93              		.loc 1 99 0
+  94 0004 4B60     		str	r3, [r1, #4]
+  95              		.loc 1 100 0
+  96 0006 8A60     		str	r2, [r1, #8]
+ 101:..\common\rtos/list.c **** 
+ 102:..\common\rtos/list.c ****     /* Only used during decision coverage testing. */
+ 103:..\common\rtos/list.c ****     mtCOVERAGE_TEST_DELAY();
+ 104:..\common\rtos/list.c **** 
+ 105:..\common\rtos/list.c ****     pxIndex->pxPrevious->pxNext = pxNewListItem;
+  97              		.loc 1 105 0
+  98 0008 9A68     		ldr	r2, [r3, #8]
+  99 000a 5160     		str	r1, [r2, #4]
+ 106:..\common\rtos/list.c ****     pxIndex->pxPrevious = pxNewListItem;
+ 100              		.loc 1 106 0
+ 101 000c 9960     		str	r1, [r3, #8]
+ 107:..\common\rtos/list.c **** 
+ 108:..\common\rtos/list.c ****     /* Remember which list the item is in. */
+ 109:..\common\rtos/list.c ****     pxNewListItem->pxContainer = pxList;
+ 110:..\common\rtos/list.c **** 
+ 111:..\common\rtos/list.c ****     ( pxList->uxNumberOfItems )++;
+ 102              		.loc 1 111 0
+ 103 000e 0368     		ldr	r3, [r0]
+ 104              	.LVL4:
+ 109:..\common\rtos/list.c **** 
+ 105              		.loc 1 109 0
+ 106 0010 0861     		str	r0, [r1, #16]
+ 107              		.loc 1 111 0
+ 108 0012 0133     		adds	r3, r3, #1
+ 109 0014 0360     		str	r3, [r0]
+ 110 0016 7047     		bx	lr
+ 111              		.cfi_endproc
+ 112              	.LFE70:
+ 113              		.size	vListInsertEnd, .-vListInsertEnd
+ 114              		.section	.text.vListInsert,"ax",%progbits
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 5
+
+
+ 115              		.align	1
+ 116              		.global	vListInsert
+ 117              		.thumb
+ 118              		.thumb_func
+ 119              		.type	vListInsert, %function
+ 120              	vListInsert:
+ 121              	.LFB71:
+ 112:..\common\rtos/list.c **** }
+ 113:..\common\rtos/list.c **** /*-----------------------------------------------------------*/
+ 114:..\common\rtos/list.c **** 
+ 115:..\common\rtos/list.c **** void vListInsert( List_t * const pxList,
+ 116:..\common\rtos/list.c ****                   ListItem_t * const pxNewListItem )
+ 117:..\common\rtos/list.c **** {
+ 122              		.loc 1 117 0
+ 123              		.cfi_startproc
+ 124              		@ args = 0, pretend = 0, frame = 0
+ 125              		@ frame_needed = 0, uses_anonymous_args = 0
+ 126              	.LVL5:
+ 118:..\common\rtos/list.c ****     ListItem_t * pxIterator;
+ 119:..\common\rtos/list.c ****     const TickType_t xValueOfInsertion = pxNewListItem->xItemValue;
+ 127              		.loc 1 119 0
+ 128 0000 0A68     		ldr	r2, [r1]
+ 129              	.LVL6:
+ 117:..\common\rtos/list.c ****     ListItem_t * pxIterator;
+ 130              		.loc 1 117 0
+ 131 0002 30B5     		push	{r4, r5, lr}
+ 132              		.cfi_def_cfa_offset 12
+ 133              		.cfi_offset 4, -12
+ 134              		.cfi_offset 5, -8
+ 135              		.cfi_offset 14, -4
+ 120:..\common\rtos/list.c **** 
+ 121:..\common\rtos/list.c ****     /* Only effective when configASSERT() is also defined, these tests may catch
+ 122:..\common\rtos/list.c ****      * the list data structures being overwritten in memory.  They will not catch
+ 123:..\common\rtos/list.c ****      * data errors caused by incorrect configuration or use of FreeRTOS. */
+ 124:..\common\rtos/list.c ****     listTEST_LIST_INTEGRITY( pxList );
+ 125:..\common\rtos/list.c ****     listTEST_LIST_ITEM_INTEGRITY( pxNewListItem );
+ 126:..\common\rtos/list.c **** 
+ 127:..\common\rtos/list.c ****     /* Insert the new list item into the list, sorted in xItemValue order.
+ 128:..\common\rtos/list.c ****      *
+ 129:..\common\rtos/list.c ****      * If the list already contains a list item with the same item value then the
+ 130:..\common\rtos/list.c ****      * new list item should be placed after it.  This ensures that TCBs which are
+ 131:..\common\rtos/list.c ****      * stored in ready lists (all of which have the same xItemValue value) get a
+ 132:..\common\rtos/list.c ****      * share of the CPU.  However, if the xItemValue is the same as the back marker
+ 133:..\common\rtos/list.c ****      * the iteration loop below will not end.  Therefore the value is checked
+ 134:..\common\rtos/list.c ****      * first, and the algorithm slightly modified if necessary. */
+ 135:..\common\rtos/list.c ****     if( xValueOfInsertion == portMAX_DELAY )
+ 136              		.loc 1 135 0
+ 137 0004 531C     		adds	r3, r2, #1
+ 138 0006 01D1     		bne	.L5
+ 136:..\common\rtos/list.c ****     {
+ 137:..\common\rtos/list.c ****         pxIterator = pxList->xListEnd.pxPrevious;
+ 139              		.loc 1 137 0
+ 140 0008 0369     		ldr	r3, [r0, #16]
+ 141              	.LVL7:
+ 142 000a 07E0     		b	.L6
+ 143              	.LVL8:
+ 144              	.L5:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 6
+
+
+ 138:..\common\rtos/list.c ****     }
+ 139:..\common\rtos/list.c ****     else
+ 140:..\common\rtos/list.c ****     {
+ 141:..\common\rtos/list.c ****         /* *** NOTE ***********************************************************
+ 142:..\common\rtos/list.c ****         *  If you find your application is crashing here then likely causes are
+ 143:..\common\rtos/list.c ****         *  listed below.  In addition see https://www.FreeRTOS.org/FAQHelp.html for
+ 144:..\common\rtos/list.c ****         *  more tips, and ensure configASSERT() is defined!
+ 145:..\common\rtos/list.c ****         *  https://www.FreeRTOS.org/a00110.html#configASSERT
+ 146:..\common\rtos/list.c ****         *
+ 147:..\common\rtos/list.c ****         *   1) Stack overflow -
+ 148:..\common\rtos/list.c ****         *      see https://www.FreeRTOS.org/Stacks-and-stack-overflow-checking.html
+ 149:..\common\rtos/list.c ****         *   2) Incorrect interrupt priority assignment, especially on Cortex-M
+ 150:..\common\rtos/list.c ****         *      parts where numerically high priority values denote low actual
+ 151:..\common\rtos/list.c ****         *      interrupt priorities, which can seem counter intuitive.  See
+ 152:..\common\rtos/list.c ****         *      https://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html and the definition
+ 153:..\common\rtos/list.c ****         *      of configMAX_SYSCALL_INTERRUPT_PRIORITY on
+ 154:..\common\rtos/list.c ****         *      https://www.FreeRTOS.org/a00110.html
+ 155:..\common\rtos/list.c ****         *   3) Calling an API function from within a critical section or when
+ 156:..\common\rtos/list.c ****         *      the scheduler is suspended, or calling an API function that does
+ 157:..\common\rtos/list.c ****         *      not end in "FromISR" from an interrupt.
+ 158:..\common\rtos/list.c ****         *   4) Using a queue or semaphore before it has been initialised or
+ 159:..\common\rtos/list.c ****         *      before the scheduler has been started (are interrupts firing
+ 160:..\common\rtos/list.c ****         *      before vTaskStartScheduler() has been called?).
+ 161:..\common\rtos/list.c ****         **********************************************************************/
+ 162:..\common\rtos/list.c **** 
+ 163:..\common\rtos/list.c ****         for( pxIterator = ( ListItem_t * ) &( pxList->xListEnd ); pxIterator->pxNext->xItemValue <=
+ 145              		.loc 1 163 0
+ 146 000c 00F10803 		add	r3, r0, #8
+ 147              	.LVL9:
+ 148              	.L7:
+ 149              		.loc 1 163 0 is_stmt 0 discriminator 1
+ 150 0010 5C68     		ldr	r4, [r3, #4]
+ 151 0012 2568     		ldr	r5, [r4]
+ 152 0014 AA42     		cmp	r2, r5
+ 153 0016 01D3     		bcc	.L6
+ 154 0018 2346     		mov	r3, r4
+ 155              	.LVL10:
+ 156 001a F9E7     		b	.L7
+ 157              	.LVL11:
+ 158              	.L6:
+ 164:..\common\rtos/list.c ****         {
+ 165:..\common\rtos/list.c ****             /* There is nothing to do here, just iterating to the wanted
+ 166:..\common\rtos/list.c ****              * insertion position. */
+ 167:..\common\rtos/list.c ****         }
+ 168:..\common\rtos/list.c ****     }
+ 169:..\common\rtos/list.c **** 
+ 170:..\common\rtos/list.c ****     pxNewListItem->pxNext = pxIterator->pxNext;
+ 159              		.loc 1 170 0 is_stmt 1
+ 160 001c 5A68     		ldr	r2, [r3, #4]
+ 161              	.LVL12:
+ 162 001e 4A60     		str	r2, [r1, #4]
+ 171:..\common\rtos/list.c ****     pxNewListItem->pxNext->pxPrevious = pxNewListItem;
+ 163              		.loc 1 171 0
+ 164 0020 9160     		str	r1, [r2, #8]
+ 172:..\common\rtos/list.c ****     pxNewListItem->pxPrevious = pxIterator;
+ 165              		.loc 1 172 0
+ 166 0022 8B60     		str	r3, [r1, #8]
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 7
+
+
+ 173:..\common\rtos/list.c ****     pxIterator->pxNext = pxNewListItem;
+ 167              		.loc 1 173 0
+ 168 0024 5960     		str	r1, [r3, #4]
+ 174:..\common\rtos/list.c **** 
+ 175:..\common\rtos/list.c ****     /* Remember which list the item is in.  This allows fast removal of the
+ 176:..\common\rtos/list.c ****      * item later. */
+ 177:..\common\rtos/list.c ****     pxNewListItem->pxContainer = pxList;
+ 178:..\common\rtos/list.c **** 
+ 179:..\common\rtos/list.c ****     ( pxList->uxNumberOfItems )++;
+ 169              		.loc 1 179 0
+ 170 0026 0368     		ldr	r3, [r0]
+ 171              	.LVL13:
+ 177:..\common\rtos/list.c **** 
+ 172              		.loc 1 177 0
+ 173 0028 0861     		str	r0, [r1, #16]
+ 174              		.loc 1 179 0
+ 175 002a 0133     		adds	r3, r3, #1
+ 176 002c 0360     		str	r3, [r0]
+ 177 002e 30BD     		pop	{r4, r5, pc}
+ 178              		.cfi_endproc
+ 179              	.LFE71:
+ 180              		.size	vListInsert, .-vListInsert
+ 181              		.section	.text.uxListRemove,"ax",%progbits
+ 182              		.align	1
+ 183              		.global	uxListRemove
+ 184              		.thumb
+ 185              		.thumb_func
+ 186              		.type	uxListRemove, %function
+ 187              	uxListRemove:
+ 188              	.LFB72:
+ 180:..\common\rtos/list.c **** }
+ 181:..\common\rtos/list.c **** /*-----------------------------------------------------------*/
+ 182:..\common\rtos/list.c **** 
+ 183:..\common\rtos/list.c **** UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove )
+ 184:..\common\rtos/list.c **** {
+ 189              		.loc 1 184 0
+ 190              		.cfi_startproc
+ 191              		@ args = 0, pretend = 0, frame = 0
+ 192              		@ frame_needed = 0, uses_anonymous_args = 0
+ 193              		@ link register save eliminated.
+ 194              	.LVL14:
+ 185:..\common\rtos/list.c **** /* The list item knows which list it is in.  Obtain the list from the list
+ 186:..\common\rtos/list.c ****  * item. */
+ 187:..\common\rtos/list.c ****     List_t * const pxList = pxItemToRemove->pxContainer;
+ 188:..\common\rtos/list.c **** 
+ 189:..\common\rtos/list.c ****     pxItemToRemove->pxNext->pxPrevious = pxItemToRemove->pxPrevious;
+ 195              		.loc 1 189 0
+ 196 0000 4168     		ldr	r1, [r0, #4]
+ 197 0002 8268     		ldr	r2, [r0, #8]
+ 187:..\common\rtos/list.c **** 
+ 198              		.loc 1 187 0
+ 199 0004 0369     		ldr	r3, [r0, #16]
+ 200              	.LVL15:
+ 201              		.loc 1 189 0
+ 202 0006 8A60     		str	r2, [r1, #8]
+ 190:..\common\rtos/list.c ****     pxItemToRemove->pxPrevious->pxNext = pxItemToRemove->pxNext;
+ 203              		.loc 1 190 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 8
+
+
+ 204 0008 8268     		ldr	r2, [r0, #8]
+ 205 000a 5160     		str	r1, [r2, #4]
+ 191:..\common\rtos/list.c **** 
+ 192:..\common\rtos/list.c ****     /* Only used during decision coverage testing. */
+ 193:..\common\rtos/list.c ****     mtCOVERAGE_TEST_DELAY();
+ 194:..\common\rtos/list.c **** 
+ 195:..\common\rtos/list.c ****     /* Make sure the index is left pointing to a valid item. */
+ 196:..\common\rtos/list.c ****     if( pxList->pxIndex == pxItemToRemove )
+ 206              		.loc 1 196 0
+ 207 000c 5968     		ldr	r1, [r3, #4]
+ 208 000e 8842     		cmp	r0, r1
+ 197:..\common\rtos/list.c ****     {
+ 198:..\common\rtos/list.c ****         pxList->pxIndex = pxItemToRemove->pxPrevious;
+ 209              		.loc 1 198 0
+ 210 0010 08BF     		it	eq
+ 211 0012 5A60     		streq	r2, [r3, #4]
+ 199:..\common\rtos/list.c ****     }
+ 200:..\common\rtos/list.c ****     else
+ 201:..\common\rtos/list.c ****     {
+ 202:..\common\rtos/list.c ****         mtCOVERAGE_TEST_MARKER();
+ 203:..\common\rtos/list.c ****     }
+ 204:..\common\rtos/list.c **** 
+ 205:..\common\rtos/list.c ****     pxItemToRemove->pxContainer = NULL;
+ 212              		.loc 1 205 0
+ 213 0014 0022     		movs	r2, #0
+ 214 0016 0261     		str	r2, [r0, #16]
+ 206:..\common\rtos/list.c ****     ( pxList->uxNumberOfItems )--;
+ 215              		.loc 1 206 0
+ 216 0018 1A68     		ldr	r2, [r3]
+ 217 001a 013A     		subs	r2, r2, #1
+ 218 001c 1A60     		str	r2, [r3]
+ 207:..\common\rtos/list.c **** 
+ 208:..\common\rtos/list.c ****     return pxList->uxNumberOfItems;
+ 219              		.loc 1 208 0
+ 220 001e 1868     		ldr	r0, [r3]
+ 221              	.LVL16:
+ 209:..\common\rtos/list.c **** }
+ 222              		.loc 1 209 0
+ 223 0020 7047     		bx	lr
+ 224              		.cfi_endproc
+ 225              	.LFE72:
+ 226              		.size	uxListRemove, .-uxListRemove
+ 227              		.text
+ 228              	.Letext0:
+ 229              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 230              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 231              		.file 4 "..\\common\\rtos\\portable\\GCC\\ARM_CM3/portmacro.h"
+ 232              		.file 5 "..\\common\\rtos\\include/list.h"
+ 233              		.file 6 "Generated_Source\\PSoC5/core_cm3.h"
+ 234              		.section	.debug_info,"",%progbits
+ 235              	.Ldebug_info0:
+ 236 0000 DA020000 		.4byte	0x2da
+ 237 0004 0400     		.2byte	0x4
+ 238 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 239 000a 04       		.byte	0x4
+ 240 000b 01       		.uleb128 0x1
+ 241 000c AE000000 		.4byte	.LASF43
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 9
+
+
+ 242 0010 0C       		.byte	0xc
+ 243 0011 86000000 		.4byte	.LASF44
+ 244 0015 52020000 		.4byte	.LASF45
+ 245 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 246 001d 00000000 		.4byte	0
+ 247 0021 00000000 		.4byte	.Ldebug_line0
+ 248 0025 02       		.uleb128 0x2
+ 249 0026 04       		.byte	0x4
+ 250 0027 07       		.byte	0x7
+ 251 0028 B2010000 		.4byte	.LASF0
+ 252 002c 03       		.uleb128 0x3
+ 253 002d 04       		.byte	0x4
+ 254 002e 05       		.byte	0x5
+ 255 002f 696E7400 		.ascii	"int\000"
+ 256 0033 02       		.uleb128 0x2
+ 257 0034 01       		.byte	0x1
+ 258 0035 06       		.byte	0x6
+ 259 0036 A6020000 		.4byte	.LASF1
+ 260 003a 02       		.uleb128 0x2
+ 261 003b 01       		.byte	0x1
+ 262 003c 08       		.byte	0x8
+ 263 003d 78000000 		.4byte	.LASF2
+ 264 0041 02       		.uleb128 0x2
+ 265 0042 02       		.byte	0x2
+ 266 0043 05       		.byte	0x5
+ 267 0044 48020000 		.4byte	.LASF3
+ 268 0048 02       		.uleb128 0x2
+ 269 0049 02       		.byte	0x2
+ 270 004a 07       		.byte	0x7
+ 271 004b 43000000 		.4byte	.LASF4
+ 272 004f 04       		.uleb128 0x4
+ 273 0050 2E000000 		.4byte	.LASF6
+ 274 0054 02       		.byte	0x2
+ 275 0055 3F       		.byte	0x3f
+ 276 0056 5A000000 		.4byte	0x5a
+ 277 005a 02       		.uleb128 0x2
+ 278 005b 04       		.byte	0x4
+ 279 005c 05       		.byte	0x5
+ 280 005d 80020000 		.4byte	.LASF5
+ 281 0061 04       		.uleb128 0x4
+ 282 0062 81010000 		.4byte	.LASF7
+ 283 0066 02       		.byte	0x2
+ 284 0067 41       		.byte	0x41
+ 285 0068 6C000000 		.4byte	0x6c
+ 286 006c 02       		.uleb128 0x2
+ 287 006d 04       		.byte	0x4
+ 288 006e 07       		.byte	0x7
+ 289 006f 9C000000 		.4byte	.LASF8
+ 290 0073 02       		.uleb128 0x2
+ 291 0074 08       		.byte	0x8
+ 292 0075 05       		.byte	0x5
+ 293 0076 1B020000 		.4byte	.LASF9
+ 294 007a 02       		.uleb128 0x2
+ 295 007b 08       		.byte	0x8
+ 296 007c 07       		.byte	0x7
+ 297 007d E1010000 		.4byte	.LASF10
+ 298 0081 02       		.uleb128 0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 10
+
+
+ 299 0082 04       		.byte	0x4
+ 300 0083 07       		.byte	0x7
+ 301 0084 12020000 		.4byte	.LASF11
+ 302 0088 05       		.uleb128 0x5
+ 303 0089 04       		.byte	0x4
+ 304 008a 02       		.uleb128 0x2
+ 305 008b 01       		.byte	0x1
+ 306 008c 08       		.byte	0x8
+ 307 008d 29020000 		.4byte	.LASF12
+ 308 0091 04       		.uleb128 0x4
+ 309 0092 0A020000 		.4byte	.LASF13
+ 310 0096 03       		.byte	0x3
+ 311 0097 2C       		.byte	0x2c
+ 312 0098 4F000000 		.4byte	0x4f
+ 313 009c 04       		.uleb128 0x4
+ 314 009d 77020000 		.4byte	.LASF14
+ 315 00a1 03       		.byte	0x3
+ 316 00a2 30       		.byte	0x30
+ 317 00a3 61000000 		.4byte	0x61
+ 318 00a7 02       		.uleb128 0x2
+ 319 00a8 04       		.byte	0x4
+ 320 00a9 04       		.byte	0x4
+ 321 00aa 72000000 		.4byte	.LASF15
+ 322 00ae 02       		.uleb128 0x2
+ 323 00af 08       		.byte	0x8
+ 324 00b0 04       		.byte	0x4
+ 325 00b1 7A010000 		.4byte	.LASF16
+ 326 00b5 04       		.uleb128 0x4
+ 327 00b6 BF020000 		.4byte	.LASF17
+ 328 00ba 04       		.byte	0x4
+ 329 00bb 39       		.byte	0x39
+ 330 00bc 6C000000 		.4byte	0x6c
+ 331 00c0 04       		.uleb128 0x4
+ 332 00c1 00000000 		.4byte	.LASF18
+ 333 00c5 04       		.byte	0x4
+ 334 00c6 3F       		.byte	0x3f
+ 335 00c7 9C000000 		.4byte	0x9c
+ 336 00cb 06       		.uleb128 0x6
+ 337 00cc 67000000 		.4byte	.LASF24
+ 338 00d0 14       		.byte	0x14
+ 339 00d1 05       		.byte	0x5
+ 340 00d2 8E       		.byte	0x8e
+ 341 00d3 14010000 		.4byte	0x114
+ 342 00d7 07       		.uleb128 0x7
+ 343 00d8 38000000 		.4byte	.LASF19
+ 344 00dc 05       		.byte	0x5
+ 345 00dd 91       		.byte	0x91
+ 346 00de C0000000 		.4byte	0xc0
+ 347 00e2 00       		.byte	0
+ 348 00e3 07       		.uleb128 0x7
+ 349 00e4 AB010000 		.4byte	.LASF20
+ 350 00e8 05       		.byte	0x5
+ 351 00e9 92       		.byte	0x92
+ 352 00ea 14010000 		.4byte	0x114
+ 353 00ee 04       		.byte	0x4
+ 354 00ef 07       		.uleb128 0x7
+ 355 00f0 47010000 		.4byte	.LASF21
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 11
+
+
+ 356 00f4 05       		.byte	0x5
+ 357 00f5 93       		.byte	0x93
+ 358 00f6 14010000 		.4byte	0x114
+ 359 00fa 08       		.byte	0x8
+ 360 00fb 07       		.uleb128 0x7
+ 361 00fc 5F000000 		.4byte	.LASF22
+ 362 0100 05       		.byte	0x5
+ 363 0101 94       		.byte	0x94
+ 364 0102 88000000 		.4byte	0x88
+ 365 0106 0C       		.byte	0xc
+ 366 0107 07       		.uleb128 0x7
+ 367 0108 0B000000 		.4byte	.LASF23
+ 368 010c 05       		.byte	0x5
+ 369 010d 95       		.byte	0x95
+ 370 010e 4B010000 		.4byte	0x14b
+ 371 0112 10       		.byte	0x10
+ 372 0113 00       		.byte	0
+ 373 0114 08       		.uleb128 0x8
+ 374 0115 04       		.byte	0x4
+ 375 0116 CB000000 		.4byte	0xcb
+ 376 011a 06       		.uleb128 0x6
+ 377 011b B9020000 		.4byte	.LASF25
+ 378 011f 14       		.byte	0x14
+ 379 0120 05       		.byte	0x5
+ 380 0121 A6       		.byte	0xa6
+ 381 0122 4B010000 		.4byte	0x14b
+ 382 0126 07       		.uleb128 0x7
+ 383 0127 8C010000 		.4byte	.LASF26
+ 384 012b 05       		.byte	0x5
+ 385 012c A9       		.byte	0xa9
+ 386 012d 98010000 		.4byte	0x198
+ 387 0131 00       		.byte	0
+ 388 0132 07       		.uleb128 0x7
+ 389 0133 17000000 		.4byte	.LASF27
+ 390 0137 05       		.byte	0x5
+ 391 0138 AA       		.byte	0xaa
+ 392 0139 9D010000 		.4byte	0x19d
+ 393 013d 04       		.byte	0x4
+ 394 013e 07       		.uleb128 0x7
+ 395 013f 56000000 		.4byte	.LASF28
+ 396 0143 05       		.byte	0x5
+ 397 0144 AB       		.byte	0xab
+ 398 0145 8D010000 		.4byte	0x18d
+ 399 0149 08       		.byte	0x8
+ 400 014a 00       		.byte	0
+ 401 014b 08       		.uleb128 0x8
+ 402 014c 04       		.byte	0x4
+ 403 014d 1A010000 		.4byte	0x11a
+ 404 0151 04       		.uleb128 0x4
+ 405 0152 FF010000 		.4byte	.LASF29
+ 406 0156 05       		.byte	0x5
+ 407 0157 98       		.byte	0x98
+ 408 0158 CB000000 		.4byte	0xcb
+ 409 015c 06       		.uleb128 0x6
+ 410 015d 96020000 		.4byte	.LASF30
+ 411 0161 0C       		.byte	0xc
+ 412 0162 05       		.byte	0x5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 12
+
+
+ 413 0163 9A       		.byte	0x9a
+ 414 0164 8D010000 		.4byte	0x18d
+ 415 0168 07       		.uleb128 0x7
+ 416 0169 38000000 		.4byte	.LASF19
+ 417 016d 05       		.byte	0x5
+ 418 016e 9D       		.byte	0x9d
+ 419 016f C0000000 		.4byte	0xc0
+ 420 0173 00       		.byte	0
+ 421 0174 07       		.uleb128 0x7
+ 422 0175 AB010000 		.4byte	.LASF20
+ 423 0179 05       		.byte	0x5
+ 424 017a 9E       		.byte	0x9e
+ 425 017b 14010000 		.4byte	0x114
+ 426 017f 04       		.byte	0x4
+ 427 0180 07       		.uleb128 0x7
+ 428 0181 47010000 		.4byte	.LASF21
+ 429 0185 05       		.byte	0x5
+ 430 0186 9F       		.byte	0x9f
+ 431 0187 14010000 		.4byte	0x114
+ 432 018b 08       		.byte	0x8
+ 433 018c 00       		.byte	0
+ 434 018d 04       		.uleb128 0x4
+ 435 018e 1F000000 		.4byte	.LASF31
+ 436 0192 05       		.byte	0x5
+ 437 0193 A1       		.byte	0xa1
+ 438 0194 5C010000 		.4byte	0x15c
+ 439 0198 09       		.uleb128 0x9
+ 440 0199 B5000000 		.4byte	0xb5
+ 441 019d 08       		.uleb128 0x8
+ 442 019e 04       		.byte	0x4
+ 443 019f 51010000 		.4byte	0x151
+ 444 01a3 04       		.uleb128 0x4
+ 445 01a4 73010000 		.4byte	.LASF32
+ 446 01a8 05       		.byte	0x5
+ 447 01a9 AD       		.byte	0xad
+ 448 01aa 1A010000 		.4byte	0x11a
+ 449 01ae 0A       		.uleb128 0xa
+ 450 01af BF010000 		.4byte	.LASF33
+ 451 01b3 01       		.byte	0x1
+ 452 01b4 30       		.byte	0x30
+ 453 01b5 00000000 		.4byte	.LFB68
+ 454 01b9 16000000 		.4byte	.LFE68-.LFB68
+ 455 01bd 01       		.uleb128 0x1
+ 456 01be 9C       		.byte	0x9c
+ 457 01bf D1010000 		.4byte	0x1d1
+ 458 01c3 0B       		.uleb128 0xb
+ 459 01c4 B2020000 		.4byte	.LASF35
+ 460 01c8 01       		.byte	0x1
+ 461 01c9 30       		.byte	0x30
+ 462 01ca D7010000 		.4byte	0x1d7
+ 463 01ce 01       		.uleb128 0x1
+ 464 01cf 50       		.byte	0x50
+ 465 01d0 00       		.byte	0
+ 466 01d1 08       		.uleb128 0x8
+ 467 01d2 04       		.byte	0x4
+ 468 01d3 A3010000 		.4byte	0x1a3
+ 469 01d7 0C       		.uleb128 0xc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 13
+
+
+ 470 01d8 D1010000 		.4byte	0x1d1
+ 471 01dc 0A       		.uleb128 0xa
+ 472 01dd 5F010000 		.4byte	.LASF34
+ 473 01e1 01       		.byte	0x1
+ 474 01e2 49       		.byte	0x49
+ 475 01e3 00000000 		.4byte	.LFB69
+ 476 01e7 06000000 		.4byte	.LFE69-.LFB69
+ 477 01eb 01       		.uleb128 0x1
+ 478 01ec 9C       		.byte	0x9c
+ 479 01ed FF010000 		.4byte	0x1ff
+ 480 01f1 0B       		.uleb128 0xb
+ 481 01f2 F8010000 		.4byte	.LASF36
+ 482 01f6 01       		.byte	0x1
+ 483 01f7 49       		.byte	0x49
+ 484 01f8 FF010000 		.4byte	0x1ff
+ 485 01fc 01       		.uleb128 0x1
+ 486 01fd 50       		.byte	0x50
+ 487 01fe 00       		.byte	0
+ 488 01ff 0C       		.uleb128 0xc
+ 489 0200 9D010000 		.4byte	0x19d
+ 490 0204 0A       		.uleb128 0xa
+ 491 0205 9C010000 		.4byte	.LASF37
+ 492 0209 01       		.byte	0x1
+ 493 020a 55       		.byte	0x55
+ 494 020b 00000000 		.4byte	.LFB70
+ 495 020f 18000000 		.4byte	.LFE70-.LFB70
+ 496 0213 01       		.uleb128 0x1
+ 497 0214 9C       		.byte	0x9c
+ 498 0215 43020000 		.4byte	0x243
+ 499 0219 0B       		.uleb128 0xb
+ 500 021a B2020000 		.4byte	.LASF35
+ 501 021e 01       		.byte	0x1
+ 502 021f 55       		.byte	0x55
+ 503 0220 D7010000 		.4byte	0x1d7
+ 504 0224 01       		.uleb128 0x1
+ 505 0225 50       		.byte	0x50
+ 506 0226 0B       		.uleb128 0xb
+ 507 0227 CB020000 		.4byte	.LASF38
+ 508 022b 01       		.byte	0x1
+ 509 022c 56       		.byte	0x56
+ 510 022d FF010000 		.4byte	0x1ff
+ 511 0231 01       		.uleb128 0x1
+ 512 0232 51       		.byte	0x51
+ 513 0233 0D       		.uleb128 0xd
+ 514 0234 17000000 		.4byte	.LASF27
+ 515 0238 01       		.byte	0x1
+ 516 0239 58       		.byte	0x58
+ 517 023a FF010000 		.4byte	0x1ff
+ 518 023e 00000000 		.4byte	.LLST0
+ 519 0242 00       		.byte	0
+ 520 0243 0A       		.uleb128 0xa
+ 521 0244 D9020000 		.4byte	.LASF39
+ 522 0248 01       		.byte	0x1
+ 523 0249 73       		.byte	0x73
+ 524 024a 00000000 		.4byte	.LFB71
+ 525 024e 30000000 		.4byte	.LFE71-.LFB71
+ 526 0252 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 14
+
+
+ 527 0253 9C       		.byte	0x9c
+ 528 0254 91020000 		.4byte	0x291
+ 529 0258 0B       		.uleb128 0xb
+ 530 0259 B2020000 		.4byte	.LASF35
+ 531 025d 01       		.byte	0x1
+ 532 025e 73       		.byte	0x73
+ 533 025f D7010000 		.4byte	0x1d7
+ 534 0263 01       		.uleb128 0x1
+ 535 0264 50       		.byte	0x50
+ 536 0265 0B       		.uleb128 0xb
+ 537 0266 CB020000 		.4byte	.LASF38
+ 538 026a 01       		.byte	0x1
+ 539 026b 74       		.byte	0x74
+ 540 026c FF010000 		.4byte	0x1ff
+ 541 0270 01       		.uleb128 0x1
+ 542 0271 51       		.byte	0x51
+ 543 0272 0D       		.uleb128 0xd
+ 544 0273 3D020000 		.4byte	.LASF40
+ 545 0277 01       		.byte	0x1
+ 546 0278 76       		.byte	0x76
+ 547 0279 9D010000 		.4byte	0x19d
+ 548 027d 1F000000 		.4byte	.LLST1
+ 549 0281 0D       		.uleb128 0xd
+ 550 0282 CF010000 		.4byte	.LASF41
+ 551 0286 01       		.byte	0x1
+ 552 0287 77       		.byte	0x77
+ 553 0288 91020000 		.4byte	0x291
+ 554 028c 54000000 		.4byte	.LLST2
+ 555 0290 00       		.byte	0
+ 556 0291 0C       		.uleb128 0xc
+ 557 0292 C0000000 		.4byte	0xc0
+ 558 0296 0E       		.uleb128 0xe
+ 559 0297 89020000 		.4byte	.LASF46
+ 560 029b 01       		.byte	0x1
+ 561 029c B7       		.byte	0xb7
+ 562 029d B5000000 		.4byte	0xb5
+ 563 02a1 00000000 		.4byte	.LFB72
+ 564 02a5 22000000 		.4byte	.LFE72-.LFB72
+ 565 02a9 01       		.uleb128 0x1
+ 566 02aa 9C       		.byte	0x9c
+ 567 02ab CC020000 		.4byte	0x2cc
+ 568 02af 0F       		.uleb128 0xf
+ 569 02b0 2E020000 		.4byte	.LASF42
+ 570 02b4 01       		.byte	0x1
+ 571 02b5 B7       		.byte	0xb7
+ 572 02b6 FF010000 		.4byte	0x1ff
+ 573 02ba 73000000 		.4byte	.LLST3
+ 574 02be 10       		.uleb128 0x10
+ 575 02bf B2020000 		.4byte	.LASF35
+ 576 02c3 01       		.byte	0x1
+ 577 02c4 BB       		.byte	0xbb
+ 578 02c5 D7010000 		.4byte	0x1d7
+ 579 02c9 01       		.uleb128 0x1
+ 580 02ca 53       		.byte	0x53
+ 581 02cb 00       		.byte	0
+ 582 02cc 11       		.uleb128 0x11
+ 583 02cd 52010000 		.4byte	.LASF47
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 15
+
+
+ 584 02d1 06       		.byte	0x6
+ 585 02d2 1207     		.2byte	0x712
+ 586 02d4 D8020000 		.4byte	0x2d8
+ 587 02d8 09       		.uleb128 0x9
+ 588 02d9 91000000 		.4byte	0x91
+ 589 02dd 00       		.byte	0
+ 590              		.section	.debug_abbrev,"",%progbits
+ 591              	.Ldebug_abbrev0:
+ 592 0000 01       		.uleb128 0x1
+ 593 0001 11       		.uleb128 0x11
+ 594 0002 01       		.byte	0x1
+ 595 0003 25       		.uleb128 0x25
+ 596 0004 0E       		.uleb128 0xe
+ 597 0005 13       		.uleb128 0x13
+ 598 0006 0B       		.uleb128 0xb
+ 599 0007 03       		.uleb128 0x3
+ 600 0008 0E       		.uleb128 0xe
+ 601 0009 1B       		.uleb128 0x1b
+ 602 000a 0E       		.uleb128 0xe
+ 603 000b 55       		.uleb128 0x55
+ 604 000c 17       		.uleb128 0x17
+ 605 000d 11       		.uleb128 0x11
+ 606 000e 01       		.uleb128 0x1
+ 607 000f 10       		.uleb128 0x10
+ 608 0010 17       		.uleb128 0x17
+ 609 0011 00       		.byte	0
+ 610 0012 00       		.byte	0
+ 611 0013 02       		.uleb128 0x2
+ 612 0014 24       		.uleb128 0x24
+ 613 0015 00       		.byte	0
+ 614 0016 0B       		.uleb128 0xb
+ 615 0017 0B       		.uleb128 0xb
+ 616 0018 3E       		.uleb128 0x3e
+ 617 0019 0B       		.uleb128 0xb
+ 618 001a 03       		.uleb128 0x3
+ 619 001b 0E       		.uleb128 0xe
+ 620 001c 00       		.byte	0
+ 621 001d 00       		.byte	0
+ 622 001e 03       		.uleb128 0x3
+ 623 001f 24       		.uleb128 0x24
+ 624 0020 00       		.byte	0
+ 625 0021 0B       		.uleb128 0xb
+ 626 0022 0B       		.uleb128 0xb
+ 627 0023 3E       		.uleb128 0x3e
+ 628 0024 0B       		.uleb128 0xb
+ 629 0025 03       		.uleb128 0x3
+ 630 0026 08       		.uleb128 0x8
+ 631 0027 00       		.byte	0
+ 632 0028 00       		.byte	0
+ 633 0029 04       		.uleb128 0x4
+ 634 002a 16       		.uleb128 0x16
+ 635 002b 00       		.byte	0
+ 636 002c 03       		.uleb128 0x3
+ 637 002d 0E       		.uleb128 0xe
+ 638 002e 3A       		.uleb128 0x3a
+ 639 002f 0B       		.uleb128 0xb
+ 640 0030 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 16
+
+
+ 641 0031 0B       		.uleb128 0xb
+ 642 0032 49       		.uleb128 0x49
+ 643 0033 13       		.uleb128 0x13
+ 644 0034 00       		.byte	0
+ 645 0035 00       		.byte	0
+ 646 0036 05       		.uleb128 0x5
+ 647 0037 0F       		.uleb128 0xf
+ 648 0038 00       		.byte	0
+ 649 0039 0B       		.uleb128 0xb
+ 650 003a 0B       		.uleb128 0xb
+ 651 003b 00       		.byte	0
+ 652 003c 00       		.byte	0
+ 653 003d 06       		.uleb128 0x6
+ 654 003e 13       		.uleb128 0x13
+ 655 003f 01       		.byte	0x1
+ 656 0040 03       		.uleb128 0x3
+ 657 0041 0E       		.uleb128 0xe
+ 658 0042 0B       		.uleb128 0xb
+ 659 0043 0B       		.uleb128 0xb
+ 660 0044 3A       		.uleb128 0x3a
+ 661 0045 0B       		.uleb128 0xb
+ 662 0046 3B       		.uleb128 0x3b
+ 663 0047 0B       		.uleb128 0xb
+ 664 0048 01       		.uleb128 0x1
+ 665 0049 13       		.uleb128 0x13
+ 666 004a 00       		.byte	0
+ 667 004b 00       		.byte	0
+ 668 004c 07       		.uleb128 0x7
+ 669 004d 0D       		.uleb128 0xd
+ 670 004e 00       		.byte	0
+ 671 004f 03       		.uleb128 0x3
+ 672 0050 0E       		.uleb128 0xe
+ 673 0051 3A       		.uleb128 0x3a
+ 674 0052 0B       		.uleb128 0xb
+ 675 0053 3B       		.uleb128 0x3b
+ 676 0054 0B       		.uleb128 0xb
+ 677 0055 49       		.uleb128 0x49
+ 678 0056 13       		.uleb128 0x13
+ 679 0057 38       		.uleb128 0x38
+ 680 0058 0B       		.uleb128 0xb
+ 681 0059 00       		.byte	0
+ 682 005a 00       		.byte	0
+ 683 005b 08       		.uleb128 0x8
+ 684 005c 0F       		.uleb128 0xf
+ 685 005d 00       		.byte	0
+ 686 005e 0B       		.uleb128 0xb
+ 687 005f 0B       		.uleb128 0xb
+ 688 0060 49       		.uleb128 0x49
+ 689 0061 13       		.uleb128 0x13
+ 690 0062 00       		.byte	0
+ 691 0063 00       		.byte	0
+ 692 0064 09       		.uleb128 0x9
+ 693 0065 35       		.uleb128 0x35
+ 694 0066 00       		.byte	0
+ 695 0067 49       		.uleb128 0x49
+ 696 0068 13       		.uleb128 0x13
+ 697 0069 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 17
+
+
+ 698 006a 00       		.byte	0
+ 699 006b 0A       		.uleb128 0xa
+ 700 006c 2E       		.uleb128 0x2e
+ 701 006d 01       		.byte	0x1
+ 702 006e 3F       		.uleb128 0x3f
+ 703 006f 19       		.uleb128 0x19
+ 704 0070 03       		.uleb128 0x3
+ 705 0071 0E       		.uleb128 0xe
+ 706 0072 3A       		.uleb128 0x3a
+ 707 0073 0B       		.uleb128 0xb
+ 708 0074 3B       		.uleb128 0x3b
+ 709 0075 0B       		.uleb128 0xb
+ 710 0076 27       		.uleb128 0x27
+ 711 0077 19       		.uleb128 0x19
+ 712 0078 11       		.uleb128 0x11
+ 713 0079 01       		.uleb128 0x1
+ 714 007a 12       		.uleb128 0x12
+ 715 007b 06       		.uleb128 0x6
+ 716 007c 40       		.uleb128 0x40
+ 717 007d 18       		.uleb128 0x18
+ 718 007e 9742     		.uleb128 0x2117
+ 719 0080 19       		.uleb128 0x19
+ 720 0081 01       		.uleb128 0x1
+ 721 0082 13       		.uleb128 0x13
+ 722 0083 00       		.byte	0
+ 723 0084 00       		.byte	0
+ 724 0085 0B       		.uleb128 0xb
+ 725 0086 05       		.uleb128 0x5
+ 726 0087 00       		.byte	0
+ 727 0088 03       		.uleb128 0x3
+ 728 0089 0E       		.uleb128 0xe
+ 729 008a 3A       		.uleb128 0x3a
+ 730 008b 0B       		.uleb128 0xb
+ 731 008c 3B       		.uleb128 0x3b
+ 732 008d 0B       		.uleb128 0xb
+ 733 008e 49       		.uleb128 0x49
+ 734 008f 13       		.uleb128 0x13
+ 735 0090 02       		.uleb128 0x2
+ 736 0091 18       		.uleb128 0x18
+ 737 0092 00       		.byte	0
+ 738 0093 00       		.byte	0
+ 739 0094 0C       		.uleb128 0xc
+ 740 0095 26       		.uleb128 0x26
+ 741 0096 00       		.byte	0
+ 742 0097 49       		.uleb128 0x49
+ 743 0098 13       		.uleb128 0x13
+ 744 0099 00       		.byte	0
+ 745 009a 00       		.byte	0
+ 746 009b 0D       		.uleb128 0xd
+ 747 009c 34       		.uleb128 0x34
+ 748 009d 00       		.byte	0
+ 749 009e 03       		.uleb128 0x3
+ 750 009f 0E       		.uleb128 0xe
+ 751 00a0 3A       		.uleb128 0x3a
+ 752 00a1 0B       		.uleb128 0xb
+ 753 00a2 3B       		.uleb128 0x3b
+ 754 00a3 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 18
+
+
+ 755 00a4 49       		.uleb128 0x49
+ 756 00a5 13       		.uleb128 0x13
+ 757 00a6 02       		.uleb128 0x2
+ 758 00a7 17       		.uleb128 0x17
+ 759 00a8 00       		.byte	0
+ 760 00a9 00       		.byte	0
+ 761 00aa 0E       		.uleb128 0xe
+ 762 00ab 2E       		.uleb128 0x2e
+ 763 00ac 01       		.byte	0x1
+ 764 00ad 3F       		.uleb128 0x3f
+ 765 00ae 19       		.uleb128 0x19
+ 766 00af 03       		.uleb128 0x3
+ 767 00b0 0E       		.uleb128 0xe
+ 768 00b1 3A       		.uleb128 0x3a
+ 769 00b2 0B       		.uleb128 0xb
+ 770 00b3 3B       		.uleb128 0x3b
+ 771 00b4 0B       		.uleb128 0xb
+ 772 00b5 27       		.uleb128 0x27
+ 773 00b6 19       		.uleb128 0x19
+ 774 00b7 49       		.uleb128 0x49
+ 775 00b8 13       		.uleb128 0x13
+ 776 00b9 11       		.uleb128 0x11
+ 777 00ba 01       		.uleb128 0x1
+ 778 00bb 12       		.uleb128 0x12
+ 779 00bc 06       		.uleb128 0x6
+ 780 00bd 40       		.uleb128 0x40
+ 781 00be 18       		.uleb128 0x18
+ 782 00bf 9742     		.uleb128 0x2117
+ 783 00c1 19       		.uleb128 0x19
+ 784 00c2 01       		.uleb128 0x1
+ 785 00c3 13       		.uleb128 0x13
+ 786 00c4 00       		.byte	0
+ 787 00c5 00       		.byte	0
+ 788 00c6 0F       		.uleb128 0xf
+ 789 00c7 05       		.uleb128 0x5
+ 790 00c8 00       		.byte	0
+ 791 00c9 03       		.uleb128 0x3
+ 792 00ca 0E       		.uleb128 0xe
+ 793 00cb 3A       		.uleb128 0x3a
+ 794 00cc 0B       		.uleb128 0xb
+ 795 00cd 3B       		.uleb128 0x3b
+ 796 00ce 0B       		.uleb128 0xb
+ 797 00cf 49       		.uleb128 0x49
+ 798 00d0 13       		.uleb128 0x13
+ 799 00d1 02       		.uleb128 0x2
+ 800 00d2 17       		.uleb128 0x17
+ 801 00d3 00       		.byte	0
+ 802 00d4 00       		.byte	0
+ 803 00d5 10       		.uleb128 0x10
+ 804 00d6 34       		.uleb128 0x34
+ 805 00d7 00       		.byte	0
+ 806 00d8 03       		.uleb128 0x3
+ 807 00d9 0E       		.uleb128 0xe
+ 808 00da 3A       		.uleb128 0x3a
+ 809 00db 0B       		.uleb128 0xb
+ 810 00dc 3B       		.uleb128 0x3b
+ 811 00dd 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 19
+
+
+ 812 00de 49       		.uleb128 0x49
+ 813 00df 13       		.uleb128 0x13
+ 814 00e0 02       		.uleb128 0x2
+ 815 00e1 18       		.uleb128 0x18
+ 816 00e2 00       		.byte	0
+ 817 00e3 00       		.byte	0
+ 818 00e4 11       		.uleb128 0x11
+ 819 00e5 34       		.uleb128 0x34
+ 820 00e6 00       		.byte	0
+ 821 00e7 03       		.uleb128 0x3
+ 822 00e8 0E       		.uleb128 0xe
+ 823 00e9 3A       		.uleb128 0x3a
+ 824 00ea 0B       		.uleb128 0xb
+ 825 00eb 3B       		.uleb128 0x3b
+ 826 00ec 05       		.uleb128 0x5
+ 827 00ed 49       		.uleb128 0x49
+ 828 00ee 13       		.uleb128 0x13
+ 829 00ef 3F       		.uleb128 0x3f
+ 830 00f0 19       		.uleb128 0x19
+ 831 00f1 3C       		.uleb128 0x3c
+ 832 00f2 19       		.uleb128 0x19
+ 833 00f3 00       		.byte	0
+ 834 00f4 00       		.byte	0
+ 835 00f5 00       		.byte	0
+ 836              		.section	.debug_loc,"",%progbits
+ 837              	.Ldebug_loc0:
+ 838              	.LLST0:
+ 839 0000 02000000 		.4byte	.LVL3
+ 840 0004 10000000 		.4byte	.LVL4
+ 841 0008 0100     		.2byte	0x1
+ 842 000a 53       		.byte	0x53
+ 843 000b 10000000 		.4byte	.LVL4
+ 844 000f 18000000 		.4byte	.LFE70
+ 845 0013 0200     		.2byte	0x2
+ 846 0015 70       		.byte	0x70
+ 847 0016 04       		.sleb128 4
+ 848 0017 00000000 		.4byte	0
+ 849 001b 00000000 		.4byte	0
+ 850              	.LLST1:
+ 851 001f 0A000000 		.4byte	.LVL7
+ 852 0023 0C000000 		.4byte	.LVL8
+ 853 0027 0100     		.2byte	0x1
+ 854 0029 53       		.byte	0x53
+ 855 002a 10000000 		.4byte	.LVL9
+ 856 002e 1A000000 		.4byte	.LVL10
+ 857 0032 0100     		.2byte	0x1
+ 858 0034 53       		.byte	0x53
+ 859 0035 1C000000 		.4byte	.LVL11
+ 860 0039 28000000 		.4byte	.LVL13
+ 861 003d 0100     		.2byte	0x1
+ 862 003f 53       		.byte	0x53
+ 863 0040 28000000 		.4byte	.LVL13
+ 864 0044 30000000 		.4byte	.LFE71
+ 865 0048 0200     		.2byte	0x2
+ 866 004a 71       		.byte	0x71
+ 867 004b 08       		.sleb128 8
+ 868 004c 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 20
+
+
+ 869 0050 00000000 		.4byte	0
+ 870              	.LLST2:
+ 871 0054 02000000 		.4byte	.LVL6
+ 872 0058 1E000000 		.4byte	.LVL12
+ 873 005c 0100     		.2byte	0x1
+ 874 005e 52       		.byte	0x52
+ 875 005f 1E000000 		.4byte	.LVL12
+ 876 0063 30000000 		.4byte	.LFE71
+ 877 0067 0200     		.2byte	0x2
+ 878 0069 71       		.byte	0x71
+ 879 006a 00       		.sleb128 0
+ 880 006b 00000000 		.4byte	0
+ 881 006f 00000000 		.4byte	0
+ 882              	.LLST3:
+ 883 0073 00000000 		.4byte	.LVL14
+ 884 0077 20000000 		.4byte	.LVL16
+ 885 007b 0100     		.2byte	0x1
+ 886 007d 50       		.byte	0x50
+ 887 007e 20000000 		.4byte	.LVL16
+ 888 0082 22000000 		.4byte	.LFE72
+ 889 0086 0400     		.2byte	0x4
+ 890 0088 F3       		.byte	0xf3
+ 891 0089 01       		.uleb128 0x1
+ 892 008a 50       		.byte	0x50
+ 893 008b 9F       		.byte	0x9f
+ 894 008c 00000000 		.4byte	0
+ 895 0090 00000000 		.4byte	0
+ 896              		.section	.debug_aranges,"",%progbits
+ 897 0000 3C000000 		.4byte	0x3c
+ 898 0004 0200     		.2byte	0x2
+ 899 0006 00000000 		.4byte	.Ldebug_info0
+ 900 000a 04       		.byte	0x4
+ 901 000b 00       		.byte	0
+ 902 000c 0000     		.2byte	0
+ 903 000e 0000     		.2byte	0
+ 904 0010 00000000 		.4byte	.LFB68
+ 905 0014 16000000 		.4byte	.LFE68-.LFB68
+ 906 0018 00000000 		.4byte	.LFB69
+ 907 001c 06000000 		.4byte	.LFE69-.LFB69
+ 908 0020 00000000 		.4byte	.LFB70
+ 909 0024 18000000 		.4byte	.LFE70-.LFB70
+ 910 0028 00000000 		.4byte	.LFB71
+ 911 002c 30000000 		.4byte	.LFE71-.LFB71
+ 912 0030 00000000 		.4byte	.LFB72
+ 913 0034 22000000 		.4byte	.LFE72-.LFB72
+ 914 0038 00000000 		.4byte	0
+ 915 003c 00000000 		.4byte	0
+ 916              		.section	.debug_ranges,"",%progbits
+ 917              	.Ldebug_ranges0:
+ 918 0000 00000000 		.4byte	.LFB68
+ 919 0004 16000000 		.4byte	.LFE68
+ 920 0008 00000000 		.4byte	.LFB69
+ 921 000c 06000000 		.4byte	.LFE69
+ 922 0010 00000000 		.4byte	.LFB70
+ 923 0014 18000000 		.4byte	.LFE70
+ 924 0018 00000000 		.4byte	.LFB71
+ 925 001c 30000000 		.4byte	.LFE71
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 21
+
+
+ 926 0020 00000000 		.4byte	.LFB72
+ 927 0024 22000000 		.4byte	.LFE72
+ 928 0028 00000000 		.4byte	0
+ 929 002c 00000000 		.4byte	0
+ 930              		.section	.debug_line,"",%progbits
+ 931              	.Ldebug_line0:
+ 932 0000 2D020000 		.section	.debug_str,"MS",%progbits,1
+ 932      0200A201 
+ 932      00000201 
+ 932      FB0E0D00 
+ 932      01010101 
+ 933              	.LASF18:
+ 934 0000 5469636B 		.ascii	"TickType_t\000"
+ 934      54797065 
+ 934      5F7400
+ 935              	.LASF23:
+ 936 000b 7076436F 		.ascii	"pvContainer\000"
+ 936      6E746169 
+ 936      6E657200 
+ 937              	.LASF27:
+ 938 0017 7078496E 		.ascii	"pxIndex\000"
+ 938      64657800 
+ 939              	.LASF31:
+ 940 001f 4D696E69 		.ascii	"MiniListItem_t\000"
+ 940      4C697374 
+ 940      4974656D 
+ 940      5F7400
+ 941              	.LASF6:
+ 942 002e 5F5F696E 		.ascii	"__int32_t\000"
+ 942      7433325F 
+ 942      7400
+ 943              	.LASF19:
+ 944 0038 78497465 		.ascii	"xItemValue\000"
+ 944      6D56616C 
+ 944      756500
+ 945              	.LASF4:
+ 946 0043 73686F72 		.ascii	"short unsigned int\000"
+ 946      7420756E 
+ 946      7369676E 
+ 946      65642069 
+ 946      6E7400
+ 947              	.LASF28:
+ 948 0056 784C6973 		.ascii	"xListEnd\000"
+ 948      74456E64 
+ 948      00
+ 949              	.LASF22:
+ 950 005f 70764F77 		.ascii	"pvOwner\000"
+ 950      6E657200 
+ 951              	.LASF24:
+ 952 0067 784C4953 		.ascii	"xLIST_ITEM\000"
+ 952      545F4954 
+ 952      454D00
+ 953              	.LASF15:
+ 954 0072 666C6F61 		.ascii	"float\000"
+ 954      7400
+ 955              	.LASF2:
+ 956 0078 756E7369 		.ascii	"unsigned char\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 22
+
+
+ 956      676E6564 
+ 956      20636861 
+ 956      7200
+ 957              	.LASF44:
+ 958 0086 2E2E5C63 		.ascii	"..\\common\\rtos\\list.c\000"
+ 958      6F6D6D6F 
+ 958      6E5C7274 
+ 958      6F735C6C 
+ 958      6973742E 
+ 959              	.LASF8:
+ 960 009c 6C6F6E67 		.ascii	"long unsigned int\000"
+ 960      20756E73 
+ 960      69676E65 
+ 960      6420696E 
+ 960      7400
+ 961              	.LASF43:
+ 962 00ae 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 962      43393920 
+ 962      352E342E 
+ 962      31203230 
+ 962      31363036 
+ 963 00e1 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 963      20726576 
+ 963      6973696F 
+ 963      6E203233 
+ 963      37373135 
+ 964 0114 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 964      74643D67 
+ 964      6E753939 
+ 964      202D6666 
+ 964      756E6374 
+ 965              	.LASF21:
+ 966 0147 70785072 		.ascii	"pxPrevious\000"
+ 966      6576696F 
+ 966      757300
+ 967              	.LASF47:
+ 968 0152 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 968      52784275 
+ 968      66666572 
+ 968      00
+ 969              	.LASF34:
+ 970 015f 764C6973 		.ascii	"vListInitialiseItem\000"
+ 970      74496E69 
+ 970      7469616C 
+ 970      69736549 
+ 970      74656D00 
+ 971              	.LASF32:
+ 972 0173 4C697374 		.ascii	"List_t\000"
+ 972      5F7400
+ 973              	.LASF16:
+ 974 017a 646F7562 		.ascii	"double\000"
+ 974      6C6500
+ 975              	.LASF7:
+ 976 0181 5F5F7569 		.ascii	"__uint32_t\000"
+ 976      6E743332 
+ 976      5F7400
+ 977              	.LASF26:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 23
+
+
+ 978 018c 75784E75 		.ascii	"uxNumberOfItems\000"
+ 978      6D626572 
+ 978      4F664974 
+ 978      656D7300 
+ 979              	.LASF37:
+ 980 019c 764C6973 		.ascii	"vListInsertEnd\000"
+ 980      74496E73 
+ 980      65727445 
+ 980      6E6400
+ 981              	.LASF20:
+ 982 01ab 70784E65 		.ascii	"pxNext\000"
+ 982      787400
+ 983              	.LASF0:
+ 984 01b2 756E7369 		.ascii	"unsigned int\000"
+ 984      676E6564 
+ 984      20696E74 
+ 984      00
+ 985              	.LASF33:
+ 986 01bf 764C6973 		.ascii	"vListInitialise\000"
+ 986      74496E69 
+ 986      7469616C 
+ 986      69736500 
+ 987              	.LASF41:
+ 988 01cf 7856616C 		.ascii	"xValueOfInsertion\000"
+ 988      75654F66 
+ 988      496E7365 
+ 988      7274696F 
+ 988      6E00
+ 989              	.LASF10:
+ 990 01e1 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 990      206C6F6E 
+ 990      6720756E 
+ 990      7369676E 
+ 990      65642069 
+ 991              	.LASF36:
+ 992 01f8 70784974 		.ascii	"pxItem\000"
+ 992      656D00
+ 993              	.LASF29:
+ 994 01ff 4C697374 		.ascii	"ListItem_t\000"
+ 994      4974656D 
+ 994      5F7400
+ 995              	.LASF13:
+ 996 020a 696E7433 		.ascii	"int32_t\000"
+ 996      325F7400 
+ 997              	.LASF11:
+ 998 0212 73697A65 		.ascii	"sizetype\000"
+ 998      74797065 
+ 998      00
+ 999              	.LASF9:
+ 1000 021b 6C6F6E67 		.ascii	"long long int\000"
+ 1000      206C6F6E 
+ 1000      6720696E 
+ 1000      7400
+ 1001              	.LASF12:
+ 1002 0229 63686172 		.ascii	"char\000"
+ 1002      00
+ 1003              	.LASF42:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 24
+
+
+ 1004 022e 70784974 		.ascii	"pxItemToRemove\000"
+ 1004      656D546F 
+ 1004      52656D6F 
+ 1004      766500
+ 1005              	.LASF40:
+ 1006 023d 70784974 		.ascii	"pxIterator\000"
+ 1006      65726174 
+ 1006      6F7200
+ 1007              	.LASF3:
+ 1008 0248 73686F72 		.ascii	"short int\000"
+ 1008      7420696E 
+ 1008      7400
+ 1009              	.LASF45:
+ 1010 0252 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 1010      73657273 
+ 1010      5C636865 
+ 1010      6D695C55 
+ 1010      44335F51 
+ 1011              	.LASF14:
+ 1012 0277 75696E74 		.ascii	"uint32_t\000"
+ 1012      33325F74 
+ 1012      00
+ 1013              	.LASF5:
+ 1014 0280 6C6F6E67 		.ascii	"long int\000"
+ 1014      20696E74 
+ 1014      00
+ 1015              	.LASF46:
+ 1016 0289 75784C69 		.ascii	"uxListRemove\000"
+ 1016      73745265 
+ 1016      6D6F7665 
+ 1016      00
+ 1017              	.LASF30:
+ 1018 0296 784D494E 		.ascii	"xMINI_LIST_ITEM\000"
+ 1018      495F4C49 
+ 1018      53545F49 
+ 1018      54454D00 
+ 1019              	.LASF1:
+ 1020 02a6 7369676E 		.ascii	"signed char\000"
+ 1020      65642063 
+ 1020      68617200 
+ 1021              	.LASF35:
+ 1022 02b2 70784C69 		.ascii	"pxList\000"
+ 1022      737400
+ 1023              	.LASF25:
+ 1024 02b9 784C4953 		.ascii	"xLIST\000"
+ 1024      5400
+ 1025              	.LASF17:
+ 1026 02bf 55426173 		.ascii	"UBaseType_t\000"
+ 1026      65547970 
+ 1026      655F7400 
+ 1027              	.LASF38:
+ 1028 02cb 70784E65 		.ascii	"pxNewListItem\000"
+ 1028      774C6973 
+ 1028      74497465 
+ 1028      6D00
+ 1029              	.LASF39:
+ 1030 02d9 764C6973 		.ascii	"vListInsert\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc0JW5r7.s 			page 25
+
+
+ 1030      74496E73 
+ 1030      65727400 
+ 1031              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

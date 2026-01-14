@@ -1,0 +1,3051 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"tsk_usb.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.tsk_usb_Task,"ax",%progbits
+  20              		.align	1
+  21              		.global	tsk_usb_Task
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	tsk_usb_Task, %function
+  25              	tsk_usb_Task:
+  26              	.LFB72:
+  27              		.file 1 "..\\common\\ud3core\\tasks\\tsk_usb.c"
+   1:..\common\ud3core\tasks/tsk_usb.c **** /* ======================================================================== */
+   2:..\common\ud3core\tasks/tsk_usb.c **** /*
+   3:..\common\ud3core\tasks/tsk_usb.c ****  * Copyright (c) 2015, E2ForLife.com
+   4:..\common\ud3core\tasks/tsk_usb.c ****  * All rights reserved.
+   5:..\common\ud3core\tasks/tsk_usb.c ****  * 
+   6:..\common\ud3core\tasks/tsk_usb.c ****  * Redistribution and use in source and binary forms, with or without
+   7:..\common\ud3core\tasks/tsk_usb.c ****  * modification, are permitted provided that the following conditions are met:
+   8:..\common\ud3core\tasks/tsk_usb.c ****  *     * Redistributions of source code must retain the above copyright
+   9:..\common\ud3core\tasks/tsk_usb.c ****  *       notice, this list of conditions and the following disclaimer.
+  10:..\common\ud3core\tasks/tsk_usb.c ****  *     * Redistributions in binary form must reproduce the above copyright
+  11:..\common\ud3core\tasks/tsk_usb.c ****  *       notice, this list of conditions and the following disclaimer in the
+  12:..\common\ud3core\tasks/tsk_usb.c ****  *       documentation and/or other materials provided with the distribution.
+  13:..\common\ud3core\tasks/tsk_usb.c ****  *     * Neither the name of the E2ForLife.com nor the
+  14:..\common\ud3core\tasks/tsk_usb.c ****  *       names of its contributors may be used to endorse or promote products
+  15:..\common\ud3core\tasks/tsk_usb.c ****  *       derived from this software without specific prior written permission.
+  16:..\common\ud3core\tasks/tsk_usb.c ****  * 
+  17:..\common\ud3core\tasks/tsk_usb.c ****  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+  18:..\common\ud3core\tasks/tsk_usb.c ****  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  19:..\common\ud3core\tasks/tsk_usb.c ****  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  20:..\common\ud3core\tasks/tsk_usb.c ****  * DISCLAIMED. IN NO EVENT SHALL E2FORLIFE.COM BE LIABLE FOR ANY
+  21:..\common\ud3core\tasks/tsk_usb.c ****  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  22:..\common\ud3core\tasks/tsk_usb.c ****  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+  23:..\common\ud3core\tasks/tsk_usb.c ****  * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  24:..\common\ud3core\tasks/tsk_usb.c ****  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  25:..\common\ud3core\tasks/tsk_usb.c ****  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  26:..\common\ud3core\tasks/tsk_usb.c ****  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  27:..\common\ud3core\tasks/tsk_usb.c ****  */
+  28:..\common\ud3core\tasks/tsk_usb.c **** /* ======================================================================== */
+  29:..\common\ud3core\tasks/tsk_usb.c **** #include <CyLib.h>
+  30:..\common\ud3core\tasks/tsk_usb.c **** #include <cytypes.h>
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 2
+
+
+  31:..\common\ud3core\tasks/tsk_usb.c **** #include <stdio.h>
+  32:..\common\ud3core\tasks/tsk_usb.c **** 
+  33:..\common\ud3core\tasks/tsk_usb.c **** #include "USBUART_1.h"
+  34:..\common\ud3core\tasks/tsk_usb.c **** #include "USBUART_1_cdc.h"
+  35:..\common\ud3core\tasks/tsk_usb.c **** #include "tsk_priority.h"
+  36:..\common\ud3core\tasks/tsk_usb.c **** #include "tsk_usb.h"
+  37:..\common\ud3core\tasks/tsk_usb.c **** #include "tsk_fault.h"
+  38:..\common\ud3core\tasks/tsk_usb.c **** #include "alarmevent.h"
+  39:..\common\ud3core\tasks/tsk_usb.c **** 
+  40:..\common\ud3core\tasks/tsk_usb.c **** 
+  41:..\common\ud3core\tasks/tsk_usb.c **** /* ======================================================================== */
+  42:..\common\ud3core\tasks/tsk_usb.c **** 
+  43:..\common\ud3core\tasks/tsk_usb.c **** #include "cli_common.h"
+  44:..\common\ud3core\tasks/tsk_usb.c **** #include "interrupter.h"
+  45:..\common\ud3core\tasks/tsk_usb.c **** #include "tsk_midi.h"
+  46:..\common\ud3core\tasks/tsk_usb.c **** #include "tsk_cli.h"
+  47:..\common\ud3core\tasks/tsk_usb.c **** uint8 tsk_usb_initVar;
+  48:..\common\ud3core\tasks/tsk_usb.c **** xTaskHandle tsk_usb_TaskHandle;
+  49:..\common\ud3core\tasks/tsk_usb.c **** 
+  50:..\common\ud3core\tasks/tsk_usb.c **** uint32_t usb_bytes_rx=0;
+  51:..\common\ud3core\tasks/tsk_usb.c **** uint32_t usb_bytes_tx=0;
+  52:..\common\ud3core\tasks/tsk_usb.c **** 
+  53:..\common\ud3core\tasks/tsk_usb.c **** 
+  54:..\common\ud3core\tasks/tsk_usb.c **** /* ======================================================================== */
+  55:..\common\ud3core\tasks/tsk_usb.c **** void tsk_usb_Start(void) {
+  56:..\common\ud3core\tasks/tsk_usb.c **** 	if (tsk_usb_initVar != 1) {
+  57:..\common\ud3core\tasks/tsk_usb.c **** 		tsk_usb_Init();
+  58:..\common\ud3core\tasks/tsk_usb.c **** 	}
+  59:..\common\ud3core\tasks/tsk_usb.c **** 
+  60:..\common\ud3core\tasks/tsk_usb.c **** 	/* Check for enumeration after initialization */
+  61:..\common\ud3core\tasks/tsk_usb.c **** 	tsk_usb_Enable();
+  62:..\common\ud3core\tasks/tsk_usb.c **** }
+  63:..\common\ud3core\tasks/tsk_usb.c **** /* ------------------------------------------------------------------------ */
+  64:..\common\ud3core\tasks/tsk_usb.c **** void tsk_usb_Init(void) {
+  65:..\common\ud3core\tasks/tsk_usb.c **** 	/*  Initialize the USB COM port */
+  66:..\common\ud3core\tasks/tsk_usb.c **** 
+  67:..\common\ud3core\tasks/tsk_usb.c **** 	if (USBUART_1_initVar == 0) {
+  68:..\common\ud3core\tasks/tsk_usb.c **** /* Start USBFS Operation with 3V operation */
+  69:..\common\ud3core\tasks/tsk_usb.c **** #if (CYDEV_VDDIO1_MV < 5000)
+  70:..\common\ud3core\tasks/tsk_usb.c **** 		USBUART_1_Start(0u, USBUART_1_3V_OPERATION);
+  71:..\common\ud3core\tasks/tsk_usb.c **** #else
+  72:..\common\ud3core\tasks/tsk_usb.c **** 		USBUART_1_Start(0u, USBUART_1_5V_OPERATION);
+  73:..\common\ud3core\tasks/tsk_usb.c **** #endif
+  74:..\common\ud3core\tasks/tsk_usb.c **** 	}
+  75:..\common\ud3core\tasks/tsk_usb.c **** 
+  76:..\common\ud3core\tasks/tsk_usb.c **** 	xTaskCreate(tsk_usb_Task, "USB-Svc", STACK_USB, NULL, PRIO_USB, &tsk_usb_TaskHandle);
+  77:..\common\ud3core\tasks/tsk_usb.c **** 
+  78:..\common\ud3core\tasks/tsk_usb.c **** 	tsk_usb_initVar = 1;
+  79:..\common\ud3core\tasks/tsk_usb.c **** }
+  80:..\common\ud3core\tasks/tsk_usb.c **** /* ------------------------------------------------------------------------ */
+  81:..\common\ud3core\tasks/tsk_usb.c **** void tsk_usb_Enable(void) {
+  82:..\common\ud3core\tasks/tsk_usb.c **** 	if (tsk_usb_initVar != 0) {
+  83:..\common\ud3core\tasks/tsk_usb.c **** 		/*
+  84:..\common\ud3core\tasks/tsk_usb.c **** 		 * COMIO was initialized, and now is bing enabled for use.
+  85:..\common\ud3core\tasks/tsk_usb.c **** 		 * Enter user extension enables within the merge region below.
+  86:..\common\ud3core\tasks/tsk_usb.c **** 		 */
+  87:..\common\ud3core\tasks/tsk_usb.c **** 		/* `#START COMIO_ENABLE` */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 3
+
+
+  88:..\common\ud3core\tasks/tsk_usb.c **** 
+  89:..\common\ud3core\tasks/tsk_usb.c **** 		/* `#END` */
+  90:..\common\ud3core\tasks/tsk_usb.c **** 	}
+  91:..\common\ud3core\tasks/tsk_usb.c **** }
+  92:..\common\ud3core\tasks/tsk_usb.c **** /* ======================================================================== */
+  93:..\common\ud3core\tasks/tsk_usb.c **** void tsk_usb_Task(void *pvParameters) {
+  28              		.loc 1 93 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 64
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  34              		.cfi_def_cfa_offset 20
+  35              		.cfi_offset 4, -20
+  36              		.cfi_offset 5, -16
+  37              		.cfi_offset 6, -12
+  38              		.cfi_offset 7, -8
+  39              		.cfi_offset 14, -4
+  94:..\common\ud3core\tasks/tsk_usb.c **** 	uint16 count;
+  95:..\common\ud3core\tasks/tsk_usb.c **** 	uint8 buffer[tsk_usb_BUFFER_LEN];
+  96:..\common\ud3core\tasks/tsk_usb.c ****     alarm_push(ALM_PRIO_INFO, "TASK: USB started", ALM_NO_VALUE);
+  40              		.loc 1 96 0
+  41 0002 4FF00042 		mov	r2, #-2147483648
+  93:..\common\ud3core\tasks/tsk_usb.c **** 	uint16 count;
+  42              		.loc 1 93 0
+  43 0006 91B0     		sub	sp, sp, #68
+  44              		.cfi_def_cfa_offset 88
+  45              		.loc 1 96 0
+  46 0008 3349     		ldr	r1, .L38
+  47 000a 0020     		movs	r0, #0
+  48              	.LVL1:
+  49 000c FFF7FEFF 		bl	alarm_push
+  50              	.LVL2:
+  51 0010 324C     		ldr	r4, .L38+4
+  97:..\common\ud3core\tasks/tsk_usb.c **** 	for (;;) {
+  98:..\common\ud3core\tasks/tsk_usb.c **** 		/* Handle enumeration of USB port */
+  99:..\common\ud3core\tasks/tsk_usb.c **** 		if (USBUART_1_IsConfigurationChanged() != 0u) /* Host could send double SET_INTERFACE request */
+ 100:..\common\ud3core\tasks/tsk_usb.c **** 		{
+ 101:..\common\ud3core\tasks/tsk_usb.c **** 			if (USBUART_1_GetConfiguration() != 0u) /* Init IN endpoints when device configured */
+ 102:..\common\ud3core\tasks/tsk_usb.c **** 			{
+ 103:..\common\ud3core\tasks/tsk_usb.c **** 				/* Enumeration is done, enable OUT endpoint for receive data from Host */
+ 104:..\common\ud3core\tasks/tsk_usb.c **** 				USBUART_1_CDC_Init();
+ 105:..\common\ud3core\tasks/tsk_usb.c **** 			}
+ 106:..\common\ud3core\tasks/tsk_usb.c **** 		}
+ 107:..\common\ud3core\tasks/tsk_usb.c **** 		/*
+ 108:..\common\ud3core\tasks/tsk_usb.c **** 		 *
+ 109:..\common\ud3core\tasks/tsk_usb.c **** 		 */
+ 110:..\common\ud3core\tasks/tsk_usb.c **** 		if (USBUART_1_GetConfiguration() != 0u) {
+ 111:..\common\ud3core\tasks/tsk_usb.c **** /*
+ 112:..\common\ud3core\tasks/tsk_usb.c **** 			 * Process received data from the USB, and store it in to the
+ 113:..\common\ud3core\tasks/tsk_usb.c **** 			 * receiver message Q.
+ 114:..\common\ud3core\tasks/tsk_usb.c **** 			 */
+ 115:..\common\ud3core\tasks/tsk_usb.c **** 
+ 116:..\common\ud3core\tasks/tsk_usb.c **** 			if (USBUART_1_DataIsReady() != 0u) {
+ 117:..\common\ud3core\tasks/tsk_usb.c **** 				count = USBUART_1_GetAll(buffer);
+ 118:..\common\ud3core\tasks/tsk_usb.c **** 				if (count != 0u) {
+ 119:..\common\ud3core\tasks/tsk_usb.c **** 					/* insert data in to Receive FIFO */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 4
+
+
+ 120:..\common\ud3core\tasks/tsk_usb.c ****                     LED_com_Write(LED_ON);
+ 121:..\common\ud3core\tasks/tsk_usb.c ****                     usb_bytes_rx+=count;
+ 122:..\common\ud3core\tasks/tsk_usb.c ****                     xStreamBufferSend(usb_port.rx, &buffer,count, 0);
+ 123:..\common\ud3core\tasks/tsk_usb.c **** 				}
+ 124:..\common\ud3core\tasks/tsk_usb.c **** 			}
+ 125:..\common\ud3core\tasks/tsk_usb.c **** 			/*
+ 126:..\common\ud3core\tasks/tsk_usb.c **** 			 * Send a block of data ack through the USB port to the PC,
+ 127:..\common\ud3core\tasks/tsk_usb.c **** 			 * by checkig to see if there is data to send, then sending
+ 128:..\common\ud3core\tasks/tsk_usb.c **** 			 * up to the BUFFER_LEN of data (64 bytes)
+ 129:..\common\ud3core\tasks/tsk_usb.c **** 			 */
+ 130:..\common\ud3core\tasks/tsk_usb.c ****             
+ 131:..\common\ud3core\tasks/tsk_usb.c ****             count = xStreamBufferBytesAvailable(usb_port.tx);
+ 132:..\common\ud3core\tasks/tsk_usb.c **** 
+ 133:..\common\ud3core\tasks/tsk_usb.c **** 			/* When component is ready to send more data to the PC */
+ 134:..\common\ud3core\tasks/tsk_usb.c **** 			if ((USBUART_1_CDCIsReady() != 0u) && (count > 0)) {
+ 135:..\common\ud3core\tasks/tsk_usb.c **** 				/*
+ 136:..\common\ud3core\tasks/tsk_usb.c **** 				 * Read the data from the transmit queue and buffer it
+ 137:..\common\ud3core\tasks/tsk_usb.c **** 				 * locally so that the data can be utilized.
+ 138:..\common\ud3core\tasks/tsk_usb.c **** 				 */
+ 139:..\common\ud3core\tasks/tsk_usb.c ****                 count = xStreamBufferReceive(usb_port.tx,&buffer,tsk_usb_BUFFER_LEN,0);
+ 140:..\common\ud3core\tasks/tsk_usb.c **** 				/* Send data back to host */
+ 141:..\common\ud3core\tasks/tsk_usb.c ****                 LED_com_Write(LED_ON);
+  52              		.loc 1 141 0
+  53 0012 334F     		ldr	r7, .L38+8
+ 142:..\common\ud3core\tasks/tsk_usb.c ****                 usb_bytes_tx+=count;
+  54              		.loc 1 142 0
+  55 0014 334D     		ldr	r5, .L38+12
+  56              	.L2:
+  99:..\common\ud3core\tasks/tsk_usb.c **** 		{
+  57              		.loc 1 99 0
+  58 0016 FFF7FEFF 		bl	USBUART_1_IsConfigurationChanged
+  59              	.LVL3:
+  60 001a 20B1     		cbz	r0, .L4
+ 101:..\common\ud3core\tasks/tsk_usb.c **** 			{
+  61              		.loc 1 101 0
+  62 001c FFF7FEFF 		bl	USBUART_1_GetConfiguration
+  63              	.LVL4:
+  64 0020 08B1     		cbz	r0, .L4
+ 104:..\common\ud3core\tasks/tsk_usb.c **** 			}
+  65              		.loc 1 104 0
+  66 0022 FFF7FEFF 		bl	USBUART_1_CDC_Init
+  67              	.LVL5:
+  68              	.L4:
+ 110:..\common\ud3core\tasks/tsk_usb.c **** /*
+  69              		.loc 1 110 0
+  70 0026 FFF7FEFF 		bl	USBUART_1_GetConfiguration
+  71              	.LVL6:
+  72 002a 0028     		cmp	r0, #0
+  73 002c 42D0     		beq	.L7
+ 116:..\common\ud3core\tasks/tsk_usb.c **** 				count = USBUART_1_GetAll(buffer);
+  74              		.loc 1 116 0
+  75 002e FFF7FEFF 		bl	USBUART_1_DataIsReady
+  76              	.LVL7:
+  77 0032 A0B1     		cbz	r0, .L9
+ 117:..\common\ud3core\tasks/tsk_usb.c **** 				if (count != 0u) {
+  78              		.loc 1 117 0
+  79 0034 6846     		mov	r0, sp
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 5
+
+
+  80 0036 FFF7FEFF 		bl	USBUART_1_GetAll
+  81              	.LVL8:
+ 118:..\common\ud3core\tasks/tsk_usb.c **** 					/* insert data in to Receive FIFO */
+  82              		.loc 1 118 0
+  83 003a 0646     		mov	r6, r0
+  84 003c 78B1     		cbz	r0, .L9
+ 120:..\common\ud3core\tasks/tsk_usb.c ****                     usb_bytes_rx+=count;
+  85              		.loc 1 120 0
+  86 003e 97F86600 		ldrb	r0, [r7, #102]	@ zero_extendqisi2
+  87              	.LVL9:
+  88 0042 B0FA80F0 		clz	r0, r0
+  89 0046 4009     		lsrs	r0, r0, #5
+  90 0048 FFF7FEFF 		bl	LED_com_Write
+  91              	.LVL10:
+ 121:..\common\ud3core\tasks/tsk_usb.c ****                     xStreamBufferSend(usb_port.rx, &buffer,count, 0);
+  92              		.loc 1 121 0
+  93 004c 2B68     		ldr	r3, [r5]
+ 122:..\common\ud3core\tasks/tsk_usb.c **** 				}
+  94              		.loc 1 122 0
+  95 004e 3246     		mov	r2, r6
+ 121:..\common\ud3core\tasks/tsk_usb.c ****                     xStreamBufferSend(usb_port.rx, &buffer,count, 0);
+  96              		.loc 1 121 0
+  97 0050 3344     		add	r3, r3, r6
+  98 0052 2B60     		str	r3, [r5]
+ 122:..\common\ud3core\tasks/tsk_usb.c **** 				}
+  99              		.loc 1 122 0
+ 100 0054 6946     		mov	r1, sp
+ 101 0056 0023     		movs	r3, #0
+ 102 0058 A068     		ldr	r0, [r4, #8]
+ 103 005a FFF7FEFF 		bl	xStreamBufferSend
+ 104              	.LVL11:
+ 105              	.L9:
+ 131:..\common\ud3core\tasks/tsk_usb.c **** 
+ 106              		.loc 1 131 0
+ 107 005e 6068     		ldr	r0, [r4, #4]
+ 108 0060 FFF7FEFF 		bl	xStreamBufferBytesAvailable
+ 109              	.LVL12:
+ 110 0064 0646     		mov	r6, r0
+ 111              	.LVL13:
+ 134:..\common\ud3core\tasks/tsk_usb.c **** 				/*
+ 112              		.loc 1 134 0
+ 113 0066 FFF7FEFF 		bl	USBUART_1_CDCIsReady
+ 114              	.LVL14:
+ 115 006a 18B3     		cbz	r0, .L7
+ 134:..\common\ud3core\tasks/tsk_usb.c **** 				/*
+ 116              		.loc 1 134 0 is_stmt 0 discriminator 1
+ 117 006c B6B2     		uxth	r6, r6
+ 118 006e 0EB3     		cbz	r6, .L7
+ 139:..\common\ud3core\tasks/tsk_usb.c **** 				/* Send data back to host */
+ 119              		.loc 1 139 0 is_stmt 1
+ 120 0070 0023     		movs	r3, #0
+ 121 0072 4022     		movs	r2, #64
+ 122 0074 6946     		mov	r1, sp
+ 123 0076 6068     		ldr	r0, [r4, #4]
+ 124 0078 FFF7FEFF 		bl	xStreamBufferReceive
+ 125              	.LVL15:
+ 126 007c 86B2     		uxth	r6, r0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 6
+
+
+ 127              	.LVL16:
+ 141:..\common\ud3core\tasks/tsk_usb.c ****                 usb_bytes_tx+=count;
+ 128              		.loc 1 141 0
+ 129 007e 97F86600 		ldrb	r0, [r7, #102]	@ zero_extendqisi2
+ 130 0082 B0FA80F0 		clz	r0, r0
+ 131 0086 4009     		lsrs	r0, r0, #5
+ 132 0088 FFF7FEFF 		bl	LED_com_Write
+ 133              	.LVL17:
+ 134              		.loc 1 142 0
+ 135 008c 6B68     		ldr	r3, [r5, #4]
+ 143:..\common\ud3core\tasks/tsk_usb.c **** 				USBUART_1_PutData(buffer, count);
+ 136              		.loc 1 143 0
+ 137 008e 3146     		mov	r1, r6
+ 142:..\common\ud3core\tasks/tsk_usb.c **** 				USBUART_1_PutData(buffer, count);
+ 138              		.loc 1 142 0
+ 139 0090 3344     		add	r3, r3, r6
+ 140              		.loc 1 143 0
+ 141 0092 6846     		mov	r0, sp
+ 142:..\common\ud3core\tasks/tsk_usb.c **** 				USBUART_1_PutData(buffer, count);
+ 142              		.loc 1 142 0
+ 143 0094 6B60     		str	r3, [r5, #4]
+ 144              		.loc 1 143 0
+ 145 0096 FFF7FEFF 		bl	USBUART_1_PutData
+ 146              	.LVL18:
+ 144:..\common\ud3core\tasks/tsk_usb.c **** 
+ 145:..\common\ud3core\tasks/tsk_usb.c **** 				/* If the last sent packet is exactly maximum packet size, 
+ 146:..\common\ud3core\tasks/tsk_usb.c ****             	 *  it shall be followed by a zero-length packet to assure the
+ 147:..\common\ud3core\tasks/tsk_usb.c ****              	 *  end of segment is properly identified by the terminal.
+ 148:..\common\ud3core\tasks/tsk_usb.c ****              	 */
+ 149:..\common\ud3core\tasks/tsk_usb.c **** 				if (count == tsk_usb_BUFFER_LEN) {
+ 147              		.loc 1 149 0
+ 148 009a 402E     		cmp	r6, #64
+ 149 009c 0AD1     		bne	.L7
+ 150              	.L12:
+ 150:..\common\ud3core\tasks/tsk_usb.c **** 					/* Wait till component is ready to send more data to the PC */
+ 151:..\common\ud3core\tasks/tsk_usb.c **** 					while (USBUART_1_CDCIsReady() == 0u) {
+ 151              		.loc 1 151 0
+ 152 009e FFF7FEFF 		bl	USBUART_1_CDCIsReady
+ 153              	.LVL19:
+ 154 00a2 18B9     		cbnz	r0, .L37
+ 152:..\common\ud3core\tasks/tsk_usb.c **** 						vTaskDelay(1);
+ 155              		.loc 1 152 0
+ 156 00a4 0120     		movs	r0, #1
+ 157 00a6 FFF7FEFF 		bl	vTaskDelay
+ 158              	.LVL20:
+ 159 00aa F8E7     		b	.L12
+ 160              	.L37:
+ 153:..\common\ud3core\tasks/tsk_usb.c **** 					}
+ 154:..\common\ud3core\tasks/tsk_usb.c **** 					USBUART_1_PutData(NULL, 0u); /* Send zero-length packet to PC */
+ 161              		.loc 1 154 0
+ 162 00ac 0021     		movs	r1, #0
+ 163 00ae 0846     		mov	r0, r1
+ 164 00b0 FFF7FEFF 		bl	USBUART_1_PutData
+ 165              	.LVL21:
+ 166              	.L7:
+ 155:..\common\ud3core\tasks/tsk_usb.c **** 				}
+ 156:..\common\ud3core\tasks/tsk_usb.c **** 			}
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 7
+
+
+ 157:..\common\ud3core\tasks/tsk_usb.c **** 		}
+ 158:..\common\ud3core\tasks/tsk_usb.c ****         if(xStreamBufferBytesAvailable(usb_port.tx)==0 || xStreamBufferBytesAvailable(usb_port.rx)=
+ 167              		.loc 1 158 0
+ 168 00b4 6068     		ldr	r0, [r4, #4]
+ 169 00b6 FFF7FEFF 		bl	xStreamBufferBytesAvailable
+ 170              	.LVL22:
+ 171 00ba 18B9     		cbnz	r0, .L14
+ 172              	.L16:
+ 159:..\common\ud3core\tasks/tsk_usb.c **** 		    vTaskDelay(2 / portTICK_PERIOD_MS);
+ 173              		.loc 1 159 0
+ 174 00bc 0220     		movs	r0, #2
+ 175 00be FFF7FEFF 		bl	vTaskDelay
+ 176              	.LVL23:
+ 177 00c2 A8E7     		b	.L2
+ 178              	.L14:
+ 158:..\common\ud3core\tasks/tsk_usb.c **** 		    vTaskDelay(2 / portTICK_PERIOD_MS);
+ 179              		.loc 1 158 0 discriminator 1
+ 180 00c4 A068     		ldr	r0, [r4, #8]
+ 181 00c6 FFF7FEFF 		bl	xStreamBufferBytesAvailable
+ 182              	.LVL24:
+ 183 00ca 0028     		cmp	r0, #0
+ 184 00cc F6D0     		beq	.L16
+ 158:..\common\ud3core\tasks/tsk_usb.c **** 		    vTaskDelay(2 / portTICK_PERIOD_MS);
+ 185              		.loc 1 158 0 is_stmt 0 discriminator 2
+ 186 00ce FFF7FEFF 		bl	USBUART_1_CDCIsReady
+ 187              	.LVL25:
+ 188 00d2 0028     		cmp	r0, #0
+ 189 00d4 F2D0     		beq	.L16
+ 190 00d6 9EE7     		b	.L2
+ 191              	.L39:
+ 192              		.align	2
+ 193              	.L38:
+ 194 00d8 00000000 		.word	.LC0
+ 195 00dc 00000000 		.word	usb_port
+ 196 00e0 00000000 		.word	configuration
+ 197 00e4 00000000 		.word	.LANCHOR0
+ 198              		.cfi_endproc
+ 199              	.LFE72:
+ 200              		.size	tsk_usb_Task, .-tsk_usb_Task
+ 201              		.section	.text.tsk_usb_Init,"ax",%progbits
+ 202              		.align	1
+ 203              		.global	tsk_usb_Init
+ 204              		.thumb
+ 205              		.thumb_func
+ 206              		.type	tsk_usb_Init, %function
+ 207              	tsk_usb_Init:
+ 208              	.LFB70:
+  64:..\common\ud3core\tasks/tsk_usb.c **** 	/*  Initialize the USB COM port */
+ 209              		.loc 1 64 0 is_stmt 1
+ 210              		.cfi_startproc
+ 211              		@ args = 0, pretend = 0, frame = 0
+ 212              		@ frame_needed = 0, uses_anonymous_args = 0
+ 213 0000 07B5     		push	{r0, r1, r2, lr}
+ 214              		.cfi_def_cfa_offset 16
+ 215              		.cfi_offset 14, -4
+  67:..\common\ud3core\tasks/tsk_usb.c **** /* Start USBFS Operation with 3V operation */
+ 216              		.loc 1 67 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 8
+
+
+ 217 0002 0B4B     		ldr	r3, .L42
+ 218 0004 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 219 0006 10B9     		cbnz	r0, .L41
+  72:..\common\ud3core\tasks/tsk_usb.c **** #endif
+ 220              		.loc 1 72 0
+ 221 0008 0121     		movs	r1, #1
+ 222 000a FFF7FEFF 		bl	USBUART_1_Start
+ 223              	.LVL26:
+ 224              	.L41:
+  76:..\common\ud3core\tasks/tsk_usb.c **** 
+ 225              		.loc 1 76 0
+ 226 000e 094B     		ldr	r3, .L42+4
+ 227 0010 8022     		movs	r2, #128
+ 228 0012 0193     		str	r3, [sp, #4]
+ 229 0014 0323     		movs	r3, #3
+ 230 0016 0093     		str	r3, [sp]
+ 231 0018 0749     		ldr	r1, .L42+8
+ 232 001a 0023     		movs	r3, #0
+ 233 001c 0748     		ldr	r0, .L42+12
+ 234 001e FFF7FEFF 		bl	xTaskCreate
+ 235              	.LVL27:
+  78:..\common\ud3core\tasks/tsk_usb.c **** }
+ 236              		.loc 1 78 0
+ 237 0022 074B     		ldr	r3, .L42+16
+ 238 0024 0122     		movs	r2, #1
+ 239 0026 1A70     		strb	r2, [r3]
+  79:..\common\ud3core\tasks/tsk_usb.c **** /* ------------------------------------------------------------------------ */
+ 240              		.loc 1 79 0
+ 241 0028 03B0     		add	sp, sp, #12
+ 242              		.cfi_def_cfa_offset 4
+ 243              		@ sp needed
+ 244 002a 5DF804FB 		ldr	pc, [sp], #4
+ 245              	.L43:
+ 246 002e 00BF     		.align	2
+ 247              	.L42:
+ 248 0030 00000000 		.word	USBUART_1_initVar
+ 249 0034 00000000 		.word	tsk_usb_TaskHandle
+ 250 0038 12000000 		.word	.LC1
+ 251 003c 00000000 		.word	tsk_usb_Task
+ 252 0040 00000000 		.word	tsk_usb_initVar
+ 253              		.cfi_endproc
+ 254              	.LFE70:
+ 255              		.size	tsk_usb_Init, .-tsk_usb_Init
+ 256              		.section	.text.tsk_usb_Start,"ax",%progbits
+ 257              		.align	1
+ 258              		.global	tsk_usb_Start
+ 259              		.thumb
+ 260              		.thumb_func
+ 261              		.type	tsk_usb_Start, %function
+ 262              	tsk_usb_Start:
+ 263              	.LFB69:
+  55:..\common\ud3core\tasks/tsk_usb.c **** 	if (tsk_usb_initVar != 1) {
+ 264              		.loc 1 55 0
+ 265              		.cfi_startproc
+ 266              		@ args = 0, pretend = 0, frame = 0
+ 267              		@ frame_needed = 0, uses_anonymous_args = 0
+ 268              		@ link register save eliminated.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 9
+
+
+  56:..\common\ud3core\tasks/tsk_usb.c **** 		tsk_usb_Init();
+ 269              		.loc 1 56 0
+ 270 0000 034B     		ldr	r3, .L46
+ 271 0002 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 272 0004 012B     		cmp	r3, #1
+ 273 0006 01D0     		beq	.L44
+  57:..\common\ud3core\tasks/tsk_usb.c **** 	}
+ 274              		.loc 1 57 0
+ 275 0008 FFF7FEBF 		b	tsk_usb_Init
+ 276              	.LVL28:
+ 277              	.L44:
+ 278 000c 7047     		bx	lr
+ 279              	.L47:
+ 280 000e 00BF     		.align	2
+ 281              	.L46:
+ 282 0010 00000000 		.word	tsk_usb_initVar
+ 283              		.cfi_endproc
+ 284              	.LFE69:
+ 285              		.size	tsk_usb_Start, .-tsk_usb_Start
+ 286              		.section	.text.tsk_usb_Enable,"ax",%progbits
+ 287              		.align	1
+ 288              		.global	tsk_usb_Enable
+ 289              		.thumb
+ 290              		.thumb_func
+ 291              		.type	tsk_usb_Enable, %function
+ 292              	tsk_usb_Enable:
+ 293              	.LFB71:
+  81:..\common\ud3core\tasks/tsk_usb.c **** 	if (tsk_usb_initVar != 0) {
+ 294              		.loc 1 81 0
+ 295              		.cfi_startproc
+ 296              		@ args = 0, pretend = 0, frame = 0
+ 297              		@ frame_needed = 0, uses_anonymous_args = 0
+ 298              		@ link register save eliminated.
+ 299 0000 7047     		bx	lr
+ 300              		.cfi_endproc
+ 301              	.LFE71:
+ 302              		.size	tsk_usb_Enable, .-tsk_usb_Enable
+ 303              		.global	usb_bytes_tx
+ 304              		.global	usb_bytes_rx
+ 305              		.comm	tsk_usb_TaskHandle,4,4
+ 306              		.comm	tsk_usb_initVar,1,1
+ 307              		.comm	interrupter,12,4
+ 308              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 309              	.LC0:
+ 310 0000 5441534B 		.ascii	"TASK: USB started\000"
+ 310      3A205553 
+ 310      42207374 
+ 310      61727465 
+ 310      6400
+ 311              	.LC1:
+ 312 0012 5553422D 		.ascii	"USB-Svc\000"
+ 312      53766300 
+ 313              		.bss
+ 314              		.align	2
+ 315              		.set	.LANCHOR0,. + 0
+ 316              		.type	usb_bytes_rx, %object
+ 317              		.size	usb_bytes_rx, 4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 10
+
+
+ 318              	usb_bytes_rx:
+ 319 0000 00000000 		.space	4
+ 320              		.type	usb_bytes_tx, %object
+ 321              		.size	usb_bytes_tx, 4
+ 322              	usb_bytes_tx:
+ 323 0004 00000000 		.space	4
+ 324              		.text
+ 325              	.Letext0:
+ 326              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 327              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 328              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 329              		.file 5 "..\\common\\rtos\\portable\\GCC\\ARM_CM3/portmacro.h"
+ 330              		.file 6 "..\\common\\rtos\\include/task.h"
+ 331              		.file 7 "..\\common\\rtos\\include/queue.h"
+ 332              		.file 8 "..\\common\\rtos\\include/semphr.h"
+ 333              		.file 9 "..\\common\\rtos\\include/stream_buffer.h"
+ 334              		.file 10 "..\\common\\ud3core/cli_basic.h"
+ 335              		.file 11 "..\\common\\rtos\\include/timers.h"
+ 336              		.file 12 "..\\common\\ud3core/cli_common.h"
+ 337              		.file 13 "..\\common\\ud3core/interrupter.h"
+ 338              		.file 14 "Generated_Source\\PSoC5/USBUART_1.h"
+ 339              		.file 15 "Generated_Source\\PSoC5/core_cm3.h"
+ 340              		.file 16 "..\\common\\ud3core\\tasks\\tsk_cli.h"
+ 341              		.file 17 "..\\common\\ud3core/alarmevent.h"
+ 342              		.file 18 "Generated_Source\\PSoC5/USBUART_1_cdc.h"
+ 343              		.file 19 "Generated_Source\\PSoC5/LED_com.h"
+ 344              		.section	.debug_info,"",%progbits
+ 345              	.Ldebug_info0:
+ 346 0000 E4080000 		.4byte	0x8e4
+ 347 0004 0400     		.2byte	0x4
+ 348 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 349 000a 04       		.byte	0x4
+ 350 000b 01       		.uleb128 0x1
+ 351 000c 5F020000 		.4byte	.LASF144
+ 352 0010 0C       		.byte	0xc
+ 353 0011 78050000 		.4byte	.LASF145
+ 354 0015 A8000000 		.4byte	.LASF146
+ 355 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 356 001d 00000000 		.4byte	0
+ 357 0021 00000000 		.4byte	.Ldebug_line0
+ 358 0025 02       		.uleb128 0x2
+ 359 0026 04       		.byte	0x4
+ 360 0027 05       		.byte	0x5
+ 361 0028 696E7400 		.ascii	"int\000"
+ 362 002c 03       		.uleb128 0x3
+ 363 002d 04       		.byte	0x4
+ 364 002e 07       		.byte	0x7
+ 365 002f 1E030000 		.4byte	.LASF0
+ 366 0033 03       		.uleb128 0x3
+ 367 0034 01       		.byte	0x1
+ 368 0035 06       		.byte	0x6
+ 369 0036 31000000 		.4byte	.LASF1
+ 370 003a 04       		.uleb128 0x4
+ 371 003b 3D000000 		.4byte	.LASF4
+ 372 003f 02       		.byte	0x2
+ 373 0040 1D       		.byte	0x1d
+ 374 0041 45000000 		.4byte	0x45
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 11
+
+
+ 375 0045 03       		.uleb128 0x3
+ 376 0046 01       		.byte	0x1
+ 377 0047 08       		.byte	0x8
+ 378 0048 04060000 		.4byte	.LASF2
+ 379 004c 03       		.uleb128 0x3
+ 380 004d 02       		.byte	0x2
+ 381 004e 05       		.byte	0x5
+ 382 004f 33060000 		.4byte	.LASF3
+ 383 0053 04       		.uleb128 0x4
+ 384 0054 E2060000 		.4byte	.LASF5
+ 385 0058 02       		.byte	0x2
+ 386 0059 2B       		.byte	0x2b
+ 387 005a 5E000000 		.4byte	0x5e
+ 388 005e 03       		.uleb128 0x3
+ 389 005f 02       		.byte	0x2
+ 390 0060 07       		.byte	0x7
+ 391 0061 BA030000 		.4byte	.LASF6
+ 392 0065 04       		.uleb128 0x4
+ 393 0066 4B040000 		.4byte	.LASF7
+ 394 006a 02       		.byte	0x2
+ 395 006b 3F       		.byte	0x3f
+ 396 006c 70000000 		.4byte	0x70
+ 397 0070 03       		.uleb128 0x3
+ 398 0071 04       		.byte	0x4
+ 399 0072 05       		.byte	0x5
+ 400 0073 7D010000 		.4byte	.LASF8
+ 401 0077 04       		.uleb128 0x4
+ 402 0078 54020000 		.4byte	.LASF9
+ 403 007c 02       		.byte	0x2
+ 404 007d 41       		.byte	0x41
+ 405 007e 82000000 		.4byte	0x82
+ 406 0082 03       		.uleb128 0x3
+ 407 0083 04       		.byte	0x4
+ 408 0084 07       		.byte	0x7
+ 409 0085 5F030000 		.4byte	.LASF10
+ 410 0089 03       		.uleb128 0x3
+ 411 008a 08       		.byte	0x8
+ 412 008b 05       		.byte	0x5
+ 413 008c 27010000 		.4byte	.LASF11
+ 414 0090 03       		.uleb128 0x3
+ 415 0091 08       		.byte	0x8
+ 416 0092 07       		.byte	0x7
+ 417 0093 CD000000 		.4byte	.LASF12
+ 418 0097 03       		.uleb128 0x3
+ 419 0098 04       		.byte	0x4
+ 420 0099 07       		.byte	0x7
+ 421 009a 9F040000 		.4byte	.LASF13
+ 422 009e 05       		.uleb128 0x5
+ 423 009f 04       		.byte	0x4
+ 424 00a0 03       		.uleb128 0x3
+ 425 00a1 01       		.byte	0x1
+ 426 00a2 08       		.byte	0x8
+ 427 00a3 B8060000 		.4byte	.LASF14
+ 428 00a7 04       		.uleb128 0x4
+ 429 00a8 98070000 		.4byte	.LASF15
+ 430 00ac 03       		.byte	0x3
+ 431 00ad 18       		.byte	0x18
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 12
+
+
+ 432 00ae 3A000000 		.4byte	0x3a
+ 433 00b2 04       		.uleb128 0x4
+ 434 00b3 E0010000 		.4byte	.LASF16
+ 435 00b7 03       		.byte	0x3
+ 436 00b8 24       		.byte	0x24
+ 437 00b9 53000000 		.4byte	0x53
+ 438 00bd 04       		.uleb128 0x4
+ 439 00be FC050000 		.4byte	.LASF17
+ 440 00c2 03       		.byte	0x3
+ 441 00c3 2C       		.byte	0x2c
+ 442 00c4 65000000 		.4byte	0x65
+ 443 00c8 04       		.uleb128 0x4
+ 444 00c9 9D060000 		.4byte	.LASF18
+ 445 00cd 03       		.byte	0x3
+ 446 00ce 30       		.byte	0x30
+ 447 00cf 77000000 		.4byte	0x77
+ 448 00d3 06       		.uleb128 0x6
+ 449 00d4 DA010000 		.4byte	.LASF19
+ 450 00d8 04       		.byte	0x4
+ 451 00d9 9201     		.2byte	0x192
+ 452 00db 45000000 		.4byte	0x45
+ 453 00df 06       		.uleb128 0x6
+ 454 00e0 12060000 		.4byte	.LASF20
+ 455 00e4 04       		.byte	0x4
+ 456 00e5 9301     		.2byte	0x193
+ 457 00e7 5E000000 		.4byte	0x5e
+ 458 00eb 03       		.uleb128 0x3
+ 459 00ec 04       		.byte	0x4
+ 460 00ed 04       		.byte	0x4
+ 461 00ee 67050000 		.4byte	.LASF21
+ 462 00f2 03       		.uleb128 0x3
+ 463 00f3 08       		.byte	0x8
+ 464 00f4 04       		.byte	0x4
+ 465 00f5 E9010000 		.4byte	.LASF22
+ 466 00f9 07       		.uleb128 0x7
+ 467 00fa D3000000 		.4byte	0xd3
+ 468 00fe 09010000 		.4byte	0x109
+ 469 0102 08       		.uleb128 0x8
+ 470 0103 97000000 		.4byte	0x97
+ 471 0107 3F       		.byte	0x3f
+ 472 0108 00       		.byte	0
+ 473 0109 04       		.uleb128 0x4
+ 474 010a F1040000 		.4byte	.LASF23
+ 475 010e 05       		.byte	0x5
+ 476 010f 3F       		.byte	0x3f
+ 477 0110 C8000000 		.4byte	0xc8
+ 478 0114 04       		.uleb128 0x4
+ 479 0115 3D060000 		.4byte	.LASF24
+ 480 0119 06       		.byte	0x6
+ 481 011a 4E       		.byte	0x4e
+ 482 011b 1F010000 		.4byte	0x11f
+ 483 011f 09       		.uleb128 0x9
+ 484 0120 04       		.byte	0x4
+ 485 0121 25010000 		.4byte	0x125
+ 486 0125 0A       		.uleb128 0xa
+ 487 0126 86010000 		.4byte	.LASF26
+ 488 012a 04       		.uleb128 0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 13
+
+
+ 489 012b 00010000 		.4byte	.LASF25
+ 490 012f 07       		.byte	0x7
+ 491 0130 31       		.byte	0x31
+ 492 0131 35010000 		.4byte	0x135
+ 493 0135 09       		.uleb128 0x9
+ 494 0136 04       		.byte	0x4
+ 495 0137 3B010000 		.4byte	0x13b
+ 496 013b 0A       		.uleb128 0xa
+ 497 013c E1050000 		.4byte	.LASF27
+ 498 0140 04       		.uleb128 0x4
+ 499 0141 A6060000 		.4byte	.LASF28
+ 500 0145 08       		.byte	0x8
+ 501 0146 24       		.byte	0x24
+ 502 0147 2A010000 		.4byte	0x12a
+ 503 014b 04       		.uleb128 0x4
+ 504 014c A5030000 		.4byte	.LASF29
+ 505 0150 09       		.byte	0x9
+ 506 0151 46       		.byte	0x46
+ 507 0152 56010000 		.4byte	0x156
+ 508 0156 09       		.uleb128 0x9
+ 509 0157 04       		.byte	0x4
+ 510 0158 5C010000 		.4byte	0x15c
+ 511 015c 0A       		.uleb128 0xa
+ 512 015d 4D030000 		.4byte	.LASF30
+ 513 0161 04       		.uleb128 0x4
+ 514 0162 F8020000 		.4byte	.LASF31
+ 515 0166 0A       		.byte	0xa
+ 516 0167 56       		.byte	0x56
+ 517 0168 6C010000 		.4byte	0x16c
+ 518 016c 0B       		.uleb128 0xb
+ 519 016d 57060000 		.4byte	.LASF39
+ 520 0171 14       		.byte	0x14
+ 521 0172 0A       		.byte	0xa
+ 522 0173 57       		.byte	0x57
+ 523 0174 D7010000 		.4byte	0x1d7
+ 524 0178 0C       		.uleb128 0xc
+ 525 0179 61000000 		.4byte	.LASF32
+ 526 017d 0A       		.byte	0xa
+ 527 017e 58       		.byte	0x58
+ 528 017f A7000000 		.4byte	0xa7
+ 529 0183 00       		.byte	0
+ 530 0184 0D       		.uleb128 0xd
+ 531 0185 6E756D00 		.ascii	"num\000"
+ 532 0189 0A       		.byte	0xa
+ 533 018a 59       		.byte	0x59
+ 534 018b A7000000 		.4byte	0xa7
+ 535 018f 01       		.byte	0x1
+ 536 0190 0C       		.uleb128 0xc
+ 537 0191 FE070000 		.4byte	.LASF33
+ 538 0195 0A       		.byte	0xa
+ 539 0196 5A       		.byte	0x5a
+ 540 0197 A7000000 		.4byte	0xa7
+ 541 019b 02       		.byte	0x2
+ 542 019c 0C       		.uleb128 0xc
+ 543 019d A0070000 		.4byte	.LASF34
+ 544 01a1 0A       		.byte	0xa
+ 545 01a2 5B       		.byte	0x5b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 14
+
+
+ 546 01a3 A7000000 		.4byte	0xa7
+ 547 01a7 03       		.byte	0x3
+ 548 01a8 0D       		.uleb128 0xd
+ 549 01a9 747800   		.ascii	"tx\000"
+ 550 01ac 0A       		.byte	0xa
+ 551 01ad 5C       		.byte	0x5c
+ 552 01ae 4B010000 		.4byte	0x14b
+ 553 01b2 04       		.byte	0x4
+ 554 01b3 0D       		.uleb128 0xd
+ 555 01b4 727800   		.ascii	"rx\000"
+ 556 01b7 0A       		.byte	0xa
+ 557 01b8 5D       		.byte	0x5d
+ 558 01b9 4B010000 		.4byte	0x14b
+ 559 01bd 08       		.byte	0x8
+ 560 01be 0C       		.uleb128 0xc
+ 561 01bf 72010000 		.4byte	.LASF35
+ 562 01c3 0A       		.byte	0xa
+ 563 01c4 5E       		.byte	0x5e
+ 564 01c5 40010000 		.4byte	0x140
+ 565 01c9 0C       		.byte	0xc
+ 566 01ca 0C       		.uleb128 0xc
+ 567 01cb 5F040000 		.4byte	.LASF36
+ 568 01cf 0A       		.byte	0xa
+ 569 01d0 5F       		.byte	0x5f
+ 570 01d1 14010000 		.4byte	0x114
+ 571 01d5 10       		.byte	0x10
+ 572 01d6 00       		.byte	0
+ 573 01d7 04       		.uleb128 0x4
+ 574 01d8 71030000 		.4byte	.LASF37
+ 575 01dc 0B       		.byte	0xb
+ 576 01dd 4E       		.byte	0x4e
+ 577 01de E2010000 		.4byte	0x1e2
+ 578 01e2 09       		.uleb128 0x9
+ 579 01e3 04       		.byte	0x4
+ 580 01e4 E8010000 		.4byte	0x1e8
+ 581 01e8 0A       		.uleb128 0xa
+ 582 01e9 78000000 		.4byte	.LASF38
+ 583 01ed 0B       		.uleb128 0xb
+ 584 01ee 10030000 		.4byte	.LASF40
+ 585 01f2 7C       		.byte	0x7c
+ 586 01f3 0C       		.byte	0xc
+ 587 01f4 4B       		.byte	0x4b
+ 588 01f5 9A040000 		.4byte	0x49a
+ 589 01f9 0C       		.uleb128 0xc
+ 590 01fa 40050000 		.4byte	.LASF41
+ 591 01fe 0C       		.byte	0xc
+ 592 01ff 4C       		.byte	0x4c
+ 593 0200 A7000000 		.4byte	0xa7
+ 594 0204 00       		.byte	0
+ 595 0205 0C       		.uleb128 0xc
+ 596 0206 BE010000 		.4byte	.LASF42
+ 597 020a 0C       		.byte	0xc
+ 598 020b 4D       		.byte	0x4d
+ 599 020c B2000000 		.4byte	0xb2
+ 600 0210 02       		.byte	0x2
+ 601 0211 0C       		.uleb128 0xc
+ 602 0212 AA050000 		.4byte	.LASF43
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 15
+
+
+ 603 0216 0C       		.byte	0xc
+ 604 0217 4E       		.byte	0x4e
+ 605 0218 B2000000 		.4byte	0xb2
+ 606 021c 04       		.byte	0x4
+ 607 021d 0C       		.uleb128 0xc
+ 608 021e ED060000 		.4byte	.LASF44
+ 609 0222 0C       		.byte	0xc
+ 610 0223 4F       		.byte	0x4f
+ 611 0224 B2000000 		.4byte	0xb2
+ 612 0228 06       		.byte	0x6
+ 613 0229 0C       		.uleb128 0xc
+ 614 022a 72070000 		.4byte	.LASF45
+ 615 022e 0C       		.byte	0xc
+ 616 022f 50       		.byte	0x50
+ 617 0230 B2000000 		.4byte	0xb2
+ 618 0234 08       		.byte	0x8
+ 619 0235 0C       		.uleb128 0xc
+ 620 0236 E4000000 		.4byte	.LASF46
+ 621 023a 0C       		.byte	0xc
+ 622 023b 51       		.byte	0x51
+ 623 023c B2000000 		.4byte	0xb2
+ 624 0240 0A       		.byte	0xa
+ 625 0241 0C       		.uleb128 0xc
+ 626 0242 01030000 		.4byte	.LASF47
+ 627 0246 0C       		.byte	0xc
+ 628 0247 52       		.byte	0x52
+ 629 0248 B2000000 		.4byte	0xb2
+ 630 024c 0C       		.byte	0xc
+ 631 024d 0C       		.uleb128 0xc
+ 632 024e 9A050000 		.4byte	.LASF48
+ 633 0252 0C       		.byte	0xc
+ 634 0253 53       		.byte	0x53
+ 635 0254 B2000000 		.4byte	0xb2
+ 636 0258 0E       		.byte	0xe
+ 637 0259 0C       		.uleb128 0xc
+ 638 025a 91030000 		.4byte	.LASF49
+ 639 025e 0C       		.byte	0xc
+ 640 025f 54       		.byte	0x54
+ 641 0260 A7000000 		.4byte	0xa7
+ 642 0264 10       		.byte	0x10
+ 643 0265 0C       		.uleb128 0xc
+ 644 0266 4B080000 		.4byte	.LASF50
+ 645 026a 0C       		.byte	0xc
+ 646 026b 55       		.byte	0x55
+ 647 026c A7000000 		.4byte	0xa7
+ 648 0270 11       		.byte	0x11
+ 649 0271 0C       		.uleb128 0xc
+ 650 0272 15070000 		.4byte	.LASF51
+ 651 0276 0C       		.byte	0xc
+ 652 0277 56       		.byte	0x56
+ 653 0278 B2000000 		.4byte	0xb2
+ 654 027c 12       		.byte	0x12
+ 655 027d 0C       		.uleb128 0xc
+ 656 027e 9B030000 		.4byte	.LASF52
+ 657 0282 0C       		.byte	0xc
+ 658 0283 57       		.byte	0x57
+ 659 0284 B2000000 		.4byte	0xb2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 16
+
+
+ 660 0288 14       		.byte	0x14
+ 661 0289 0C       		.uleb128 0xc
+ 662 028a 88060000 		.4byte	.LASF53
+ 663 028e 0C       		.byte	0xc
+ 664 028f 58       		.byte	0x58
+ 665 0290 B2000000 		.4byte	0xb2
+ 666 0294 16       		.byte	0x16
+ 667 0295 0C       		.uleb128 0xc
+ 668 0296 6D050000 		.4byte	.LASF54
+ 669 029a 0C       		.byte	0xc
+ 670 029b 59       		.byte	0x59
+ 671 029c B2000000 		.4byte	0xb2
+ 672 02a0 18       		.byte	0x18
+ 673 02a1 0C       		.uleb128 0xc
+ 674 02a2 D2070000 		.4byte	.LASF55
+ 675 02a6 0C       		.byte	0xc
+ 676 02a7 5A       		.byte	0x5a
+ 677 02a8 B2000000 		.4byte	0xb2
+ 678 02ac 1A       		.byte	0x1a
+ 679 02ad 0C       		.uleb128 0xc
+ 680 02ae 76060000 		.4byte	.LASF56
+ 681 02b2 0C       		.byte	0xc
+ 682 02b3 5B       		.byte	0x5b
+ 683 02b4 B2000000 		.4byte	0xb2
+ 684 02b8 1C       		.byte	0x1c
+ 685 02b9 0C       		.uleb128 0xc
+ 686 02ba 08080000 		.4byte	.LASF57
+ 687 02be 0C       		.byte	0xc
+ 688 02bf 5C       		.byte	0x5c
+ 689 02c0 A7000000 		.4byte	0xa7
+ 690 02c4 1E       		.byte	0x1e
+ 691 02c5 0C       		.uleb128 0xc
+ 692 02c6 7C040000 		.4byte	.LASF58
+ 693 02ca 0C       		.byte	0xc
+ 694 02cb 5D       		.byte	0x5d
+ 695 02cc B2000000 		.4byte	0xb2
+ 696 02d0 20       		.byte	0x20
+ 697 02d1 0C       		.uleb128 0xc
+ 698 02d2 46070000 		.4byte	.LASF59
+ 699 02d6 0C       		.byte	0xc
+ 700 02d7 5E       		.byte	0x5e
+ 701 02d8 B2000000 		.4byte	0xb2
+ 702 02dc 22       		.byte	0x22
+ 703 02dd 0C       		.uleb128 0xc
+ 704 02de B6040000 		.4byte	.LASF60
+ 705 02e2 0C       		.byte	0xc
+ 706 02e3 5F       		.byte	0x5f
+ 707 02e4 B2000000 		.4byte	0xb2
+ 708 02e8 24       		.byte	0x24
+ 709 02e9 0C       		.uleb128 0xc
+ 710 02ea 28020000 		.4byte	.LASF61
+ 711 02ee 0C       		.byte	0xc
+ 712 02ef 60       		.byte	0x60
+ 713 02f0 B2000000 		.4byte	0xb2
+ 714 02f4 26       		.byte	0x26
+ 715 02f5 0C       		.uleb128 0xc
+ 716 02f6 0C020000 		.4byte	.LASF62
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 17
+
+
+ 717 02fa 0C       		.byte	0xc
+ 718 02fb 61       		.byte	0x61
+ 719 02fc B2000000 		.4byte	0xb2
+ 720 0300 28       		.byte	0x28
+ 721 0301 0C       		.uleb128 0xc
+ 722 0302 53000000 		.4byte	.LASF63
+ 723 0306 0C       		.byte	0xc
+ 724 0307 62       		.byte	0x62
+ 725 0308 A7000000 		.4byte	0xa7
+ 726 030c 2A       		.byte	0x2a
+ 727 030d 0C       		.uleb128 0xc
+ 728 030e F3070000 		.4byte	.LASF64
+ 729 0312 0C       		.byte	0xc
+ 730 0313 63       		.byte	0x63
+ 731 0314 EB000000 		.4byte	0xeb
+ 732 0318 2C       		.byte	0x2c
+ 733 0319 0C       		.uleb128 0xc
+ 734 031a DC070000 		.4byte	.LASF65
+ 735 031e 0C       		.byte	0xc
+ 736 031f 64       		.byte	0x64
+ 737 0320 EB000000 		.4byte	0xeb
+ 738 0324 30       		.byte	0x30
+ 739 0325 0C       		.uleb128 0xc
+ 740 0326 F1050000 		.4byte	.LASF66
+ 741 032a 0C       		.byte	0xc
+ 742 032b 65       		.byte	0x65
+ 743 032c A7000000 		.4byte	0xa7
+ 744 0330 34       		.byte	0x34
+ 745 0331 0C       		.uleb128 0xc
+ 746 0332 93060000 		.4byte	.LASF67
+ 747 0336 0C       		.byte	0xc
+ 748 0337 66       		.byte	0x66
+ 749 0338 A7000000 		.4byte	0xa7
+ 750 033c 35       		.byte	0x35
+ 751 033d 0C       		.uleb128 0xc
+ 752 033e CF010000 		.4byte	.LASF68
+ 753 0342 0C       		.byte	0xc
+ 754 0343 67       		.byte	0x67
+ 755 0344 A7000000 		.4byte	0xa7
+ 756 0348 36       		.byte	0x36
+ 757 0349 0C       		.uleb128 0xc
+ 758 034a BA050000 		.4byte	.LASF69
+ 759 034e 0C       		.byte	0xc
+ 760 034f 68       		.byte	0x68
+ 761 0350 9A040000 		.4byte	0x49a
+ 762 0354 37       		.byte	0x37
+ 763 0355 0C       		.uleb128 0xc
+ 764 0356 28000000 		.4byte	.LASF70
+ 765 035a 0C       		.byte	0xc
+ 766 035b 69       		.byte	0x69
+ 767 035c C8000000 		.4byte	0xc8
+ 768 0360 48       		.byte	0x48
+ 769 0361 0C       		.uleb128 0xc
+ 770 0362 A8010000 		.4byte	.LASF71
+ 771 0366 0C       		.byte	0xc
+ 772 0367 6A       		.byte	0x6a
+ 773 0368 A7000000 		.4byte	0xa7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 18
+
+
+ 774 036c 4C       		.byte	0x4c
+ 775 036d 0C       		.uleb128 0xc
+ 776 036e 00020000 		.4byte	.LASF72
+ 777 0372 0C       		.byte	0xc
+ 778 0373 6B       		.byte	0x6b
+ 779 0374 B2000000 		.4byte	0xb2
+ 780 0378 4E       		.byte	0x4e
+ 781 0379 0C       		.uleb128 0xc
+ 782 037a C2060000 		.4byte	.LASF73
+ 783 037e 0C       		.byte	0xc
+ 784 037f 6C       		.byte	0x6c
+ 785 0380 B2000000 		.4byte	0xb2
+ 786 0384 50       		.byte	0x50
+ 787 0385 0C       		.uleb128 0xc
+ 788 0386 5C050000 		.4byte	.LASF74
+ 789 038a 0C       		.byte	0xc
+ 790 038b 6D       		.byte	0x6d
+ 791 038c B2000000 		.4byte	0xb2
+ 792 0390 52       		.byte	0x52
+ 793 0391 0C       		.uleb128 0xc
+ 794 0392 1F070000 		.4byte	.LASF75
+ 795 0396 0C       		.byte	0xc
+ 796 0397 6E       		.byte	0x6e
+ 797 0398 C8000000 		.4byte	0xc8
+ 798 039c 54       		.byte	0x54
+ 799 039d 0C       		.uleb128 0xc
+ 800 039e E7070000 		.4byte	.LASF76
+ 801 03a2 0C       		.byte	0xc
+ 802 03a3 6F       		.byte	0x6f
+ 803 03a4 B2000000 		.4byte	0xb2
+ 804 03a8 58       		.byte	0x58
+ 805 03a9 0C       		.uleb128 0xc
+ 806 03aa 20040000 		.4byte	.LASF77
+ 807 03ae 0C       		.byte	0xc
+ 808 03af 70       		.byte	0x70
+ 809 03b0 A7000000 		.4byte	0xa7
+ 810 03b4 5A       		.byte	0x5a
+ 811 03b5 0C       		.uleb128 0xc
+ 812 03b6 F0010000 		.4byte	.LASF78
+ 813 03ba 0C       		.byte	0xc
+ 814 03bb 71       		.byte	0x71
+ 815 03bc A7000000 		.4byte	0xa7
+ 816 03c0 5B       		.byte	0x5b
+ 817 03c1 0C       		.uleb128 0xc
+ 818 03c2 EA040000 		.4byte	.LASF79
+ 819 03c6 0C       		.byte	0xc
+ 820 03c7 72       		.byte	0x72
+ 821 03c8 A7000000 		.4byte	0xa7
+ 822 03cc 5C       		.byte	0x5c
+ 823 03cd 0C       		.uleb128 0xc
+ 824 03ce 0C040000 		.4byte	.LASF80
+ 825 03d2 0C       		.byte	0xc
+ 826 03d3 73       		.byte	0x73
+ 827 03d4 A7000000 		.4byte	0xa7
+ 828 03d8 5D       		.byte	0x5d
+ 829 03d9 0C       		.uleb128 0xc
+ 830 03da 25070000 		.4byte	.LASF81
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 19
+
+
+ 831 03de 0C       		.byte	0xc
+ 832 03df 74       		.byte	0x74
+ 833 03e0 B2000000 		.4byte	0xb2
+ 834 03e4 5E       		.byte	0x5e
+ 835 03e5 0C       		.uleb128 0xc
+ 836 03e6 B4050000 		.4byte	.LASF82
+ 837 03ea 0C       		.byte	0xc
+ 838 03eb 75       		.byte	0x75
+ 839 03ec B2000000 		.4byte	0xb2
+ 840 03f0 60       		.byte	0x60
+ 841 03f1 0C       		.uleb128 0xc
+ 842 03f2 CD030000 		.4byte	.LASF83
+ 843 03f6 0C       		.byte	0xc
+ 844 03f7 76       		.byte	0x76
+ 845 03f8 B2000000 		.4byte	0xb2
+ 846 03fc 62       		.byte	0x62
+ 847 03fd 0C       		.uleb128 0xc
+ 848 03fe 09070000 		.4byte	.LASF84
+ 849 0402 0C       		.byte	0xc
+ 850 0403 77       		.byte	0x77
+ 851 0404 B2000000 		.4byte	0xb2
+ 852 0408 64       		.byte	0x64
+ 853 0409 0C       		.uleb128 0xc
+ 854 040a 33070000 		.4byte	.LASF85
+ 855 040e 0C       		.byte	0xc
+ 856 040f 78       		.byte	0x78
+ 857 0410 A7000000 		.4byte	0xa7
+ 858 0414 66       		.byte	0x66
+ 859 0415 0C       		.uleb128 0xc
+ 860 0416 1B010000 		.4byte	.LASF86
+ 861 041a 0C       		.byte	0xc
+ 862 041b 79       		.byte	0x79
+ 863 041c B2000000 		.4byte	0xb2
+ 864 0420 68       		.byte	0x68
+ 865 0421 0C       		.uleb128 0xc
+ 866 0422 81060000 		.4byte	.LASF87
+ 867 0426 0C       		.byte	0xc
+ 868 0427 7A       		.byte	0x7a
+ 869 0428 EB000000 		.4byte	0xeb
+ 870 042c 6C       		.byte	0x6c
+ 871 042d 0C       		.uleb128 0xc
+ 872 042e 55080000 		.4byte	.LASF88
+ 873 0432 0C       		.byte	0xc
+ 874 0433 7B       		.byte	0x7b
+ 875 0434 A7000000 		.4byte	0xa7
+ 876 0438 70       		.byte	0x70
+ 877 0439 0C       		.uleb128 0xc
+ 878 043a 29060000 		.4byte	.LASF89
+ 879 043e 0C       		.byte	0xc
+ 880 043f 7C       		.byte	0x7c
+ 881 0440 A7000000 		.4byte	0xa7
+ 882 0444 71       		.byte	0x71
+ 883 0445 0C       		.uleb128 0xc
+ 884 0446 3E030000 		.4byte	.LASF90
+ 885 044a 0C       		.byte	0xc
+ 886 044b 7D       		.byte	0x7d
+ 887 044c A7000000 		.4byte	0xa7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 20
+
+
+ 888 0450 72       		.byte	0x72
+ 889 0451 0C       		.uleb128 0xc
+ 890 0452 17050000 		.4byte	.LASF91
+ 891 0456 0C       		.byte	0xc
+ 892 0457 7F       		.byte	0x7f
+ 893 0458 A7000000 		.4byte	0xa7
+ 894 045c 73       		.byte	0x73
+ 895 045d 0C       		.uleb128 0xc
+ 896 045e F8060000 		.4byte	.LASF92
+ 897 0462 0C       		.byte	0xc
+ 898 0463 81       		.byte	0x81
+ 899 0464 A7000000 		.4byte	0xa7
+ 900 0468 74       		.byte	0x74
+ 901 0469 0C       		.uleb128 0xc
+ 902 046a 49050000 		.4byte	.LASF93
+ 903 046e 0C       		.byte	0xc
+ 904 046f 82       		.byte	0x82
+ 905 0470 A7000000 		.4byte	0xa7
+ 906 0474 75       		.byte	0x75
+ 907 0475 0C       		.uleb128 0xc
+ 908 0476 35010000 		.4byte	.LASF94
+ 909 047a 0C       		.byte	0xc
+ 910 047b 83       		.byte	0x83
+ 911 047c A7000000 		.4byte	0xa7
+ 912 0480 76       		.byte	0x76
+ 913 0481 0C       		.uleb128 0xc
+ 914 0482 C5040000 		.4byte	.LASF95
+ 915 0486 0C       		.byte	0xc
+ 916 0487 84       		.byte	0x84
+ 917 0488 A7000000 		.4byte	0xa7
+ 918 048c 77       		.byte	0x77
+ 919 048d 0C       		.uleb128 0xc
+ 920 048e B1010000 		.4byte	.LASF96
+ 921 0492 0C       		.byte	0xc
+ 922 0493 86       		.byte	0x86
+ 923 0494 EB000000 		.4byte	0xeb
+ 924 0498 78       		.byte	0x78
+ 925 0499 00       		.byte	0
+ 926 049a 07       		.uleb128 0x7
+ 927 049b A0000000 		.4byte	0xa0
+ 928 049f AA040000 		.4byte	0x4aa
+ 929 04a3 08       		.uleb128 0x8
+ 930 04a4 97000000 		.4byte	0x97
+ 931 04a8 0F       		.byte	0xf
+ 932 04a9 00       		.byte	0
+ 933 04aa 04       		.uleb128 0x4
+ 934 04ab 3B070000 		.4byte	.LASF97
+ 935 04af 0C       		.byte	0xc
+ 936 04b0 88       		.byte	0x88
+ 937 04b1 ED010000 		.4byte	0x1ed
+ 938 04b5 0E       		.uleb128 0xe
+ 939 04b6 44020000 		.4byte	.LASF100
+ 940 04ba 01       		.byte	0x1
+ 941 04bb 45000000 		.4byte	0x45
+ 942 04bf 0D       		.byte	0xd
+ 943 04c0 38       		.byte	0x38
+ 944 04c1 D2040000 		.4byte	0x4d2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 21
+
+
+ 945 04c5 0F       		.uleb128 0xf
+ 946 04c6 70040000 		.4byte	.LASF98
+ 947 04ca 00       		.byte	0
+ 948 04cb 0F       		.uleb128 0xf
+ 949 04cc 4A060000 		.4byte	.LASF99
+ 950 04d0 01       		.byte	0x1
+ 951 04d1 00       		.byte	0
+ 952 04d2 0E       		.uleb128 0xe
+ 953 04d3 3A040000 		.4byte	.LASF101
+ 954 04d7 01       		.byte	0x1
+ 955 04d8 45000000 		.4byte	0x45
+ 956 04dc 0D       		.byte	0xd
+ 957 04dd 3D       		.byte	0x3d
+ 958 04de F5040000 		.4byte	0x4f5
+ 959 04e2 0F       		.uleb128 0xf
+ 960 04e3 09050000 		.4byte	.LASF102
+ 961 04e7 00       		.byte	0
+ 962 04e8 0F       		.uleb128 0xf
+ 963 04e9 65070000 		.4byte	.LASF103
+ 964 04ed 01       		.byte	0x1
+ 965 04ee 0F       		.uleb128 0xf
+ 966 04ef 66000000 		.4byte	.LASF104
+ 967 04f3 02       		.byte	0x2
+ 968 04f4 00       		.byte	0
+ 969 04f5 0E       		.uleb128 0xe
+ 970 04f6 53070000 		.4byte	.LASF105
+ 971 04fa 01       		.byte	0x1
+ 972 04fb 45000000 		.4byte	0x45
+ 973 04ff 0D       		.byte	0xd
+ 974 0500 43       		.byte	0x43
+ 975 0501 12050000 		.4byte	0x512
+ 976 0505 0F       		.uleb128 0xf
+ 977 0506 C2050000 		.4byte	.LASF106
+ 978 050a 00       		.byte	0
+ 979 050b 0F       		.uleb128 0xf
+ 980 050c 55040000 		.4byte	.LASF107
+ 981 0510 01       		.byte	0x1
+ 982 0511 00       		.byte	0
+ 983 0512 0E       		.uleb128 0xe
+ 984 0513 88040000 		.4byte	.LASF108
+ 985 0517 01       		.byte	0x1
+ 986 0518 45000000 		.4byte	0x45
+ 987 051c 0D       		.byte	0xd
+ 988 051d 49       		.byte	0x49
+ 989 051e 2F050000 		.4byte	0x52f
+ 990 0522 0F       		.uleb128 0xf
+ 991 0523 B1070000 		.4byte	.LASF109
+ 992 0527 00       		.byte	0
+ 993 0528 0F       		.uleb128 0xf
+ 994 0529 48010000 		.4byte	.LASF110
+ 995 052d 01       		.byte	0x1
+ 996 052e 00       		.byte	0
+ 997 052f 10       		.uleb128 0x10
+ 998 0530 0C       		.byte	0xc
+ 999 0531 0D       		.byte	0xd
+ 1000 0532 4E       		.byte	0x4e
+ 1001 0533 8B050000 		.4byte	0x58b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 22
+
+
+ 1002 0537 0D       		.uleb128 0xd
+ 1003 0538 707700   		.ascii	"pw\000"
+ 1004 053b 0D       		.byte	0xd
+ 1005 053c 50       		.byte	0x50
+ 1006 053d B2000000 		.4byte	0xb2
+ 1007 0541 00       		.byte	0
+ 1008 0542 0D       		.uleb128 0xd
+ 1009 0543 70726400 		.ascii	"prd\000"
+ 1010 0547 0D       		.byte	0xd
+ 1011 0548 51       		.byte	0x51
+ 1012 0549 B2000000 		.4byte	0xb2
+ 1013 054d 02       		.byte	0x2
+ 1014 054e 0C       		.uleb128 0xc
+ 1015 054f BD060000 		.4byte	.LASF111
+ 1016 0553 0D       		.byte	0xd
+ 1017 0554 52       		.byte	0x52
+ 1018 0555 D2040000 		.4byte	0x4d2
+ 1019 0559 04       		.byte	0x4
+ 1020 055a 0C       		.uleb128 0xc
+ 1021 055b 47000000 		.4byte	.LASF112
+ 1022 055f 0D       		.byte	0xd
+ 1023 0560 53       		.byte	0x53
+ 1024 0561 F5040000 		.4byte	0x4f5
+ 1025 0565 05       		.byte	0x5
+ 1026 0566 0D       		.uleb128 0xd
+ 1027 0567 6D6F6400 		.ascii	"mod\000"
+ 1028 056b 0D       		.byte	0xd
+ 1029 056c 54       		.byte	0x54
+ 1030 056d 12050000 		.4byte	0x512
+ 1031 0571 06       		.byte	0x6
+ 1032 0572 0C       		.uleb128 0xc
+ 1033 0573 37050000 		.4byte	.LASF113
+ 1034 0577 0D       		.byte	0xd
+ 1035 0578 55       		.byte	0x55
+ 1036 0579 B5040000 		.4byte	0x4b5
+ 1037 057d 07       		.byte	0x7
+ 1038 057e 0C       		.uleb128 0xc
+ 1039 057f 2A050000 		.4byte	.LASF114
+ 1040 0583 0D       		.byte	0xd
+ 1041 0584 56       		.byte	0x56
+ 1042 0585 D7010000 		.4byte	0x1d7
+ 1043 0589 08       		.byte	0x8
+ 1044 058a 00       		.byte	0
+ 1045 058b 04       		.uleb128 0x4
+ 1046 058c 88000000 		.4byte	.LASF115
+ 1047 0590 0D       		.byte	0xd
+ 1048 0591 57       		.byte	0x57
+ 1049 0592 2F050000 		.4byte	0x52f
+ 1050 0596 11       		.uleb128 0x11
+ 1051 0597 BD000000 		.4byte	0xbd
+ 1052 059b 12       		.uleb128 0x12
+ 1053 059c 19020000 		.4byte	.LASF147
+ 1054 05a0 01       		.byte	0x1
+ 1055 05a1 51       		.byte	0x51
+ 1056 05a2 01       		.byte	0x1
+ 1057 05a3 13       		.uleb128 0x13
+ 1058 05a4 9B000000 		.4byte	.LASF148
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 23
+
+
+ 1059 05a8 01       		.byte	0x1
+ 1060 05a9 5D       		.byte	0x5d
+ 1061 05aa 00000000 		.4byte	.LFB72
+ 1062 05ae E8000000 		.4byte	.LFE72-.LFB72
+ 1063 05b2 01       		.uleb128 0x1
+ 1064 05b3 9C       		.byte	0x9c
+ 1065 05b4 29070000 		.4byte	0x729
+ 1066 05b8 14       		.uleb128 0x14
+ 1067 05b9 F3000000 		.4byte	.LASF149
+ 1068 05bd 01       		.byte	0x1
+ 1069 05be 5D       		.byte	0x5d
+ 1070 05bf 9E000000 		.4byte	0x9e
+ 1071 05c3 00000000 		.4byte	.LLST0
+ 1072 05c7 15       		.uleb128 0x15
+ 1073 05c8 10000000 		.4byte	.LASF116
+ 1074 05cc 01       		.byte	0x1
+ 1075 05cd 5E       		.byte	0x5e
+ 1076 05ce DF000000 		.4byte	0xdf
+ 1077 05d2 21000000 		.4byte	.LLST1
+ 1078 05d6 16       		.uleb128 0x16
+ 1079 05d7 0E070000 		.4byte	.LASF117
+ 1080 05db 01       		.byte	0x1
+ 1081 05dc 5F       		.byte	0x5f
+ 1082 05dd F9000000 		.4byte	0xf9
+ 1083 05e1 03       		.uleb128 0x3
+ 1084 05e2 91       		.byte	0x91
+ 1085 05e3 A87F     		.sleb128 -88
+ 1086 05e5 17       		.uleb128 0x17
+ 1087 05e6 10000000 		.4byte	.LVL2
+ 1088 05ea 3A080000 		.4byte	0x83a
+ 1089 05ee 09060000 		.4byte	0x609
+ 1090 05f2 18       		.uleb128 0x18
+ 1091 05f3 01       		.uleb128 0x1
+ 1092 05f4 50       		.byte	0x50
+ 1093 05f5 01       		.uleb128 0x1
+ 1094 05f6 30       		.byte	0x30
+ 1095 05f7 18       		.uleb128 0x18
+ 1096 05f8 01       		.uleb128 0x1
+ 1097 05f9 51       		.byte	0x51
+ 1098 05fa 05       		.uleb128 0x5
+ 1099 05fb 03       		.byte	0x3
+ 1100 05fc 00000000 		.4byte	.LC0
+ 1101 0600 18       		.uleb128 0x18
+ 1102 0601 01       		.uleb128 0x1
+ 1103 0602 52       		.byte	0x52
+ 1104 0603 04       		.uleb128 0x4
+ 1105 0604 40       		.byte	0x40
+ 1106 0605 4B       		.byte	0x4b
+ 1107 0606 24       		.byte	0x24
+ 1108 0607 1F       		.byte	0x1f
+ 1109 0608 00       		.byte	0
+ 1110 0609 19       		.uleb128 0x19
+ 1111 060a 1A000000 		.4byte	.LVL3
+ 1112 060e 45080000 		.4byte	0x845
+ 1113 0612 19       		.uleb128 0x19
+ 1114 0613 20000000 		.4byte	.LVL4
+ 1115 0617 51080000 		.4byte	0x851
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 24
+
+
+ 1116 061b 19       		.uleb128 0x19
+ 1117 061c 26000000 		.4byte	.LVL5
+ 1118 0620 5D080000 		.4byte	0x85d
+ 1119 0624 19       		.uleb128 0x19
+ 1120 0625 2A000000 		.4byte	.LVL6
+ 1121 0629 51080000 		.4byte	0x851
+ 1122 062d 19       		.uleb128 0x19
+ 1123 062e 32000000 		.4byte	.LVL7
+ 1124 0632 68080000 		.4byte	0x868
+ 1125 0636 17       		.uleb128 0x17
+ 1126 0637 3A000000 		.4byte	.LVL8
+ 1127 063b 73080000 		.4byte	0x873
+ 1128 063f 4A060000 		.4byte	0x64a
+ 1129 0643 18       		.uleb128 0x18
+ 1130 0644 01       		.uleb128 0x1
+ 1131 0645 50       		.byte	0x50
+ 1132 0646 02       		.uleb128 0x2
+ 1133 0647 7D       		.byte	0x7d
+ 1134 0648 00       		.sleb128 0
+ 1135 0649 00       		.byte	0
+ 1136 064a 19       		.uleb128 0x19
+ 1137 064b 4C000000 		.4byte	.LVL10
+ 1138 064f 7E080000 		.4byte	0x87e
+ 1139 0653 17       		.uleb128 0x17
+ 1140 0654 5E000000 		.4byte	.LVL11
+ 1141 0658 89080000 		.4byte	0x889
+ 1142 065c 72060000 		.4byte	0x672
+ 1143 0660 18       		.uleb128 0x18
+ 1144 0661 01       		.uleb128 0x1
+ 1145 0662 51       		.byte	0x51
+ 1146 0663 02       		.uleb128 0x2
+ 1147 0664 7D       		.byte	0x7d
+ 1148 0665 00       		.sleb128 0
+ 1149 0666 18       		.uleb128 0x18
+ 1150 0667 01       		.uleb128 0x1
+ 1151 0668 52       		.byte	0x52
+ 1152 0669 02       		.uleb128 0x2
+ 1153 066a 76       		.byte	0x76
+ 1154 066b 00       		.sleb128 0
+ 1155 066c 18       		.uleb128 0x18
+ 1156 066d 01       		.uleb128 0x1
+ 1157 066e 53       		.byte	0x53
+ 1158 066f 01       		.uleb128 0x1
+ 1159 0670 30       		.byte	0x30
+ 1160 0671 00       		.byte	0
+ 1161 0672 19       		.uleb128 0x19
+ 1162 0673 64000000 		.4byte	.LVL12
+ 1163 0677 95080000 		.4byte	0x895
+ 1164 067b 19       		.uleb128 0x19
+ 1165 067c 6A000000 		.4byte	.LVL14
+ 1166 0680 A1080000 		.4byte	0x8a1
+ 1167 0684 17       		.uleb128 0x17
+ 1168 0685 7C000000 		.4byte	.LVL15
+ 1169 0689 AC080000 		.4byte	0x8ac
+ 1170 068d A3060000 		.4byte	0x6a3
+ 1171 0691 18       		.uleb128 0x18
+ 1172 0692 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 25
+
+
+ 1173 0693 51       		.byte	0x51
+ 1174 0694 02       		.uleb128 0x2
+ 1175 0695 7D       		.byte	0x7d
+ 1176 0696 00       		.sleb128 0
+ 1177 0697 18       		.uleb128 0x18
+ 1178 0698 01       		.uleb128 0x1
+ 1179 0699 52       		.byte	0x52
+ 1180 069a 02       		.uleb128 0x2
+ 1181 069b 08       		.byte	0x8
+ 1182 069c 40       		.byte	0x40
+ 1183 069d 18       		.uleb128 0x18
+ 1184 069e 01       		.uleb128 0x1
+ 1185 069f 53       		.byte	0x53
+ 1186 06a0 01       		.uleb128 0x1
+ 1187 06a1 30       		.byte	0x30
+ 1188 06a2 00       		.byte	0
+ 1189 06a3 19       		.uleb128 0x19
+ 1190 06a4 8C000000 		.4byte	.LVL17
+ 1191 06a8 7E080000 		.4byte	0x87e
+ 1192 06ac 17       		.uleb128 0x17
+ 1193 06ad 9A000000 		.4byte	.LVL18
+ 1194 06b1 B8080000 		.4byte	0x8b8
+ 1195 06b5 C6060000 		.4byte	0x6c6
+ 1196 06b9 18       		.uleb128 0x18
+ 1197 06ba 01       		.uleb128 0x1
+ 1198 06bb 50       		.byte	0x50
+ 1199 06bc 02       		.uleb128 0x2
+ 1200 06bd 7D       		.byte	0x7d
+ 1201 06be 00       		.sleb128 0
+ 1202 06bf 18       		.uleb128 0x18
+ 1203 06c0 01       		.uleb128 0x1
+ 1204 06c1 51       		.byte	0x51
+ 1205 06c2 02       		.uleb128 0x2
+ 1206 06c3 76       		.byte	0x76
+ 1207 06c4 00       		.sleb128 0
+ 1208 06c5 00       		.byte	0
+ 1209 06c6 19       		.uleb128 0x19
+ 1210 06c7 A2000000 		.4byte	.LVL19
+ 1211 06cb A1080000 		.4byte	0x8a1
+ 1212 06cf 17       		.uleb128 0x17
+ 1213 06d0 AA000000 		.4byte	.LVL20
+ 1214 06d4 C3080000 		.4byte	0x8c3
+ 1215 06d8 E2060000 		.4byte	0x6e2
+ 1216 06dc 18       		.uleb128 0x18
+ 1217 06dd 01       		.uleb128 0x1
+ 1218 06de 50       		.byte	0x50
+ 1219 06df 01       		.uleb128 0x1
+ 1220 06e0 31       		.byte	0x31
+ 1221 06e1 00       		.byte	0
+ 1222 06e2 17       		.uleb128 0x17
+ 1223 06e3 B4000000 		.4byte	.LVL21
+ 1224 06e7 B8080000 		.4byte	0x8b8
+ 1225 06eb FA060000 		.4byte	0x6fa
+ 1226 06ef 18       		.uleb128 0x18
+ 1227 06f0 01       		.uleb128 0x1
+ 1228 06f1 50       		.byte	0x50
+ 1229 06f2 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 26
+
+
+ 1230 06f3 30       		.byte	0x30
+ 1231 06f4 18       		.uleb128 0x18
+ 1232 06f5 01       		.uleb128 0x1
+ 1233 06f6 51       		.byte	0x51
+ 1234 06f7 01       		.uleb128 0x1
+ 1235 06f8 30       		.byte	0x30
+ 1236 06f9 00       		.byte	0
+ 1237 06fa 19       		.uleb128 0x19
+ 1238 06fb BA000000 		.4byte	.LVL22
+ 1239 06ff 95080000 		.4byte	0x895
+ 1240 0703 17       		.uleb128 0x17
+ 1241 0704 C2000000 		.4byte	.LVL23
+ 1242 0708 C3080000 		.4byte	0x8c3
+ 1243 070c 16070000 		.4byte	0x716
+ 1244 0710 18       		.uleb128 0x18
+ 1245 0711 01       		.uleb128 0x1
+ 1246 0712 50       		.byte	0x50
+ 1247 0713 01       		.uleb128 0x1
+ 1248 0714 32       		.byte	0x32
+ 1249 0715 00       		.byte	0
+ 1250 0716 19       		.uleb128 0x19
+ 1251 0717 CA000000 		.4byte	.LVL24
+ 1252 071b 95080000 		.4byte	0x895
+ 1253 071f 19       		.uleb128 0x19
+ 1254 0720 D2000000 		.4byte	.LVL25
+ 1255 0724 A1080000 		.4byte	0x8a1
+ 1256 0728 00       		.byte	0
+ 1257 0729 1A       		.uleb128 0x1a
+ 1258 072a D5030000 		.4byte	.LASF118
+ 1259 072e 01       		.byte	0x1
+ 1260 072f 40       		.byte	0x40
+ 1261 0730 00000000 		.4byte	.LFB70
+ 1262 0734 44000000 		.4byte	.LFE70-.LFB70
+ 1263 0738 01       		.uleb128 0x1
+ 1264 0739 9C       		.byte	0x9c
+ 1265 073a 89070000 		.4byte	0x789
+ 1266 073e 17       		.uleb128 0x17
+ 1267 073f 0E000000 		.4byte	.LVL26
+ 1268 0743 CF080000 		.4byte	0x8cf
+ 1269 0747 51070000 		.4byte	0x751
+ 1270 074b 18       		.uleb128 0x18
+ 1271 074c 01       		.uleb128 0x1
+ 1272 074d 51       		.byte	0x51
+ 1273 074e 01       		.uleb128 0x1
+ 1274 074f 31       		.byte	0x31
+ 1275 0750 00       		.byte	0
+ 1276 0751 1B       		.uleb128 0x1b
+ 1277 0752 22000000 		.4byte	.LVL27
+ 1278 0756 DB080000 		.4byte	0x8db
+ 1279 075a 18       		.uleb128 0x18
+ 1280 075b 01       		.uleb128 0x1
+ 1281 075c 50       		.byte	0x50
+ 1282 075d 05       		.uleb128 0x5
+ 1283 075e 03       		.byte	0x3
+ 1284 075f 00000000 		.4byte	tsk_usb_Task
+ 1285 0763 18       		.uleb128 0x18
+ 1286 0764 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 27
+
+
+ 1287 0765 51       		.byte	0x51
+ 1288 0766 05       		.uleb128 0x5
+ 1289 0767 03       		.byte	0x3
+ 1290 0768 12000000 		.4byte	.LC1
+ 1291 076c 18       		.uleb128 0x18
+ 1292 076d 01       		.uleb128 0x1
+ 1293 076e 52       		.byte	0x52
+ 1294 076f 02       		.uleb128 0x2
+ 1295 0770 08       		.byte	0x8
+ 1296 0771 80       		.byte	0x80
+ 1297 0772 18       		.uleb128 0x18
+ 1298 0773 01       		.uleb128 0x1
+ 1299 0774 53       		.byte	0x53
+ 1300 0775 01       		.uleb128 0x1
+ 1301 0776 30       		.byte	0x30
+ 1302 0777 18       		.uleb128 0x18
+ 1303 0778 02       		.uleb128 0x2
+ 1304 0779 7D       		.byte	0x7d
+ 1305 077a 00       		.sleb128 0
+ 1306 077b 01       		.uleb128 0x1
+ 1307 077c 33       		.byte	0x33
+ 1308 077d 18       		.uleb128 0x18
+ 1309 077e 02       		.uleb128 0x2
+ 1310 077f 7D       		.byte	0x7d
+ 1311 0780 04       		.sleb128 4
+ 1312 0781 05       		.uleb128 0x5
+ 1313 0782 03       		.byte	0x3
+ 1314 0783 00000000 		.4byte	tsk_usb_TaskHandle
+ 1315 0787 00       		.byte	0
+ 1316 0788 00       		.byte	0
+ 1317 0789 1A       		.uleb128 0x1a
+ 1318 078a A8040000 		.4byte	.LASF119
+ 1319 078e 01       		.byte	0x1
+ 1320 078f 37       		.byte	0x37
+ 1321 0790 00000000 		.4byte	.LFB69
+ 1322 0794 14000000 		.4byte	.LFE69-.LFB69
+ 1323 0798 01       		.uleb128 0x1
+ 1324 0799 9C       		.byte	0x9c
+ 1325 079a A8070000 		.4byte	0x7a8
+ 1326 079e 1C       		.uleb128 0x1c
+ 1327 079f 0C000000 		.4byte	.LVL28
+ 1328 07a3 29070000 		.4byte	0x729
+ 1329 07a7 00       		.byte	0
+ 1330 07a8 1D       		.uleb128 0x1d
+ 1331 07a9 9B050000 		.4byte	0x59b
+ 1332 07ad 00000000 		.4byte	.LFB71
+ 1333 07b1 02000000 		.4byte	.LFE71-.LFB71
+ 1334 07b5 01       		.uleb128 0x1
+ 1335 07b6 9C       		.byte	0x9c
+ 1336 07b7 1E       		.uleb128 0x1e
+ 1337 07b8 7F030000 		.4byte	.LASF120
+ 1338 07bc 0E       		.byte	0xe
+ 1339 07bd D102     		.2byte	0x2d1
+ 1340 07bf D3000000 		.4byte	0xd3
+ 1341 07c3 1E       		.uleb128 0x1e
+ 1342 07c4 0E010000 		.4byte	.LASF121
+ 1343 07c8 0F       		.byte	0xf
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 28
+
+
+ 1344 07c9 1207     		.2byte	0x712
+ 1345 07cb 96050000 		.4byte	0x596
+ 1346 07cf 1F       		.uleb128 0x1f
+ 1347 07d0 37020000 		.4byte	.LASF122
+ 1348 07d4 01       		.byte	0x1
+ 1349 07d5 32       		.byte	0x32
+ 1350 07d6 C8000000 		.4byte	0xc8
+ 1351 07da 05       		.uleb128 0x5
+ 1352 07db 03       		.byte	0x3
+ 1353 07dc 00000000 		.4byte	usb_bytes_rx
+ 1354 07e0 1F       		.uleb128 0x1f
+ 1355 07e1 FC040000 		.4byte	.LASF123
+ 1356 07e5 01       		.byte	0x1
+ 1357 07e6 33       		.byte	0x33
+ 1358 07e7 C8000000 		.4byte	0xc8
+ 1359 07eb 05       		.uleb128 0x5
+ 1360 07ec 03       		.byte	0x3
+ 1361 07ed 00000000 		.4byte	usb_bytes_tx
+ 1362 07f1 20       		.uleb128 0x20
+ 1363 07f2 E2030000 		.4byte	.LASF124
+ 1364 07f6 0C       		.byte	0xc
+ 1365 07f7 A1       		.byte	0xa1
+ 1366 07f8 AA040000 		.4byte	0x4aa
+ 1367 07fc 1F       		.uleb128 0x1f
+ 1368 07fd 14040000 		.4byte	.LASF125
+ 1369 0801 0D       		.byte	0xd
+ 1370 0802 59       		.byte	0x59
+ 1371 0803 8B050000 		.4byte	0x58b
+ 1372 0807 05       		.uleb128 0x5
+ 1373 0808 03       		.byte	0x3
+ 1374 0809 00000000 		.4byte	interrupter
+ 1375 080d 20       		.uleb128 0x20
+ 1376 080e D9060000 		.4byte	.LASF126
+ 1377 0812 10       		.byte	0x10
+ 1378 0813 33       		.byte	0x33
+ 1379 0814 61010000 		.4byte	0x161
+ 1380 0818 1F       		.uleb128 0x1f
+ 1381 0819 00000000 		.4byte	.LASF127
+ 1382 081d 01       		.byte	0x1
+ 1383 081e 2F       		.byte	0x2f
+ 1384 081f D3000000 		.4byte	0xd3
+ 1385 0823 05       		.uleb128 0x5
+ 1386 0824 03       		.byte	0x3
+ 1387 0825 00000000 		.4byte	tsk_usb_initVar
+ 1388 0829 1F       		.uleb128 0x1f
+ 1389 082a 63060000 		.4byte	.LASF128
+ 1390 082e 01       		.byte	0x1
+ 1391 082f 30       		.byte	0x30
+ 1392 0830 14010000 		.4byte	0x114
+ 1393 0834 05       		.uleb128 0x5
+ 1394 0835 03       		.byte	0x3
+ 1395 0836 00000000 		.4byte	tsk_usb_TaskHandle
+ 1396 083a 21       		.uleb128 0x21
+ 1397 083b CE060000 		.4byte	.LASF129
+ 1398 083f CE060000 		.4byte	.LASF129
+ 1399 0843 11       		.byte	0x11
+ 1400 0844 2C       		.byte	0x2c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 29
+
+
+ 1401 0845 22       		.uleb128 0x22
+ 1402 0846 2A080000 		.4byte	.LASF130
+ 1403 084a 2A080000 		.4byte	.LASF130
+ 1404 084e 0E       		.byte	0xe
+ 1405 084f 2E01     		.2byte	0x12e
+ 1406 0851 22       		.uleb128 0x22
+ 1407 0852 7D070000 		.4byte	.LASF131
+ 1408 0856 7D070000 		.4byte	.LASF131
+ 1409 085a 0E       		.byte	0xe
+ 1410 085b 2D01     		.2byte	0x12d
+ 1411 085d 21       		.uleb128 0x21
+ 1412 085e 2B030000 		.4byte	.LASF132
+ 1413 0862 2B030000 		.4byte	.LASF132
+ 1414 0866 12       		.byte	0x12
+ 1415 0867 22       		.byte	0x22
+ 1416 0868 21       		.uleb128 0x21
+ 1417 0869 CB050000 		.4byte	.LASF133
+ 1418 086d CB050000 		.4byte	.LASF133
+ 1419 0871 12       		.byte	0x12
+ 1420 0872 29       		.byte	0x29
+ 1421 0873 21       		.uleb128 0x21
+ 1422 0874 29040000 		.4byte	.LASF134
+ 1423 0878 29040000 		.4byte	.LASF134
+ 1424 087c 12       		.byte	0x12
+ 1425 087d 2B       		.byte	0x2b
+ 1426 087e 21       		.uleb128 0x21
+ 1427 087f 9A010000 		.4byte	.LASF135
+ 1428 0883 9A010000 		.4byte	.LASF135
+ 1429 0887 13       		.byte	0x13
+ 1430 0888 26       		.byte	0x26
+ 1431 0889 22       		.uleb128 0x22
+ 1432 088a 16000000 		.4byte	.LASF136
+ 1433 088e 16000000 		.4byte	.LASF136
+ 1434 0892 09       		.byte	0x9
+ 1435 0893 3A01     		.2byte	0x13a
+ 1436 0895 22       		.uleb128 0x22
+ 1437 0896 F0030000 		.4byte	.LASF137
+ 1438 089a F0030000 		.4byte	.LASF137
+ 1439 089e 09       		.byte	0x9
+ 1440 089f D002     		.2byte	0x2d0
+ 1441 08a1 21       		.uleb128 0x21
+ 1442 08a2 15080000 		.4byte	.LASF138
+ 1443 08a6 15080000 		.4byte	.LASF138
+ 1444 08aa 12       		.byte	0x12
+ 1445 08ab 28       		.byte	0x28
+ 1446 08ac 22       		.uleb128 0x22
+ 1447 08ad BD070000 		.4byte	.LASF139
+ 1448 08b1 BD070000 		.4byte	.LASF139
+ 1449 08b5 09       		.byte	0x9
+ 1450 08b6 F801     		.2byte	0x1f8
+ 1451 08b8 21       		.uleb128 0x21
+ 1452 08b9 60010000 		.4byte	.LASF140
+ 1453 08bd 60010000 		.4byte	.LASF140
+ 1454 08c1 12       		.byte	0x12
+ 1455 08c2 23       		.byte	0x23
+ 1456 08c3 22       		.uleb128 0x22
+ 1457 08c4 55010000 		.4byte	.LASF141
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 30
+
+
+ 1458 08c8 55010000 		.4byte	.LASF141
+ 1459 08cc 06       		.byte	0x6
+ 1460 08cd 0C03     		.2byte	0x30c
+ 1461 08cf 22       		.uleb128 0x22
+ 1462 08d0 19060000 		.4byte	.LASF142
+ 1463 08d4 19060000 		.4byte	.LASF142
+ 1464 08d8 0E       		.byte	0xe
+ 1465 08d9 2A01     		.2byte	0x12a
+ 1466 08db 22       		.uleb128 0x22
+ 1467 08dc DE040000 		.4byte	.LASF143
+ 1468 08e0 DE040000 		.4byte	.LASF143
+ 1469 08e4 06       		.byte	0x6
+ 1470 08e5 5501     		.2byte	0x155
+ 1471 08e7 00       		.byte	0
+ 1472              		.section	.debug_abbrev,"",%progbits
+ 1473              	.Ldebug_abbrev0:
+ 1474 0000 01       		.uleb128 0x1
+ 1475 0001 11       		.uleb128 0x11
+ 1476 0002 01       		.byte	0x1
+ 1477 0003 25       		.uleb128 0x25
+ 1478 0004 0E       		.uleb128 0xe
+ 1479 0005 13       		.uleb128 0x13
+ 1480 0006 0B       		.uleb128 0xb
+ 1481 0007 03       		.uleb128 0x3
+ 1482 0008 0E       		.uleb128 0xe
+ 1483 0009 1B       		.uleb128 0x1b
+ 1484 000a 0E       		.uleb128 0xe
+ 1485 000b 55       		.uleb128 0x55
+ 1486 000c 17       		.uleb128 0x17
+ 1487 000d 11       		.uleb128 0x11
+ 1488 000e 01       		.uleb128 0x1
+ 1489 000f 10       		.uleb128 0x10
+ 1490 0010 17       		.uleb128 0x17
+ 1491 0011 00       		.byte	0
+ 1492 0012 00       		.byte	0
+ 1493 0013 02       		.uleb128 0x2
+ 1494 0014 24       		.uleb128 0x24
+ 1495 0015 00       		.byte	0
+ 1496 0016 0B       		.uleb128 0xb
+ 1497 0017 0B       		.uleb128 0xb
+ 1498 0018 3E       		.uleb128 0x3e
+ 1499 0019 0B       		.uleb128 0xb
+ 1500 001a 03       		.uleb128 0x3
+ 1501 001b 08       		.uleb128 0x8
+ 1502 001c 00       		.byte	0
+ 1503 001d 00       		.byte	0
+ 1504 001e 03       		.uleb128 0x3
+ 1505 001f 24       		.uleb128 0x24
+ 1506 0020 00       		.byte	0
+ 1507 0021 0B       		.uleb128 0xb
+ 1508 0022 0B       		.uleb128 0xb
+ 1509 0023 3E       		.uleb128 0x3e
+ 1510 0024 0B       		.uleb128 0xb
+ 1511 0025 03       		.uleb128 0x3
+ 1512 0026 0E       		.uleb128 0xe
+ 1513 0027 00       		.byte	0
+ 1514 0028 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 31
+
+
+ 1515 0029 04       		.uleb128 0x4
+ 1516 002a 16       		.uleb128 0x16
+ 1517 002b 00       		.byte	0
+ 1518 002c 03       		.uleb128 0x3
+ 1519 002d 0E       		.uleb128 0xe
+ 1520 002e 3A       		.uleb128 0x3a
+ 1521 002f 0B       		.uleb128 0xb
+ 1522 0030 3B       		.uleb128 0x3b
+ 1523 0031 0B       		.uleb128 0xb
+ 1524 0032 49       		.uleb128 0x49
+ 1525 0033 13       		.uleb128 0x13
+ 1526 0034 00       		.byte	0
+ 1527 0035 00       		.byte	0
+ 1528 0036 05       		.uleb128 0x5
+ 1529 0037 0F       		.uleb128 0xf
+ 1530 0038 00       		.byte	0
+ 1531 0039 0B       		.uleb128 0xb
+ 1532 003a 0B       		.uleb128 0xb
+ 1533 003b 00       		.byte	0
+ 1534 003c 00       		.byte	0
+ 1535 003d 06       		.uleb128 0x6
+ 1536 003e 16       		.uleb128 0x16
+ 1537 003f 00       		.byte	0
+ 1538 0040 03       		.uleb128 0x3
+ 1539 0041 0E       		.uleb128 0xe
+ 1540 0042 3A       		.uleb128 0x3a
+ 1541 0043 0B       		.uleb128 0xb
+ 1542 0044 3B       		.uleb128 0x3b
+ 1543 0045 05       		.uleb128 0x5
+ 1544 0046 49       		.uleb128 0x49
+ 1545 0047 13       		.uleb128 0x13
+ 1546 0048 00       		.byte	0
+ 1547 0049 00       		.byte	0
+ 1548 004a 07       		.uleb128 0x7
+ 1549 004b 01       		.uleb128 0x1
+ 1550 004c 01       		.byte	0x1
+ 1551 004d 49       		.uleb128 0x49
+ 1552 004e 13       		.uleb128 0x13
+ 1553 004f 01       		.uleb128 0x1
+ 1554 0050 13       		.uleb128 0x13
+ 1555 0051 00       		.byte	0
+ 1556 0052 00       		.byte	0
+ 1557 0053 08       		.uleb128 0x8
+ 1558 0054 21       		.uleb128 0x21
+ 1559 0055 00       		.byte	0
+ 1560 0056 49       		.uleb128 0x49
+ 1561 0057 13       		.uleb128 0x13
+ 1562 0058 2F       		.uleb128 0x2f
+ 1563 0059 0B       		.uleb128 0xb
+ 1564 005a 00       		.byte	0
+ 1565 005b 00       		.byte	0
+ 1566 005c 09       		.uleb128 0x9
+ 1567 005d 0F       		.uleb128 0xf
+ 1568 005e 00       		.byte	0
+ 1569 005f 0B       		.uleb128 0xb
+ 1570 0060 0B       		.uleb128 0xb
+ 1571 0061 49       		.uleb128 0x49
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 32
+
+
+ 1572 0062 13       		.uleb128 0x13
+ 1573 0063 00       		.byte	0
+ 1574 0064 00       		.byte	0
+ 1575 0065 0A       		.uleb128 0xa
+ 1576 0066 13       		.uleb128 0x13
+ 1577 0067 00       		.byte	0
+ 1578 0068 03       		.uleb128 0x3
+ 1579 0069 0E       		.uleb128 0xe
+ 1580 006a 3C       		.uleb128 0x3c
+ 1581 006b 19       		.uleb128 0x19
+ 1582 006c 00       		.byte	0
+ 1583 006d 00       		.byte	0
+ 1584 006e 0B       		.uleb128 0xb
+ 1585 006f 13       		.uleb128 0x13
+ 1586 0070 01       		.byte	0x1
+ 1587 0071 03       		.uleb128 0x3
+ 1588 0072 0E       		.uleb128 0xe
+ 1589 0073 0B       		.uleb128 0xb
+ 1590 0074 0B       		.uleb128 0xb
+ 1591 0075 3A       		.uleb128 0x3a
+ 1592 0076 0B       		.uleb128 0xb
+ 1593 0077 3B       		.uleb128 0x3b
+ 1594 0078 0B       		.uleb128 0xb
+ 1595 0079 01       		.uleb128 0x1
+ 1596 007a 13       		.uleb128 0x13
+ 1597 007b 00       		.byte	0
+ 1598 007c 00       		.byte	0
+ 1599 007d 0C       		.uleb128 0xc
+ 1600 007e 0D       		.uleb128 0xd
+ 1601 007f 00       		.byte	0
+ 1602 0080 03       		.uleb128 0x3
+ 1603 0081 0E       		.uleb128 0xe
+ 1604 0082 3A       		.uleb128 0x3a
+ 1605 0083 0B       		.uleb128 0xb
+ 1606 0084 3B       		.uleb128 0x3b
+ 1607 0085 0B       		.uleb128 0xb
+ 1608 0086 49       		.uleb128 0x49
+ 1609 0087 13       		.uleb128 0x13
+ 1610 0088 38       		.uleb128 0x38
+ 1611 0089 0B       		.uleb128 0xb
+ 1612 008a 00       		.byte	0
+ 1613 008b 00       		.byte	0
+ 1614 008c 0D       		.uleb128 0xd
+ 1615 008d 0D       		.uleb128 0xd
+ 1616 008e 00       		.byte	0
+ 1617 008f 03       		.uleb128 0x3
+ 1618 0090 08       		.uleb128 0x8
+ 1619 0091 3A       		.uleb128 0x3a
+ 1620 0092 0B       		.uleb128 0xb
+ 1621 0093 3B       		.uleb128 0x3b
+ 1622 0094 0B       		.uleb128 0xb
+ 1623 0095 49       		.uleb128 0x49
+ 1624 0096 13       		.uleb128 0x13
+ 1625 0097 38       		.uleb128 0x38
+ 1626 0098 0B       		.uleb128 0xb
+ 1627 0099 00       		.byte	0
+ 1628 009a 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 33
+
+
+ 1629 009b 0E       		.uleb128 0xe
+ 1630 009c 04       		.uleb128 0x4
+ 1631 009d 01       		.byte	0x1
+ 1632 009e 03       		.uleb128 0x3
+ 1633 009f 0E       		.uleb128 0xe
+ 1634 00a0 0B       		.uleb128 0xb
+ 1635 00a1 0B       		.uleb128 0xb
+ 1636 00a2 49       		.uleb128 0x49
+ 1637 00a3 13       		.uleb128 0x13
+ 1638 00a4 3A       		.uleb128 0x3a
+ 1639 00a5 0B       		.uleb128 0xb
+ 1640 00a6 3B       		.uleb128 0x3b
+ 1641 00a7 0B       		.uleb128 0xb
+ 1642 00a8 01       		.uleb128 0x1
+ 1643 00a9 13       		.uleb128 0x13
+ 1644 00aa 00       		.byte	0
+ 1645 00ab 00       		.byte	0
+ 1646 00ac 0F       		.uleb128 0xf
+ 1647 00ad 28       		.uleb128 0x28
+ 1648 00ae 00       		.byte	0
+ 1649 00af 03       		.uleb128 0x3
+ 1650 00b0 0E       		.uleb128 0xe
+ 1651 00b1 1C       		.uleb128 0x1c
+ 1652 00b2 0B       		.uleb128 0xb
+ 1653 00b3 00       		.byte	0
+ 1654 00b4 00       		.byte	0
+ 1655 00b5 10       		.uleb128 0x10
+ 1656 00b6 13       		.uleb128 0x13
+ 1657 00b7 01       		.byte	0x1
+ 1658 00b8 0B       		.uleb128 0xb
+ 1659 00b9 0B       		.uleb128 0xb
+ 1660 00ba 3A       		.uleb128 0x3a
+ 1661 00bb 0B       		.uleb128 0xb
+ 1662 00bc 3B       		.uleb128 0x3b
+ 1663 00bd 0B       		.uleb128 0xb
+ 1664 00be 01       		.uleb128 0x1
+ 1665 00bf 13       		.uleb128 0x13
+ 1666 00c0 00       		.byte	0
+ 1667 00c1 00       		.byte	0
+ 1668 00c2 11       		.uleb128 0x11
+ 1669 00c3 35       		.uleb128 0x35
+ 1670 00c4 00       		.byte	0
+ 1671 00c5 49       		.uleb128 0x49
+ 1672 00c6 13       		.uleb128 0x13
+ 1673 00c7 00       		.byte	0
+ 1674 00c8 00       		.byte	0
+ 1675 00c9 12       		.uleb128 0x12
+ 1676 00ca 2E       		.uleb128 0x2e
+ 1677 00cb 00       		.byte	0
+ 1678 00cc 3F       		.uleb128 0x3f
+ 1679 00cd 19       		.uleb128 0x19
+ 1680 00ce 03       		.uleb128 0x3
+ 1681 00cf 0E       		.uleb128 0xe
+ 1682 00d0 3A       		.uleb128 0x3a
+ 1683 00d1 0B       		.uleb128 0xb
+ 1684 00d2 3B       		.uleb128 0x3b
+ 1685 00d3 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 34
+
+
+ 1686 00d4 27       		.uleb128 0x27
+ 1687 00d5 19       		.uleb128 0x19
+ 1688 00d6 20       		.uleb128 0x20
+ 1689 00d7 0B       		.uleb128 0xb
+ 1690 00d8 00       		.byte	0
+ 1691 00d9 00       		.byte	0
+ 1692 00da 13       		.uleb128 0x13
+ 1693 00db 2E       		.uleb128 0x2e
+ 1694 00dc 01       		.byte	0x1
+ 1695 00dd 3F       		.uleb128 0x3f
+ 1696 00de 19       		.uleb128 0x19
+ 1697 00df 03       		.uleb128 0x3
+ 1698 00e0 0E       		.uleb128 0xe
+ 1699 00e1 3A       		.uleb128 0x3a
+ 1700 00e2 0B       		.uleb128 0xb
+ 1701 00e3 3B       		.uleb128 0x3b
+ 1702 00e4 0B       		.uleb128 0xb
+ 1703 00e5 27       		.uleb128 0x27
+ 1704 00e6 19       		.uleb128 0x19
+ 1705 00e7 8701     		.uleb128 0x87
+ 1706 00e9 19       		.uleb128 0x19
+ 1707 00ea 11       		.uleb128 0x11
+ 1708 00eb 01       		.uleb128 0x1
+ 1709 00ec 12       		.uleb128 0x12
+ 1710 00ed 06       		.uleb128 0x6
+ 1711 00ee 40       		.uleb128 0x40
+ 1712 00ef 18       		.uleb128 0x18
+ 1713 00f0 9742     		.uleb128 0x2117
+ 1714 00f2 19       		.uleb128 0x19
+ 1715 00f3 01       		.uleb128 0x1
+ 1716 00f4 13       		.uleb128 0x13
+ 1717 00f5 00       		.byte	0
+ 1718 00f6 00       		.byte	0
+ 1719 00f7 14       		.uleb128 0x14
+ 1720 00f8 05       		.uleb128 0x5
+ 1721 00f9 00       		.byte	0
+ 1722 00fa 03       		.uleb128 0x3
+ 1723 00fb 0E       		.uleb128 0xe
+ 1724 00fc 3A       		.uleb128 0x3a
+ 1725 00fd 0B       		.uleb128 0xb
+ 1726 00fe 3B       		.uleb128 0x3b
+ 1727 00ff 0B       		.uleb128 0xb
+ 1728 0100 49       		.uleb128 0x49
+ 1729 0101 13       		.uleb128 0x13
+ 1730 0102 02       		.uleb128 0x2
+ 1731 0103 17       		.uleb128 0x17
+ 1732 0104 00       		.byte	0
+ 1733 0105 00       		.byte	0
+ 1734 0106 15       		.uleb128 0x15
+ 1735 0107 34       		.uleb128 0x34
+ 1736 0108 00       		.byte	0
+ 1737 0109 03       		.uleb128 0x3
+ 1738 010a 0E       		.uleb128 0xe
+ 1739 010b 3A       		.uleb128 0x3a
+ 1740 010c 0B       		.uleb128 0xb
+ 1741 010d 3B       		.uleb128 0x3b
+ 1742 010e 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 35
+
+
+ 1743 010f 49       		.uleb128 0x49
+ 1744 0110 13       		.uleb128 0x13
+ 1745 0111 02       		.uleb128 0x2
+ 1746 0112 17       		.uleb128 0x17
+ 1747 0113 00       		.byte	0
+ 1748 0114 00       		.byte	0
+ 1749 0115 16       		.uleb128 0x16
+ 1750 0116 34       		.uleb128 0x34
+ 1751 0117 00       		.byte	0
+ 1752 0118 03       		.uleb128 0x3
+ 1753 0119 0E       		.uleb128 0xe
+ 1754 011a 3A       		.uleb128 0x3a
+ 1755 011b 0B       		.uleb128 0xb
+ 1756 011c 3B       		.uleb128 0x3b
+ 1757 011d 0B       		.uleb128 0xb
+ 1758 011e 49       		.uleb128 0x49
+ 1759 011f 13       		.uleb128 0x13
+ 1760 0120 02       		.uleb128 0x2
+ 1761 0121 18       		.uleb128 0x18
+ 1762 0122 00       		.byte	0
+ 1763 0123 00       		.byte	0
+ 1764 0124 17       		.uleb128 0x17
+ 1765 0125 898201   		.uleb128 0x4109
+ 1766 0128 01       		.byte	0x1
+ 1767 0129 11       		.uleb128 0x11
+ 1768 012a 01       		.uleb128 0x1
+ 1769 012b 31       		.uleb128 0x31
+ 1770 012c 13       		.uleb128 0x13
+ 1771 012d 01       		.uleb128 0x1
+ 1772 012e 13       		.uleb128 0x13
+ 1773 012f 00       		.byte	0
+ 1774 0130 00       		.byte	0
+ 1775 0131 18       		.uleb128 0x18
+ 1776 0132 8A8201   		.uleb128 0x410a
+ 1777 0135 00       		.byte	0
+ 1778 0136 02       		.uleb128 0x2
+ 1779 0137 18       		.uleb128 0x18
+ 1780 0138 9142     		.uleb128 0x2111
+ 1781 013a 18       		.uleb128 0x18
+ 1782 013b 00       		.byte	0
+ 1783 013c 00       		.byte	0
+ 1784 013d 19       		.uleb128 0x19
+ 1785 013e 898201   		.uleb128 0x4109
+ 1786 0141 00       		.byte	0
+ 1787 0142 11       		.uleb128 0x11
+ 1788 0143 01       		.uleb128 0x1
+ 1789 0144 31       		.uleb128 0x31
+ 1790 0145 13       		.uleb128 0x13
+ 1791 0146 00       		.byte	0
+ 1792 0147 00       		.byte	0
+ 1793 0148 1A       		.uleb128 0x1a
+ 1794 0149 2E       		.uleb128 0x2e
+ 1795 014a 01       		.byte	0x1
+ 1796 014b 3F       		.uleb128 0x3f
+ 1797 014c 19       		.uleb128 0x19
+ 1798 014d 03       		.uleb128 0x3
+ 1799 014e 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 36
+
+
+ 1800 014f 3A       		.uleb128 0x3a
+ 1801 0150 0B       		.uleb128 0xb
+ 1802 0151 3B       		.uleb128 0x3b
+ 1803 0152 0B       		.uleb128 0xb
+ 1804 0153 27       		.uleb128 0x27
+ 1805 0154 19       		.uleb128 0x19
+ 1806 0155 11       		.uleb128 0x11
+ 1807 0156 01       		.uleb128 0x1
+ 1808 0157 12       		.uleb128 0x12
+ 1809 0158 06       		.uleb128 0x6
+ 1810 0159 40       		.uleb128 0x40
+ 1811 015a 18       		.uleb128 0x18
+ 1812 015b 9742     		.uleb128 0x2117
+ 1813 015d 19       		.uleb128 0x19
+ 1814 015e 01       		.uleb128 0x1
+ 1815 015f 13       		.uleb128 0x13
+ 1816 0160 00       		.byte	0
+ 1817 0161 00       		.byte	0
+ 1818 0162 1B       		.uleb128 0x1b
+ 1819 0163 898201   		.uleb128 0x4109
+ 1820 0166 01       		.byte	0x1
+ 1821 0167 11       		.uleb128 0x11
+ 1822 0168 01       		.uleb128 0x1
+ 1823 0169 31       		.uleb128 0x31
+ 1824 016a 13       		.uleb128 0x13
+ 1825 016b 00       		.byte	0
+ 1826 016c 00       		.byte	0
+ 1827 016d 1C       		.uleb128 0x1c
+ 1828 016e 898201   		.uleb128 0x4109
+ 1829 0171 00       		.byte	0
+ 1830 0172 11       		.uleb128 0x11
+ 1831 0173 01       		.uleb128 0x1
+ 1832 0174 9542     		.uleb128 0x2115
+ 1833 0176 19       		.uleb128 0x19
+ 1834 0177 31       		.uleb128 0x31
+ 1835 0178 13       		.uleb128 0x13
+ 1836 0179 00       		.byte	0
+ 1837 017a 00       		.byte	0
+ 1838 017b 1D       		.uleb128 0x1d
+ 1839 017c 2E       		.uleb128 0x2e
+ 1840 017d 00       		.byte	0
+ 1841 017e 31       		.uleb128 0x31
+ 1842 017f 13       		.uleb128 0x13
+ 1843 0180 11       		.uleb128 0x11
+ 1844 0181 01       		.uleb128 0x1
+ 1845 0182 12       		.uleb128 0x12
+ 1846 0183 06       		.uleb128 0x6
+ 1847 0184 40       		.uleb128 0x40
+ 1848 0185 18       		.uleb128 0x18
+ 1849 0186 9742     		.uleb128 0x2117
+ 1850 0188 19       		.uleb128 0x19
+ 1851 0189 00       		.byte	0
+ 1852 018a 00       		.byte	0
+ 1853 018b 1E       		.uleb128 0x1e
+ 1854 018c 34       		.uleb128 0x34
+ 1855 018d 00       		.byte	0
+ 1856 018e 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 37
+
+
+ 1857 018f 0E       		.uleb128 0xe
+ 1858 0190 3A       		.uleb128 0x3a
+ 1859 0191 0B       		.uleb128 0xb
+ 1860 0192 3B       		.uleb128 0x3b
+ 1861 0193 05       		.uleb128 0x5
+ 1862 0194 49       		.uleb128 0x49
+ 1863 0195 13       		.uleb128 0x13
+ 1864 0196 3F       		.uleb128 0x3f
+ 1865 0197 19       		.uleb128 0x19
+ 1866 0198 3C       		.uleb128 0x3c
+ 1867 0199 19       		.uleb128 0x19
+ 1868 019a 00       		.byte	0
+ 1869 019b 00       		.byte	0
+ 1870 019c 1F       		.uleb128 0x1f
+ 1871 019d 34       		.uleb128 0x34
+ 1872 019e 00       		.byte	0
+ 1873 019f 03       		.uleb128 0x3
+ 1874 01a0 0E       		.uleb128 0xe
+ 1875 01a1 3A       		.uleb128 0x3a
+ 1876 01a2 0B       		.uleb128 0xb
+ 1877 01a3 3B       		.uleb128 0x3b
+ 1878 01a4 0B       		.uleb128 0xb
+ 1879 01a5 49       		.uleb128 0x49
+ 1880 01a6 13       		.uleb128 0x13
+ 1881 01a7 3F       		.uleb128 0x3f
+ 1882 01a8 19       		.uleb128 0x19
+ 1883 01a9 02       		.uleb128 0x2
+ 1884 01aa 18       		.uleb128 0x18
+ 1885 01ab 00       		.byte	0
+ 1886 01ac 00       		.byte	0
+ 1887 01ad 20       		.uleb128 0x20
+ 1888 01ae 34       		.uleb128 0x34
+ 1889 01af 00       		.byte	0
+ 1890 01b0 03       		.uleb128 0x3
+ 1891 01b1 0E       		.uleb128 0xe
+ 1892 01b2 3A       		.uleb128 0x3a
+ 1893 01b3 0B       		.uleb128 0xb
+ 1894 01b4 3B       		.uleb128 0x3b
+ 1895 01b5 0B       		.uleb128 0xb
+ 1896 01b6 49       		.uleb128 0x49
+ 1897 01b7 13       		.uleb128 0x13
+ 1898 01b8 3F       		.uleb128 0x3f
+ 1899 01b9 19       		.uleb128 0x19
+ 1900 01ba 3C       		.uleb128 0x3c
+ 1901 01bb 19       		.uleb128 0x19
+ 1902 01bc 00       		.byte	0
+ 1903 01bd 00       		.byte	0
+ 1904 01be 21       		.uleb128 0x21
+ 1905 01bf 2E       		.uleb128 0x2e
+ 1906 01c0 00       		.byte	0
+ 1907 01c1 3F       		.uleb128 0x3f
+ 1908 01c2 19       		.uleb128 0x19
+ 1909 01c3 3C       		.uleb128 0x3c
+ 1910 01c4 19       		.uleb128 0x19
+ 1911 01c5 6E       		.uleb128 0x6e
+ 1912 01c6 0E       		.uleb128 0xe
+ 1913 01c7 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 38
+
+
+ 1914 01c8 0E       		.uleb128 0xe
+ 1915 01c9 3A       		.uleb128 0x3a
+ 1916 01ca 0B       		.uleb128 0xb
+ 1917 01cb 3B       		.uleb128 0x3b
+ 1918 01cc 0B       		.uleb128 0xb
+ 1919 01cd 00       		.byte	0
+ 1920 01ce 00       		.byte	0
+ 1921 01cf 22       		.uleb128 0x22
+ 1922 01d0 2E       		.uleb128 0x2e
+ 1923 01d1 00       		.byte	0
+ 1924 01d2 3F       		.uleb128 0x3f
+ 1925 01d3 19       		.uleb128 0x19
+ 1926 01d4 3C       		.uleb128 0x3c
+ 1927 01d5 19       		.uleb128 0x19
+ 1928 01d6 6E       		.uleb128 0x6e
+ 1929 01d7 0E       		.uleb128 0xe
+ 1930 01d8 03       		.uleb128 0x3
+ 1931 01d9 0E       		.uleb128 0xe
+ 1932 01da 3A       		.uleb128 0x3a
+ 1933 01db 0B       		.uleb128 0xb
+ 1934 01dc 3B       		.uleb128 0x3b
+ 1935 01dd 05       		.uleb128 0x5
+ 1936 01de 00       		.byte	0
+ 1937 01df 00       		.byte	0
+ 1938 01e0 00       		.byte	0
+ 1939              		.section	.debug_loc,"",%progbits
+ 1940              	.Ldebug_loc0:
+ 1941              	.LLST0:
+ 1942 0000 00000000 		.4byte	.LVL0
+ 1943 0004 0C000000 		.4byte	.LVL1
+ 1944 0008 0100     		.2byte	0x1
+ 1945 000a 50       		.byte	0x50
+ 1946 000b 0C000000 		.4byte	.LVL1
+ 1947 000f E8000000 		.4byte	.LFE72
+ 1948 0013 0400     		.2byte	0x4
+ 1949 0015 F3       		.byte	0xf3
+ 1950 0016 01       		.uleb128 0x1
+ 1951 0017 50       		.byte	0x50
+ 1952 0018 9F       		.byte	0x9f
+ 1953 0019 00000000 		.4byte	0
+ 1954 001d 00000000 		.4byte	0
+ 1955              	.LLST1:
+ 1956 0021 3A000000 		.4byte	.LVL8
+ 1957 0025 42000000 		.4byte	.LVL9
+ 1958 0029 0100     		.2byte	0x1
+ 1959 002b 50       		.byte	0x50
+ 1960 002c 66000000 		.4byte	.LVL13
+ 1961 0030 B4000000 		.4byte	.LVL21
+ 1962 0034 0100     		.2byte	0x1
+ 1963 0036 56       		.byte	0x56
+ 1964 0037 00000000 		.4byte	0
+ 1965 003b 00000000 		.4byte	0
+ 1966              		.section	.debug_aranges,"",%progbits
+ 1967 0000 34000000 		.4byte	0x34
+ 1968 0004 0200     		.2byte	0x2
+ 1969 0006 00000000 		.4byte	.Ldebug_info0
+ 1970 000a 04       		.byte	0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 39
+
+
+ 1971 000b 00       		.byte	0
+ 1972 000c 0000     		.2byte	0
+ 1973 000e 0000     		.2byte	0
+ 1974 0010 00000000 		.4byte	.LFB72
+ 1975 0014 E8000000 		.4byte	.LFE72-.LFB72
+ 1976 0018 00000000 		.4byte	.LFB70
+ 1977 001c 44000000 		.4byte	.LFE70-.LFB70
+ 1978 0020 00000000 		.4byte	.LFB69
+ 1979 0024 14000000 		.4byte	.LFE69-.LFB69
+ 1980 0028 00000000 		.4byte	.LFB71
+ 1981 002c 02000000 		.4byte	.LFE71-.LFB71
+ 1982 0030 00000000 		.4byte	0
+ 1983 0034 00000000 		.4byte	0
+ 1984              		.section	.debug_ranges,"",%progbits
+ 1985              	.Ldebug_ranges0:
+ 1986 0000 00000000 		.4byte	.LFB72
+ 1987 0004 E8000000 		.4byte	.LFE72
+ 1988 0008 00000000 		.4byte	.LFB70
+ 1989 000c 44000000 		.4byte	.LFE70
+ 1990 0010 00000000 		.4byte	.LFB69
+ 1991 0014 14000000 		.4byte	.LFE69
+ 1992 0018 00000000 		.4byte	.LFB71
+ 1993 001c 02000000 		.4byte	.LFE71
+ 1994 0020 00000000 		.4byte	0
+ 1995 0024 00000000 		.4byte	0
+ 1996              		.section	.debug_line,"",%progbits
+ 1997              	.Ldebug_line0:
+ 1998 0000 03030000 		.section	.debug_str,"MS",%progbits,1
+ 1998      02007F02 
+ 1998      00000201 
+ 1998      FB0E0D00 
+ 1998      01010101 
+ 1999              	.LASF127:
+ 2000 0000 74736B5F 		.ascii	"tsk_usb_initVar\000"
+ 2000      7573625F 
+ 2000      696E6974 
+ 2000      56617200 
+ 2001              	.LASF116:
+ 2002 0010 636F756E 		.ascii	"count\000"
+ 2002      7400
+ 2003              	.LASF136:
+ 2004 0016 78537472 		.ascii	"xStreamBufferSend\000"
+ 2004      65616D42 
+ 2004      75666665 
+ 2004      7253656E 
+ 2004      6400
+ 2005              	.LASF70:
+ 2006 0028 62617564 		.ascii	"baudrate\000"
+ 2006      72617465 
+ 2006      00
+ 2007              	.LASF1:
+ 2008 0031 7369676E 		.ascii	"signed char\000"
+ 2008      65642063 
+ 2008      68617200 
+ 2009              	.LASF4:
+ 2010 003d 5F5F7569 		.ascii	"__uint8_t\000"
+ 2010      6E74385F 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 40
+
+
+ 2010      7400
+ 2011              	.LASF112:
+ 2012 0047 62757273 		.ascii	"burst_state\000"
+ 2012      745F7374 
+ 2012      61746500 
+ 2013              	.LASF63:
+ 2014 0053 7069645F 		.ascii	"pid_temp_mode\000"
+ 2014      74656D70 
+ 2014      5F6D6F64 
+ 2014      6500
+ 2015              	.LASF32:
+ 2016 0061 74797065 		.ascii	"type\000"
+ 2016      00
+ 2017              	.LASF104:
+ 2018 0066 494E5452 		.ascii	"INTR_MODE_BLOCKED\000"
+ 2018      5F4D4F44 
+ 2018      455F424C 
+ 2018      4F434B45 
+ 2018      4400
+ 2019              	.LASF38:
+ 2020 0078 746D7254 		.ascii	"tmrTimerControl\000"
+ 2020      696D6572 
+ 2020      436F6E74 
+ 2020      726F6C00 
+ 2021              	.LASF115:
+ 2022 0088 696E7465 		.ascii	"interrupter_params\000"
+ 2022      72727570 
+ 2022      7465725F 
+ 2022      70617261 
+ 2022      6D7300
+ 2023              	.LASF148:
+ 2024 009b 74736B5F 		.ascii	"tsk_usb_Task\000"
+ 2024      7573625F 
+ 2024      5461736B 
+ 2024      00
+ 2025              	.LASF146:
+ 2026 00a8 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 2026      73657273 
+ 2026      5C636865 
+ 2026      6D695C55 
+ 2026      44335F51 
+ 2027              	.LASF12:
+ 2028 00cd 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2028      206C6F6E 
+ 2028      6720756E 
+ 2028      7369676E 
+ 2028      65642069 
+ 2029              	.LASF46:
+ 2030 00e4 6D61785F 		.ascii	"max_tr_current\000"
+ 2030      74725F63 
+ 2030      75727265 
+ 2030      6E7400
+ 2031              	.LASF149:
+ 2032 00f3 70765061 		.ascii	"pvParameters\000"
+ 2032      72616D65 
+ 2032      74657273 
+ 2032      00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 41
+
+
+ 2033              	.LASF25:
+ 2034 0100 51756575 		.ascii	"QueueHandle_t\000"
+ 2034      6548616E 
+ 2034      646C655F 
+ 2034      7400
+ 2035              	.LASF121:
+ 2036 010e 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 2036      52784275 
+ 2036      66666572 
+ 2036      00
+ 2037              	.LASF86:
+ 2038 011b 75766C6F 		.ascii	"uvlo_analog\000"
+ 2038      5F616E61 
+ 2038      6C6F6700 
+ 2039              	.LASF11:
+ 2040 0127 6C6F6E67 		.ascii	"long long int\000"
+ 2040      206C6F6E 
+ 2040      6720696E 
+ 2040      7400
+ 2041              	.LASF94:
+ 2042 0135 636F6D70 		.ascii	"compressor_release\000"
+ 2042      72657373 
+ 2042      6F725F72 
+ 2042      656C6561 
+ 2042      736500
+ 2043              	.LASF110:
+ 2044 0148 494E5452 		.ascii	"INTR_MOD_CUR\000"
+ 2044      5F4D4F44 
+ 2044      5F435552 
+ 2044      00
+ 2045              	.LASF141:
+ 2046 0155 76546173 		.ascii	"vTaskDelay\000"
+ 2046      6B44656C 
+ 2046      617900
+ 2047              	.LASF140:
+ 2048 0160 55534255 		.ascii	"USBUART_1_PutData\000"
+ 2048      4152545F 
+ 2048      315F5075 
+ 2048      74446174 
+ 2048      6100
+ 2049              	.LASF35:
+ 2050 0172 7465726D 		.ascii	"term_block\000"
+ 2050      5F626C6F 
+ 2050      636B00
+ 2051              	.LASF8:
+ 2052 017d 6C6F6E67 		.ascii	"long int\000"
+ 2052      20696E74 
+ 2052      00
+ 2053              	.LASF26:
+ 2054 0186 74736B54 		.ascii	"tskTaskControlBlock\000"
+ 2054      61736B43 
+ 2054      6F6E7472 
+ 2054      6F6C426C 
+ 2054      6F636B00 
+ 2055              	.LASF135:
+ 2056 019a 4C45445F 		.ascii	"LED_com_Write\000"
+ 2056      636F6D5F 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 42
+
+
+ 2056      57726974 
+ 2056      6500
+ 2057              	.LASF71:
+ 2058 01a8 6374325F 		.ascii	"ct2_type\000"
+ 2058      74797065 
+ 2058      00
+ 2059              	.LASF96:
+ 2060 01b1 64726976 		.ascii	"drive_factor\000"
+ 2060      655F6661 
+ 2060      63746F72 
+ 2060      00
+ 2061              	.LASF42:
+ 2062 01be 77617463 		.ascii	"watchdog_timeout\000"
+ 2062      68646F67 
+ 2062      5F74696D 
+ 2062      656F7574 
+ 2062      00
+ 2063              	.LASF68:
+ 2064 01cf 6175746F 		.ascii	"autotune_s\000"
+ 2064      74756E65 
+ 2064      5F7300
+ 2065              	.LASF19:
+ 2066 01da 75696E74 		.ascii	"uint8\000"
+ 2066      3800
+ 2067              	.LASF16:
+ 2068 01e0 75696E74 		.ascii	"uint16_t\000"
+ 2068      31365F74 
+ 2068      00
+ 2069              	.LASF22:
+ 2070 01e9 646F7562 		.ascii	"double\000"
+ 2070      6C6500
+ 2071              	.LASF78:
+ 2072 01f0 6578745F 		.ascii	"ext_interrupter\000"
+ 2072      696E7465 
+ 2072      72727570 
+ 2072      74657200 
+ 2073              	.LASF72:
+ 2074 0200 6374325F 		.ascii	"ct2_current\000"
+ 2074      63757272 
+ 2074      656E7400 
+ 2075              	.LASF62:
+ 2076 020c 7069645F 		.ascii	"pid_temp_set\000"
+ 2076      74656D70 
+ 2076      5F736574 
+ 2076      00
+ 2077              	.LASF147:
+ 2078 0219 74736B5F 		.ascii	"tsk_usb_Enable\000"
+ 2078      7573625F 
+ 2078      456E6162 
+ 2078      6C6500
+ 2079              	.LASF61:
+ 2080 0228 74656D70 		.ascii	"temp2_setpoint\000"
+ 2080      325F7365 
+ 2080      74706F69 
+ 2080      6E7400
+ 2081              	.LASF122:
+ 2082 0237 7573625F 		.ascii	"usb_bytes_rx\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 43
+
+
+ 2082      62797465 
+ 2082      735F7278 
+ 2082      00
+ 2083              	.LASF100:
+ 2084 0244 696E7465 		.ascii	"interrupter_DMA\000"
+ 2084      72727570 
+ 2084      7465725F 
+ 2084      444D4100 
+ 2085              	.LASF9:
+ 2086 0254 5F5F7569 		.ascii	"__uint32_t\000"
+ 2086      6E743332 
+ 2086      5F7400
+ 2087              	.LASF144:
+ 2088 025f 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2088      43393920 
+ 2088      352E342E 
+ 2088      31203230 
+ 2088      31363036 
+ 2089 0292 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2089      20726576 
+ 2089      6973696F 
+ 2089      6E203233 
+ 2089      37373135 
+ 2090 02c5 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 2090      74643D67 
+ 2090      6E753939 
+ 2090      202D6666 
+ 2090      756E6374 
+ 2091              	.LASF31:
+ 2092 02f8 706F7274 		.ascii	"port_str\000"
+ 2092      5F737472 
+ 2092      00
+ 2093              	.LASF47:
+ 2094 0301 6D696E5F 		.ascii	"min_tr_current\000"
+ 2094      74725F63 
+ 2094      75727265 
+ 2094      6E7400
+ 2095              	.LASF40:
+ 2096 0310 636F6E66 		.ascii	"config_struct\000"
+ 2096      69675F73 
+ 2096      74727563 
+ 2096      7400
+ 2097              	.LASF0:
+ 2098 031e 756E7369 		.ascii	"unsigned int\000"
+ 2098      676E6564 
+ 2098      20696E74 
+ 2098      00
+ 2099              	.LASF132:
+ 2100 032b 55534255 		.ascii	"USBUART_1_CDC_Init\000"
+ 2100      4152545F 
+ 2100      315F4344 
+ 2100      435F496E 
+ 2100      697400
+ 2101              	.LASF90:
+ 2102 033e 6D696E5F 		.ascii	"min_fb_current\000"
+ 2102      66625F63 
+ 2102      75727265 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 44
+
+
+ 2102      6E7400
+ 2103              	.LASF30:
+ 2104 034d 53747265 		.ascii	"StreamBufferDef_t\000"
+ 2104      616D4275 
+ 2104      66666572 
+ 2104      4465665F 
+ 2104      7400
+ 2105              	.LASF10:
+ 2106 035f 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2106      20756E73 
+ 2106      69676E65 
+ 2106      6420696E 
+ 2106      7400
+ 2107              	.LASF37:
+ 2108 0371 54696D65 		.ascii	"TimerHandle_t\000"
+ 2108      7248616E 
+ 2108      646C655F 
+ 2108      7400
+ 2109              	.LASF120:
+ 2110 037f 55534255 		.ascii	"USBUART_1_initVar\000"
+ 2110      4152545F 
+ 2110      315F696E 
+ 2110      69745661 
+ 2110      7200
+ 2111              	.LASF49:
+ 2112 0391 74656D70 		.ascii	"temp1_max\000"
+ 2112      315F6D61 
+ 2112      7800
+ 2113              	.LASF52:
+ 2114 039b 6374325F 		.ascii	"ct2_ratio\000"
+ 2114      72617469 
+ 2114      6F00
+ 2115              	.LASF29:
+ 2116 03a5 53747265 		.ascii	"StreamBufferHandle_t\000"
+ 2116      616D4275 
+ 2116      66666572 
+ 2116      48616E64 
+ 2116      6C655F74 
+ 2117              	.LASF6:
+ 2118 03ba 73686F72 		.ascii	"short unsigned int\000"
+ 2118      7420756E 
+ 2118      7369676E 
+ 2118      65642069 
+ 2118      6E7400
+ 2119              	.LASF83:
+ 2120 03cd 6E74635F 		.ascii	"ntc_r25\000"
+ 2120      72323500 
+ 2121              	.LASF118:
+ 2122 03d5 74736B5F 		.ascii	"tsk_usb_Init\000"
+ 2122      7573625F 
+ 2122      496E6974 
+ 2122      00
+ 2123              	.LASF124:
+ 2124 03e2 636F6E66 		.ascii	"configuration\000"
+ 2124      69677572 
+ 2124      6174696F 
+ 2124      6E00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 45
+
+
+ 2125              	.LASF137:
+ 2126 03f0 78537472 		.ascii	"xStreamBufferBytesAvailable\000"
+ 2126      65616D42 
+ 2126      75666665 
+ 2126      72427974 
+ 2126      65734176 
+ 2127              	.LASF80:
+ 2128 040c 70636139 		.ascii	"pca9685\000"
+ 2128      36383500 
+ 2129              	.LASF125:
+ 2130 0414 696E7465 		.ascii	"interrupter\000"
+ 2130      72727570 
+ 2130      74657200 
+ 2131              	.LASF77:
+ 2132 0420 69766F5F 		.ascii	"ivo_uart\000"
+ 2132      75617274 
+ 2132      00
+ 2133              	.LASF134:
+ 2134 0429 55534255 		.ascii	"USBUART_1_GetAll\000"
+ 2134      4152545F 
+ 2134      315F4765 
+ 2134      74416C6C 
+ 2134      00
+ 2135              	.LASF101:
+ 2136 043a 696E7465 		.ascii	"interrupter_mode\000"
+ 2136      72727570 
+ 2136      7465725F 
+ 2136      6D6F6465 
+ 2136      00
+ 2137              	.LASF7:
+ 2138 044b 5F5F696E 		.ascii	"__int32_t\000"
+ 2138      7433325F 
+ 2138      7400
+ 2139              	.LASF107:
+ 2140 0455 42555253 		.ascii	"BURST_OFF\000"
+ 2140      545F4F46 
+ 2140      4600
+ 2141              	.LASF36:
+ 2142 045f 74656C65 		.ascii	"telemetry_handle\000"
+ 2142      6D657472 
+ 2142      795F6861 
+ 2142      6E646C65 
+ 2142      00
+ 2143              	.LASF98:
+ 2144 0470 494E5452 		.ascii	"INTR_DMA_TR\000"
+ 2144      5F444D41 
+ 2144      5F545200 
+ 2145              	.LASF58:
+ 2146 047c 6D61785F 		.ascii	"max_tr_duty\000"
+ 2146      74725F64 
+ 2146      75747900 
+ 2147              	.LASF108:
+ 2148 0488 696E7465 		.ascii	"interrupter_modulation\000"
+ 2148      72727570 
+ 2148      7465725F 
+ 2148      6D6F6475 
+ 2148      6C617469 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 46
+
+
+ 2149              	.LASF13:
+ 2150 049f 73697A65 		.ascii	"sizetype\000"
+ 2150      74797065 
+ 2150      00
+ 2151              	.LASF119:
+ 2152 04a8 74736B5F 		.ascii	"tsk_usb_Start\000"
+ 2152      7573625F 
+ 2152      53746172 
+ 2152      7400
+ 2153              	.LASF60:
+ 2154 04b6 74656D70 		.ascii	"temp1_setpoint\000"
+ 2154      315F7365 
+ 2154      74706F69 
+ 2154      6E7400
+ 2155              	.LASF95:
+ 2156 04c5 636F6D70 		.ascii	"compressor_maxDutyOffset\000"
+ 2156      72657373 
+ 2156      6F725F6D 
+ 2156      61784475 
+ 2156      74794F66 
+ 2157              	.LASF143:
+ 2158 04de 78546173 		.ascii	"xTaskCreate\000"
+ 2158      6B437265 
+ 2158      61746500 
+ 2159              	.LASF79:
+ 2160 04ea 69735F71 		.ascii	"is_qcw\000"
+ 2160      637700
+ 2161              	.LASF23:
+ 2162 04f1 5469636B 		.ascii	"TickType_t\000"
+ 2162      54797065 
+ 2162      5F7400
+ 2163              	.LASF123:
+ 2164 04fc 7573625F 		.ascii	"usb_bytes_tx\000"
+ 2164      62797465 
+ 2164      735F7478 
+ 2164      00
+ 2165              	.LASF102:
+ 2166 0509 494E5452 		.ascii	"INTR_MODE_OFF\000"
+ 2166      5F4D4F44 
+ 2166      455F4F46 
+ 2166      4600
+ 2167              	.LASF91:
+ 2168 0517 53696747 		.ascii	"SigGen_minOtOffset\000"
+ 2168      656E5F6D 
+ 2168      696E4F74 
+ 2168      4F666673 
+ 2168      657400
+ 2169              	.LASF114:
+ 2170 052a 78427572 		.ascii	"xBurst_Timer\000"
+ 2170      73745F54 
+ 2170      696D6572 
+ 2170      00
+ 2171              	.LASF113:
+ 2172 0537 646D615F 		.ascii	"dma_mode\000"
+ 2172      6D6F6465 
+ 2172      00
+ 2173              	.LASF41:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 47
+
+
+ 2174 0540 77617463 		.ascii	"watchdog\000"
+ 2174      68646F67 
+ 2174      00
+ 2175              	.LASF93:
+ 2176 0549 636F6D70 		.ascii	"compressor_sustain\000"
+ 2176      72657373 
+ 2176      6F725F73 
+ 2176      75737461 
+ 2176      696E00
+ 2177              	.LASF74:
+ 2178 055c 6374325F 		.ascii	"ct2_offset\000"
+ 2178      6F666673 
+ 2178      657400
+ 2179              	.LASF21:
+ 2180 0567 666C6F61 		.ascii	"float\000"
+ 2180      7400
+ 2181              	.LASF54:
+ 2182 056d 6374325F 		.ascii	"ct2_burden\000"
+ 2182      62757264 
+ 2182      656E00
+ 2183              	.LASF145:
+ 2184 0578 2E2E5C63 		.ascii	"..\\common\\ud3core\\tasks\\tsk_usb.c\000"
+ 2184      6F6D6D6F 
+ 2184      6E5C7564 
+ 2184      33636F72 
+ 2184      655C7461 
+ 2185              	.LASF48:
+ 2186 059a 6D61785F 		.ascii	"max_qcw_current\000"
+ 2186      7163775F 
+ 2186      63757272 
+ 2186      656E7400 
+ 2187              	.LASF43:
+ 2188 05aa 6D61785F 		.ascii	"max_tr_pw\000"
+ 2188      74725F70 
+ 2188      7700
+ 2189              	.LASF82:
+ 2190 05b4 6E74635F 		.ascii	"ntc_b\000"
+ 2190      6200
+ 2191              	.LASF69:
+ 2192 05ba 75645F6E 		.ascii	"ud_name\000"
+ 2192      616D6500 
+ 2193              	.LASF106:
+ 2194 05c2 42555253 		.ascii	"BURST_ON\000"
+ 2194      545F4F4E 
+ 2194      00
+ 2195              	.LASF133:
+ 2196 05cb 55534255 		.ascii	"USBUART_1_DataIsReady\000"
+ 2196      4152545F 
+ 2196      315F4461 
+ 2196      74614973 
+ 2196      52656164 
+ 2197              	.LASF27:
+ 2198 05e1 51756575 		.ascii	"QueueDefinition\000"
+ 2198      65446566 
+ 2198      696E6974 
+ 2198      696F6E00 
+ 2199              	.LASF66:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 48
+
+
+ 2200 05f1 74656D70 		.ascii	"temp2_mode\000"
+ 2200      325F6D6F 
+ 2200      646500
+ 2201              	.LASF17:
+ 2202 05fc 696E7433 		.ascii	"int32_t\000"
+ 2202      325F7400 
+ 2203              	.LASF2:
+ 2204 0604 756E7369 		.ascii	"unsigned char\000"
+ 2204      676E6564 
+ 2204      20636861 
+ 2204      7200
+ 2205              	.LASF20:
+ 2206 0612 75696E74 		.ascii	"uint16\000"
+ 2206      313600
+ 2207              	.LASF142:
+ 2208 0619 55534255 		.ascii	"USBUART_1_Start\000"
+ 2208      4152545F 
+ 2208      315F5374 
+ 2208      61727400 
+ 2209              	.LASF89:
+ 2210 0629 6175746F 		.ascii	"autostart\000"
+ 2210      73746172 
+ 2210      7400
+ 2211              	.LASF3:
+ 2212 0633 73686F72 		.ascii	"short int\000"
+ 2212      7420696E 
+ 2212      7400
+ 2213              	.LASF24:
+ 2214 063d 5461736B 		.ascii	"TaskHandle_t\000"
+ 2214      48616E64 
+ 2214      6C655F74 
+ 2214      00
+ 2215              	.LASF99:
+ 2216 064a 494E5452 		.ascii	"INTR_DMA_DDS\000"
+ 2216      5F444D41 
+ 2216      5F444453 
+ 2216      00
+ 2217              	.LASF39:
+ 2218 0657 706F7274 		.ascii	"port_struct\000"
+ 2218      5F737472 
+ 2218      75637400 
+ 2219              	.LASF128:
+ 2220 0663 74736B5F 		.ascii	"tsk_usb_TaskHandle\000"
+ 2220      7573625F 
+ 2220      5461736B 
+ 2220      48616E64 
+ 2220      6C6500
+ 2221              	.LASF56:
+ 2222 0676 73746172 		.ascii	"start_freq\000"
+ 2222      745F6672 
+ 2222      657100
+ 2223              	.LASF87:
+ 2224 0681 76647269 		.ascii	"vdrive\000"
+ 2224      766500
+ 2225              	.LASF53:
+ 2226 0688 6374315F 		.ascii	"ct1_burden\000"
+ 2226      62757264 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 49
+
+
+ 2226      656E00
+ 2227              	.LASF67:
+ 2228 0693 70735F73 		.ascii	"ps_scheme\000"
+ 2228      6368656D 
+ 2228      6500
+ 2229              	.LASF18:
+ 2230 069d 75696E74 		.ascii	"uint32_t\000"
+ 2230      33325F74 
+ 2230      00
+ 2231              	.LASF28:
+ 2232 06a6 53656D61 		.ascii	"SemaphoreHandle_t\000"
+ 2232      70686F72 
+ 2232      6548616E 
+ 2232      646C655F 
+ 2232      7400
+ 2233              	.LASF14:
+ 2234 06b8 63686172 		.ascii	"char\000"
+ 2234      00
+ 2235              	.LASF111:
+ 2236 06bd 6D6F6465 		.ascii	"mode\000"
+ 2236      00
+ 2237              	.LASF73:
+ 2238 06c2 6374325F 		.ascii	"ct2_voltage\000"
+ 2238      766F6C74 
+ 2238      61676500 
+ 2239              	.LASF129:
+ 2240 06ce 616C6172 		.ascii	"alarm_push\000"
+ 2240      6D5F7075 
+ 2240      736800
+ 2241              	.LASF126:
+ 2242 06d9 7573625F 		.ascii	"usb_port\000"
+ 2242      706F7274 
+ 2242      00
+ 2243              	.LASF5:
+ 2244 06e2 5F5F7569 		.ascii	"__uint16_t\000"
+ 2244      6E743136 
+ 2244      5F7400
+ 2245              	.LASF44:
+ 2246 06ed 6D61785F 		.ascii	"max_tr_prf\000"
+ 2246      74725F70 
+ 2246      726600
+ 2247              	.LASF92:
+ 2248 06f8 636F6D70 		.ascii	"compressor_attac\000"
+ 2248      72657373 
+ 2248      6F725F61 
+ 2248      74746163 
+ 2248      00
+ 2249              	.LASF84:
+ 2250 0709 69646163 		.ascii	"idac\000"
+ 2250      00
+ 2251              	.LASF117:
+ 2252 070e 62756666 		.ascii	"buffer\000"
+ 2252      657200
+ 2253              	.LASF51:
+ 2254 0715 6374315F 		.ascii	"ct1_ratio\000"
+ 2254      72617469 
+ 2254      6F00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 50
+
+
+ 2255              	.LASF75:
+ 2256 071f 725F746F 		.ascii	"r_top\000"
+ 2256      7000
+ 2257              	.LASF81:
+ 2258 0725 6D61785F 		.ascii	"max_fb_errors\000"
+ 2258      66625F65 
+ 2258      72726F72 
+ 2258      7300
+ 2259              	.LASF85:
+ 2260 0733 69766F5F 		.ascii	"ivo_led\000"
+ 2260      6C656400 
+ 2261              	.LASF97:
+ 2262 073b 636C695F 		.ascii	"cli_config\000"
+ 2262      636F6E66 
+ 2262      696700
+ 2263              	.LASF59:
+ 2264 0746 6D61785F 		.ascii	"max_qcw_duty\000"
+ 2264      7163775F 
+ 2264      64757479 
+ 2264      00
+ 2265              	.LASF105:
+ 2266 0753 696E7465 		.ascii	"interrupter_burst\000"
+ 2266      72727570 
+ 2266      7465725F 
+ 2266      62757273 
+ 2266      7400
+ 2267              	.LASF103:
+ 2268 0765 494E5452 		.ascii	"INTR_MODE_TR\000"
+ 2268      5F4D4F44 
+ 2268      455F5452 
+ 2268      00
+ 2269              	.LASF45:
+ 2270 0772 6D61785F 		.ascii	"max_qcw_pw\000"
+ 2270      7163775F 
+ 2270      707700
+ 2271              	.LASF131:
+ 2272 077d 55534255 		.ascii	"USBUART_1_GetConfiguration\000"
+ 2272      4152545F 
+ 2272      315F4765 
+ 2272      74436F6E 
+ 2272      66696775 
+ 2273              	.LASF15:
+ 2274 0798 75696E74 		.ascii	"uint8_t\000"
+ 2274      385F7400 
+ 2275              	.LASF34:
+ 2276 07a0 7465726D 		.ascii	"term_send_alarms\000"
+ 2276      5F73656E 
+ 2276      645F616C 
+ 2276      61726D73 
+ 2276      00
+ 2277              	.LASF109:
+ 2278 07b1 494E5452 		.ascii	"INTR_MOD_PW\000"
+ 2278      5F4D4F44 
+ 2278      5F505700 
+ 2279              	.LASF139:
+ 2280 07bd 78537472 		.ascii	"xStreamBufferReceive\000"
+ 2280      65616D42 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccN9mSKQ.s 			page 51
+
+
+ 2280      75666665 
+ 2280      72526563 
+ 2280      65697665 
+ 2281              	.LASF55:
+ 2282 07d2 6C656164 		.ascii	"lead_time\000"
+ 2282      5F74696D 
+ 2282      6500
+ 2283              	.LASF65:
+ 2284 07dc 7069645F 		.ascii	"pid_temp_i\000"
+ 2284      74656D70 
+ 2284      5F6900
+ 2285              	.LASF76:
+ 2286 07e7 63686172 		.ascii	"chargedelay\000"
+ 2286      67656465 
+ 2286      6C617900 
+ 2287              	.LASF64:
+ 2288 07f3 7069645F 		.ascii	"pid_temp_p\000"
+ 2288      74656D70 
+ 2288      5F7000
+ 2289              	.LASF33:
+ 2290 07fe 7465726D 		.ascii	"term_mode\000"
+ 2290      5F6D6F64 
+ 2290      6500
+ 2291              	.LASF57:
+ 2292 0808 73746172 		.ascii	"start_cycles\000"
+ 2292      745F6379 
+ 2292      636C6573 
+ 2292      00
+ 2293              	.LASF138:
+ 2294 0815 55534255 		.ascii	"USBUART_1_CDCIsReady\000"
+ 2294      4152545F 
+ 2294      315F4344 
+ 2294      43497352 
+ 2294      65616479 
+ 2295              	.LASF130:
+ 2296 082a 55534255 		.ascii	"USBUART_1_IsConfigurationChanged\000"
+ 2296      4152545F 
+ 2296      315F4973 
+ 2296      436F6E66 
+ 2296      69677572 
+ 2297              	.LASF50:
+ 2298 084b 74656D70 		.ascii	"temp2_max\000"
+ 2298      325F6D61 
+ 2298      7800
+ 2299              	.LASF88:
+ 2300 0855 68775F72 		.ascii	"hw_rev\000"
+ 2300      657600
+ 2301              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

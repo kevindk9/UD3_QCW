@@ -1,0 +1,2971 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"temp_pwm.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.temp_pwm_Enable,"ax",%progbits
+  20              		.align	1
+  21              		.global	temp_pwm_Enable
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	temp_pwm_Enable, %function
+  25              	temp_pwm_Enable:
+  26              	.LFB2:
+  27              		.file 1 "Generated_Source\\PSoC5\\temp_pwm.c"
+   1:Generated_Source\PSoC5/temp_pwm.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/temp_pwm.c **** * File Name: temp_pwm.c
+   3:Generated_Source\PSoC5/temp_pwm.c **** * Version 3.30
+   4:Generated_Source\PSoC5/temp_pwm.c **** *
+   5:Generated_Source\PSoC5/temp_pwm.c **** * Description:
+   6:Generated_Source\PSoC5/temp_pwm.c **** *  The PWM User Module consist of an 8 or 16-bit counter with two 8 or 16-bit
+   7:Generated_Source\PSoC5/temp_pwm.c **** *  comparitors. Each instance of this user module is capable of generating
+   8:Generated_Source\PSoC5/temp_pwm.c **** *  two PWM outputs with the same period. The pulse width is selectable between
+   9:Generated_Source\PSoC5/temp_pwm.c **** *  1 and 255/65535. The period is selectable between 2 and 255/65536 clocks.
+  10:Generated_Source\PSoC5/temp_pwm.c **** *  The compare value output may be configured to be active when the present
+  11:Generated_Source\PSoC5/temp_pwm.c **** *  counter is less than or less than/equal to the compare value.
+  12:Generated_Source\PSoC5/temp_pwm.c **** *  A terminal count output is also provided. It generates a pulse one clock
+  13:Generated_Source\PSoC5/temp_pwm.c **** *  width wide when the counter is equal to zero.
+  14:Generated_Source\PSoC5/temp_pwm.c **** *
+  15:Generated_Source\PSoC5/temp_pwm.c **** * Note:
+  16:Generated_Source\PSoC5/temp_pwm.c **** *
+  17:Generated_Source\PSoC5/temp_pwm.c **** *******************************************************************************
+  18:Generated_Source\PSoC5/temp_pwm.c **** * Copyright 2008-2014, Cypress Semiconductor Corporation.  All rights reserved.
+  19:Generated_Source\PSoC5/temp_pwm.c **** * You may use this file only in accordance with the license, terms, conditions,
+  20:Generated_Source\PSoC5/temp_pwm.c **** * disclaimers, and limitations in the end user license agreement accompanying
+  21:Generated_Source\PSoC5/temp_pwm.c **** * the software package with which this file was provided.
+  22:Generated_Source\PSoC5/temp_pwm.c **** ********************************************************************************/
+  23:Generated_Source\PSoC5/temp_pwm.c **** 
+  24:Generated_Source\PSoC5/temp_pwm.c **** #include "temp_pwm.h"
+  25:Generated_Source\PSoC5/temp_pwm.c **** 
+  26:Generated_Source\PSoC5/temp_pwm.c **** /* Error message for removed <resource> through optimization */
+  27:Generated_Source\PSoC5/temp_pwm.c **** #ifdef temp_pwm_PWMUDB_genblk1_ctrlreg__REMOVED
+  28:Generated_Source\PSoC5/temp_pwm.c ****     #error PWM_v3_30 detected with a constant 0 for the enable or \
+  29:Generated_Source\PSoC5/temp_pwm.c ****          constant 1 for reset. This will prevent the component from operating.
+  30:Generated_Source\PSoC5/temp_pwm.c **** #endif /* temp_pwm_PWMUDB_genblk1_ctrlreg__REMOVED */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 2
+
+
+  31:Generated_Source\PSoC5/temp_pwm.c **** 
+  32:Generated_Source\PSoC5/temp_pwm.c **** uint8 temp_pwm_initVar = 0u;
+  33:Generated_Source\PSoC5/temp_pwm.c **** 
+  34:Generated_Source\PSoC5/temp_pwm.c **** 
+  35:Generated_Source\PSoC5/temp_pwm.c **** /*******************************************************************************
+  36:Generated_Source\PSoC5/temp_pwm.c **** * Function Name: temp_pwm_Start
+  37:Generated_Source\PSoC5/temp_pwm.c **** ********************************************************************************
+  38:Generated_Source\PSoC5/temp_pwm.c **** *
+  39:Generated_Source\PSoC5/temp_pwm.c **** * Summary:
+  40:Generated_Source\PSoC5/temp_pwm.c **** *  The start function initializes the pwm with the default values, the
+  41:Generated_Source\PSoC5/temp_pwm.c **** *  enables the counter to begin counting.  It does not enable interrupts,
+  42:Generated_Source\PSoC5/temp_pwm.c **** *  the EnableInt command should be called if interrupt generation is required.
+  43:Generated_Source\PSoC5/temp_pwm.c **** *
+  44:Generated_Source\PSoC5/temp_pwm.c **** * Parameters:
+  45:Generated_Source\PSoC5/temp_pwm.c **** *  None
+  46:Generated_Source\PSoC5/temp_pwm.c **** *
+  47:Generated_Source\PSoC5/temp_pwm.c **** * Return:
+  48:Generated_Source\PSoC5/temp_pwm.c **** *  None
+  49:Generated_Source\PSoC5/temp_pwm.c **** *
+  50:Generated_Source\PSoC5/temp_pwm.c **** * Global variables:
+  51:Generated_Source\PSoC5/temp_pwm.c **** *  temp_pwm_initVar: Is modified when this function is called for the
+  52:Generated_Source\PSoC5/temp_pwm.c **** *   first time. Is used to ensure that initialization happens only once.
+  53:Generated_Source\PSoC5/temp_pwm.c **** *
+  54:Generated_Source\PSoC5/temp_pwm.c **** *******************************************************************************/
+  55:Generated_Source\PSoC5/temp_pwm.c **** void temp_pwm_Start(void) 
+  56:Generated_Source\PSoC5/temp_pwm.c **** {
+  57:Generated_Source\PSoC5/temp_pwm.c ****     /* If not Initialized then initialize all required hardware and software */
+  58:Generated_Source\PSoC5/temp_pwm.c ****     if(temp_pwm_initVar == 0u)
+  59:Generated_Source\PSoC5/temp_pwm.c ****     {
+  60:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_Init();
+  61:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_initVar = 1u;
+  62:Generated_Source\PSoC5/temp_pwm.c ****     }
+  63:Generated_Source\PSoC5/temp_pwm.c ****     temp_pwm_Enable();
+  64:Generated_Source\PSoC5/temp_pwm.c **** 
+  65:Generated_Source\PSoC5/temp_pwm.c **** }
+  66:Generated_Source\PSoC5/temp_pwm.c **** 
+  67:Generated_Source\PSoC5/temp_pwm.c **** 
+  68:Generated_Source\PSoC5/temp_pwm.c **** /*******************************************************************************
+  69:Generated_Source\PSoC5/temp_pwm.c **** * Function Name: temp_pwm_Init
+  70:Generated_Source\PSoC5/temp_pwm.c **** ********************************************************************************
+  71:Generated_Source\PSoC5/temp_pwm.c **** *
+  72:Generated_Source\PSoC5/temp_pwm.c **** * Summary:
+  73:Generated_Source\PSoC5/temp_pwm.c **** *  Initialize component's parameters to the parameters set by user in the
+  74:Generated_Source\PSoC5/temp_pwm.c **** *  customizer of the component placed onto schematic. Usually called in
+  75:Generated_Source\PSoC5/temp_pwm.c **** *  temp_pwm_Start().
+  76:Generated_Source\PSoC5/temp_pwm.c **** *
+  77:Generated_Source\PSoC5/temp_pwm.c **** * Parameters:
+  78:Generated_Source\PSoC5/temp_pwm.c **** *  None
+  79:Generated_Source\PSoC5/temp_pwm.c **** *
+  80:Generated_Source\PSoC5/temp_pwm.c **** * Return:
+  81:Generated_Source\PSoC5/temp_pwm.c **** *  None
+  82:Generated_Source\PSoC5/temp_pwm.c **** *
+  83:Generated_Source\PSoC5/temp_pwm.c **** *******************************************************************************/
+  84:Generated_Source\PSoC5/temp_pwm.c **** void temp_pwm_Init(void) 
+  85:Generated_Source\PSoC5/temp_pwm.c **** {
+  86:Generated_Source\PSoC5/temp_pwm.c ****     #if (temp_pwm_UsingFixedFunction || temp_pwm_UseControl)
+  87:Generated_Source\PSoC5/temp_pwm.c ****         uint8 ctrl;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 3
+
+
+  88:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (temp_pwm_UsingFixedFunction || temp_pwm_UseControl) */
+  89:Generated_Source\PSoC5/temp_pwm.c **** 
+  90:Generated_Source\PSoC5/temp_pwm.c ****     #if(!temp_pwm_UsingFixedFunction)
+  91:Generated_Source\PSoC5/temp_pwm.c ****         #if(temp_pwm_UseStatus)
+  92:Generated_Source\PSoC5/temp_pwm.c ****             /* Interrupt State Backup for Critical Region*/
+  93:Generated_Source\PSoC5/temp_pwm.c ****             uint8 temp_pwm_interruptState;
+  94:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UseStatus) */
+  95:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (!temp_pwm_UsingFixedFunction) */
+  96:Generated_Source\PSoC5/temp_pwm.c **** 
+  97:Generated_Source\PSoC5/temp_pwm.c ****     #if (temp_pwm_UsingFixedFunction)
+  98:Generated_Source\PSoC5/temp_pwm.c ****         /* You are allowed to write the compare value (FF only) */
+  99:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_CONTROL |= temp_pwm_CFG0_MODE;
+ 100:Generated_Source\PSoC5/temp_pwm.c ****         #if (temp_pwm_DeadBand2_4)
+ 101:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_CONTROL |= temp_pwm_CFG0_DB;
+ 102:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_DeadBand2_4) */
+ 103:Generated_Source\PSoC5/temp_pwm.c **** 
+ 104:Generated_Source\PSoC5/temp_pwm.c ****         ctrl = temp_pwm_CONTROL3 & ((uint8 )(~temp_pwm_CTRL_CMPMODE1_MASK));
+ 105:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_CONTROL3 = ctrl | temp_pwm_DEFAULT_COMPARE1_MODE;
+ 106:Generated_Source\PSoC5/temp_pwm.c **** 
+ 107:Generated_Source\PSoC5/temp_pwm.c ****          /* Clear and Set SYNCTC and SYNCCMP bits of RT1 register */
+ 108:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_RT1 &= ((uint8)(~temp_pwm_RT1_MASK));
+ 109:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_RT1 |= temp_pwm_SYNC;
+ 110:Generated_Source\PSoC5/temp_pwm.c **** 
+ 111:Generated_Source\PSoC5/temp_pwm.c ****         /*Enable DSI Sync all all inputs of the PWM*/
+ 112:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_RT1 &= ((uint8)(~temp_pwm_SYNCDSI_MASK));
+ 113:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_RT1 |= temp_pwm_SYNCDSI_EN;
+ 114:Generated_Source\PSoC5/temp_pwm.c **** 
+ 115:Generated_Source\PSoC5/temp_pwm.c ****     #elif (temp_pwm_UseControl)
+ 116:Generated_Source\PSoC5/temp_pwm.c ****         /* Set the default compare mode defined in the parameter */
+ 117:Generated_Source\PSoC5/temp_pwm.c ****         ctrl = temp_pwm_CONTROL & ((uint8)(~temp_pwm_CTRL_CMPMODE2_MASK)) &
+ 118:Generated_Source\PSoC5/temp_pwm.c ****                 ((uint8)(~temp_pwm_CTRL_CMPMODE1_MASK));
+ 119:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_CONTROL = ctrl | temp_pwm_DEFAULT_COMPARE2_MODE |
+ 120:Generated_Source\PSoC5/temp_pwm.c ****                                    temp_pwm_DEFAULT_COMPARE1_MODE;
+ 121:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (temp_pwm_UsingFixedFunction) */
+ 122:Generated_Source\PSoC5/temp_pwm.c **** 
+ 123:Generated_Source\PSoC5/temp_pwm.c ****     #if (!temp_pwm_UsingFixedFunction)
+ 124:Generated_Source\PSoC5/temp_pwm.c ****         #if (temp_pwm_Resolution == 8)
+ 125:Generated_Source\PSoC5/temp_pwm.c ****             /* Set FIFO 0 to 1 byte register for period*/
+ 126:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_AUX_CONTROLDP0 |= (temp_pwm_AUX_CTRL_FIFO0_CLR);
+ 127:Generated_Source\PSoC5/temp_pwm.c ****         #else /* (temp_pwm_Resolution == 16)*/
+ 128:Generated_Source\PSoC5/temp_pwm.c ****             /* Set FIFO 0 to 1 byte register for period */
+ 129:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_AUX_CONTROLDP0 |= (temp_pwm_AUX_CTRL_FIFO0_CLR);
+ 130:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_AUX_CONTROLDP1 |= (temp_pwm_AUX_CTRL_FIFO0_CLR);
+ 131:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_Resolution == 8) */
+ 132:Generated_Source\PSoC5/temp_pwm.c **** 
+ 133:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_WriteCounter(temp_pwm_INIT_PERIOD_VALUE);
+ 134:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (!temp_pwm_UsingFixedFunction) */
+ 135:Generated_Source\PSoC5/temp_pwm.c **** 
+ 136:Generated_Source\PSoC5/temp_pwm.c ****     temp_pwm_WritePeriod(temp_pwm_INIT_PERIOD_VALUE);
+ 137:Generated_Source\PSoC5/temp_pwm.c **** 
+ 138:Generated_Source\PSoC5/temp_pwm.c ****         #if (temp_pwm_UseOneCompareMode)
+ 139:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_WriteCompare(temp_pwm_INIT_COMPARE_VALUE1);
+ 140:Generated_Source\PSoC5/temp_pwm.c ****         #else
+ 141:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_WriteCompare1(temp_pwm_INIT_COMPARE_VALUE1);
+ 142:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_WriteCompare2(temp_pwm_INIT_COMPARE_VALUE2);
+ 143:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UseOneCompareMode) */
+ 144:Generated_Source\PSoC5/temp_pwm.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 4
+
+
+ 145:Generated_Source\PSoC5/temp_pwm.c ****         #if (temp_pwm_KillModeMinTime)
+ 146:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_WriteKillTime(temp_pwm_MinimumKillTime);
+ 147:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_KillModeMinTime) */
+ 148:Generated_Source\PSoC5/temp_pwm.c **** 
+ 149:Generated_Source\PSoC5/temp_pwm.c ****         #if (temp_pwm_DeadBandUsed)
+ 150:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_WriteDeadTime(temp_pwm_INIT_DEAD_TIME);
+ 151:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_DeadBandUsed) */
+ 152:Generated_Source\PSoC5/temp_pwm.c **** 
+ 153:Generated_Source\PSoC5/temp_pwm.c ****     #if (temp_pwm_UseStatus || temp_pwm_UsingFixedFunction)
+ 154:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_SetInterruptMode(temp_pwm_INIT_INTERRUPTS_MODE);
+ 155:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (temp_pwm_UseStatus || temp_pwm_UsingFixedFunction) */
+ 156:Generated_Source\PSoC5/temp_pwm.c **** 
+ 157:Generated_Source\PSoC5/temp_pwm.c ****     #if (temp_pwm_UsingFixedFunction)
+ 158:Generated_Source\PSoC5/temp_pwm.c ****         /* Globally Enable the Fixed Function Block chosen */
+ 159:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_GLOBAL_ENABLE |= temp_pwm_BLOCK_EN_MASK;
+ 160:Generated_Source\PSoC5/temp_pwm.c ****         /* Set the Interrupt source to come from the status register */
+ 161:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_CONTROL2 |= temp_pwm_CTRL2_IRQ_SEL;
+ 162:Generated_Source\PSoC5/temp_pwm.c ****     #else
+ 163:Generated_Source\PSoC5/temp_pwm.c ****         #if(temp_pwm_UseStatus)
+ 164:Generated_Source\PSoC5/temp_pwm.c **** 
+ 165:Generated_Source\PSoC5/temp_pwm.c ****             /* CyEnterCriticalRegion and CyExitCriticalRegion are used to mark following region cri
+ 166:Generated_Source\PSoC5/temp_pwm.c ****             /* Enter Critical Region*/
+ 167:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_interruptState = CyEnterCriticalSection();
+ 168:Generated_Source\PSoC5/temp_pwm.c ****             /* Use the interrupt output of the status register for IRQ output */
+ 169:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_STATUS_AUX_CTRL |= temp_pwm_STATUS_ACTL_INT_EN_MASK;
+ 170:Generated_Source\PSoC5/temp_pwm.c **** 
+ 171:Generated_Source\PSoC5/temp_pwm.c ****              /* Exit Critical Region*/
+ 172:Generated_Source\PSoC5/temp_pwm.c ****             CyExitCriticalSection(temp_pwm_interruptState);
+ 173:Generated_Source\PSoC5/temp_pwm.c **** 
+ 174:Generated_Source\PSoC5/temp_pwm.c ****             /* Clear the FIFO to enable the temp_pwm_STATUS_FIFOFULL
+ 175:Generated_Source\PSoC5/temp_pwm.c ****                    bit to be set on FIFO full. */
+ 176:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_ClearFIFO();
+ 177:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UseStatus) */
+ 178:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (temp_pwm_UsingFixedFunction) */
+ 179:Generated_Source\PSoC5/temp_pwm.c **** }
+ 180:Generated_Source\PSoC5/temp_pwm.c **** 
+ 181:Generated_Source\PSoC5/temp_pwm.c **** 
+ 182:Generated_Source\PSoC5/temp_pwm.c **** /*******************************************************************************
+ 183:Generated_Source\PSoC5/temp_pwm.c **** * Function Name: temp_pwm_Enable
+ 184:Generated_Source\PSoC5/temp_pwm.c **** ********************************************************************************
+ 185:Generated_Source\PSoC5/temp_pwm.c **** *
+ 186:Generated_Source\PSoC5/temp_pwm.c **** * Summary:
+ 187:Generated_Source\PSoC5/temp_pwm.c **** *  Enables the PWM block operation
+ 188:Generated_Source\PSoC5/temp_pwm.c **** *
+ 189:Generated_Source\PSoC5/temp_pwm.c **** * Parameters:
+ 190:Generated_Source\PSoC5/temp_pwm.c **** *  None
+ 191:Generated_Source\PSoC5/temp_pwm.c **** *
+ 192:Generated_Source\PSoC5/temp_pwm.c **** * Return:
+ 193:Generated_Source\PSoC5/temp_pwm.c **** *  None
+ 194:Generated_Source\PSoC5/temp_pwm.c **** *
+ 195:Generated_Source\PSoC5/temp_pwm.c **** * Side Effects:
+ 196:Generated_Source\PSoC5/temp_pwm.c **** *  This works only if software enable mode is chosen
+ 197:Generated_Source\PSoC5/temp_pwm.c **** *
+ 198:Generated_Source\PSoC5/temp_pwm.c **** *******************************************************************************/
+ 199:Generated_Source\PSoC5/temp_pwm.c **** void temp_pwm_Enable(void) 
+ 200:Generated_Source\PSoC5/temp_pwm.c **** {
+  28              		.loc 1 200 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 5
+
+
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+ 201:Generated_Source\PSoC5/temp_pwm.c ****     /* Globally Enable the Fixed Function Block chosen */
+ 202:Generated_Source\PSoC5/temp_pwm.c ****     #if (temp_pwm_UsingFixedFunction)
+ 203:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_GLOBAL_ENABLE |= temp_pwm_BLOCK_EN_MASK;
+ 204:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_GLOBAL_STBY_ENABLE |= temp_pwm_BLOCK_STBY_EN_MASK;
+ 205:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (temp_pwm_UsingFixedFunction) */
+ 206:Generated_Source\PSoC5/temp_pwm.c **** 
+ 207:Generated_Source\PSoC5/temp_pwm.c ****     /* Enable the PWM from the control register  */
+ 208:Generated_Source\PSoC5/temp_pwm.c ****     #if (temp_pwm_UseControl || temp_pwm_UsingFixedFunction)
+ 209:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_CONTROL |= temp_pwm_CTRL_ENABLE;
+  33              		.loc 1 209 0
+  34 0000 024A     		ldr	r2, .L2
+  35 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  36 0004 43F08003 		orr	r3, r3, #128
+  37 0008 1370     		strb	r3, [r2]
+  38 000a 7047     		bx	lr
+  39              	.L3:
+  40              		.align	2
+  41              	.L2:
+  42 000c 71640040 		.word	1073767537
+  43              		.cfi_endproc
+  44              	.LFE2:
+  45              		.size	temp_pwm_Enable, .-temp_pwm_Enable
+  46              		.section	.text.temp_pwm_Stop,"ax",%progbits
+  47              		.align	1
+  48              		.global	temp_pwm_Stop
+  49              		.thumb
+  50              		.thumb_func
+  51              		.type	temp_pwm_Stop, %function
+  52              	temp_pwm_Stop:
+  53              	.LFB3:
+ 210:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (temp_pwm_UseControl || temp_pwm_UsingFixedFunction) */
+ 211:Generated_Source\PSoC5/temp_pwm.c **** }
+ 212:Generated_Source\PSoC5/temp_pwm.c **** 
+ 213:Generated_Source\PSoC5/temp_pwm.c **** 
+ 214:Generated_Source\PSoC5/temp_pwm.c **** /*******************************************************************************
+ 215:Generated_Source\PSoC5/temp_pwm.c **** * Function Name: temp_pwm_Stop
+ 216:Generated_Source\PSoC5/temp_pwm.c **** ********************************************************************************
+ 217:Generated_Source\PSoC5/temp_pwm.c **** *
+ 218:Generated_Source\PSoC5/temp_pwm.c **** * Summary:
+ 219:Generated_Source\PSoC5/temp_pwm.c **** *  The stop function halts the PWM, but does not change any modes or disable
+ 220:Generated_Source\PSoC5/temp_pwm.c **** *  interrupts.
+ 221:Generated_Source\PSoC5/temp_pwm.c **** *
+ 222:Generated_Source\PSoC5/temp_pwm.c **** * Parameters:
+ 223:Generated_Source\PSoC5/temp_pwm.c **** *  None
+ 224:Generated_Source\PSoC5/temp_pwm.c **** *
+ 225:Generated_Source\PSoC5/temp_pwm.c **** * Return:
+ 226:Generated_Source\PSoC5/temp_pwm.c **** *  None
+ 227:Generated_Source\PSoC5/temp_pwm.c **** *
+ 228:Generated_Source\PSoC5/temp_pwm.c **** * Side Effects:
+ 229:Generated_Source\PSoC5/temp_pwm.c **** *  If the Enable mode is set to Hardware only then this function
+ 230:Generated_Source\PSoC5/temp_pwm.c **** *  has no effect on the operation of the PWM
+ 231:Generated_Source\PSoC5/temp_pwm.c **** *
+ 232:Generated_Source\PSoC5/temp_pwm.c **** *******************************************************************************/
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 6
+
+
+ 233:Generated_Source\PSoC5/temp_pwm.c **** void temp_pwm_Stop(void) 
+ 234:Generated_Source\PSoC5/temp_pwm.c **** {
+  54              		.loc 1 234 0
+  55              		.cfi_startproc
+  56              		@ args = 0, pretend = 0, frame = 0
+  57              		@ frame_needed = 0, uses_anonymous_args = 0
+  58              		@ link register save eliminated.
+ 235:Generated_Source\PSoC5/temp_pwm.c ****     #if (temp_pwm_UseControl || temp_pwm_UsingFixedFunction)
+ 236:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_CONTROL &= ((uint8)(~temp_pwm_CTRL_ENABLE));
+  59              		.loc 1 236 0
+  60 0000 024A     		ldr	r2, .L5
+  61 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  62 0004 03F07F03 		and	r3, r3, #127
+  63 0008 1370     		strb	r3, [r2]
+  64 000a 7047     		bx	lr
+  65              	.L6:
+  66              		.align	2
+  67              	.L5:
+  68 000c 71640040 		.word	1073767537
+  69              		.cfi_endproc
+  70              	.LFE3:
+  71              		.size	temp_pwm_Stop, .-temp_pwm_Stop
+  72              		.section	.text.temp_pwm_WriteCounter,"ax",%progbits
+  73              		.align	1
+  74              		.global	temp_pwm_WriteCounter
+  75              		.thumb
+  76              		.thumb_func
+  77              		.type	temp_pwm_WriteCounter, %function
+  78              	temp_pwm_WriteCounter:
+  79              	.LFB4:
+ 237:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (temp_pwm_UseControl || temp_pwm_UsingFixedFunction) */
+ 238:Generated_Source\PSoC5/temp_pwm.c **** 
+ 239:Generated_Source\PSoC5/temp_pwm.c ****     /* Globally disable the Fixed Function Block chosen */
+ 240:Generated_Source\PSoC5/temp_pwm.c ****     #if (temp_pwm_UsingFixedFunction)
+ 241:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_GLOBAL_ENABLE &= ((uint8)(~temp_pwm_BLOCK_EN_MASK));
+ 242:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_GLOBAL_STBY_ENABLE &= ((uint8)(~temp_pwm_BLOCK_STBY_EN_MASK));
+ 243:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (temp_pwm_UsingFixedFunction) */
+ 244:Generated_Source\PSoC5/temp_pwm.c **** }
+ 245:Generated_Source\PSoC5/temp_pwm.c **** 
+ 246:Generated_Source\PSoC5/temp_pwm.c **** #if (temp_pwm_UseOneCompareMode)
+ 247:Generated_Source\PSoC5/temp_pwm.c ****     #if (temp_pwm_CompareMode1SW)
+ 248:Generated_Source\PSoC5/temp_pwm.c **** 
+ 249:Generated_Source\PSoC5/temp_pwm.c **** 
+ 250:Generated_Source\PSoC5/temp_pwm.c ****         /*******************************************************************************
+ 251:Generated_Source\PSoC5/temp_pwm.c ****         * Function Name: temp_pwm_SetCompareMode
+ 252:Generated_Source\PSoC5/temp_pwm.c ****         ********************************************************************************
+ 253:Generated_Source\PSoC5/temp_pwm.c ****         *
+ 254:Generated_Source\PSoC5/temp_pwm.c ****         * Summary:
+ 255:Generated_Source\PSoC5/temp_pwm.c ****         *  This function writes the Compare Mode for the pwm output when in Dither mode,
+ 256:Generated_Source\PSoC5/temp_pwm.c ****         *  Center Align Mode or One Output Mode.
+ 257:Generated_Source\PSoC5/temp_pwm.c ****         *
+ 258:Generated_Source\PSoC5/temp_pwm.c ****         * Parameters:
+ 259:Generated_Source\PSoC5/temp_pwm.c ****         *  comparemode:  The new compare mode for the PWM output. Use the compare types
+ 260:Generated_Source\PSoC5/temp_pwm.c ****         *                defined in the H file as input arguments.
+ 261:Generated_Source\PSoC5/temp_pwm.c ****         *
+ 262:Generated_Source\PSoC5/temp_pwm.c ****         * Return:
+ 263:Generated_Source\PSoC5/temp_pwm.c ****         *  None
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 7
+
+
+ 264:Generated_Source\PSoC5/temp_pwm.c ****         *
+ 265:Generated_Source\PSoC5/temp_pwm.c ****         *******************************************************************************/
+ 266:Generated_Source\PSoC5/temp_pwm.c ****         void temp_pwm_SetCompareMode(uint8 comparemode) 
+ 267:Generated_Source\PSoC5/temp_pwm.c ****         {
+ 268:Generated_Source\PSoC5/temp_pwm.c ****             #if(temp_pwm_UsingFixedFunction)
+ 269:Generated_Source\PSoC5/temp_pwm.c **** 
+ 270:Generated_Source\PSoC5/temp_pwm.c ****                 #if(0 != temp_pwm_CTRL_CMPMODE1_SHIFT)
+ 271:Generated_Source\PSoC5/temp_pwm.c ****                     uint8 comparemodemasked = ((uint8)((uint8)comparemode << temp_pwm_CTRL_CMPMODE1
+ 272:Generated_Source\PSoC5/temp_pwm.c ****                 #else
+ 273:Generated_Source\PSoC5/temp_pwm.c ****                     uint8 comparemodemasked = comparemode;
+ 274:Generated_Source\PSoC5/temp_pwm.c ****                 #endif /* (0 != temp_pwm_CTRL_CMPMODE1_SHIFT) */
+ 275:Generated_Source\PSoC5/temp_pwm.c **** 
+ 276:Generated_Source\PSoC5/temp_pwm.c ****                 temp_pwm_CONTROL3 &= ((uint8)(~temp_pwm_CTRL_CMPMODE1_MASK)); /*Clear Existing Data
+ 277:Generated_Source\PSoC5/temp_pwm.c ****                 temp_pwm_CONTROL3 |= comparemodemasked;
+ 278:Generated_Source\PSoC5/temp_pwm.c **** 
+ 279:Generated_Source\PSoC5/temp_pwm.c ****             #elif (temp_pwm_UseControl)
+ 280:Generated_Source\PSoC5/temp_pwm.c **** 
+ 281:Generated_Source\PSoC5/temp_pwm.c ****                 #if(0 != temp_pwm_CTRL_CMPMODE1_SHIFT)
+ 282:Generated_Source\PSoC5/temp_pwm.c ****                     uint8 comparemode1masked = ((uint8)((uint8)comparemode << temp_pwm_CTRL_CMPMODE
+ 283:Generated_Source\PSoC5/temp_pwm.c ****                                                 temp_pwm_CTRL_CMPMODE1_MASK;
+ 284:Generated_Source\PSoC5/temp_pwm.c ****                 #else
+ 285:Generated_Source\PSoC5/temp_pwm.c ****                     uint8 comparemode1masked = comparemode & temp_pwm_CTRL_CMPMODE1_MASK;
+ 286:Generated_Source\PSoC5/temp_pwm.c ****                 #endif /* (0 != temp_pwm_CTRL_CMPMODE1_SHIFT) */
+ 287:Generated_Source\PSoC5/temp_pwm.c **** 
+ 288:Generated_Source\PSoC5/temp_pwm.c ****                 #if(0 != temp_pwm_CTRL_CMPMODE2_SHIFT)
+ 289:Generated_Source\PSoC5/temp_pwm.c ****                     uint8 comparemode2masked = ((uint8)((uint8)comparemode << temp_pwm_CTRL_CMPMODE
+ 290:Generated_Source\PSoC5/temp_pwm.c ****                                                temp_pwm_CTRL_CMPMODE2_MASK;
+ 291:Generated_Source\PSoC5/temp_pwm.c ****                 #else
+ 292:Generated_Source\PSoC5/temp_pwm.c ****                     uint8 comparemode2masked = comparemode & temp_pwm_CTRL_CMPMODE2_MASK;
+ 293:Generated_Source\PSoC5/temp_pwm.c ****                 #endif /* (0 != temp_pwm_CTRL_CMPMODE2_SHIFT) */
+ 294:Generated_Source\PSoC5/temp_pwm.c **** 
+ 295:Generated_Source\PSoC5/temp_pwm.c ****                 /*Clear existing mode */
+ 296:Generated_Source\PSoC5/temp_pwm.c ****                 temp_pwm_CONTROL &= ((uint8)(~(temp_pwm_CTRL_CMPMODE1_MASK |
+ 297:Generated_Source\PSoC5/temp_pwm.c ****                                             temp_pwm_CTRL_CMPMODE2_MASK)));
+ 298:Generated_Source\PSoC5/temp_pwm.c ****                 temp_pwm_CONTROL |= (comparemode1masked | comparemode2masked);
+ 299:Generated_Source\PSoC5/temp_pwm.c **** 
+ 300:Generated_Source\PSoC5/temp_pwm.c ****             #else
+ 301:Generated_Source\PSoC5/temp_pwm.c ****                 uint8 temp = comparemode;
+ 302:Generated_Source\PSoC5/temp_pwm.c ****             #endif /* (temp_pwm_UsingFixedFunction) */
+ 303:Generated_Source\PSoC5/temp_pwm.c ****         }
+ 304:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* temp_pwm_CompareMode1SW */
+ 305:Generated_Source\PSoC5/temp_pwm.c **** 
+ 306:Generated_Source\PSoC5/temp_pwm.c **** #else /* UseOneCompareMode */
+ 307:Generated_Source\PSoC5/temp_pwm.c **** 
+ 308:Generated_Source\PSoC5/temp_pwm.c ****     #if (temp_pwm_CompareMode1SW)
+ 309:Generated_Source\PSoC5/temp_pwm.c **** 
+ 310:Generated_Source\PSoC5/temp_pwm.c **** 
+ 311:Generated_Source\PSoC5/temp_pwm.c ****         /*******************************************************************************
+ 312:Generated_Source\PSoC5/temp_pwm.c ****         * Function Name: temp_pwm_SetCompareMode1
+ 313:Generated_Source\PSoC5/temp_pwm.c ****         ********************************************************************************
+ 314:Generated_Source\PSoC5/temp_pwm.c ****         *
+ 315:Generated_Source\PSoC5/temp_pwm.c ****         * Summary:
+ 316:Generated_Source\PSoC5/temp_pwm.c ****         *  This function writes the Compare Mode for the pwm or pwm1 output
+ 317:Generated_Source\PSoC5/temp_pwm.c ****         *
+ 318:Generated_Source\PSoC5/temp_pwm.c ****         * Parameters:
+ 319:Generated_Source\PSoC5/temp_pwm.c ****         *  comparemode:  The new compare mode for the PWM output. Use the compare types
+ 320:Generated_Source\PSoC5/temp_pwm.c ****         *                defined in the H file as input arguments.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 8
+
+
+ 321:Generated_Source\PSoC5/temp_pwm.c ****         *
+ 322:Generated_Source\PSoC5/temp_pwm.c ****         * Return:
+ 323:Generated_Source\PSoC5/temp_pwm.c ****         *  None
+ 324:Generated_Source\PSoC5/temp_pwm.c ****         *
+ 325:Generated_Source\PSoC5/temp_pwm.c ****         *******************************************************************************/
+ 326:Generated_Source\PSoC5/temp_pwm.c ****         void temp_pwm_SetCompareMode1(uint8 comparemode) 
+ 327:Generated_Source\PSoC5/temp_pwm.c ****         {
+ 328:Generated_Source\PSoC5/temp_pwm.c ****             #if(0 != temp_pwm_CTRL_CMPMODE1_SHIFT)
+ 329:Generated_Source\PSoC5/temp_pwm.c ****                 uint8 comparemodemasked = ((uint8)((uint8)comparemode << temp_pwm_CTRL_CMPMODE1_SHI
+ 330:Generated_Source\PSoC5/temp_pwm.c ****                                            temp_pwm_CTRL_CMPMODE1_MASK;
+ 331:Generated_Source\PSoC5/temp_pwm.c ****             #else
+ 332:Generated_Source\PSoC5/temp_pwm.c ****                 uint8 comparemodemasked = comparemode & temp_pwm_CTRL_CMPMODE1_MASK;
+ 333:Generated_Source\PSoC5/temp_pwm.c ****             #endif /* (0 != temp_pwm_CTRL_CMPMODE1_SHIFT) */
+ 334:Generated_Source\PSoC5/temp_pwm.c **** 
+ 335:Generated_Source\PSoC5/temp_pwm.c ****             #if (temp_pwm_UseControl)
+ 336:Generated_Source\PSoC5/temp_pwm.c ****                 temp_pwm_CONTROL &= ((uint8)(~temp_pwm_CTRL_CMPMODE1_MASK)); /*Clear existing mode 
+ 337:Generated_Source\PSoC5/temp_pwm.c ****                 temp_pwm_CONTROL |= comparemodemasked;
+ 338:Generated_Source\PSoC5/temp_pwm.c ****             #endif /* (temp_pwm_UseControl) */
+ 339:Generated_Source\PSoC5/temp_pwm.c ****         }
+ 340:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* temp_pwm_CompareMode1SW */
+ 341:Generated_Source\PSoC5/temp_pwm.c **** 
+ 342:Generated_Source\PSoC5/temp_pwm.c **** #if (temp_pwm_CompareMode2SW)
+ 343:Generated_Source\PSoC5/temp_pwm.c **** 
+ 344:Generated_Source\PSoC5/temp_pwm.c **** 
+ 345:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 346:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_SetCompareMode2
+ 347:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 348:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 349:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 350:Generated_Source\PSoC5/temp_pwm.c ****     *  This function writes the Compare Mode for the pwm or pwm2 output
+ 351:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 352:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 353:Generated_Source\PSoC5/temp_pwm.c ****     *  comparemode:  The new compare mode for the PWM output. Use the compare types
+ 354:Generated_Source\PSoC5/temp_pwm.c ****     *                defined in the H file as input arguments.
+ 355:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 356:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 357:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 358:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 359:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 360:Generated_Source\PSoC5/temp_pwm.c ****     void temp_pwm_SetCompareMode2(uint8 comparemode) 
+ 361:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 362:Generated_Source\PSoC5/temp_pwm.c **** 
+ 363:Generated_Source\PSoC5/temp_pwm.c ****         #if(0 != temp_pwm_CTRL_CMPMODE2_SHIFT)
+ 364:Generated_Source\PSoC5/temp_pwm.c ****             uint8 comparemodemasked = ((uint8)((uint8)comparemode << temp_pwm_CTRL_CMPMODE2_SHIFT))
+ 365:Generated_Source\PSoC5/temp_pwm.c ****                                                  temp_pwm_CTRL_CMPMODE2_MASK;
+ 366:Generated_Source\PSoC5/temp_pwm.c ****         #else
+ 367:Generated_Source\PSoC5/temp_pwm.c ****             uint8 comparemodemasked = comparemode & temp_pwm_CTRL_CMPMODE2_MASK;
+ 368:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (0 != temp_pwm_CTRL_CMPMODE2_SHIFT) */
+ 369:Generated_Source\PSoC5/temp_pwm.c **** 
+ 370:Generated_Source\PSoC5/temp_pwm.c ****         #if (temp_pwm_UseControl)
+ 371:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_CONTROL &= ((uint8)(~temp_pwm_CTRL_CMPMODE2_MASK)); /*Clear existing mode */
+ 372:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_CONTROL |= comparemodemasked;
+ 373:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UseControl) */
+ 374:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 375:Generated_Source\PSoC5/temp_pwm.c ****     #endif /*temp_pwm_CompareMode2SW */
+ 376:Generated_Source\PSoC5/temp_pwm.c **** 
+ 377:Generated_Source\PSoC5/temp_pwm.c **** #endif /* UseOneCompareMode */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 9
+
+
+ 378:Generated_Source\PSoC5/temp_pwm.c **** 
+ 379:Generated_Source\PSoC5/temp_pwm.c **** 
+ 380:Generated_Source\PSoC5/temp_pwm.c **** #if (!temp_pwm_UsingFixedFunction)
+ 381:Generated_Source\PSoC5/temp_pwm.c **** 
+ 382:Generated_Source\PSoC5/temp_pwm.c **** 
+ 383:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 384:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_WriteCounter
+ 385:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 386:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 387:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 388:Generated_Source\PSoC5/temp_pwm.c ****     *  Writes a new counter value directly to the counter register. This will be
+ 389:Generated_Source\PSoC5/temp_pwm.c ****     *  implemented for that currently running period and only that period. This API
+ 390:Generated_Source\PSoC5/temp_pwm.c ****     *  is valid only for UDB implementation and not available for fixed function
+ 391:Generated_Source\PSoC5/temp_pwm.c ****     *  PWM implementation.
+ 392:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 393:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 394:Generated_Source\PSoC5/temp_pwm.c ****     *  counter:  The period new period counter value.
+ 395:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 396:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 397:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 398:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 399:Generated_Source\PSoC5/temp_pwm.c ****     * Side Effects:
+ 400:Generated_Source\PSoC5/temp_pwm.c ****     *  The PWM Period will be reloaded when a counter value will be a zero
+ 401:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 402:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 403:Generated_Source\PSoC5/temp_pwm.c ****     void temp_pwm_WriteCounter(uint8 counter) \
+ 404:Generated_Source\PSoC5/temp_pwm.c ****                                        
+ 405:Generated_Source\PSoC5/temp_pwm.c ****     {
+  80              		.loc 1 405 0
+  81              		.cfi_startproc
+  82              		@ args = 0, pretend = 0, frame = 0
+  83              		@ frame_needed = 0, uses_anonymous_args = 0
+  84              		@ link register save eliminated.
+  85              	.LVL0:
+ 406:Generated_Source\PSoC5/temp_pwm.c ****         CY_SET_REG8(temp_pwm_COUNTER_LSB_PTR, counter);
+  86              		.loc 1 406 0
+  87 0000 014B     		ldr	r3, .L8
+  88 0002 1870     		strb	r0, [r3]
+  89 0004 7047     		bx	lr
+  90              	.L9:
+  91 0006 00BF     		.align	2
+  92              	.L8:
+  93 0008 02640040 		.word	1073767426
+  94              		.cfi_endproc
+  95              	.LFE4:
+  96              		.size	temp_pwm_WriteCounter, .-temp_pwm_WriteCounter
+  97              		.section	.text.temp_pwm_ReadCounter,"ax",%progbits
+  98              		.align	1
+  99              		.global	temp_pwm_ReadCounter
+ 100              		.thumb
+ 101              		.thumb_func
+ 102              		.type	temp_pwm_ReadCounter, %function
+ 103              	temp_pwm_ReadCounter:
+ 104              	.LFB5:
+ 407:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 408:Generated_Source\PSoC5/temp_pwm.c **** 
+ 409:Generated_Source\PSoC5/temp_pwm.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 10
+
+
+ 410:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 411:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_ReadCounter
+ 412:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 413:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 414:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 415:Generated_Source\PSoC5/temp_pwm.c ****     *  This function returns the current value of the counter.  It doesn't matter
+ 416:Generated_Source\PSoC5/temp_pwm.c ****     *  if the counter is enabled or running.
+ 417:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 418:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 419:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 420:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 421:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 422:Generated_Source\PSoC5/temp_pwm.c ****     *  The current value of the counter.
+ 423:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 424:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 425:Generated_Source\PSoC5/temp_pwm.c ****     uint8 temp_pwm_ReadCounter(void) 
+ 426:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 105              		.loc 1 426 0
+ 106              		.cfi_startproc
+ 107              		@ args = 0, pretend = 0, frame = 0
+ 108              		@ frame_needed = 0, uses_anonymous_args = 0
+ 109              		@ link register save eliminated.
+ 427:Generated_Source\PSoC5/temp_pwm.c ****         /* Force capture by reading Accumulator */
+ 428:Generated_Source\PSoC5/temp_pwm.c ****         /* Must first do a software capture to be able to read the counter */
+ 429:Generated_Source\PSoC5/temp_pwm.c ****         /* It is up to the user code to make sure there isn't already captured data in the FIFO */
+ 430:Generated_Source\PSoC5/temp_pwm.c ****           (void)CY_GET_REG8(temp_pwm_COUNTERCAP_LSB_PTR_8BIT);
+ 110              		.loc 1 430 0
+ 111 0000 024B     		ldr	r3, .L11
+ 112 0002 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 431:Generated_Source\PSoC5/temp_pwm.c **** 
+ 432:Generated_Source\PSoC5/temp_pwm.c ****         /* Read the data from the FIFO */
+ 433:Generated_Source\PSoC5/temp_pwm.c ****         return (CY_GET_REG8(temp_pwm_CAPTURE_LSB_PTR));
+ 113              		.loc 1 433 0
+ 114 0004 024B     		ldr	r3, .L11+4
+ 115 0006 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 434:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 116              		.loc 1 434 0
+ 117 0008 7047     		bx	lr
+ 118              	.L12:
+ 119 000a 00BF     		.align	2
+ 120              	.L11:
+ 121 000c 12640040 		.word	1073767442
+ 122 0010 52640040 		.word	1073767506
+ 123              		.cfi_endproc
+ 124              	.LFE5:
+ 125              		.size	temp_pwm_ReadCounter, .-temp_pwm_ReadCounter
+ 126              		.section	.text.temp_pwm_ClearFIFO,"ax",%progbits
+ 127              		.align	1
+ 128              		.global	temp_pwm_ClearFIFO
+ 129              		.thumb
+ 130              		.thumb_func
+ 131              		.type	temp_pwm_ClearFIFO, %function
+ 132              	temp_pwm_ClearFIFO:
+ 133              	.LFB6:
+ 435:Generated_Source\PSoC5/temp_pwm.c **** 
+ 436:Generated_Source\PSoC5/temp_pwm.c ****     #if (temp_pwm_UseStatus)
+ 437:Generated_Source\PSoC5/temp_pwm.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 11
+
+
+ 438:Generated_Source\PSoC5/temp_pwm.c **** 
+ 439:Generated_Source\PSoC5/temp_pwm.c ****         /*******************************************************************************
+ 440:Generated_Source\PSoC5/temp_pwm.c ****         * Function Name: temp_pwm_ClearFIFO
+ 441:Generated_Source\PSoC5/temp_pwm.c ****         ********************************************************************************
+ 442:Generated_Source\PSoC5/temp_pwm.c ****         *
+ 443:Generated_Source\PSoC5/temp_pwm.c ****         * Summary:
+ 444:Generated_Source\PSoC5/temp_pwm.c ****         *  This function clears all capture data from the capture FIFO
+ 445:Generated_Source\PSoC5/temp_pwm.c ****         *
+ 446:Generated_Source\PSoC5/temp_pwm.c ****         * Parameters:
+ 447:Generated_Source\PSoC5/temp_pwm.c ****         *  None
+ 448:Generated_Source\PSoC5/temp_pwm.c ****         *
+ 449:Generated_Source\PSoC5/temp_pwm.c ****         * Return:
+ 450:Generated_Source\PSoC5/temp_pwm.c ****         *  None
+ 451:Generated_Source\PSoC5/temp_pwm.c ****         *
+ 452:Generated_Source\PSoC5/temp_pwm.c ****         *******************************************************************************/
+ 453:Generated_Source\PSoC5/temp_pwm.c ****         void temp_pwm_ClearFIFO(void) 
+ 454:Generated_Source\PSoC5/temp_pwm.c ****         {
+ 134              		.loc 1 454 0
+ 135              		.cfi_startproc
+ 136              		@ args = 0, pretend = 0, frame = 0
+ 137              		@ frame_needed = 0, uses_anonymous_args = 0
+ 138              		@ link register save eliminated.
+ 139              	.LBB16:
+ 140              	.LBB17:
+ 455:Generated_Source\PSoC5/temp_pwm.c ****             while(0u != (temp_pwm_ReadStatusRegister() & temp_pwm_STATUS_FIFONEMPTY))
+ 456:Generated_Source\PSoC5/temp_pwm.c ****             {
+ 457:Generated_Source\PSoC5/temp_pwm.c ****                 (void)temp_pwm_ReadCapture();
+ 458:Generated_Source\PSoC5/temp_pwm.c ****             }
+ 459:Generated_Source\PSoC5/temp_pwm.c ****         }
+ 460:Generated_Source\PSoC5/temp_pwm.c **** 
+ 461:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* temp_pwm_UseStatus */
+ 462:Generated_Source\PSoC5/temp_pwm.c **** 
+ 463:Generated_Source\PSoC5/temp_pwm.c **** #endif /* !temp_pwm_UsingFixedFunction */
+ 464:Generated_Source\PSoC5/temp_pwm.c **** 
+ 465:Generated_Source\PSoC5/temp_pwm.c **** 
+ 466:Generated_Source\PSoC5/temp_pwm.c **** /*******************************************************************************
+ 467:Generated_Source\PSoC5/temp_pwm.c **** * Function Name: temp_pwm_WritePeriod
+ 468:Generated_Source\PSoC5/temp_pwm.c **** ********************************************************************************
+ 469:Generated_Source\PSoC5/temp_pwm.c **** *
+ 470:Generated_Source\PSoC5/temp_pwm.c **** * Summary:
+ 471:Generated_Source\PSoC5/temp_pwm.c **** *  This function is used to change the period of the counter.  The new period
+ 472:Generated_Source\PSoC5/temp_pwm.c **** *  will be loaded the next time terminal count is detected.
+ 473:Generated_Source\PSoC5/temp_pwm.c **** *
+ 474:Generated_Source\PSoC5/temp_pwm.c **** * Parameters:
+ 475:Generated_Source\PSoC5/temp_pwm.c **** *  period:  Period value. May be between 1 and (2^Resolution)-1.  A value of 0
+ 476:Generated_Source\PSoC5/temp_pwm.c **** *           will result in the counter remaining at zero.
+ 477:Generated_Source\PSoC5/temp_pwm.c **** *
+ 478:Generated_Source\PSoC5/temp_pwm.c **** * Return:
+ 479:Generated_Source\PSoC5/temp_pwm.c **** *  None
+ 480:Generated_Source\PSoC5/temp_pwm.c **** *
+ 481:Generated_Source\PSoC5/temp_pwm.c **** *******************************************************************************/
+ 482:Generated_Source\PSoC5/temp_pwm.c **** void temp_pwm_WritePeriod(uint8 period) 
+ 483:Generated_Source\PSoC5/temp_pwm.c **** {
+ 484:Generated_Source\PSoC5/temp_pwm.c ****     #if(temp_pwm_UsingFixedFunction)
+ 485:Generated_Source\PSoC5/temp_pwm.c ****         CY_SET_REG16(temp_pwm_PERIOD_LSB_PTR, (uint16)period);
+ 486:Generated_Source\PSoC5/temp_pwm.c ****     #else
+ 487:Generated_Source\PSoC5/temp_pwm.c ****         CY_SET_REG8(temp_pwm_PERIOD_LSB_PTR, period);
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 12
+
+
+ 488:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (temp_pwm_UsingFixedFunction) */
+ 489:Generated_Source\PSoC5/temp_pwm.c **** }
+ 490:Generated_Source\PSoC5/temp_pwm.c **** 
+ 491:Generated_Source\PSoC5/temp_pwm.c **** #if (temp_pwm_UseOneCompareMode)
+ 492:Generated_Source\PSoC5/temp_pwm.c **** 
+ 493:Generated_Source\PSoC5/temp_pwm.c **** 
+ 494:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 495:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_WriteCompare
+ 496:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 497:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 498:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 499:Generated_Source\PSoC5/temp_pwm.c ****     *  This funtion is used to change the compare1 value when the PWM is in Dither
+ 500:Generated_Source\PSoC5/temp_pwm.c ****     *  mode. The compare output will reflect the new value on the next UDB clock.
+ 501:Generated_Source\PSoC5/temp_pwm.c ****     *  The compare output will be driven high when the present counter value is
+ 502:Generated_Source\PSoC5/temp_pwm.c ****     *  compared to the compare value based on the compare mode defined in
+ 503:Generated_Source\PSoC5/temp_pwm.c ****     *  Dither Mode.
+ 504:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 505:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 506:Generated_Source\PSoC5/temp_pwm.c ****     *  compare:  New compare value.
+ 507:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 508:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 509:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 510:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 511:Generated_Source\PSoC5/temp_pwm.c ****     * Side Effects:
+ 512:Generated_Source\PSoC5/temp_pwm.c ****     *  This function is only available if the PWM mode parameter is set to
+ 513:Generated_Source\PSoC5/temp_pwm.c ****     *  Dither Mode, Center Aligned Mode or One Output Mode
+ 514:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 515:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 516:Generated_Source\PSoC5/temp_pwm.c ****     void temp_pwm_WriteCompare(uint8 compare) \
+ 517:Generated_Source\PSoC5/temp_pwm.c ****                                        
+ 518:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 519:Generated_Source\PSoC5/temp_pwm.c ****         #if(temp_pwm_UsingFixedFunction)
+ 520:Generated_Source\PSoC5/temp_pwm.c ****             CY_SET_REG16(temp_pwm_COMPARE1_LSB_PTR, (uint16)compare);
+ 521:Generated_Source\PSoC5/temp_pwm.c ****         #else
+ 522:Generated_Source\PSoC5/temp_pwm.c ****             CY_SET_REG8(temp_pwm_COMPARE1_LSB_PTR, compare);
+ 523:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UsingFixedFunction) */
+ 524:Generated_Source\PSoC5/temp_pwm.c **** 
+ 525:Generated_Source\PSoC5/temp_pwm.c ****         #if (temp_pwm_PWMMode == temp_pwm__B_PWM__DITHER)
+ 526:Generated_Source\PSoC5/temp_pwm.c ****             #if(temp_pwm_UsingFixedFunction)
+ 527:Generated_Source\PSoC5/temp_pwm.c ****                 CY_SET_REG16(temp_pwm_COMPARE2_LSB_PTR, (uint16)(compare + 1u));
+ 528:Generated_Source\PSoC5/temp_pwm.c ****             #else
+ 529:Generated_Source\PSoC5/temp_pwm.c ****                 CY_SET_REG8(temp_pwm_COMPARE2_LSB_PTR, (compare + 1u));
+ 530:Generated_Source\PSoC5/temp_pwm.c ****             #endif /* (temp_pwm_UsingFixedFunction) */
+ 531:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_PWMMode == temp_pwm__B_PWM__DITHER) */
+ 532:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 533:Generated_Source\PSoC5/temp_pwm.c **** 
+ 534:Generated_Source\PSoC5/temp_pwm.c **** 
+ 535:Generated_Source\PSoC5/temp_pwm.c **** #else
+ 536:Generated_Source\PSoC5/temp_pwm.c **** 
+ 537:Generated_Source\PSoC5/temp_pwm.c **** 
+ 538:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 539:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_WriteCompare1
+ 540:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 541:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 542:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 543:Generated_Source\PSoC5/temp_pwm.c ****     *  This funtion is used to change the compare1 value.  The compare output will
+ 544:Generated_Source\PSoC5/temp_pwm.c ****     *  reflect the new value on the next UDB clock.  The compare output will be
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 13
+
+
+ 545:Generated_Source\PSoC5/temp_pwm.c ****     *  driven high when the present counter value is less than or less than or
+ 546:Generated_Source\PSoC5/temp_pwm.c ****     *  equal to the compare register, depending on the mode.
+ 547:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 548:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 549:Generated_Source\PSoC5/temp_pwm.c ****     *  compare:  New compare value.
+ 550:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 551:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 552:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 553:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 554:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 555:Generated_Source\PSoC5/temp_pwm.c ****     void temp_pwm_WriteCompare1(uint8 compare) \
+ 556:Generated_Source\PSoC5/temp_pwm.c ****                                         
+ 557:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 558:Generated_Source\PSoC5/temp_pwm.c ****         #if(temp_pwm_UsingFixedFunction)
+ 559:Generated_Source\PSoC5/temp_pwm.c ****             CY_SET_REG16(temp_pwm_COMPARE1_LSB_PTR, (uint16)compare);
+ 560:Generated_Source\PSoC5/temp_pwm.c ****         #else
+ 561:Generated_Source\PSoC5/temp_pwm.c ****             CY_SET_REG8(temp_pwm_COMPARE1_LSB_PTR, compare);
+ 562:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UsingFixedFunction) */
+ 563:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 564:Generated_Source\PSoC5/temp_pwm.c **** 
+ 565:Generated_Source\PSoC5/temp_pwm.c **** 
+ 566:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 567:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_WriteCompare2
+ 568:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 569:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 570:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 571:Generated_Source\PSoC5/temp_pwm.c ****     *  This funtion is used to change the compare value, for compare1 output.
+ 572:Generated_Source\PSoC5/temp_pwm.c ****     *  The compare output will reflect the new value on the next UDB clock.
+ 573:Generated_Source\PSoC5/temp_pwm.c ****     *  The compare output will be driven high when the present counter value is
+ 574:Generated_Source\PSoC5/temp_pwm.c ****     *  less than or less than or equal to the compare register, depending on the
+ 575:Generated_Source\PSoC5/temp_pwm.c ****     *  mode.
+ 576:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 577:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 578:Generated_Source\PSoC5/temp_pwm.c ****     *  compare:  New compare value.
+ 579:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 580:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 581:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 582:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 583:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 584:Generated_Source\PSoC5/temp_pwm.c ****     void temp_pwm_WriteCompare2(uint8 compare) \
+ 585:Generated_Source\PSoC5/temp_pwm.c ****                                         
+ 586:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 587:Generated_Source\PSoC5/temp_pwm.c ****         #if(temp_pwm_UsingFixedFunction)
+ 588:Generated_Source\PSoC5/temp_pwm.c ****             CY_SET_REG16(temp_pwm_COMPARE2_LSB_PTR, compare);
+ 589:Generated_Source\PSoC5/temp_pwm.c ****         #else
+ 590:Generated_Source\PSoC5/temp_pwm.c ****             CY_SET_REG8(temp_pwm_COMPARE2_LSB_PTR, compare);
+ 591:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UsingFixedFunction) */
+ 592:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 593:Generated_Source\PSoC5/temp_pwm.c **** #endif /* UseOneCompareMode */
+ 594:Generated_Source\PSoC5/temp_pwm.c **** 
+ 595:Generated_Source\PSoC5/temp_pwm.c **** #if (temp_pwm_DeadBandUsed)
+ 596:Generated_Source\PSoC5/temp_pwm.c **** 
+ 597:Generated_Source\PSoC5/temp_pwm.c **** 
+ 598:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 599:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_WriteDeadTime
+ 600:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 601:Generated_Source\PSoC5/temp_pwm.c ****     *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 14
+
+
+ 602:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 603:Generated_Source\PSoC5/temp_pwm.c ****     *  This function writes the dead-band counts to the corresponding register
+ 604:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 605:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 606:Generated_Source\PSoC5/temp_pwm.c ****     *  deadtime:  Number of counts for dead time
+ 607:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 608:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 609:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 610:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 611:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 612:Generated_Source\PSoC5/temp_pwm.c ****     void temp_pwm_WriteDeadTime(uint8 deadtime) 
+ 613:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 614:Generated_Source\PSoC5/temp_pwm.c ****         /* If using the Dead Band 1-255 mode then just write the register */
+ 615:Generated_Source\PSoC5/temp_pwm.c ****         #if(!temp_pwm_DeadBand2_4)
+ 616:Generated_Source\PSoC5/temp_pwm.c ****             CY_SET_REG8(temp_pwm_DEADBAND_COUNT_PTR, deadtime);
+ 617:Generated_Source\PSoC5/temp_pwm.c ****         #else
+ 618:Generated_Source\PSoC5/temp_pwm.c ****             /* Otherwise the data has to be masked and offset */
+ 619:Generated_Source\PSoC5/temp_pwm.c ****             /* Clear existing data */
+ 620:Generated_Source\PSoC5/temp_pwm.c ****             temp_pwm_DEADBAND_COUNT &= ((uint8)(~temp_pwm_DEADBAND_COUNT_MASK));
+ 621:Generated_Source\PSoC5/temp_pwm.c **** 
+ 622:Generated_Source\PSoC5/temp_pwm.c ****             /* Set new dead time */
+ 623:Generated_Source\PSoC5/temp_pwm.c ****             #if(temp_pwm_DEADBAND_COUNT_SHIFT)
+ 624:Generated_Source\PSoC5/temp_pwm.c ****                 temp_pwm_DEADBAND_COUNT |= ((uint8)((uint8)deadtime << temp_pwm_DEADBAND_COUNT_SHIF
+ 625:Generated_Source\PSoC5/temp_pwm.c ****                                                     temp_pwm_DEADBAND_COUNT_MASK;
+ 626:Generated_Source\PSoC5/temp_pwm.c ****             #else
+ 627:Generated_Source\PSoC5/temp_pwm.c ****                 temp_pwm_DEADBAND_COUNT |= deadtime & temp_pwm_DEADBAND_COUNT_MASK;
+ 628:Generated_Source\PSoC5/temp_pwm.c ****             #endif /* (temp_pwm_DEADBAND_COUNT_SHIFT) */
+ 629:Generated_Source\PSoC5/temp_pwm.c **** 
+ 630:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (!temp_pwm_DeadBand2_4) */
+ 631:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 632:Generated_Source\PSoC5/temp_pwm.c **** 
+ 633:Generated_Source\PSoC5/temp_pwm.c **** 
+ 634:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 635:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_ReadDeadTime
+ 636:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 637:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 638:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 639:Generated_Source\PSoC5/temp_pwm.c ****     *  This function reads the dead-band counts from the corresponding register
+ 640:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 641:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 642:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 643:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 644:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 645:Generated_Source\PSoC5/temp_pwm.c ****     *  Dead Band Counts
+ 646:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 647:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 648:Generated_Source\PSoC5/temp_pwm.c ****     uint8 temp_pwm_ReadDeadTime(void) 
+ 649:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 650:Generated_Source\PSoC5/temp_pwm.c ****         /* If using the Dead Band 1-255 mode then just read the register */
+ 651:Generated_Source\PSoC5/temp_pwm.c ****         #if(!temp_pwm_DeadBand2_4)
+ 652:Generated_Source\PSoC5/temp_pwm.c ****             return (CY_GET_REG8(temp_pwm_DEADBAND_COUNT_PTR));
+ 653:Generated_Source\PSoC5/temp_pwm.c ****         #else
+ 654:Generated_Source\PSoC5/temp_pwm.c **** 
+ 655:Generated_Source\PSoC5/temp_pwm.c ****             /* Otherwise the data has to be masked and offset */
+ 656:Generated_Source\PSoC5/temp_pwm.c ****             #if(temp_pwm_DEADBAND_COUNT_SHIFT)
+ 657:Generated_Source\PSoC5/temp_pwm.c ****                 return ((uint8)(((uint8)(temp_pwm_DEADBAND_COUNT & temp_pwm_DEADBAND_COUNT_MASK)) >
+ 658:Generated_Source\PSoC5/temp_pwm.c ****                                                                            temp_pwm_DEADBAND_COUNT_
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 15
+
+
+ 659:Generated_Source\PSoC5/temp_pwm.c ****             #else
+ 660:Generated_Source\PSoC5/temp_pwm.c ****                 return (temp_pwm_DEADBAND_COUNT & temp_pwm_DEADBAND_COUNT_MASK);
+ 661:Generated_Source\PSoC5/temp_pwm.c ****             #endif /* (temp_pwm_DEADBAND_COUNT_SHIFT) */
+ 662:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (!temp_pwm_DeadBand2_4) */
+ 663:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 664:Generated_Source\PSoC5/temp_pwm.c **** #endif /* DeadBandUsed */
+ 665:Generated_Source\PSoC5/temp_pwm.c **** 
+ 666:Generated_Source\PSoC5/temp_pwm.c **** #if (temp_pwm_UseStatus || temp_pwm_UsingFixedFunction)
+ 667:Generated_Source\PSoC5/temp_pwm.c **** 
+ 668:Generated_Source\PSoC5/temp_pwm.c **** 
+ 669:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 670:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_SetInterruptMode
+ 671:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 672:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 673:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 674:Generated_Source\PSoC5/temp_pwm.c ****     *  This function configures the interrupts mask control of theinterrupt
+ 675:Generated_Source\PSoC5/temp_pwm.c ****     *  source status register.
+ 676:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 677:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 678:Generated_Source\PSoC5/temp_pwm.c ****     *  uint8 interruptMode: Bit field containing the interrupt sources enabled
+ 679:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 680:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 681:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 682:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 683:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 684:Generated_Source\PSoC5/temp_pwm.c ****     void temp_pwm_SetInterruptMode(uint8 interruptMode) 
+ 685:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 686:Generated_Source\PSoC5/temp_pwm.c ****         CY_SET_REG8(temp_pwm_STATUS_MASK_PTR, interruptMode);
+ 687:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 688:Generated_Source\PSoC5/temp_pwm.c **** 
+ 689:Generated_Source\PSoC5/temp_pwm.c **** 
+ 690:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 691:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_ReadStatusRegister
+ 692:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 693:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 694:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 695:Generated_Source\PSoC5/temp_pwm.c ****     *  This function returns the current state of the status register.
+ 696:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 697:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 698:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 699:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 700:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 701:Generated_Source\PSoC5/temp_pwm.c ****     *  uint8 : Current status register value. The status register bits are:
+ 702:Generated_Source\PSoC5/temp_pwm.c ****     *  [7:6] : Unused(0)
+ 703:Generated_Source\PSoC5/temp_pwm.c ****     *  [5]   : Kill event output
+ 704:Generated_Source\PSoC5/temp_pwm.c ****     *  [4]   : FIFO not empty
+ 705:Generated_Source\PSoC5/temp_pwm.c ****     *  [3]   : FIFO full
+ 706:Generated_Source\PSoC5/temp_pwm.c ****     *  [2]   : Terminal count
+ 707:Generated_Source\PSoC5/temp_pwm.c ****     *  [1]   : Compare output 2
+ 708:Generated_Source\PSoC5/temp_pwm.c ****     *  [0]   : Compare output 1
+ 709:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 710:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 711:Generated_Source\PSoC5/temp_pwm.c ****     uint8 temp_pwm_ReadStatusRegister(void) 
+ 712:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 713:Generated_Source\PSoC5/temp_pwm.c ****         return (CY_GET_REG8(temp_pwm_STATUS_PTR));
+ 141              		.loc 1 713 0
+ 142 0000 034A     		ldr	r2, .L18
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 16
+
+
+ 143              	.LBE17:
+ 144              	.LBE16:
+ 145              	.LBB19:
+ 146              	.LBB20:
+ 714:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 715:Generated_Source\PSoC5/temp_pwm.c **** 
+ 716:Generated_Source\PSoC5/temp_pwm.c **** #endif /* (temp_pwm_UseStatus || temp_pwm_UsingFixedFunction) */
+ 717:Generated_Source\PSoC5/temp_pwm.c **** 
+ 718:Generated_Source\PSoC5/temp_pwm.c **** 
+ 719:Generated_Source\PSoC5/temp_pwm.c **** #if (temp_pwm_UseControl)
+ 720:Generated_Source\PSoC5/temp_pwm.c **** 
+ 721:Generated_Source\PSoC5/temp_pwm.c **** 
+ 722:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 723:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_ReadControlRegister
+ 724:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 725:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 726:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 727:Generated_Source\PSoC5/temp_pwm.c ****     *  Returns the current state of the control register. This API is available
+ 728:Generated_Source\PSoC5/temp_pwm.c ****     *  only if the control register is not removed.
+ 729:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 730:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 731:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 732:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 733:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 734:Generated_Source\PSoC5/temp_pwm.c ****     *  uint8 : Current control register value
+ 735:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 736:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 737:Generated_Source\PSoC5/temp_pwm.c ****     uint8 temp_pwm_ReadControlRegister(void) 
+ 738:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 739:Generated_Source\PSoC5/temp_pwm.c ****         uint8 result;
+ 740:Generated_Source\PSoC5/temp_pwm.c **** 
+ 741:Generated_Source\PSoC5/temp_pwm.c ****         result = CY_GET_REG8(temp_pwm_CONTROL_PTR);
+ 742:Generated_Source\PSoC5/temp_pwm.c ****         return (result);
+ 743:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 744:Generated_Source\PSoC5/temp_pwm.c **** 
+ 745:Generated_Source\PSoC5/temp_pwm.c **** 
+ 746:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 747:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_WriteControlRegister
+ 748:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 749:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 750:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 751:Generated_Source\PSoC5/temp_pwm.c ****     *  Sets the bit field of the control register. This API is available only if
+ 752:Generated_Source\PSoC5/temp_pwm.c ****     *  the control register is not removed.
+ 753:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 754:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 755:Generated_Source\PSoC5/temp_pwm.c ****     *  uint8 control: Control register bit field, The status register bits are:
+ 756:Generated_Source\PSoC5/temp_pwm.c ****     *  [7]   : PWM Enable
+ 757:Generated_Source\PSoC5/temp_pwm.c ****     *  [6]   : Reset
+ 758:Generated_Source\PSoC5/temp_pwm.c ****     *  [5:3] : Compare Mode2
+ 759:Generated_Source\PSoC5/temp_pwm.c ****     *  [2:0] : Compare Mode2
+ 760:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 761:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 762:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 763:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 764:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 765:Generated_Source\PSoC5/temp_pwm.c ****     void temp_pwm_WriteControlRegister(uint8 control) 
+ 766:Generated_Source\PSoC5/temp_pwm.c ****     {
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 17
+
+
+ 767:Generated_Source\PSoC5/temp_pwm.c ****         CY_SET_REG8(temp_pwm_CONTROL_PTR, control);
+ 768:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 769:Generated_Source\PSoC5/temp_pwm.c **** 
+ 770:Generated_Source\PSoC5/temp_pwm.c **** #endif /* (temp_pwm_UseControl) */
+ 771:Generated_Source\PSoC5/temp_pwm.c **** 
+ 772:Generated_Source\PSoC5/temp_pwm.c **** 
+ 773:Generated_Source\PSoC5/temp_pwm.c **** #if (!temp_pwm_UsingFixedFunction)
+ 774:Generated_Source\PSoC5/temp_pwm.c **** 
+ 775:Generated_Source\PSoC5/temp_pwm.c **** 
+ 776:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 777:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_ReadCapture
+ 778:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 779:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 780:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 781:Generated_Source\PSoC5/temp_pwm.c ****     *  Reads the capture value from the capture FIFO.
+ 782:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 783:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 784:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 785:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 786:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 787:Generated_Source\PSoC5/temp_pwm.c ****     *  uint8/uint16: The current capture value
+ 788:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 789:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 790:Generated_Source\PSoC5/temp_pwm.c ****     uint8 temp_pwm_ReadCapture(void) 
+ 791:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 792:Generated_Source\PSoC5/temp_pwm.c ****         return (CY_GET_REG8(temp_pwm_CAPTURE_LSB_PTR));
+ 147              		.loc 1 792 0
+ 148 0002 0449     		ldr	r1, .L18+4
+ 149              	.L14:
+ 150              	.LBE20:
+ 151              	.LBE19:
+ 152              	.LBB22:
+ 153              	.LBB18:
+ 713:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 154              		.loc 1 713 0
+ 155 0004 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 156              	.LBE18:
+ 157              	.LBE22:
+ 455:Generated_Source\PSoC5/temp_pwm.c ****             while(0u != (temp_pwm_ReadStatusRegister() & temp_pwm_STATUS_FIFONEMPTY))
+ 158              		.loc 1 455 0
+ 159 0006 DB06     		lsls	r3, r3, #27
+ 160 0008 01D5     		bpl	.L17
+ 161              	.LBB23:
+ 162              	.LBB21:
+ 163              		.loc 1 792 0
+ 164 000a 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 165 000c FAE7     		b	.L14
+ 166              	.L17:
+ 167              	.LBE21:
+ 168              	.LBE23:
+ 459:Generated_Source\PSoC5/temp_pwm.c **** 
+ 169              		.loc 1 459 0
+ 170 000e 7047     		bx	lr
+ 171              	.L19:
+ 172              		.align	2
+ 173              	.L18:
+ 174 0010 61640040 		.word	1073767521
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 18
+
+
+ 175 0014 52640040 		.word	1073767506
+ 176              		.cfi_endproc
+ 177              	.LFE6:
+ 178              		.size	temp_pwm_ClearFIFO, .-temp_pwm_ClearFIFO
+ 179              		.section	.text.temp_pwm_Init,"ax",%progbits
+ 180              		.align	1
+ 181              		.global	temp_pwm_Init
+ 182              		.thumb
+ 183              		.thumb_func
+ 184              		.type	temp_pwm_Init, %function
+ 185              	temp_pwm_Init:
+ 186              	.LFB1:
+  85:Generated_Source\PSoC5/temp_pwm.c ****     #if (temp_pwm_UsingFixedFunction || temp_pwm_UseControl)
+ 187              		.loc 1 85 0
+ 188              		.cfi_startproc
+ 189              		@ args = 0, pretend = 0, frame = 0
+ 190              		@ frame_needed = 0, uses_anonymous_args = 0
+ 191 0000 08B5     		push	{r3, lr}
+ 192              		.cfi_def_cfa_offset 8
+ 193              		.cfi_offset 3, -8
+ 194              		.cfi_offset 14, -4
+ 117:Generated_Source\PSoC5/temp_pwm.c ****                 ((uint8)(~temp_pwm_CTRL_CMPMODE1_MASK));
+ 195              		.loc 1 117 0
+ 196 0002 124A     		ldr	r2, .L21
+ 197 0004 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 198              	.LVL1:
+ 119:Generated_Source\PSoC5/temp_pwm.c ****                                    temp_pwm_DEFAULT_COMPARE1_MODE;
+ 199              		.loc 1 119 0
+ 200 0006 03F0C003 		and	r3, r3, #192
+ 201              	.LVL2:
+ 202 000a 43F00903 		orr	r3, r3, #9
+ 203 000e 1370     		strb	r3, [r2]
+ 126:Generated_Source\PSoC5/temp_pwm.c ****         #else /* (temp_pwm_Resolution == 16)*/
+ 204              		.loc 1 126 0
+ 205 0010 92F82130 		ldrb	r3, [r2, #33]	@ zero_extendqisi2
+ 206 0014 43F00103 		orr	r3, r3, #1
+ 207 0018 82F82130 		strb	r3, [r2, #33]
+ 208              	.LVL3:
+ 209              	.LBB24:
+ 210              	.LBB25:
+ 406:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 211              		.loc 1 406 0
+ 212 001c FE23     		movs	r3, #254
+ 213 001e 02F86F3C 		strb	r3, [r2, #-111]
+ 214              	.LVL4:
+ 215              	.LBE25:
+ 216              	.LBE24:
+ 217              	.LBB26:
+ 218              	.LBB27:
+ 487:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (temp_pwm_UsingFixedFunction) */
+ 219              		.loc 1 487 0
+ 220 0022 02F82F3C 		strb	r3, [r2, #-47]
+ 221              	.LVL5:
+ 222              	.LBE27:
+ 223              	.LBE26:
+ 224              	.LBB28:
+ 225              	.LBB29:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 19
+
+
+ 561:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UsingFixedFunction) */
+ 226              		.loc 1 561 0
+ 227 0026 0023     		movs	r3, #0
+ 228 0028 02F84F3C 		strb	r3, [r2, #-79]
+ 229              	.LVL6:
+ 230              	.LBE29:
+ 231              	.LBE28:
+ 232              	.LBB30:
+ 233              	.LBB31:
+ 590:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UsingFixedFunction) */
+ 234              		.loc 1 590 0
+ 235 002c 02F83F3C 		strb	r3, [r2, #-63]
+ 236              	.LVL7:
+ 237              	.LBE31:
+ 238              	.LBE30:
+ 239              	.LBB32:
+ 240              	.LBB33:
+ 686:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 241              		.loc 1 686 0
+ 242 0030 1374     		strb	r3, [r2, #16]
+ 243              	.LVL8:
+ 244              	.LBE33:
+ 245              	.LBE32:
+ 167:Generated_Source\PSoC5/temp_pwm.c ****             /* Use the interrupt output of the status register for IRQ output */
+ 246              		.loc 1 167 0
+ 247 0032 FFF7FEFF 		bl	CyEnterCriticalSection
+ 248              	.LVL9:
+ 169:Generated_Source\PSoC5/temp_pwm.c **** 
+ 249              		.loc 1 169 0
+ 250 0036 064A     		ldr	r2, .L21+4
+ 251 0038 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 252 003a 43F01003 		orr	r3, r3, #16
+ 253 003e 1370     		strb	r3, [r2]
+ 172:Generated_Source\PSoC5/temp_pwm.c **** 
+ 254              		.loc 1 172 0
+ 255 0040 FFF7FEFF 		bl	CyExitCriticalSection
+ 256              	.LVL10:
+ 179:Generated_Source\PSoC5/temp_pwm.c **** 
+ 257              		.loc 1 179 0
+ 258 0044 BDE80840 		pop	{r3, lr}
+ 259              		.cfi_restore 14
+ 260              		.cfi_restore 3
+ 261              		.cfi_def_cfa_offset 0
+ 176:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UseStatus) */
+ 262              		.loc 1 176 0
+ 263 0048 FFF7FEBF 		b	temp_pwm_ClearFIFO
+ 264              	.LVL11:
+ 265              	.L22:
+ 266              		.align	2
+ 267              	.L21:
+ 268 004c 71640040 		.word	1073767537
+ 269 0050 91640040 		.word	1073767569
+ 270              		.cfi_endproc
+ 271              	.LFE1:
+ 272              		.size	temp_pwm_Init, .-temp_pwm_Init
+ 273              		.section	.text.temp_pwm_Start,"ax",%progbits
+ 274              		.align	1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 20
+
+
+ 275              		.global	temp_pwm_Start
+ 276              		.thumb
+ 277              		.thumb_func
+ 278              		.type	temp_pwm_Start, %function
+ 279              	temp_pwm_Start:
+ 280              	.LFB0:
+  56:Generated_Source\PSoC5/temp_pwm.c ****     /* If not Initialized then initialize all required hardware and software */
+ 281              		.loc 1 56 0
+ 282              		.cfi_startproc
+ 283              		@ args = 0, pretend = 0, frame = 0
+ 284              		@ frame_needed = 0, uses_anonymous_args = 0
+ 285 0000 10B5     		push	{r4, lr}
+ 286              		.cfi_def_cfa_offset 8
+ 287              		.cfi_offset 4, -8
+ 288              		.cfi_offset 14, -4
+  58:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 289              		.loc 1 58 0
+ 290 0002 054C     		ldr	r4, .L25
+ 291 0004 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 292 0006 1BB9     		cbnz	r3, .L24
+  60:Generated_Source\PSoC5/temp_pwm.c ****         temp_pwm_initVar = 1u;
+ 293              		.loc 1 60 0
+ 294 0008 FFF7FEFF 		bl	temp_pwm_Init
+ 295              	.LVL12:
+  61:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 296              		.loc 1 61 0
+ 297 000c 0123     		movs	r3, #1
+ 298 000e 2370     		strb	r3, [r4]
+ 299              	.L24:
+  65:Generated_Source\PSoC5/temp_pwm.c **** 
+ 300              		.loc 1 65 0
+ 301 0010 BDE81040 		pop	{r4, lr}
+ 302              		.cfi_restore 14
+ 303              		.cfi_restore 4
+ 304              		.cfi_def_cfa_offset 0
+  63:Generated_Source\PSoC5/temp_pwm.c **** 
+ 305              		.loc 1 63 0
+ 306 0014 FFF7FEBF 		b	temp_pwm_Enable
+ 307              	.LVL13:
+ 308              	.L26:
+ 309              		.align	2
+ 310              	.L25:
+ 311 0018 00000000 		.word	.LANCHOR0
+ 312              		.cfi_endproc
+ 313              	.LFE0:
+ 314              		.size	temp_pwm_Start, .-temp_pwm_Start
+ 315              		.section	.text.temp_pwm_WritePeriod,"ax",%progbits
+ 316              		.align	1
+ 317              		.global	temp_pwm_WritePeriod
+ 318              		.thumb
+ 319              		.thumb_func
+ 320              		.type	temp_pwm_WritePeriod, %function
+ 321              	temp_pwm_WritePeriod:
+ 322              	.LFB7:
+ 483:Generated_Source\PSoC5/temp_pwm.c ****     #if(temp_pwm_UsingFixedFunction)
+ 323              		.loc 1 483 0
+ 324              		.cfi_startproc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 21
+
+
+ 325              		@ args = 0, pretend = 0, frame = 0
+ 326              		@ frame_needed = 0, uses_anonymous_args = 0
+ 327              		@ link register save eliminated.
+ 328              	.LVL14:
+ 487:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (temp_pwm_UsingFixedFunction) */
+ 329              		.loc 1 487 0
+ 330 0000 014B     		ldr	r3, .L28
+ 331 0002 1870     		strb	r0, [r3]
+ 332 0004 7047     		bx	lr
+ 333              	.L29:
+ 334 0006 00BF     		.align	2
+ 335              	.L28:
+ 336 0008 42640040 		.word	1073767490
+ 337              		.cfi_endproc
+ 338              	.LFE7:
+ 339              		.size	temp_pwm_WritePeriod, .-temp_pwm_WritePeriod
+ 340              		.section	.text.temp_pwm_WriteCompare1,"ax",%progbits
+ 341              		.align	1
+ 342              		.global	temp_pwm_WriteCompare1
+ 343              		.thumb
+ 344              		.thumb_func
+ 345              		.type	temp_pwm_WriteCompare1, %function
+ 346              	temp_pwm_WriteCompare1:
+ 347              	.LFB8:
+ 557:Generated_Source\PSoC5/temp_pwm.c ****         #if(temp_pwm_UsingFixedFunction)
+ 348              		.loc 1 557 0
+ 349              		.cfi_startproc
+ 350              		@ args = 0, pretend = 0, frame = 0
+ 351              		@ frame_needed = 0, uses_anonymous_args = 0
+ 352              		@ link register save eliminated.
+ 353              	.LVL15:
+ 561:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UsingFixedFunction) */
+ 354              		.loc 1 561 0
+ 355 0000 014B     		ldr	r3, .L31
+ 356 0002 1870     		strb	r0, [r3]
+ 357 0004 7047     		bx	lr
+ 358              	.L32:
+ 359 0006 00BF     		.align	2
+ 360              	.L31:
+ 361 0008 22640040 		.word	1073767458
+ 362              		.cfi_endproc
+ 363              	.LFE8:
+ 364              		.size	temp_pwm_WriteCompare1, .-temp_pwm_WriteCompare1
+ 365              		.section	.text.temp_pwm_WriteCompare2,"ax",%progbits
+ 366              		.align	1
+ 367              		.global	temp_pwm_WriteCompare2
+ 368              		.thumb
+ 369              		.thumb_func
+ 370              		.type	temp_pwm_WriteCompare2, %function
+ 371              	temp_pwm_WriteCompare2:
+ 372              	.LFB9:
+ 586:Generated_Source\PSoC5/temp_pwm.c ****         #if(temp_pwm_UsingFixedFunction)
+ 373              		.loc 1 586 0
+ 374              		.cfi_startproc
+ 375              		@ args = 0, pretend = 0, frame = 0
+ 376              		@ frame_needed = 0, uses_anonymous_args = 0
+ 377              		@ link register save eliminated.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 22
+
+
+ 378              	.LVL16:
+ 590:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UsingFixedFunction) */
+ 379              		.loc 1 590 0
+ 380 0000 014B     		ldr	r3, .L34
+ 381 0002 1870     		strb	r0, [r3]
+ 382 0004 7047     		bx	lr
+ 383              	.L35:
+ 384 0006 00BF     		.align	2
+ 385              	.L34:
+ 386 0008 32640040 		.word	1073767474
+ 387              		.cfi_endproc
+ 388              	.LFE9:
+ 389              		.size	temp_pwm_WriteCompare2, .-temp_pwm_WriteCompare2
+ 390              		.section	.text.temp_pwm_SetInterruptMode,"ax",%progbits
+ 391              		.align	1
+ 392              		.global	temp_pwm_SetInterruptMode
+ 393              		.thumb
+ 394              		.thumb_func
+ 395              		.type	temp_pwm_SetInterruptMode, %function
+ 396              	temp_pwm_SetInterruptMode:
+ 397              	.LFB10:
+ 685:Generated_Source\PSoC5/temp_pwm.c ****         CY_SET_REG8(temp_pwm_STATUS_MASK_PTR, interruptMode);
+ 398              		.loc 1 685 0
+ 399              		.cfi_startproc
+ 400              		@ args = 0, pretend = 0, frame = 0
+ 401              		@ frame_needed = 0, uses_anonymous_args = 0
+ 402              		@ link register save eliminated.
+ 403              	.LVL17:
+ 686:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 404              		.loc 1 686 0
+ 405 0000 014B     		ldr	r3, .L37
+ 406 0002 1870     		strb	r0, [r3]
+ 407 0004 7047     		bx	lr
+ 408              	.L38:
+ 409 0006 00BF     		.align	2
+ 410              	.L37:
+ 411 0008 81640040 		.word	1073767553
+ 412              		.cfi_endproc
+ 413              	.LFE10:
+ 414              		.size	temp_pwm_SetInterruptMode, .-temp_pwm_SetInterruptMode
+ 415              		.section	.text.temp_pwm_ReadStatusRegister,"ax",%progbits
+ 416              		.align	1
+ 417              		.global	temp_pwm_ReadStatusRegister
+ 418              		.thumb
+ 419              		.thumb_func
+ 420              		.type	temp_pwm_ReadStatusRegister, %function
+ 421              	temp_pwm_ReadStatusRegister:
+ 422              	.LFB11:
+ 712:Generated_Source\PSoC5/temp_pwm.c ****         return (CY_GET_REG8(temp_pwm_STATUS_PTR));
+ 423              		.loc 1 712 0
+ 424              		.cfi_startproc
+ 425              		@ args = 0, pretend = 0, frame = 0
+ 426              		@ frame_needed = 0, uses_anonymous_args = 0
+ 427              		@ link register save eliminated.
+ 713:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 428              		.loc 1 713 0
+ 429 0000 014B     		ldr	r3, .L40
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 23
+
+
+ 430 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 714:Generated_Source\PSoC5/temp_pwm.c **** 
+ 431              		.loc 1 714 0
+ 432 0004 7047     		bx	lr
+ 433              	.L41:
+ 434 0006 00BF     		.align	2
+ 435              	.L40:
+ 436 0008 61640040 		.word	1073767521
+ 437              		.cfi_endproc
+ 438              	.LFE11:
+ 439              		.size	temp_pwm_ReadStatusRegister, .-temp_pwm_ReadStatusRegister
+ 440              		.section	.text.temp_pwm_ReadControlRegister,"ax",%progbits
+ 441              		.align	1
+ 442              		.global	temp_pwm_ReadControlRegister
+ 443              		.thumb
+ 444              		.thumb_func
+ 445              		.type	temp_pwm_ReadControlRegister, %function
+ 446              	temp_pwm_ReadControlRegister:
+ 447              	.LFB12:
+ 738:Generated_Source\PSoC5/temp_pwm.c ****         uint8 result;
+ 448              		.loc 1 738 0
+ 449              		.cfi_startproc
+ 450              		@ args = 0, pretend = 0, frame = 0
+ 451              		@ frame_needed = 0, uses_anonymous_args = 0
+ 452              		@ link register save eliminated.
+ 741:Generated_Source\PSoC5/temp_pwm.c ****         return (result);
+ 453              		.loc 1 741 0
+ 454 0000 014B     		ldr	r3, .L43
+ 455 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 456              	.LVL18:
+ 743:Generated_Source\PSoC5/temp_pwm.c **** 
+ 457              		.loc 1 743 0
+ 458 0004 7047     		bx	lr
+ 459              	.L44:
+ 460 0006 00BF     		.align	2
+ 461              	.L43:
+ 462 0008 71640040 		.word	1073767537
+ 463              		.cfi_endproc
+ 464              	.LFE12:
+ 465              		.size	temp_pwm_ReadControlRegister, .-temp_pwm_ReadControlRegister
+ 466              		.section	.text.temp_pwm_WriteControlRegister,"ax",%progbits
+ 467              		.align	1
+ 468              		.global	temp_pwm_WriteControlRegister
+ 469              		.thumb
+ 470              		.thumb_func
+ 471              		.type	temp_pwm_WriteControlRegister, %function
+ 472              	temp_pwm_WriteControlRegister:
+ 473              	.LFB13:
+ 766:Generated_Source\PSoC5/temp_pwm.c ****         CY_SET_REG8(temp_pwm_CONTROL_PTR, control);
+ 474              		.loc 1 766 0
+ 475              		.cfi_startproc
+ 476              		@ args = 0, pretend = 0, frame = 0
+ 477              		@ frame_needed = 0, uses_anonymous_args = 0
+ 478              		@ link register save eliminated.
+ 479              	.LVL19:
+ 767:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 480              		.loc 1 767 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 24
+
+
+ 481 0000 014B     		ldr	r3, .L46
+ 482 0002 1870     		strb	r0, [r3]
+ 483 0004 7047     		bx	lr
+ 484              	.L47:
+ 485 0006 00BF     		.align	2
+ 486              	.L46:
+ 487 0008 71640040 		.word	1073767537
+ 488              		.cfi_endproc
+ 489              	.LFE13:
+ 490              		.size	temp_pwm_WriteControlRegister, .-temp_pwm_WriteControlRegister
+ 491              		.section	.text.temp_pwm_ReadCapture,"ax",%progbits
+ 492              		.align	1
+ 493              		.global	temp_pwm_ReadCapture
+ 494              		.thumb
+ 495              		.thumb_func
+ 496              		.type	temp_pwm_ReadCapture, %function
+ 497              	temp_pwm_ReadCapture:
+ 498              	.LFB14:
+ 791:Generated_Source\PSoC5/temp_pwm.c ****         return (CY_GET_REG8(temp_pwm_CAPTURE_LSB_PTR));
+ 499              		.loc 1 791 0
+ 500              		.cfi_startproc
+ 501              		@ args = 0, pretend = 0, frame = 0
+ 502              		@ frame_needed = 0, uses_anonymous_args = 0
+ 503              		@ link register save eliminated.
+ 504              		.loc 1 792 0
+ 505 0000 014B     		ldr	r3, .L49
+ 506 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 793:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 507              		.loc 1 793 0
+ 508 0004 7047     		bx	lr
+ 509              	.L50:
+ 510 0006 00BF     		.align	2
+ 511              	.L49:
+ 512 0008 52640040 		.word	1073767506
+ 513              		.cfi_endproc
+ 514              	.LFE14:
+ 515              		.size	temp_pwm_ReadCapture, .-temp_pwm_ReadCapture
+ 516              		.section	.text.temp_pwm_ReadCompare1,"ax",%progbits
+ 517              		.align	1
+ 518              		.global	temp_pwm_ReadCompare1
+ 519              		.thumb
+ 520              		.thumb_func
+ 521              		.type	temp_pwm_ReadCompare1, %function
+ 522              	temp_pwm_ReadCompare1:
+ 523              	.LFB15:
+ 794:Generated_Source\PSoC5/temp_pwm.c **** 
+ 795:Generated_Source\PSoC5/temp_pwm.c **** #endif /* (!temp_pwm_UsingFixedFunction) */
+ 796:Generated_Source\PSoC5/temp_pwm.c **** 
+ 797:Generated_Source\PSoC5/temp_pwm.c **** 
+ 798:Generated_Source\PSoC5/temp_pwm.c **** #if (temp_pwm_UseOneCompareMode)
+ 799:Generated_Source\PSoC5/temp_pwm.c **** 
+ 800:Generated_Source\PSoC5/temp_pwm.c **** 
+ 801:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 802:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_ReadCompare
+ 803:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 804:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 805:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 25
+
+
+ 806:Generated_Source\PSoC5/temp_pwm.c ****     *  Reads the compare value for the compare output when the PWM Mode parameter is
+ 807:Generated_Source\PSoC5/temp_pwm.c ****     *  set to Dither mode, Center Aligned mode, or One Output mode.
+ 808:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 809:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 810:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 811:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 812:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 813:Generated_Source\PSoC5/temp_pwm.c ****     *  uint8/uint16: Current compare value
+ 814:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 815:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 816:Generated_Source\PSoC5/temp_pwm.c ****     uint8 temp_pwm_ReadCompare(void) 
+ 817:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 818:Generated_Source\PSoC5/temp_pwm.c ****         #if(temp_pwm_UsingFixedFunction)
+ 819:Generated_Source\PSoC5/temp_pwm.c ****             return ((uint8)CY_GET_REG16(temp_pwm_COMPARE1_LSB_PTR));
+ 820:Generated_Source\PSoC5/temp_pwm.c ****         #else
+ 821:Generated_Source\PSoC5/temp_pwm.c ****             return (CY_GET_REG8(temp_pwm_COMPARE1_LSB_PTR));
+ 822:Generated_Source\PSoC5/temp_pwm.c ****         #endif /* (temp_pwm_UsingFixedFunction) */
+ 823:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 824:Generated_Source\PSoC5/temp_pwm.c **** 
+ 825:Generated_Source\PSoC5/temp_pwm.c **** #else
+ 826:Generated_Source\PSoC5/temp_pwm.c **** 
+ 827:Generated_Source\PSoC5/temp_pwm.c **** 
+ 828:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 829:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_ReadCompare1
+ 830:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 831:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 832:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 833:Generated_Source\PSoC5/temp_pwm.c ****     *  Reads the compare value for the compare1 output.
+ 834:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 835:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 836:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 837:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 838:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 839:Generated_Source\PSoC5/temp_pwm.c ****     *  uint8/uint16: Current compare value.
+ 840:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 841:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 842:Generated_Source\PSoC5/temp_pwm.c ****     uint8 temp_pwm_ReadCompare1(void) 
+ 843:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 524              		.loc 1 843 0
+ 525              		.cfi_startproc
+ 526              		@ args = 0, pretend = 0, frame = 0
+ 527              		@ frame_needed = 0, uses_anonymous_args = 0
+ 528              		@ link register save eliminated.
+ 844:Generated_Source\PSoC5/temp_pwm.c ****         return (CY_GET_REG8(temp_pwm_COMPARE1_LSB_PTR));
+ 529              		.loc 1 844 0
+ 530 0000 014B     		ldr	r3, .L52
+ 531 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 845:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 532              		.loc 1 845 0
+ 533 0004 7047     		bx	lr
+ 534              	.L53:
+ 535 0006 00BF     		.align	2
+ 536              	.L52:
+ 537 0008 22640040 		.word	1073767458
+ 538              		.cfi_endproc
+ 539              	.LFE15:
+ 540              		.size	temp_pwm_ReadCompare1, .-temp_pwm_ReadCompare1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 26
+
+
+ 541              		.section	.text.temp_pwm_ReadCompare2,"ax",%progbits
+ 542              		.align	1
+ 543              		.global	temp_pwm_ReadCompare2
+ 544              		.thumb
+ 545              		.thumb_func
+ 546              		.type	temp_pwm_ReadCompare2, %function
+ 547              	temp_pwm_ReadCompare2:
+ 548              	.LFB16:
+ 846:Generated_Source\PSoC5/temp_pwm.c **** 
+ 847:Generated_Source\PSoC5/temp_pwm.c **** 
+ 848:Generated_Source\PSoC5/temp_pwm.c ****     /*******************************************************************************
+ 849:Generated_Source\PSoC5/temp_pwm.c ****     * Function Name: temp_pwm_ReadCompare2
+ 850:Generated_Source\PSoC5/temp_pwm.c ****     ********************************************************************************
+ 851:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 852:Generated_Source\PSoC5/temp_pwm.c ****     * Summary:
+ 853:Generated_Source\PSoC5/temp_pwm.c ****     *  Reads the compare value for the compare2 output.
+ 854:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 855:Generated_Source\PSoC5/temp_pwm.c ****     * Parameters:
+ 856:Generated_Source\PSoC5/temp_pwm.c ****     *  None
+ 857:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 858:Generated_Source\PSoC5/temp_pwm.c ****     * Return:
+ 859:Generated_Source\PSoC5/temp_pwm.c ****     *  uint8/uint16: Current compare value.
+ 860:Generated_Source\PSoC5/temp_pwm.c ****     *
+ 861:Generated_Source\PSoC5/temp_pwm.c ****     *******************************************************************************/
+ 862:Generated_Source\PSoC5/temp_pwm.c ****     uint8 temp_pwm_ReadCompare2(void) 
+ 863:Generated_Source\PSoC5/temp_pwm.c ****     {
+ 549              		.loc 1 863 0
+ 550              		.cfi_startproc
+ 551              		@ args = 0, pretend = 0, frame = 0
+ 552              		@ frame_needed = 0, uses_anonymous_args = 0
+ 553              		@ link register save eliminated.
+ 864:Generated_Source\PSoC5/temp_pwm.c ****         return (CY_GET_REG8(temp_pwm_COMPARE2_LSB_PTR));
+ 554              		.loc 1 864 0
+ 555 0000 014B     		ldr	r3, .L55
+ 556 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 865:Generated_Source\PSoC5/temp_pwm.c ****     }
+ 557              		.loc 1 865 0
+ 558 0004 7047     		bx	lr
+ 559              	.L56:
+ 560 0006 00BF     		.align	2
+ 561              	.L55:
+ 562 0008 32640040 		.word	1073767474
+ 563              		.cfi_endproc
+ 564              	.LFE16:
+ 565              		.size	temp_pwm_ReadCompare2, .-temp_pwm_ReadCompare2
+ 566              		.section	.text.temp_pwm_ReadPeriod,"ax",%progbits
+ 567              		.align	1
+ 568              		.global	temp_pwm_ReadPeriod
+ 569              		.thumb
+ 570              		.thumb_func
+ 571              		.type	temp_pwm_ReadPeriod, %function
+ 572              	temp_pwm_ReadPeriod:
+ 573              	.LFB17:
+ 866:Generated_Source\PSoC5/temp_pwm.c **** 
+ 867:Generated_Source\PSoC5/temp_pwm.c **** #endif /* (temp_pwm_UseOneCompareMode) */
+ 868:Generated_Source\PSoC5/temp_pwm.c **** 
+ 869:Generated_Source\PSoC5/temp_pwm.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 27
+
+
+ 870:Generated_Source\PSoC5/temp_pwm.c **** /*******************************************************************************
+ 871:Generated_Source\PSoC5/temp_pwm.c **** * Function Name: temp_pwm_ReadPeriod
+ 872:Generated_Source\PSoC5/temp_pwm.c **** ********************************************************************************
+ 873:Generated_Source\PSoC5/temp_pwm.c **** *
+ 874:Generated_Source\PSoC5/temp_pwm.c **** * Summary:
+ 875:Generated_Source\PSoC5/temp_pwm.c **** *  Reads the period value used by the PWM hardware.
+ 876:Generated_Source\PSoC5/temp_pwm.c **** *
+ 877:Generated_Source\PSoC5/temp_pwm.c **** * Parameters:
+ 878:Generated_Source\PSoC5/temp_pwm.c **** *  None
+ 879:Generated_Source\PSoC5/temp_pwm.c **** *
+ 880:Generated_Source\PSoC5/temp_pwm.c **** * Return:
+ 881:Generated_Source\PSoC5/temp_pwm.c **** *  uint8/16: Period value
+ 882:Generated_Source\PSoC5/temp_pwm.c **** *
+ 883:Generated_Source\PSoC5/temp_pwm.c **** *******************************************************************************/
+ 884:Generated_Source\PSoC5/temp_pwm.c **** uint8 temp_pwm_ReadPeriod(void) 
+ 885:Generated_Source\PSoC5/temp_pwm.c **** {
+ 574              		.loc 1 885 0
+ 575              		.cfi_startproc
+ 576              		@ args = 0, pretend = 0, frame = 0
+ 577              		@ frame_needed = 0, uses_anonymous_args = 0
+ 578              		@ link register save eliminated.
+ 886:Generated_Source\PSoC5/temp_pwm.c ****     #if(temp_pwm_UsingFixedFunction)
+ 887:Generated_Source\PSoC5/temp_pwm.c ****         return ((uint8)CY_GET_REG16(temp_pwm_PERIOD_LSB_PTR));
+ 888:Generated_Source\PSoC5/temp_pwm.c ****     #else
+ 889:Generated_Source\PSoC5/temp_pwm.c ****         return (CY_GET_REG8(temp_pwm_PERIOD_LSB_PTR));
+ 579              		.loc 1 889 0
+ 580 0000 014B     		ldr	r3, .L58
+ 581 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 890:Generated_Source\PSoC5/temp_pwm.c ****     #endif /* (temp_pwm_UsingFixedFunction) */
+ 891:Generated_Source\PSoC5/temp_pwm.c **** }
+ 582              		.loc 1 891 0
+ 583 0004 7047     		bx	lr
+ 584              	.L59:
+ 585 0006 00BF     		.align	2
+ 586              	.L58:
+ 587 0008 42640040 		.word	1073767490
+ 588              		.cfi_endproc
+ 589              	.LFE17:
+ 590              		.size	temp_pwm_ReadPeriod, .-temp_pwm_ReadPeriod
+ 591              		.global	temp_pwm_initVar
+ 592              		.bss
+ 593              		.set	.LANCHOR0,. + 0
+ 594              		.type	temp_pwm_initVar, %object
+ 595              		.size	temp_pwm_initVar, 1
+ 596              	temp_pwm_initVar:
+ 597 0000 00       		.space	1
+ 598              		.text
+ 599              	.Letext0:
+ 600              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+ 601              		.file 3 "Generated_Source\\PSoC5\\CyLib.h"
+ 602              		.section	.debug_info,"",%progbits
+ 603              	.Ldebug_info0:
+ 604 0000 10040000 		.4byte	0x410
+ 605 0004 0400     		.2byte	0x4
+ 606 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 607 000a 04       		.byte	0x4
+ 608 000b 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 28
+
+
+ 609 000c BB000000 		.4byte	.LASF41
+ 610 0010 0C       		.byte	0xc
+ 611 0011 D2010000 		.4byte	.LASF42
+ 612 0015 12030000 		.4byte	.LASF43
+ 613 0019 30000000 		.4byte	.Ldebug_ranges0+0x30
+ 614 001d 00000000 		.4byte	0
+ 615 0021 00000000 		.4byte	.Ldebug_line0
+ 616 0025 02       		.uleb128 0x2
+ 617 0026 01       		.byte	0x1
+ 618 0027 06       		.byte	0x6
+ 619 0028 70030000 		.4byte	.LASF0
+ 620 002c 02       		.uleb128 0x2
+ 621 002d 01       		.byte	0x1
+ 622 002e 08       		.byte	0x8
+ 623 002f 96000000 		.4byte	.LASF1
+ 624 0033 02       		.uleb128 0x2
+ 625 0034 02       		.byte	0x2
+ 626 0035 05       		.byte	0x5
+ 627 0036 E4020000 		.4byte	.LASF2
+ 628 003a 02       		.uleb128 0x2
+ 629 003b 02       		.byte	0x2
+ 630 003c 07       		.byte	0x7
+ 631 003d 32000000 		.4byte	.LASF3
+ 632 0041 02       		.uleb128 0x2
+ 633 0042 04       		.byte	0x4
+ 634 0043 05       		.byte	0x5
+ 635 0044 4B030000 		.4byte	.LASF4
+ 636 0048 02       		.uleb128 0x2
+ 637 0049 04       		.byte	0x4
+ 638 004a 07       		.byte	0x7
+ 639 004b A9000000 		.4byte	.LASF5
+ 640 004f 02       		.uleb128 0x2
+ 641 0050 08       		.byte	0x8
+ 642 0051 05       		.byte	0x5
+ 643 0052 76020000 		.4byte	.LASF6
+ 644 0056 02       		.uleb128 0x2
+ 645 0057 08       		.byte	0x8
+ 646 0058 07       		.byte	0x7
+ 647 0059 7F000000 		.4byte	.LASF7
+ 648 005d 03       		.uleb128 0x3
+ 649 005e 04       		.byte	0x4
+ 650 005f 05       		.byte	0x5
+ 651 0060 696E7400 		.ascii	"int\000"
+ 652 0064 02       		.uleb128 0x2
+ 653 0065 04       		.byte	0x4
+ 654 0066 07       		.byte	0x7
+ 655 0067 F4010000 		.4byte	.LASF8
+ 656 006b 04       		.uleb128 0x4
+ 657 006c 54010000 		.4byte	.LASF12
+ 658 0070 02       		.byte	0x2
+ 659 0071 9201     		.2byte	0x192
+ 660 0073 2C000000 		.4byte	0x2c
+ 661 0077 02       		.uleb128 0x2
+ 662 0078 04       		.byte	0x4
+ 663 0079 04       		.byte	0x4
+ 664 007a 71000000 		.4byte	.LASF9
+ 665 007e 02       		.uleb128 0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 29
+
+
+ 666 007f 08       		.byte	0x8
+ 667 0080 04       		.byte	0x4
+ 668 0081 89010000 		.4byte	.LASF10
+ 669 0085 02       		.uleb128 0x2
+ 670 0086 01       		.byte	0x1
+ 671 0087 08       		.byte	0x8
+ 672 0088 54030000 		.4byte	.LASF11
+ 673 008c 04       		.uleb128 0x4
+ 674 008d A4000000 		.4byte	.LASF13
+ 675 0091 02       		.byte	0x2
+ 676 0092 3C02     		.2byte	0x23c
+ 677 0094 98000000 		.4byte	0x98
+ 678 0098 05       		.uleb128 0x5
+ 679 0099 6B000000 		.4byte	0x6b
+ 680 009d 02       		.uleb128 0x2
+ 681 009e 04       		.byte	0x4
+ 682 009f 07       		.byte	0x7
+ 683 00a0 6D020000 		.4byte	.LASF14
+ 684 00a4 06       		.uleb128 0x6
+ 685 00a5 1D020000 		.4byte	.LASF15
+ 686 00a9 01       		.byte	0x1
+ 687 00aa 1603     		.2byte	0x316
+ 688 00ac 6B000000 		.4byte	0x6b
+ 689 00b0 01       		.byte	0x1
+ 690 00b1 06       		.uleb128 0x6
+ 691 00b2 01020000 		.4byte	.LASF16
+ 692 00b6 01       		.byte	0x1
+ 693 00b7 C702     		.2byte	0x2c7
+ 694 00b9 6B000000 		.4byte	0x6b
+ 695 00bd 01       		.byte	0x1
+ 696 00be 07       		.uleb128 0x7
+ 697 00bf CA020000 		.4byte	.LASF17
+ 698 00c3 01       		.byte	0x1
+ 699 00c4 AC02     		.2byte	0x2ac
+ 700 00c6 01       		.byte	0x1
+ 701 00c7 D8000000 		.4byte	0xd8
+ 702 00cb 08       		.uleb128 0x8
+ 703 00cc 94020000 		.4byte	.LASF19
+ 704 00d0 01       		.byte	0x1
+ 705 00d1 AC02     		.2byte	0x2ac
+ 706 00d3 6B000000 		.4byte	0x6b
+ 707 00d7 00       		.byte	0
+ 708 00d8 07       		.uleb128 0x7
+ 709 00d9 84030000 		.4byte	.LASF18
+ 710 00dd 01       		.byte	0x1
+ 711 00de 4802     		.2byte	0x248
+ 712 00e0 01       		.byte	0x1
+ 713 00e1 F2000000 		.4byte	0xf2
+ 714 00e5 08       		.uleb128 0x8
+ 715 00e6 7C030000 		.4byte	.LASF20
+ 716 00ea 01       		.byte	0x1
+ 717 00eb 4802     		.2byte	0x248
+ 718 00ed 6B000000 		.4byte	0x6b
+ 719 00f1 00       		.byte	0
+ 720 00f2 07       		.uleb128 0x7
+ 721 00f3 59030000 		.4byte	.LASF21
+ 722 00f7 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 30
+
+
+ 723 00f8 2B02     		.2byte	0x22b
+ 724 00fa 01       		.byte	0x1
+ 725 00fb 0C010000 		.4byte	0x10c
+ 726 00ff 08       		.uleb128 0x8
+ 727 0100 7C030000 		.4byte	.LASF20
+ 728 0104 01       		.byte	0x1
+ 729 0105 2B02     		.2byte	0x22b
+ 730 0107 6B000000 		.4byte	0x6b
+ 731 010b 00       		.byte	0
+ 732 010c 07       		.uleb128 0x7
+ 733 010d 00000000 		.4byte	.LASF22
+ 734 0111 01       		.byte	0x1
+ 735 0112 E201     		.2byte	0x1e2
+ 736 0114 01       		.byte	0x1
+ 737 0115 26010000 		.4byte	0x126
+ 738 0119 08       		.uleb128 0x8
+ 739 011a 2B000000 		.4byte	.LASF23
+ 740 011e 01       		.byte	0x1
+ 741 011f E201     		.2byte	0x1e2
+ 742 0121 6B000000 		.4byte	0x6b
+ 743 0125 00       		.byte	0
+ 744 0126 07       		.uleb128 0x7
+ 745 0127 15000000 		.4byte	.LASF24
+ 746 012b 01       		.byte	0x1
+ 747 012c 9301     		.2byte	0x193
+ 748 012e 01       		.byte	0x1
+ 749 012f 40010000 		.4byte	0x140
+ 750 0133 08       		.uleb128 0x8
+ 751 0134 77000000 		.4byte	.LASF25
+ 752 0138 01       		.byte	0x1
+ 753 0139 9301     		.2byte	0x193
+ 754 013b 6B000000 		.4byte	0x6b
+ 755 013f 00       		.byte	0
+ 756 0140 09       		.uleb128 0x9
+ 757 0141 84020000 		.4byte	.LASF26
+ 758 0145 01       		.byte	0x1
+ 759 0146 C7       		.byte	0xc7
+ 760 0147 00000000 		.4byte	.LFB2
+ 761 014b 10000000 		.4byte	.LFE2-.LFB2
+ 762 014f 01       		.uleb128 0x1
+ 763 0150 9C       		.byte	0x9c
+ 764 0151 09       		.uleb128 0x9
+ 765 0152 04030000 		.4byte	.LASF27
+ 766 0156 01       		.byte	0x1
+ 767 0157 E9       		.byte	0xe9
+ 768 0158 00000000 		.4byte	.LFB3
+ 769 015c 10000000 		.4byte	.LFE3-.LFB3
+ 770 0160 01       		.uleb128 0x1
+ 771 0161 9C       		.byte	0x9c
+ 772 0162 0A       		.uleb128 0xa
+ 773 0163 26010000 		.4byte	0x126
+ 774 0167 00000000 		.4byte	.LFB4
+ 775 016b 0C000000 		.4byte	.LFE4-.LFB4
+ 776 016f 01       		.uleb128 0x1
+ 777 0170 9C       		.byte	0x9c
+ 778 0171 7D010000 		.4byte	0x17d
+ 779 0175 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 31
+
+
+ 780 0176 33010000 		.4byte	0x133
+ 781 017a 01       		.uleb128 0x1
+ 782 017b 50       		.byte	0x50
+ 783 017c 00       		.byte	0
+ 784 017d 0C       		.uleb128 0xc
+ 785 017e B5020000 		.4byte	.LASF35
+ 786 0182 01       		.byte	0x1
+ 787 0183 A901     		.2byte	0x1a9
+ 788 0185 6B000000 		.4byte	0x6b
+ 789 0189 00000000 		.4byte	.LFB5
+ 790 018d 14000000 		.4byte	.LFE5-.LFB5
+ 791 0191 01       		.uleb128 0x1
+ 792 0192 9C       		.byte	0x9c
+ 793 0193 0D       		.uleb128 0xd
+ 794 0194 A2020000 		.4byte	.LASF28
+ 795 0198 01       		.byte	0x1
+ 796 0199 C501     		.2byte	0x1c5
+ 797 019b 00000000 		.4byte	.LFB6
+ 798 019f 18000000 		.4byte	.LFE6-.LFB6
+ 799 01a3 01       		.uleb128 0x1
+ 800 01a4 9C       		.byte	0x9c
+ 801 01a5 CA010000 		.4byte	0x1ca
+ 802 01a9 0E       		.uleb128 0xe
+ 803 01aa B1000000 		.4byte	0xb1
+ 804 01ae 00000000 		.4byte	.LBB16
+ 805 01b2 00000000 		.4byte	.Ldebug_ranges0+0
+ 806 01b6 01       		.byte	0x1
+ 807 01b7 C701     		.2byte	0x1c7
+ 808 01b9 0E       		.uleb128 0xe
+ 809 01ba A4000000 		.4byte	0xa4
+ 810 01be 02000000 		.4byte	.LBB19
+ 811 01c2 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 812 01c6 01       		.byte	0x1
+ 813 01c7 C901     		.2byte	0x1c9
+ 814 01c9 00       		.byte	0
+ 815 01ca 0F       		.uleb128 0xf
+ 816 01cb AD010000 		.4byte	.LASF29
+ 817 01cf 01       		.byte	0x1
+ 818 01d0 54       		.byte	0x54
+ 819 01d1 00000000 		.4byte	.LFB1
+ 820 01d5 54000000 		.4byte	.LFE1-.LFB1
+ 821 01d9 01       		.uleb128 0x1
+ 822 01da 9C       		.byte	0x9c
+ 823 01db AA020000 		.4byte	0x2aa
+ 824 01df 10       		.uleb128 0x10
+ 825 01e0 FF020000 		.4byte	.LASF30
+ 826 01e4 01       		.byte	0x1
+ 827 01e5 57       		.byte	0x57
+ 828 01e6 6B000000 		.4byte	0x6b
+ 829 01ea 00000000 		.4byte	.LLST0
+ 830 01ee 10       		.uleb128 0x10
+ 831 01ef 62010000 		.4byte	.LASF31
+ 832 01f3 01       		.byte	0x1
+ 833 01f4 5D       		.byte	0x5d
+ 834 01f5 6B000000 		.4byte	0x6b
+ 835 01f9 18000000 		.4byte	.LLST1
+ 836 01fd 11       		.uleb128 0x11
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 32
+
+
+ 837 01fe 26010000 		.4byte	0x126
+ 838 0202 1C000000 		.4byte	.LBB24
+ 839 0206 06000000 		.4byte	.LBE24-.LBB24
+ 840 020a 01       		.byte	0x1
+ 841 020b 85       		.byte	0x85
+ 842 020c 1A020000 		.4byte	0x21a
+ 843 0210 12       		.uleb128 0x12
+ 844 0211 33010000 		.4byte	0x133
+ 845 0215 2B000000 		.4byte	.LLST2
+ 846 0219 00       		.byte	0
+ 847 021a 11       		.uleb128 0x11
+ 848 021b 0C010000 		.4byte	0x10c
+ 849 021f 22000000 		.4byte	.LBB26
+ 850 0223 04000000 		.4byte	.LBE26-.LBB26
+ 851 0227 01       		.byte	0x1
+ 852 0228 88       		.byte	0x88
+ 853 0229 37020000 		.4byte	0x237
+ 854 022d 12       		.uleb128 0x12
+ 855 022e 19010000 		.4byte	0x119
+ 856 0232 40000000 		.4byte	.LLST3
+ 857 0236 00       		.byte	0
+ 858 0237 11       		.uleb128 0x11
+ 859 0238 F2000000 		.4byte	0xf2
+ 860 023c 26000000 		.4byte	.LBB28
+ 861 0240 06000000 		.4byte	.LBE28-.LBB28
+ 862 0244 01       		.byte	0x1
+ 863 0245 8D       		.byte	0x8d
+ 864 0246 54020000 		.4byte	0x254
+ 865 024a 12       		.uleb128 0x12
+ 866 024b FF000000 		.4byte	0xff
+ 867 024f 55000000 		.4byte	.LLST4
+ 868 0253 00       		.byte	0
+ 869 0254 11       		.uleb128 0x11
+ 870 0255 D8000000 		.4byte	0xd8
+ 871 0259 2C000000 		.4byte	.LBB30
+ 872 025d 04000000 		.4byte	.LBE30-.LBB30
+ 873 0261 01       		.byte	0x1
+ 874 0262 8E       		.byte	0x8e
+ 875 0263 71020000 		.4byte	0x271
+ 876 0267 12       		.uleb128 0x12
+ 877 0268 E5000000 		.4byte	0xe5
+ 878 026c 69000000 		.4byte	.LLST5
+ 879 0270 00       		.byte	0
+ 880 0271 11       		.uleb128 0x11
+ 881 0272 BE000000 		.4byte	0xbe
+ 882 0276 30000000 		.4byte	.LBB32
+ 883 027a 02000000 		.4byte	.LBE32-.LBB32
+ 884 027e 01       		.byte	0x1
+ 885 027f 9A       		.byte	0x9a
+ 886 0280 8E020000 		.4byte	0x28e
+ 887 0284 12       		.uleb128 0x12
+ 888 0285 CB000000 		.4byte	0xcb
+ 889 0289 7D000000 		.4byte	.LLST6
+ 890 028d 00       		.byte	0
+ 891 028e 13       		.uleb128 0x13
+ 892 028f 36000000 		.4byte	.LVL9
+ 893 0293 FD030000 		.4byte	0x3fd
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 33
+
+
+ 894 0297 13       		.uleb128 0x13
+ 895 0298 44000000 		.4byte	.LVL10
+ 896 029c 08040000 		.4byte	0x408
+ 897 02a0 14       		.uleb128 0x14
+ 898 02a1 4C000000 		.4byte	.LVL11
+ 899 02a5 93010000 		.4byte	0x193
+ 900 02a9 00       		.byte	0
+ 901 02aa 0F       		.uleb128 0xf
+ 902 02ab 7A010000 		.4byte	.LASF32
+ 903 02af 01       		.byte	0x1
+ 904 02b0 37       		.byte	0x37
+ 905 02b1 00000000 		.4byte	.LFB0
+ 906 02b5 1C000000 		.4byte	.LFE0-.LFB0
+ 907 02b9 01       		.uleb128 0x1
+ 908 02ba 9C       		.byte	0x9c
+ 909 02bb D2020000 		.4byte	0x2d2
+ 910 02bf 13       		.uleb128 0x13
+ 911 02c0 0C000000 		.4byte	.LVL12
+ 912 02c4 CA010000 		.4byte	0x1ca
+ 913 02c8 14       		.uleb128 0x14
+ 914 02c9 18000000 		.4byte	.LVL13
+ 915 02cd 40010000 		.4byte	0x140
+ 916 02d1 00       		.byte	0
+ 917 02d2 0A       		.uleb128 0xa
+ 918 02d3 0C010000 		.4byte	0x10c
+ 919 02d7 00000000 		.4byte	.LFB7
+ 920 02db 0C000000 		.4byte	.LFE7-.LFB7
+ 921 02df 01       		.uleb128 0x1
+ 922 02e0 9C       		.byte	0x9c
+ 923 02e1 ED020000 		.4byte	0x2ed
+ 924 02e5 0B       		.uleb128 0xb
+ 925 02e6 19010000 		.4byte	0x119
+ 926 02ea 01       		.uleb128 0x1
+ 927 02eb 50       		.byte	0x50
+ 928 02ec 00       		.byte	0
+ 929 02ed 0A       		.uleb128 0xa
+ 930 02ee F2000000 		.4byte	0xf2
+ 931 02f2 00000000 		.4byte	.LFB8
+ 932 02f6 0C000000 		.4byte	.LFE8-.LFB8
+ 933 02fa 01       		.uleb128 0x1
+ 934 02fb 9C       		.byte	0x9c
+ 935 02fc 08030000 		.4byte	0x308
+ 936 0300 0B       		.uleb128 0xb
+ 937 0301 FF000000 		.4byte	0xff
+ 938 0305 01       		.uleb128 0x1
+ 939 0306 50       		.byte	0x50
+ 940 0307 00       		.byte	0
+ 941 0308 0A       		.uleb128 0xa
+ 942 0309 D8000000 		.4byte	0xd8
+ 943 030d 00000000 		.4byte	.LFB9
+ 944 0311 0C000000 		.4byte	.LFE9-.LFB9
+ 945 0315 01       		.uleb128 0x1
+ 946 0316 9C       		.byte	0x9c
+ 947 0317 23030000 		.4byte	0x323
+ 948 031b 0B       		.uleb128 0xb
+ 949 031c E5000000 		.4byte	0xe5
+ 950 0320 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 34
+
+
+ 951 0321 50       		.byte	0x50
+ 952 0322 00       		.byte	0
+ 953 0323 0A       		.uleb128 0xa
+ 954 0324 BE000000 		.4byte	0xbe
+ 955 0328 00000000 		.4byte	.LFB10
+ 956 032c 0C000000 		.4byte	.LFE10-.LFB10
+ 957 0330 01       		.uleb128 0x1
+ 958 0331 9C       		.byte	0x9c
+ 959 0332 3E030000 		.4byte	0x33e
+ 960 0336 0B       		.uleb128 0xb
+ 961 0337 CB000000 		.4byte	0xcb
+ 962 033b 01       		.uleb128 0x1
+ 963 033c 50       		.byte	0x50
+ 964 033d 00       		.byte	0
+ 965 033e 15       		.uleb128 0x15
+ 966 033f B1000000 		.4byte	0xb1
+ 967 0343 00000000 		.4byte	.LFB11
+ 968 0347 0C000000 		.4byte	.LFE11-.LFB11
+ 969 034b 01       		.uleb128 0x1
+ 970 034c 9C       		.byte	0x9c
+ 971 034d 16       		.uleb128 0x16
+ 972 034e 90010000 		.4byte	.LASF44
+ 973 0352 01       		.byte	0x1
+ 974 0353 E102     		.2byte	0x2e1
+ 975 0355 6B000000 		.4byte	0x6b
+ 976 0359 00000000 		.4byte	.LFB12
+ 977 035d 0C000000 		.4byte	.LFE12-.LFB12
+ 978 0361 01       		.uleb128 0x1
+ 979 0362 9C       		.byte	0x9c
+ 980 0363 76030000 		.4byte	0x376
+ 981 0367 17       		.uleb128 0x17
+ 982 0368 48020000 		.4byte	.LASF33
+ 983 036c 01       		.byte	0x1
+ 984 036d E302     		.2byte	0x2e3
+ 985 036f 6B000000 		.4byte	0x6b
+ 986 0373 01       		.uleb128 0x1
+ 987 0374 50       		.byte	0x50
+ 988 0375 00       		.byte	0
+ 989 0376 0D       		.uleb128 0xd
+ 990 0377 4F020000 		.4byte	.LASF34
+ 991 037b 01       		.byte	0x1
+ 992 037c FD02     		.2byte	0x2fd
+ 993 037e 00000000 		.4byte	.LFB13
+ 994 0382 0C000000 		.4byte	.LFE13-.LFB13
+ 995 0386 01       		.uleb128 0x1
+ 996 0387 9C       		.byte	0x9c
+ 997 0388 9B030000 		.4byte	0x39b
+ 998 038c 18       		.uleb128 0x18
+ 999 038d 5A010000 		.4byte	.LASF45
+ 1000 0391 01       		.byte	0x1
+ 1001 0392 FD02     		.2byte	0x2fd
+ 1002 0394 6B000000 		.4byte	0x6b
+ 1003 0398 01       		.uleb128 0x1
+ 1004 0399 50       		.byte	0x50
+ 1005 039a 00       		.byte	0
+ 1006 039b 15       		.uleb128 0x15
+ 1007 039c A4000000 		.4byte	0xa4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 35
+
+
+ 1008 03a0 00000000 		.4byte	.LFB14
+ 1009 03a4 0C000000 		.4byte	.LFE14-.LFB14
+ 1010 03a8 01       		.uleb128 0x1
+ 1011 03a9 9C       		.byte	0x9c
+ 1012 03aa 0C       		.uleb128 0xc
+ 1013 03ab 45000000 		.4byte	.LASF36
+ 1014 03af 01       		.byte	0x1
+ 1015 03b0 4A03     		.2byte	0x34a
+ 1016 03b2 6B000000 		.4byte	0x6b
+ 1017 03b6 00000000 		.4byte	.LFB15
+ 1018 03ba 0C000000 		.4byte	.LFE15-.LFB15
+ 1019 03be 01       		.uleb128 0x1
+ 1020 03bf 9C       		.byte	0x9c
+ 1021 03c0 0C       		.uleb128 0xc
+ 1022 03c1 5B000000 		.4byte	.LASF37
+ 1023 03c5 01       		.byte	0x1
+ 1024 03c6 5E03     		.2byte	0x35e
+ 1025 03c8 6B000000 		.4byte	0x6b
+ 1026 03cc 00000000 		.4byte	.LFB16
+ 1027 03d0 0C000000 		.4byte	.LFE16-.LFB16
+ 1028 03d4 01       		.uleb128 0x1
+ 1029 03d5 9C       		.byte	0x9c
+ 1030 03d6 0C       		.uleb128 0xc
+ 1031 03d7 37030000 		.4byte	.LASF38
+ 1032 03db 01       		.byte	0x1
+ 1033 03dc 7403     		.2byte	0x374
+ 1034 03de 6B000000 		.4byte	0x6b
+ 1035 03e2 00000000 		.4byte	.LFB17
+ 1036 03e6 0C000000 		.4byte	.LFE17-.LFB17
+ 1037 03ea 01       		.uleb128 0x1
+ 1038 03eb 9C       		.byte	0x9c
+ 1039 03ec 19       		.uleb128 0x19
+ 1040 03ed EE020000 		.4byte	.LASF46
+ 1041 03f1 01       		.byte	0x1
+ 1042 03f2 20       		.byte	0x20
+ 1043 03f3 6B000000 		.4byte	0x6b
+ 1044 03f7 05       		.uleb128 0x5
+ 1045 03f8 03       		.byte	0x3
+ 1046 03f9 00000000 		.4byte	temp_pwm_initVar
+ 1047 03fd 1A       		.uleb128 0x1a
+ 1048 03fe BB010000 		.4byte	.LASF39
+ 1049 0402 BB010000 		.4byte	.LASF39
+ 1050 0406 03       		.byte	0x3
+ 1051 0407 7D       		.byte	0x7d
+ 1052 0408 1A       		.uleb128 0x1a
+ 1053 0409 32020000 		.4byte	.LASF40
+ 1054 040d 32020000 		.4byte	.LASF40
+ 1055 0411 03       		.byte	0x3
+ 1056 0412 7E       		.byte	0x7e
+ 1057 0413 00       		.byte	0
+ 1058              		.section	.debug_abbrev,"",%progbits
+ 1059              	.Ldebug_abbrev0:
+ 1060 0000 01       		.uleb128 0x1
+ 1061 0001 11       		.uleb128 0x11
+ 1062 0002 01       		.byte	0x1
+ 1063 0003 25       		.uleb128 0x25
+ 1064 0004 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 36
+
+
+ 1065 0005 13       		.uleb128 0x13
+ 1066 0006 0B       		.uleb128 0xb
+ 1067 0007 03       		.uleb128 0x3
+ 1068 0008 0E       		.uleb128 0xe
+ 1069 0009 1B       		.uleb128 0x1b
+ 1070 000a 0E       		.uleb128 0xe
+ 1071 000b 55       		.uleb128 0x55
+ 1072 000c 17       		.uleb128 0x17
+ 1073 000d 11       		.uleb128 0x11
+ 1074 000e 01       		.uleb128 0x1
+ 1075 000f 10       		.uleb128 0x10
+ 1076 0010 17       		.uleb128 0x17
+ 1077 0011 00       		.byte	0
+ 1078 0012 00       		.byte	0
+ 1079 0013 02       		.uleb128 0x2
+ 1080 0014 24       		.uleb128 0x24
+ 1081 0015 00       		.byte	0
+ 1082 0016 0B       		.uleb128 0xb
+ 1083 0017 0B       		.uleb128 0xb
+ 1084 0018 3E       		.uleb128 0x3e
+ 1085 0019 0B       		.uleb128 0xb
+ 1086 001a 03       		.uleb128 0x3
+ 1087 001b 0E       		.uleb128 0xe
+ 1088 001c 00       		.byte	0
+ 1089 001d 00       		.byte	0
+ 1090 001e 03       		.uleb128 0x3
+ 1091 001f 24       		.uleb128 0x24
+ 1092 0020 00       		.byte	0
+ 1093 0021 0B       		.uleb128 0xb
+ 1094 0022 0B       		.uleb128 0xb
+ 1095 0023 3E       		.uleb128 0x3e
+ 1096 0024 0B       		.uleb128 0xb
+ 1097 0025 03       		.uleb128 0x3
+ 1098 0026 08       		.uleb128 0x8
+ 1099 0027 00       		.byte	0
+ 1100 0028 00       		.byte	0
+ 1101 0029 04       		.uleb128 0x4
+ 1102 002a 16       		.uleb128 0x16
+ 1103 002b 00       		.byte	0
+ 1104 002c 03       		.uleb128 0x3
+ 1105 002d 0E       		.uleb128 0xe
+ 1106 002e 3A       		.uleb128 0x3a
+ 1107 002f 0B       		.uleb128 0xb
+ 1108 0030 3B       		.uleb128 0x3b
+ 1109 0031 05       		.uleb128 0x5
+ 1110 0032 49       		.uleb128 0x49
+ 1111 0033 13       		.uleb128 0x13
+ 1112 0034 00       		.byte	0
+ 1113 0035 00       		.byte	0
+ 1114 0036 05       		.uleb128 0x5
+ 1115 0037 35       		.uleb128 0x35
+ 1116 0038 00       		.byte	0
+ 1117 0039 49       		.uleb128 0x49
+ 1118 003a 13       		.uleb128 0x13
+ 1119 003b 00       		.byte	0
+ 1120 003c 00       		.byte	0
+ 1121 003d 06       		.uleb128 0x6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 37
+
+
+ 1122 003e 2E       		.uleb128 0x2e
+ 1123 003f 00       		.byte	0
+ 1124 0040 3F       		.uleb128 0x3f
+ 1125 0041 19       		.uleb128 0x19
+ 1126 0042 03       		.uleb128 0x3
+ 1127 0043 0E       		.uleb128 0xe
+ 1128 0044 3A       		.uleb128 0x3a
+ 1129 0045 0B       		.uleb128 0xb
+ 1130 0046 3B       		.uleb128 0x3b
+ 1131 0047 05       		.uleb128 0x5
+ 1132 0048 27       		.uleb128 0x27
+ 1133 0049 19       		.uleb128 0x19
+ 1134 004a 49       		.uleb128 0x49
+ 1135 004b 13       		.uleb128 0x13
+ 1136 004c 20       		.uleb128 0x20
+ 1137 004d 0B       		.uleb128 0xb
+ 1138 004e 00       		.byte	0
+ 1139 004f 00       		.byte	0
+ 1140 0050 07       		.uleb128 0x7
+ 1141 0051 2E       		.uleb128 0x2e
+ 1142 0052 01       		.byte	0x1
+ 1143 0053 3F       		.uleb128 0x3f
+ 1144 0054 19       		.uleb128 0x19
+ 1145 0055 03       		.uleb128 0x3
+ 1146 0056 0E       		.uleb128 0xe
+ 1147 0057 3A       		.uleb128 0x3a
+ 1148 0058 0B       		.uleb128 0xb
+ 1149 0059 3B       		.uleb128 0x3b
+ 1150 005a 05       		.uleb128 0x5
+ 1151 005b 27       		.uleb128 0x27
+ 1152 005c 19       		.uleb128 0x19
+ 1153 005d 20       		.uleb128 0x20
+ 1154 005e 0B       		.uleb128 0xb
+ 1155 005f 01       		.uleb128 0x1
+ 1156 0060 13       		.uleb128 0x13
+ 1157 0061 00       		.byte	0
+ 1158 0062 00       		.byte	0
+ 1159 0063 08       		.uleb128 0x8
+ 1160 0064 05       		.uleb128 0x5
+ 1161 0065 00       		.byte	0
+ 1162 0066 03       		.uleb128 0x3
+ 1163 0067 0E       		.uleb128 0xe
+ 1164 0068 3A       		.uleb128 0x3a
+ 1165 0069 0B       		.uleb128 0xb
+ 1166 006a 3B       		.uleb128 0x3b
+ 1167 006b 05       		.uleb128 0x5
+ 1168 006c 49       		.uleb128 0x49
+ 1169 006d 13       		.uleb128 0x13
+ 1170 006e 00       		.byte	0
+ 1171 006f 00       		.byte	0
+ 1172 0070 09       		.uleb128 0x9
+ 1173 0071 2E       		.uleb128 0x2e
+ 1174 0072 00       		.byte	0
+ 1175 0073 3F       		.uleb128 0x3f
+ 1176 0074 19       		.uleb128 0x19
+ 1177 0075 03       		.uleb128 0x3
+ 1178 0076 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 38
+
+
+ 1179 0077 3A       		.uleb128 0x3a
+ 1180 0078 0B       		.uleb128 0xb
+ 1181 0079 3B       		.uleb128 0x3b
+ 1182 007a 0B       		.uleb128 0xb
+ 1183 007b 27       		.uleb128 0x27
+ 1184 007c 19       		.uleb128 0x19
+ 1185 007d 11       		.uleb128 0x11
+ 1186 007e 01       		.uleb128 0x1
+ 1187 007f 12       		.uleb128 0x12
+ 1188 0080 06       		.uleb128 0x6
+ 1189 0081 40       		.uleb128 0x40
+ 1190 0082 18       		.uleb128 0x18
+ 1191 0083 9742     		.uleb128 0x2117
+ 1192 0085 19       		.uleb128 0x19
+ 1193 0086 00       		.byte	0
+ 1194 0087 00       		.byte	0
+ 1195 0088 0A       		.uleb128 0xa
+ 1196 0089 2E       		.uleb128 0x2e
+ 1197 008a 01       		.byte	0x1
+ 1198 008b 31       		.uleb128 0x31
+ 1199 008c 13       		.uleb128 0x13
+ 1200 008d 11       		.uleb128 0x11
+ 1201 008e 01       		.uleb128 0x1
+ 1202 008f 12       		.uleb128 0x12
+ 1203 0090 06       		.uleb128 0x6
+ 1204 0091 40       		.uleb128 0x40
+ 1205 0092 18       		.uleb128 0x18
+ 1206 0093 9742     		.uleb128 0x2117
+ 1207 0095 19       		.uleb128 0x19
+ 1208 0096 01       		.uleb128 0x1
+ 1209 0097 13       		.uleb128 0x13
+ 1210 0098 00       		.byte	0
+ 1211 0099 00       		.byte	0
+ 1212 009a 0B       		.uleb128 0xb
+ 1213 009b 05       		.uleb128 0x5
+ 1214 009c 00       		.byte	0
+ 1215 009d 31       		.uleb128 0x31
+ 1216 009e 13       		.uleb128 0x13
+ 1217 009f 02       		.uleb128 0x2
+ 1218 00a0 18       		.uleb128 0x18
+ 1219 00a1 00       		.byte	0
+ 1220 00a2 00       		.byte	0
+ 1221 00a3 0C       		.uleb128 0xc
+ 1222 00a4 2E       		.uleb128 0x2e
+ 1223 00a5 00       		.byte	0
+ 1224 00a6 3F       		.uleb128 0x3f
+ 1225 00a7 19       		.uleb128 0x19
+ 1226 00a8 03       		.uleb128 0x3
+ 1227 00a9 0E       		.uleb128 0xe
+ 1228 00aa 3A       		.uleb128 0x3a
+ 1229 00ab 0B       		.uleb128 0xb
+ 1230 00ac 3B       		.uleb128 0x3b
+ 1231 00ad 05       		.uleb128 0x5
+ 1232 00ae 27       		.uleb128 0x27
+ 1233 00af 19       		.uleb128 0x19
+ 1234 00b0 49       		.uleb128 0x49
+ 1235 00b1 13       		.uleb128 0x13
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 39
+
+
+ 1236 00b2 11       		.uleb128 0x11
+ 1237 00b3 01       		.uleb128 0x1
+ 1238 00b4 12       		.uleb128 0x12
+ 1239 00b5 06       		.uleb128 0x6
+ 1240 00b6 40       		.uleb128 0x40
+ 1241 00b7 18       		.uleb128 0x18
+ 1242 00b8 9742     		.uleb128 0x2117
+ 1243 00ba 19       		.uleb128 0x19
+ 1244 00bb 00       		.byte	0
+ 1245 00bc 00       		.byte	0
+ 1246 00bd 0D       		.uleb128 0xd
+ 1247 00be 2E       		.uleb128 0x2e
+ 1248 00bf 01       		.byte	0x1
+ 1249 00c0 3F       		.uleb128 0x3f
+ 1250 00c1 19       		.uleb128 0x19
+ 1251 00c2 03       		.uleb128 0x3
+ 1252 00c3 0E       		.uleb128 0xe
+ 1253 00c4 3A       		.uleb128 0x3a
+ 1254 00c5 0B       		.uleb128 0xb
+ 1255 00c6 3B       		.uleb128 0x3b
+ 1256 00c7 05       		.uleb128 0x5
+ 1257 00c8 27       		.uleb128 0x27
+ 1258 00c9 19       		.uleb128 0x19
+ 1259 00ca 11       		.uleb128 0x11
+ 1260 00cb 01       		.uleb128 0x1
+ 1261 00cc 12       		.uleb128 0x12
+ 1262 00cd 06       		.uleb128 0x6
+ 1263 00ce 40       		.uleb128 0x40
+ 1264 00cf 18       		.uleb128 0x18
+ 1265 00d0 9742     		.uleb128 0x2117
+ 1266 00d2 19       		.uleb128 0x19
+ 1267 00d3 01       		.uleb128 0x1
+ 1268 00d4 13       		.uleb128 0x13
+ 1269 00d5 00       		.byte	0
+ 1270 00d6 00       		.byte	0
+ 1271 00d7 0E       		.uleb128 0xe
+ 1272 00d8 1D       		.uleb128 0x1d
+ 1273 00d9 00       		.byte	0
+ 1274 00da 31       		.uleb128 0x31
+ 1275 00db 13       		.uleb128 0x13
+ 1276 00dc 52       		.uleb128 0x52
+ 1277 00dd 01       		.uleb128 0x1
+ 1278 00de 55       		.uleb128 0x55
+ 1279 00df 17       		.uleb128 0x17
+ 1280 00e0 58       		.uleb128 0x58
+ 1281 00e1 0B       		.uleb128 0xb
+ 1282 00e2 59       		.uleb128 0x59
+ 1283 00e3 05       		.uleb128 0x5
+ 1284 00e4 00       		.byte	0
+ 1285 00e5 00       		.byte	0
+ 1286 00e6 0F       		.uleb128 0xf
+ 1287 00e7 2E       		.uleb128 0x2e
+ 1288 00e8 01       		.byte	0x1
+ 1289 00e9 3F       		.uleb128 0x3f
+ 1290 00ea 19       		.uleb128 0x19
+ 1291 00eb 03       		.uleb128 0x3
+ 1292 00ec 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 40
+
+
+ 1293 00ed 3A       		.uleb128 0x3a
+ 1294 00ee 0B       		.uleb128 0xb
+ 1295 00ef 3B       		.uleb128 0x3b
+ 1296 00f0 0B       		.uleb128 0xb
+ 1297 00f1 27       		.uleb128 0x27
+ 1298 00f2 19       		.uleb128 0x19
+ 1299 00f3 11       		.uleb128 0x11
+ 1300 00f4 01       		.uleb128 0x1
+ 1301 00f5 12       		.uleb128 0x12
+ 1302 00f6 06       		.uleb128 0x6
+ 1303 00f7 40       		.uleb128 0x40
+ 1304 00f8 18       		.uleb128 0x18
+ 1305 00f9 9742     		.uleb128 0x2117
+ 1306 00fb 19       		.uleb128 0x19
+ 1307 00fc 01       		.uleb128 0x1
+ 1308 00fd 13       		.uleb128 0x13
+ 1309 00fe 00       		.byte	0
+ 1310 00ff 00       		.byte	0
+ 1311 0100 10       		.uleb128 0x10
+ 1312 0101 34       		.uleb128 0x34
+ 1313 0102 00       		.byte	0
+ 1314 0103 03       		.uleb128 0x3
+ 1315 0104 0E       		.uleb128 0xe
+ 1316 0105 3A       		.uleb128 0x3a
+ 1317 0106 0B       		.uleb128 0xb
+ 1318 0107 3B       		.uleb128 0x3b
+ 1319 0108 0B       		.uleb128 0xb
+ 1320 0109 49       		.uleb128 0x49
+ 1321 010a 13       		.uleb128 0x13
+ 1322 010b 02       		.uleb128 0x2
+ 1323 010c 17       		.uleb128 0x17
+ 1324 010d 00       		.byte	0
+ 1325 010e 00       		.byte	0
+ 1326 010f 11       		.uleb128 0x11
+ 1327 0110 1D       		.uleb128 0x1d
+ 1328 0111 01       		.byte	0x1
+ 1329 0112 31       		.uleb128 0x31
+ 1330 0113 13       		.uleb128 0x13
+ 1331 0114 11       		.uleb128 0x11
+ 1332 0115 01       		.uleb128 0x1
+ 1333 0116 12       		.uleb128 0x12
+ 1334 0117 06       		.uleb128 0x6
+ 1335 0118 58       		.uleb128 0x58
+ 1336 0119 0B       		.uleb128 0xb
+ 1337 011a 59       		.uleb128 0x59
+ 1338 011b 0B       		.uleb128 0xb
+ 1339 011c 01       		.uleb128 0x1
+ 1340 011d 13       		.uleb128 0x13
+ 1341 011e 00       		.byte	0
+ 1342 011f 00       		.byte	0
+ 1343 0120 12       		.uleb128 0x12
+ 1344 0121 05       		.uleb128 0x5
+ 1345 0122 00       		.byte	0
+ 1346 0123 31       		.uleb128 0x31
+ 1347 0124 13       		.uleb128 0x13
+ 1348 0125 02       		.uleb128 0x2
+ 1349 0126 17       		.uleb128 0x17
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 41
+
+
+ 1350 0127 00       		.byte	0
+ 1351 0128 00       		.byte	0
+ 1352 0129 13       		.uleb128 0x13
+ 1353 012a 898201   		.uleb128 0x4109
+ 1354 012d 00       		.byte	0
+ 1355 012e 11       		.uleb128 0x11
+ 1356 012f 01       		.uleb128 0x1
+ 1357 0130 31       		.uleb128 0x31
+ 1358 0131 13       		.uleb128 0x13
+ 1359 0132 00       		.byte	0
+ 1360 0133 00       		.byte	0
+ 1361 0134 14       		.uleb128 0x14
+ 1362 0135 898201   		.uleb128 0x4109
+ 1363 0138 00       		.byte	0
+ 1364 0139 11       		.uleb128 0x11
+ 1365 013a 01       		.uleb128 0x1
+ 1366 013b 9542     		.uleb128 0x2115
+ 1367 013d 19       		.uleb128 0x19
+ 1368 013e 31       		.uleb128 0x31
+ 1369 013f 13       		.uleb128 0x13
+ 1370 0140 00       		.byte	0
+ 1371 0141 00       		.byte	0
+ 1372 0142 15       		.uleb128 0x15
+ 1373 0143 2E       		.uleb128 0x2e
+ 1374 0144 00       		.byte	0
+ 1375 0145 31       		.uleb128 0x31
+ 1376 0146 13       		.uleb128 0x13
+ 1377 0147 11       		.uleb128 0x11
+ 1378 0148 01       		.uleb128 0x1
+ 1379 0149 12       		.uleb128 0x12
+ 1380 014a 06       		.uleb128 0x6
+ 1381 014b 40       		.uleb128 0x40
+ 1382 014c 18       		.uleb128 0x18
+ 1383 014d 9742     		.uleb128 0x2117
+ 1384 014f 19       		.uleb128 0x19
+ 1385 0150 00       		.byte	0
+ 1386 0151 00       		.byte	0
+ 1387 0152 16       		.uleb128 0x16
+ 1388 0153 2E       		.uleb128 0x2e
+ 1389 0154 01       		.byte	0x1
+ 1390 0155 3F       		.uleb128 0x3f
+ 1391 0156 19       		.uleb128 0x19
+ 1392 0157 03       		.uleb128 0x3
+ 1393 0158 0E       		.uleb128 0xe
+ 1394 0159 3A       		.uleb128 0x3a
+ 1395 015a 0B       		.uleb128 0xb
+ 1396 015b 3B       		.uleb128 0x3b
+ 1397 015c 05       		.uleb128 0x5
+ 1398 015d 27       		.uleb128 0x27
+ 1399 015e 19       		.uleb128 0x19
+ 1400 015f 49       		.uleb128 0x49
+ 1401 0160 13       		.uleb128 0x13
+ 1402 0161 11       		.uleb128 0x11
+ 1403 0162 01       		.uleb128 0x1
+ 1404 0163 12       		.uleb128 0x12
+ 1405 0164 06       		.uleb128 0x6
+ 1406 0165 40       		.uleb128 0x40
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 42
+
+
+ 1407 0166 18       		.uleb128 0x18
+ 1408 0167 9742     		.uleb128 0x2117
+ 1409 0169 19       		.uleb128 0x19
+ 1410 016a 01       		.uleb128 0x1
+ 1411 016b 13       		.uleb128 0x13
+ 1412 016c 00       		.byte	0
+ 1413 016d 00       		.byte	0
+ 1414 016e 17       		.uleb128 0x17
+ 1415 016f 34       		.uleb128 0x34
+ 1416 0170 00       		.byte	0
+ 1417 0171 03       		.uleb128 0x3
+ 1418 0172 0E       		.uleb128 0xe
+ 1419 0173 3A       		.uleb128 0x3a
+ 1420 0174 0B       		.uleb128 0xb
+ 1421 0175 3B       		.uleb128 0x3b
+ 1422 0176 05       		.uleb128 0x5
+ 1423 0177 49       		.uleb128 0x49
+ 1424 0178 13       		.uleb128 0x13
+ 1425 0179 02       		.uleb128 0x2
+ 1426 017a 18       		.uleb128 0x18
+ 1427 017b 00       		.byte	0
+ 1428 017c 00       		.byte	0
+ 1429 017d 18       		.uleb128 0x18
+ 1430 017e 05       		.uleb128 0x5
+ 1431 017f 00       		.byte	0
+ 1432 0180 03       		.uleb128 0x3
+ 1433 0181 0E       		.uleb128 0xe
+ 1434 0182 3A       		.uleb128 0x3a
+ 1435 0183 0B       		.uleb128 0xb
+ 1436 0184 3B       		.uleb128 0x3b
+ 1437 0185 05       		.uleb128 0x5
+ 1438 0186 49       		.uleb128 0x49
+ 1439 0187 13       		.uleb128 0x13
+ 1440 0188 02       		.uleb128 0x2
+ 1441 0189 18       		.uleb128 0x18
+ 1442 018a 00       		.byte	0
+ 1443 018b 00       		.byte	0
+ 1444 018c 19       		.uleb128 0x19
+ 1445 018d 34       		.uleb128 0x34
+ 1446 018e 00       		.byte	0
+ 1447 018f 03       		.uleb128 0x3
+ 1448 0190 0E       		.uleb128 0xe
+ 1449 0191 3A       		.uleb128 0x3a
+ 1450 0192 0B       		.uleb128 0xb
+ 1451 0193 3B       		.uleb128 0x3b
+ 1452 0194 0B       		.uleb128 0xb
+ 1453 0195 49       		.uleb128 0x49
+ 1454 0196 13       		.uleb128 0x13
+ 1455 0197 3F       		.uleb128 0x3f
+ 1456 0198 19       		.uleb128 0x19
+ 1457 0199 02       		.uleb128 0x2
+ 1458 019a 18       		.uleb128 0x18
+ 1459 019b 00       		.byte	0
+ 1460 019c 00       		.byte	0
+ 1461 019d 1A       		.uleb128 0x1a
+ 1462 019e 2E       		.uleb128 0x2e
+ 1463 019f 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 43
+
+
+ 1464 01a0 3F       		.uleb128 0x3f
+ 1465 01a1 19       		.uleb128 0x19
+ 1466 01a2 3C       		.uleb128 0x3c
+ 1467 01a3 19       		.uleb128 0x19
+ 1468 01a4 6E       		.uleb128 0x6e
+ 1469 01a5 0E       		.uleb128 0xe
+ 1470 01a6 03       		.uleb128 0x3
+ 1471 01a7 0E       		.uleb128 0xe
+ 1472 01a8 3A       		.uleb128 0x3a
+ 1473 01a9 0B       		.uleb128 0xb
+ 1474 01aa 3B       		.uleb128 0x3b
+ 1475 01ab 0B       		.uleb128 0xb
+ 1476 01ac 00       		.byte	0
+ 1477 01ad 00       		.byte	0
+ 1478 01ae 00       		.byte	0
+ 1479              		.section	.debug_loc,"",%progbits
+ 1480              	.Ldebug_loc0:
+ 1481              	.LLST0:
+ 1482 0000 06000000 		.4byte	.LVL1
+ 1483 0004 0A000000 		.4byte	.LVL2
+ 1484 0008 0600     		.2byte	0x6
+ 1485 000a 73       		.byte	0x73
+ 1486 000b 00       		.sleb128 0
+ 1487 000c 09       		.byte	0x9
+ 1488 000d C0       		.byte	0xc0
+ 1489 000e 1A       		.byte	0x1a
+ 1490 000f 9F       		.byte	0x9f
+ 1491 0010 00000000 		.4byte	0
+ 1492 0014 00000000 		.4byte	0
+ 1493              	.LLST1:
+ 1494 0018 36000000 		.4byte	.LVL9
+ 1495 001c 43000000 		.4byte	.LVL10-1
+ 1496 0020 0100     		.2byte	0x1
+ 1497 0022 50       		.byte	0x50
+ 1498 0023 00000000 		.4byte	0
+ 1499 0027 00000000 		.4byte	0
+ 1500              	.LLST2:
+ 1501 002b 1C000000 		.4byte	.LVL3
+ 1502 002f 22000000 		.4byte	.LVL4
+ 1503 0033 0300     		.2byte	0x3
+ 1504 0035 09       		.byte	0x9
+ 1505 0036 FE       		.byte	0xfe
+ 1506 0037 9F       		.byte	0x9f
+ 1507 0038 00000000 		.4byte	0
+ 1508 003c 00000000 		.4byte	0
+ 1509              	.LLST3:
+ 1510 0040 22000000 		.4byte	.LVL4
+ 1511 0044 26000000 		.4byte	.LVL5
+ 1512 0048 0300     		.2byte	0x3
+ 1513 004a 09       		.byte	0x9
+ 1514 004b FE       		.byte	0xfe
+ 1515 004c 9F       		.byte	0x9f
+ 1516 004d 00000000 		.4byte	0
+ 1517 0051 00000000 		.4byte	0
+ 1518              	.LLST4:
+ 1519 0055 26000000 		.4byte	.LVL5
+ 1520 0059 2C000000 		.4byte	.LVL6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 44
+
+
+ 1521 005d 0200     		.2byte	0x2
+ 1522 005f 30       		.byte	0x30
+ 1523 0060 9F       		.byte	0x9f
+ 1524 0061 00000000 		.4byte	0
+ 1525 0065 00000000 		.4byte	0
+ 1526              	.LLST5:
+ 1527 0069 2C000000 		.4byte	.LVL6
+ 1528 006d 30000000 		.4byte	.LVL7
+ 1529 0071 0200     		.2byte	0x2
+ 1530 0073 30       		.byte	0x30
+ 1531 0074 9F       		.byte	0x9f
+ 1532 0075 00000000 		.4byte	0
+ 1533 0079 00000000 		.4byte	0
+ 1534              	.LLST6:
+ 1535 007d 30000000 		.4byte	.LVL7
+ 1536 0081 32000000 		.4byte	.LVL8
+ 1537 0085 0200     		.2byte	0x2
+ 1538 0087 30       		.byte	0x30
+ 1539 0088 9F       		.byte	0x9f
+ 1540 0089 00000000 		.4byte	0
+ 1541 008d 00000000 		.4byte	0
+ 1542              		.section	.debug_aranges,"",%progbits
+ 1543 0000 A4000000 		.4byte	0xa4
+ 1544 0004 0200     		.2byte	0x2
+ 1545 0006 00000000 		.4byte	.Ldebug_info0
+ 1546 000a 04       		.byte	0x4
+ 1547 000b 00       		.byte	0
+ 1548 000c 0000     		.2byte	0
+ 1549 000e 0000     		.2byte	0
+ 1550 0010 00000000 		.4byte	.LFB2
+ 1551 0014 10000000 		.4byte	.LFE2-.LFB2
+ 1552 0018 00000000 		.4byte	.LFB3
+ 1553 001c 10000000 		.4byte	.LFE3-.LFB3
+ 1554 0020 00000000 		.4byte	.LFB4
+ 1555 0024 0C000000 		.4byte	.LFE4-.LFB4
+ 1556 0028 00000000 		.4byte	.LFB5
+ 1557 002c 14000000 		.4byte	.LFE5-.LFB5
+ 1558 0030 00000000 		.4byte	.LFB6
+ 1559 0034 18000000 		.4byte	.LFE6-.LFB6
+ 1560 0038 00000000 		.4byte	.LFB1
+ 1561 003c 54000000 		.4byte	.LFE1-.LFB1
+ 1562 0040 00000000 		.4byte	.LFB0
+ 1563 0044 1C000000 		.4byte	.LFE0-.LFB0
+ 1564 0048 00000000 		.4byte	.LFB7
+ 1565 004c 0C000000 		.4byte	.LFE7-.LFB7
+ 1566 0050 00000000 		.4byte	.LFB8
+ 1567 0054 0C000000 		.4byte	.LFE8-.LFB8
+ 1568 0058 00000000 		.4byte	.LFB9
+ 1569 005c 0C000000 		.4byte	.LFE9-.LFB9
+ 1570 0060 00000000 		.4byte	.LFB10
+ 1571 0064 0C000000 		.4byte	.LFE10-.LFB10
+ 1572 0068 00000000 		.4byte	.LFB11
+ 1573 006c 0C000000 		.4byte	.LFE11-.LFB11
+ 1574 0070 00000000 		.4byte	.LFB12
+ 1575 0074 0C000000 		.4byte	.LFE12-.LFB12
+ 1576 0078 00000000 		.4byte	.LFB13
+ 1577 007c 0C000000 		.4byte	.LFE13-.LFB13
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 45
+
+
+ 1578 0080 00000000 		.4byte	.LFB14
+ 1579 0084 0C000000 		.4byte	.LFE14-.LFB14
+ 1580 0088 00000000 		.4byte	.LFB15
+ 1581 008c 0C000000 		.4byte	.LFE15-.LFB15
+ 1582 0090 00000000 		.4byte	.LFB16
+ 1583 0094 0C000000 		.4byte	.LFE16-.LFB16
+ 1584 0098 00000000 		.4byte	.LFB17
+ 1585 009c 0C000000 		.4byte	.LFE17-.LFB17
+ 1586 00a0 00000000 		.4byte	0
+ 1587 00a4 00000000 		.4byte	0
+ 1588              		.section	.debug_ranges,"",%progbits
+ 1589              	.Ldebug_ranges0:
+ 1590 0000 00000000 		.4byte	.LBB16
+ 1591 0004 02000000 		.4byte	.LBE16
+ 1592 0008 04000000 		.4byte	.LBB22
+ 1593 000c 06000000 		.4byte	.LBE22
+ 1594 0010 00000000 		.4byte	0
+ 1595 0014 00000000 		.4byte	0
+ 1596 0018 02000000 		.4byte	.LBB19
+ 1597 001c 04000000 		.4byte	.LBE19
+ 1598 0020 0A000000 		.4byte	.LBB23
+ 1599 0024 0E000000 		.4byte	.LBE23
+ 1600 0028 00000000 		.4byte	0
+ 1601 002c 00000000 		.4byte	0
+ 1602 0030 00000000 		.4byte	.LFB2
+ 1603 0034 10000000 		.4byte	.LFE2
+ 1604 0038 00000000 		.4byte	.LFB3
+ 1605 003c 10000000 		.4byte	.LFE3
+ 1606 0040 00000000 		.4byte	.LFB4
+ 1607 0044 0C000000 		.4byte	.LFE4
+ 1608 0048 00000000 		.4byte	.LFB5
+ 1609 004c 14000000 		.4byte	.LFE5
+ 1610 0050 00000000 		.4byte	.LFB6
+ 1611 0054 18000000 		.4byte	.LFE6
+ 1612 0058 00000000 		.4byte	.LFB1
+ 1613 005c 54000000 		.4byte	.LFE1
+ 1614 0060 00000000 		.4byte	.LFB0
+ 1615 0064 1C000000 		.4byte	.LFE0
+ 1616 0068 00000000 		.4byte	.LFB7
+ 1617 006c 0C000000 		.4byte	.LFE7
+ 1618 0070 00000000 		.4byte	.LFB8
+ 1619 0074 0C000000 		.4byte	.LFE8
+ 1620 0078 00000000 		.4byte	.LFB9
+ 1621 007c 0C000000 		.4byte	.LFE9
+ 1622 0080 00000000 		.4byte	.LFB10
+ 1623 0084 0C000000 		.4byte	.LFE10
+ 1624 0088 00000000 		.4byte	.LFB11
+ 1625 008c 0C000000 		.4byte	.LFE11
+ 1626 0090 00000000 		.4byte	.LFB12
+ 1627 0094 0C000000 		.4byte	.LFE12
+ 1628 0098 00000000 		.4byte	.LFB13
+ 1629 009c 0C000000 		.4byte	.LFE13
+ 1630 00a0 00000000 		.4byte	.LFB14
+ 1631 00a4 0C000000 		.4byte	.LFE14
+ 1632 00a8 00000000 		.4byte	.LFB15
+ 1633 00ac 0C000000 		.4byte	.LFE15
+ 1634 00b0 00000000 		.4byte	.LFB16
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 46
+
+
+ 1635 00b4 0C000000 		.4byte	.LFE16
+ 1636 00b8 00000000 		.4byte	.LFB17
+ 1637 00bc 0C000000 		.4byte	.LFE17
+ 1638 00c0 00000000 		.4byte	0
+ 1639 00c4 00000000 		.4byte	0
+ 1640              		.section	.debug_line,"",%progbits
+ 1641              	.Ldebug_line0:
+ 1642 0000 CB010000 		.section	.debug_str,"MS",%progbits,1
+ 1642      02005000 
+ 1642      00000201 
+ 1642      FB0E0D00 
+ 1642      01010101 
+ 1643              	.LASF22:
+ 1644 0000 74656D70 		.ascii	"temp_pwm_WritePeriod\000"
+ 1644      5F70776D 
+ 1644      5F577269 
+ 1644      74655065 
+ 1644      72696F64 
+ 1645              	.LASF24:
+ 1646 0015 74656D70 		.ascii	"temp_pwm_WriteCounter\000"
+ 1646      5F70776D 
+ 1646      5F577269 
+ 1646      7465436F 
+ 1646      756E7465 
+ 1647              	.LASF23:
+ 1648 002b 70657269 		.ascii	"period\000"
+ 1648      6F6400
+ 1649              	.LASF3:
+ 1650 0032 73686F72 		.ascii	"short unsigned int\000"
+ 1650      7420756E 
+ 1650      7369676E 
+ 1650      65642069 
+ 1650      6E7400
+ 1651              	.LASF36:
+ 1652 0045 74656D70 		.ascii	"temp_pwm_ReadCompare1\000"
+ 1652      5F70776D 
+ 1652      5F526561 
+ 1652      64436F6D 
+ 1652      70617265 
+ 1653              	.LASF37:
+ 1654 005b 74656D70 		.ascii	"temp_pwm_ReadCompare2\000"
+ 1654      5F70776D 
+ 1654      5F526561 
+ 1654      64436F6D 
+ 1654      70617265 
+ 1655              	.LASF9:
+ 1656 0071 666C6F61 		.ascii	"float\000"
+ 1656      7400
+ 1657              	.LASF25:
+ 1658 0077 636F756E 		.ascii	"counter\000"
+ 1658      74657200 
+ 1659              	.LASF7:
+ 1660 007f 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1660      206C6F6E 
+ 1660      6720756E 
+ 1660      7369676E 
+ 1660      65642069 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 47
+
+
+ 1661              	.LASF1:
+ 1662 0096 756E7369 		.ascii	"unsigned char\000"
+ 1662      676E6564 
+ 1662      20636861 
+ 1662      7200
+ 1663              	.LASF13:
+ 1664 00a4 72656738 		.ascii	"reg8\000"
+ 1664      00
+ 1665              	.LASF5:
+ 1666 00a9 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1666      20756E73 
+ 1666      69676E65 
+ 1666      6420696E 
+ 1666      7400
+ 1667              	.LASF41:
+ 1668 00bb 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1668      43393920 
+ 1668      352E342E 
+ 1668      31203230 
+ 1668      31363036 
+ 1669 00ee 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1669      20726576 
+ 1669      6973696F 
+ 1669      6E203233 
+ 1669      37373135 
+ 1670 0121 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 1670      74643D67 
+ 1670      6E753939 
+ 1670      202D6666 
+ 1670      756E6374 
+ 1671              	.LASF12:
+ 1672 0154 75696E74 		.ascii	"uint8\000"
+ 1672      3800
+ 1673              	.LASF45:
+ 1674 015a 636F6E74 		.ascii	"control\000"
+ 1674      726F6C00 
+ 1675              	.LASF31:
+ 1676 0162 74656D70 		.ascii	"temp_pwm_interruptState\000"
+ 1676      5F70776D 
+ 1676      5F696E74 
+ 1676      65727275 
+ 1676      70745374 
+ 1677              	.LASF32:
+ 1678 017a 74656D70 		.ascii	"temp_pwm_Start\000"
+ 1678      5F70776D 
+ 1678      5F537461 
+ 1678      727400
+ 1679              	.LASF10:
+ 1680 0189 646F7562 		.ascii	"double\000"
+ 1680      6C6500
+ 1681              	.LASF44:
+ 1682 0190 74656D70 		.ascii	"temp_pwm_ReadControlRegister\000"
+ 1682      5F70776D 
+ 1682      5F526561 
+ 1682      64436F6E 
+ 1682      74726F6C 
+ 1683              	.LASF29:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 48
+
+
+ 1684 01ad 74656D70 		.ascii	"temp_pwm_Init\000"
+ 1684      5F70776D 
+ 1684      5F496E69 
+ 1684      7400
+ 1685              	.LASF39:
+ 1686 01bb 4379456E 		.ascii	"CyEnterCriticalSection\000"
+ 1686      74657243 
+ 1686      72697469 
+ 1686      63616C53 
+ 1686      65637469 
+ 1687              	.LASF42:
+ 1688 01d2 47656E65 		.ascii	"Generated_Source\\PSoC5\\temp_pwm.c\000"
+ 1688      72617465 
+ 1688      645F536F 
+ 1688      75726365 
+ 1688      5C50536F 
+ 1689              	.LASF8:
+ 1690 01f4 756E7369 		.ascii	"unsigned int\000"
+ 1690      676E6564 
+ 1690      20696E74 
+ 1690      00
+ 1691              	.LASF16:
+ 1692 0201 74656D70 		.ascii	"temp_pwm_ReadStatusRegister\000"
+ 1692      5F70776D 
+ 1692      5F526561 
+ 1692      64537461 
+ 1692      74757352 
+ 1693              	.LASF15:
+ 1694 021d 74656D70 		.ascii	"temp_pwm_ReadCapture\000"
+ 1694      5F70776D 
+ 1694      5F526561 
+ 1694      64436170 
+ 1694      74757265 
+ 1695              	.LASF40:
+ 1696 0232 43794578 		.ascii	"CyExitCriticalSection\000"
+ 1696      69744372 
+ 1696      69746963 
+ 1696      616C5365 
+ 1696      6374696F 
+ 1697              	.LASF33:
+ 1698 0248 72657375 		.ascii	"result\000"
+ 1698      6C7400
+ 1699              	.LASF34:
+ 1700 024f 74656D70 		.ascii	"temp_pwm_WriteControlRegister\000"
+ 1700      5F70776D 
+ 1700      5F577269 
+ 1700      7465436F 
+ 1700      6E74726F 
+ 1701              	.LASF14:
+ 1702 026d 73697A65 		.ascii	"sizetype\000"
+ 1702      74797065 
+ 1702      00
+ 1703              	.LASF6:
+ 1704 0276 6C6F6E67 		.ascii	"long long int\000"
+ 1704      206C6F6E 
+ 1704      6720696E 
+ 1704      7400
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 49
+
+
+ 1705              	.LASF26:
+ 1706 0284 74656D70 		.ascii	"temp_pwm_Enable\000"
+ 1706      5F70776D 
+ 1706      5F456E61 
+ 1706      626C6500 
+ 1707              	.LASF19:
+ 1708 0294 696E7465 		.ascii	"interruptMode\000"
+ 1708      72727570 
+ 1708      744D6F64 
+ 1708      6500
+ 1709              	.LASF28:
+ 1710 02a2 74656D70 		.ascii	"temp_pwm_ClearFIFO\000"
+ 1710      5F70776D 
+ 1710      5F436C65 
+ 1710      61724649 
+ 1710      464F00
+ 1711              	.LASF35:
+ 1712 02b5 74656D70 		.ascii	"temp_pwm_ReadCounter\000"
+ 1712      5F70776D 
+ 1712      5F526561 
+ 1712      64436F75 
+ 1712      6E746572 
+ 1713              	.LASF17:
+ 1714 02ca 74656D70 		.ascii	"temp_pwm_SetInterruptMode\000"
+ 1714      5F70776D 
+ 1714      5F536574 
+ 1714      496E7465 
+ 1714      72727570 
+ 1715              	.LASF2:
+ 1716 02e4 73686F72 		.ascii	"short int\000"
+ 1716      7420696E 
+ 1716      7400
+ 1717              	.LASF46:
+ 1718 02ee 74656D70 		.ascii	"temp_pwm_initVar\000"
+ 1718      5F70776D 
+ 1718      5F696E69 
+ 1718      74566172 
+ 1718      00
+ 1719              	.LASF30:
+ 1720 02ff 6374726C 		.ascii	"ctrl\000"
+ 1720      00
+ 1721              	.LASF27:
+ 1722 0304 74656D70 		.ascii	"temp_pwm_Stop\000"
+ 1722      5F70776D 
+ 1722      5F53746F 
+ 1722      7000
+ 1723              	.LASF43:
+ 1724 0312 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 1724      73657273 
+ 1724      5C636865 
+ 1724      6D695C55 
+ 1724      44335F51 
+ 1725              	.LASF38:
+ 1726 0337 74656D70 		.ascii	"temp_pwm_ReadPeriod\000"
+ 1726      5F70776D 
+ 1726      5F526561 
+ 1726      64506572 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc6jL70a.s 			page 50
+
+
+ 1726      696F6400 
+ 1727              	.LASF4:
+ 1728 034b 6C6F6E67 		.ascii	"long int\000"
+ 1728      20696E74 
+ 1728      00
+ 1729              	.LASF11:
+ 1730 0354 63686172 		.ascii	"char\000"
+ 1730      00
+ 1731              	.LASF21:
+ 1732 0359 74656D70 		.ascii	"temp_pwm_WriteCompare1\000"
+ 1732      5F70776D 
+ 1732      5F577269 
+ 1732      7465436F 
+ 1732      6D706172 
+ 1733              	.LASF0:
+ 1734 0370 7369676E 		.ascii	"signed char\000"
+ 1734      65642063 
+ 1734      68617200 
+ 1735              	.LASF20:
+ 1736 037c 636F6D70 		.ascii	"compare\000"
+ 1736      61726500 
+ 1737              	.LASF18:
+ 1738 0384 74656D70 		.ascii	"temp_pwm_WriteCompare2\000"
+ 1738      5F70776D 
+ 1738      5F577269 
+ 1738      7465436F 
+ 1738      6D706172 
+ 1739              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

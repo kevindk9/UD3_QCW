@@ -1,0 +1,1035 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"Em_EEPROM_1.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.Em_EEPROM_1_Init,"ax",%progbits
+  20              		.align	1
+  21              		.global	Em_EEPROM_1_Init
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	Em_EEPROM_1_Init, %function
+  25              	Em_EEPROM_1_Init:
+  26              	.LFB0:
+  27              		.file 1 "Generated_Source\\PSoC5\\Em_EEPROM_1.c"
+   1:Generated_Source\PSoC5/Em_EEPROM_1.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/Em_EEPROM_1.c **** * File Name: Em_EEPROM_1.c
+   3:Generated_Source\PSoC5/Em_EEPROM_1.c **** * Version 2.20
+   4:Generated_Source\PSoC5/Em_EEPROM_1.c **** *
+   5:Generated_Source\PSoC5/Em_EEPROM_1.c **** * Description:
+   6:Generated_Source\PSoC5/Em_EEPROM_1.c **** *  This file provides source code of the API for the Emulated EEPROM
+   7:Generated_Source\PSoC5/Em_EEPROM_1.c **** *  Component.
+   8:Generated_Source\PSoC5/Em_EEPROM_1.c **** *
+   9:Generated_Source\PSoC5/Em_EEPROM_1.c **** ********************************************************************************
+  10:Generated_Source\PSoC5/Em_EEPROM_1.c **** * Copyright 2013-2017, Cypress Semiconductor Corporation. All rights reserved.
+  11:Generated_Source\PSoC5/Em_EEPROM_1.c **** * You may use this file only in accordance with the license, terms, conditions,
+  12:Generated_Source\PSoC5/Em_EEPROM_1.c **** * disclaimers, and limitations in the end user license agreement accompanying
+  13:Generated_Source\PSoC5/Em_EEPROM_1.c **** * the software package with which this file was provided.
+  14:Generated_Source\PSoC5/Em_EEPROM_1.c **** *******************************************************************************/
+  15:Generated_Source\PSoC5/Em_EEPROM_1.c **** 
+  16:Generated_Source\PSoC5/Em_EEPROM_1.c **** #include "Em_EEPROM_1.h"
+  17:Generated_Source\PSoC5/Em_EEPROM_1.c **** 
+  18:Generated_Source\PSoC5/Em_EEPROM_1.c **** /** The instance-specific configuration structure. This should be used in the
+  19:Generated_Source\PSoC5/Em_EEPROM_1.c **** *  associated Em_EEPROM_1_Init() function.
+  20:Generated_Source\PSoC5/Em_EEPROM_1.c **** */
+  21:Generated_Source\PSoC5/Em_EEPROM_1.c **** cy_stc_eeprom_config_t const Em_EEPROM_1_config =
+  22:Generated_Source\PSoC5/Em_EEPROM_1.c **** {
+  23:Generated_Source\PSoC5/Em_EEPROM_1.c ****     32000U,
+  24:Generated_Source\PSoC5/Em_EEPROM_1.c ****     1U,
+  25:Generated_Source\PSoC5/Em_EEPROM_1.c ****     0U,
+  26:Generated_Source\PSoC5/Em_EEPROM_1.c ****     0U,
+  27:Generated_Source\PSoC5/Em_EEPROM_1.c ****     0U
+  28:Generated_Source\PSoC5/Em_EEPROM_1.c **** };
+  29:Generated_Source\PSoC5/Em_EEPROM_1.c **** 
+  30:Generated_Source\PSoC5/Em_EEPROM_1.c **** /** The instance-specific context structure that holds all required information
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 2
+
+
+  31:Generated_Source\PSoC5/Em_EEPROM_1.c **** * about an EEPROM instance. This structure is filled by the Em_EEPROM
+  32:Generated_Source\PSoC5/Em_EEPROM_1.c **** * library Init() function and used by EEPROM library functions.
+  33:Generated_Source\PSoC5/Em_EEPROM_1.c **** */
+  34:Generated_Source\PSoC5/Em_EEPROM_1.c **** cy_stc_eeprom_context_t Em_EEPROM_1_context;
+  35:Generated_Source\PSoC5/Em_EEPROM_1.c **** 
+  36:Generated_Source\PSoC5/Em_EEPROM_1.c **** /* For PSoC 6 place EEPROM into Emulated EEPROM flash area */
+  37:Generated_Source\PSoC5/Em_EEPROM_1.c **** #if ((CY_PSOC6) && (Em_EEPROM_1_STORAGE_EM_EEPROM))
+  38:Generated_Source\PSoC5/Em_EEPROM_1.c **** 
+  39:Generated_Source\PSoC5/Em_EEPROM_1.c ****     CY_SECTION(".cy_em_eeprom") CY_ALIGN(CY_FLASH_SIZEOF_ROW)
+  40:Generated_Source\PSoC5/Em_EEPROM_1.c ****     const uint8 Em_EEPROM_1_em_EepromStorage[Em_EEPROM_1_ACTUAL_SIZE] = {0u};
+  41:Generated_Source\PSoC5/Em_EEPROM_1.c **** 
+  42:Generated_Source\PSoC5/Em_EEPROM_1.c **** #endif /* ((CY_PSOC6) && (Em_EEPROM_1_STORAGE_EM_EEPROM)) */
+  43:Generated_Source\PSoC5/Em_EEPROM_1.c **** 
+  44:Generated_Source\PSoC5/Em_EEPROM_1.c **** 
+  45:Generated_Source\PSoC5/Em_EEPROM_1.c **** /*******************************************************************************
+  46:Generated_Source\PSoC5/Em_EEPROM_1.c **** * Function Name: Em_EEPROM_1_Init
+  47:Generated_Source\PSoC5/Em_EEPROM_1.c **** ********************************************************************************
+  48:Generated_Source\PSoC5/Em_EEPROM_1.c **** *
+  49:Generated_Source\PSoC5/Em_EEPROM_1.c **** * Fills the start address of the EEPROM to the component configuration structure
+  50:Generated_Source\PSoC5/Em_EEPROM_1.c **** * and invokes Cy_Em_EEPROM_Init() function. In case of PSoC 6 the function 
+  51:Generated_Source\PSoC5/Em_EEPROM_1.c **** * is located in Cy_Em_EEPROM middleware library which is part of PDL. In case if
+  52:Generated_Source\PSoC5/Em_EEPROM_1.c **** * it is utilized in the design based on non-PSOC 6 device the function is 
+  53:Generated_Source\PSoC5/Em_EEPROM_1.c **** * located in internal design wide resource component - Em_EEPROM_Dynamic.
+  54:Generated_Source\PSoC5/Em_EEPROM_1.c **** *
+  55:Generated_Source\PSoC5/Em_EEPROM_1.c **** * \param startAddress
+  56:Generated_Source\PSoC5/Em_EEPROM_1.c **** * Start address of the EEPROM storage. For PSoC 6, if Emulated EEPROM is 
+  57:Generated_Source\PSoC5/Em_EEPROM_1.c **** * selected for EEPROM storage, the start address will be overwritten to some 
+  58:Generated_Source\PSoC5/Em_EEPROM_1.c **** * address from Emulated EEPROM flash area.
+  59:Generated_Source\PSoC5/Em_EEPROM_1.c **** *
+  60:Generated_Source\PSoC5/Em_EEPROM_1.c **** * \return
+  61:Generated_Source\PSoC5/Em_EEPROM_1.c **** * A result of function execution of type cy_en_em_eeprom_status_t.
+  62:Generated_Source\PSoC5/Em_EEPROM_1.c **** *
+  63:Generated_Source\PSoC5/Em_EEPROM_1.c **** *******************************************************************************/
+  64:Generated_Source\PSoC5/Em_EEPROM_1.c **** cy_en_em_eeprom_status_t Em_EEPROM_1_Init(uint32 startAddress)
+  65:Generated_Source\PSoC5/Em_EEPROM_1.c **** {
+  28              		.loc 1 65 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 16
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 1FB5     		push	{r0, r1, r2, r3, r4, lr}
+  34              		.cfi_def_cfa_offset 24
+  35              		.cfi_offset 14, -4
+  66:Generated_Source\PSoC5/Em_EEPROM_1.c ****     cy_en_em_eeprom_status_t ret;
+  67:Generated_Source\PSoC5/Em_EEPROM_1.c ****     cy_stc_eeprom_config_t config;
+  68:Generated_Source\PSoC5/Em_EEPROM_1.c **** 
+  69:Generated_Source\PSoC5/Em_EEPROM_1.c ****     config.blockingWrite =      Em_EEPROM_1_config.blockingWrite;
+  36              		.loc 1 69 0
+  37 0002 0023     		movs	r3, #0
+  38 0004 8DF80930 		strb	r3, [sp, #9]
+  70:Generated_Source\PSoC5/Em_EEPROM_1.c ****     config.eepromSize =         Em_EEPROM_1_config.eepromSize;
+  39              		.loc 1 70 0
+  40 0008 4FF4FA42 		mov	r2, #32000
+  71:Generated_Source\PSoC5/Em_EEPROM_1.c ****     config.redundantCopy =      Em_EEPROM_1_config.redundantCopy;
+  41              		.loc 1 71 0
+  42 000c 8DF80830 		strb	r3, [sp, #8]
+  72:Generated_Source\PSoC5/Em_EEPROM_1.c ****     config.wearLevelingFactor = Em_EEPROM_1_config.wearLevelingFactor;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 3
+
+
+  73:Generated_Source\PSoC5/Em_EEPROM_1.c ****     
+  74:Generated_Source\PSoC5/Em_EEPROM_1.c **** #if ((CY_PSOC6) && (Em_EEPROM_1_STORAGE_EM_EEPROM))
+  75:Generated_Source\PSoC5/Em_EEPROM_1.c ****     /* For PSoC 6, if Emulated EEPROM is selected - override the eeprom start 
+  76:Generated_Source\PSoC5/Em_EEPROM_1.c ****     * address.
+  77:Generated_Source\PSoC5/Em_EEPROM_1.c ****     */
+  78:Generated_Source\PSoC5/Em_EEPROM_1.c ****     config.userFlashStartAddr = (uint32)Em_EEPROM_1_em_EepromStorage;
+  79:Generated_Source\PSoC5/Em_EEPROM_1.c **** #else
+  80:Generated_Source\PSoC5/Em_EEPROM_1.c ****     config.userFlashStartAddr = startAddress;
+  43              		.loc 1 80 0
+  44 0010 0390     		str	r0, [sp, #12]
+  72:Generated_Source\PSoC5/Em_EEPROM_1.c ****     config.wearLevelingFactor = Em_EEPROM_1_config.wearLevelingFactor;
+  45              		.loc 1 72 0
+  46 0012 0123     		movs	r3, #1
+  81:Generated_Source\PSoC5/Em_EEPROM_1.c **** #endif /* ((CY_PSOC6) && (Em_EEPROM_1_STORAGE_EM_EEPROM)) */
+  82:Generated_Source\PSoC5/Em_EEPROM_1.c ****         
+  83:Generated_Source\PSoC5/Em_EEPROM_1.c ****     ret = Cy_Em_EEPROM_Init(&config, &Em_EEPROM_1_context);
+  47              		.loc 1 83 0
+  48 0014 0449     		ldr	r1, .L2
+  49 0016 6846     		mov	r0, sp
+  50              	.LVL1:
+  70:Generated_Source\PSoC5/Em_EEPROM_1.c ****     config.redundantCopy =      Em_EEPROM_1_config.redundantCopy;
+  51              		.loc 1 70 0
+  52 0018 0092     		str	r2, [sp]
+  72:Generated_Source\PSoC5/Em_EEPROM_1.c ****     config.wearLevelingFactor = Em_EEPROM_1_config.wearLevelingFactor;
+  53              		.loc 1 72 0
+  54 001a 0193     		str	r3, [sp, #4]
+  55              		.loc 1 83 0
+  56 001c FFF7FEFF 		bl	Cy_Em_EEPROM_Init
+  57              	.LVL2:
+  84:Generated_Source\PSoC5/Em_EEPROM_1.c **** 
+  85:Generated_Source\PSoC5/Em_EEPROM_1.c ****     return(ret);
+  86:Generated_Source\PSoC5/Em_EEPROM_1.c **** }
+  58              		.loc 1 86 0
+  59 0020 05B0     		add	sp, sp, #20
+  60              		.cfi_def_cfa_offset 4
+  61              		@ sp needed
+  62 0022 5DF804FB 		ldr	pc, [sp], #4
+  63              	.L3:
+  64 0026 00BF     		.align	2
+  65              	.L2:
+  66 0028 00000000 		.word	Em_EEPROM_1_context
+  67              		.cfi_endproc
+  68              	.LFE0:
+  69              		.size	Em_EEPROM_1_Init, .-Em_EEPROM_1_Init
+  70              		.comm	Em_EEPROM_1_context,28,4
+  71              		.global	Em_EEPROM_1_config
+  72              		.section	.rodata
+  73              		.align	2
+  74              		.type	Em_EEPROM_1_config, %object
+  75              		.size	Em_EEPROM_1_config, 16
+  76              	Em_EEPROM_1_config:
+  77 0000 007D0000 		.word	32000
+  78 0004 01000000 		.word	1
+  79 0008 00       		.byte	0
+  80 0009 00       		.byte	0
+  81 000a 0000     		.space	2
+  82 000c 00000000 		.word	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 4
+
+
+  83              		.text
+  84              	.Letext0:
+  85              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+  86              		.file 3 "Generated_Source\\PSoC5\\cy_em_eeprom.h"
+  87              		.section	.debug_info,"",%progbits
+  88              	.Ldebug_info0:
+  89 0000 37020000 		.4byte	0x237
+  90 0004 0400     		.2byte	0x4
+  91 0006 00000000 		.4byte	.Ldebug_abbrev0
+  92 000a 04       		.byte	0x4
+  93 000b 01       		.uleb128 0x1
+  94 000c A7000000 		.4byte	.LASF34
+  95 0010 0C       		.byte	0xc
+  96 0011 79020000 		.4byte	.LASF35
+  97 0015 9E020000 		.4byte	.LASF36
+  98 0019 00000000 		.4byte	.Ldebug_ranges0+0
+  99 001d 00000000 		.4byte	0
+ 100 0021 00000000 		.4byte	.Ldebug_line0
+ 101 0025 02       		.uleb128 0x2
+ 102 0026 01       		.byte	0x1
+ 103 0027 06       		.byte	0x6
+ 104 0028 F5020000 		.4byte	.LASF0
+ 105 002c 02       		.uleb128 0x2
+ 106 002d 01       		.byte	0x1
+ 107 002e 08       		.byte	0x8
+ 108 002f 6F000000 		.4byte	.LASF1
+ 109 0033 02       		.uleb128 0x2
+ 110 0034 02       		.byte	0x2
+ 111 0035 05       		.byte	0x5
+ 112 0036 5B020000 		.4byte	.LASF2
+ 113 003a 02       		.uleb128 0x2
+ 114 003b 02       		.byte	0x2
+ 115 003c 07       		.byte	0x7
+ 116 003d 20000000 		.4byte	.LASF3
+ 117 0041 02       		.uleb128 0x2
+ 118 0042 04       		.byte	0x4
+ 119 0043 05       		.byte	0x5
+ 120 0044 CD020000 		.4byte	.LASF4
+ 121 0048 02       		.uleb128 0x2
+ 122 0049 04       		.byte	0x4
+ 123 004a 07       		.byte	0x7
+ 124 004b 95000000 		.4byte	.LASF5
+ 125 004f 02       		.uleb128 0x2
+ 126 0050 08       		.byte	0x8
+ 127 0051 05       		.byte	0x5
+ 128 0052 F8010000 		.4byte	.LASF6
+ 129 0056 02       		.uleb128 0x2
+ 130 0057 08       		.byte	0x8
+ 131 0058 07       		.byte	0x7
+ 132 0059 A0010000 		.4byte	.LASF7
+ 133 005d 03       		.uleb128 0x3
+ 134 005e 04       		.byte	0x4
+ 135 005f 05       		.byte	0x5
+ 136 0060 696E7400 		.ascii	"int\000"
+ 137 0064 02       		.uleb128 0x2
+ 138 0065 04       		.byte	0x4
+ 139 0066 07       		.byte	0x7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 5
+
+
+ 140 0067 7D010000 		.4byte	.LASF8
+ 141 006b 04       		.uleb128 0x4
+ 142 006c 40010000 		.4byte	.LASF9
+ 143 0070 02       		.byte	0x2
+ 144 0071 9201     		.2byte	0x192
+ 145 0073 2C000000 		.4byte	0x2c
+ 146 0077 04       		.uleb128 0x4
+ 147 0078 76010000 		.4byte	.LASF10
+ 148 007c 02       		.byte	0x2
+ 149 007d 9401     		.2byte	0x194
+ 150 007f 48000000 		.4byte	0x48
+ 151 0083 02       		.uleb128 0x2
+ 152 0084 04       		.byte	0x4
+ 153 0085 04       		.byte	0x4
+ 154 0086 69000000 		.4byte	.LASF11
+ 155 008a 02       		.uleb128 0x2
+ 156 008b 08       		.byte	0x8
+ 157 008c 04       		.byte	0x4
+ 158 008d 6F010000 		.4byte	.LASF12
+ 159 0091 02       		.uleb128 0x2
+ 160 0092 01       		.byte	0x1
+ 161 0093 08       		.byte	0x8
+ 162 0094 26020000 		.4byte	.LASF13
+ 163 0098 02       		.uleb128 0x2
+ 164 0099 04       		.byte	0x4
+ 165 009a 07       		.byte	0x7
+ 166 009b EF010000 		.4byte	.LASF14
+ 167 009f 05       		.uleb128 0x5
+ 168 00a0 10       		.byte	0x10
+ 169 00a1 03       		.byte	0x3
+ 170 00a2 FB       		.byte	0xfb
+ 171 00a3 E8000000 		.4byte	0xe8
+ 172 00a7 06       		.uleb128 0x6
+ 173 00a8 5E000000 		.4byte	.LASF15
+ 174 00ac 03       		.byte	0x3
+ 175 00ad FE       		.byte	0xfe
+ 176 00ae 77000000 		.4byte	0x77
+ 177 00b2 00       		.byte	0
+ 178 00b3 07       		.uleb128 0x7
+ 179 00b4 4B000000 		.4byte	.LASF16
+ 180 00b8 03       		.byte	0x3
+ 181 00b9 0301     		.2byte	0x103
+ 182 00bb 77000000 		.4byte	0x77
+ 183 00bf 04       		.byte	0x4
+ 184 00c0 07       		.uleb128 0x7
+ 185 00c1 E1010000 		.4byte	.LASF17
+ 186 00c5 03       		.byte	0x3
+ 187 00c6 0601     		.2byte	0x106
+ 188 00c8 6B000000 		.4byte	0x6b
+ 189 00cc 08       		.byte	0x8
+ 190 00cd 07       		.uleb128 0x7
+ 191 00ce CC010000 		.4byte	.LASF18
+ 192 00d2 03       		.byte	0x3
+ 193 00d3 0B01     		.2byte	0x10b
+ 194 00d5 6B000000 		.4byte	0x6b
+ 195 00d9 09       		.byte	0x9
+ 196 00da 07       		.uleb128 0x7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 6
+
+
+ 197 00db 00000000 		.4byte	.LASF19
+ 198 00df 03       		.byte	0x3
+ 199 00e0 0E01     		.2byte	0x10e
+ 200 00e2 77000000 		.4byte	0x77
+ 201 00e6 0C       		.byte	0xc
+ 202 00e7 00       		.byte	0
+ 203 00e8 04       		.uleb128 0x4
+ 204 00e9 46010000 		.4byte	.LASF20
+ 205 00ed 03       		.byte	0x3
+ 206 00ee 0F01     		.2byte	0x10f
+ 207 00f0 9F000000 		.4byte	0x9f
+ 208 00f4 08       		.uleb128 0x8
+ 209 00f5 1C       		.byte	0x1c
+ 210 00f6 03       		.byte	0x3
+ 211 00f7 1601     		.2byte	0x116
+ 212 00f9 66010000 		.4byte	0x166
+ 213 00fd 07       		.uleb128 0x7
+ 214 00fe C3020000 		.4byte	.LASF21
+ 215 0102 03       		.byte	0x3
+ 216 0103 1B01     		.2byte	0x11b
+ 217 0105 77000000 		.4byte	0x77
+ 218 0109 00       		.byte	0
+ 219 010a 07       		.uleb128 0x7
+ 220 010b 13000000 		.4byte	.LASF22
+ 221 010f 03       		.byte	0x3
+ 222 0110 2001     		.2byte	0x120
+ 223 0112 77000000 		.4byte	0x77
+ 224 0116 04       		.byte	0x4
+ 225 0117 07       		.uleb128 0x7
+ 226 0118 E7020000 		.4byte	.LASF23
+ 227 011c 03       		.byte	0x3
+ 228 011d 2301     		.2byte	0x123
+ 229 011f 77000000 		.4byte	0x77
+ 230 0123 08       		.byte	0x8
+ 231 0124 07       		.uleb128 0x7
+ 232 0125 5E000000 		.4byte	.LASF15
+ 233 0129 03       		.byte	0x3
+ 234 012a 2601     		.2byte	0x126
+ 235 012c 77000000 		.4byte	0x77
+ 236 0130 0C       		.byte	0xc
+ 237 0131 07       		.uleb128 0x7
+ 238 0132 4B000000 		.4byte	.LASF16
+ 239 0136 03       		.byte	0x3
+ 240 0137 2B01     		.2byte	0x12b
+ 241 0139 77000000 		.4byte	0x77
+ 242 013d 10       		.byte	0x10
+ 243 013e 07       		.uleb128 0x7
+ 244 013f E1010000 		.4byte	.LASF17
+ 245 0143 03       		.byte	0x3
+ 246 0144 2E01     		.2byte	0x12e
+ 247 0146 6B000000 		.4byte	0x6b
+ 248 014a 14       		.byte	0x14
+ 249 014b 07       		.uleb128 0x7
+ 250 014c CC010000 		.4byte	.LASF18
+ 251 0150 03       		.byte	0x3
+ 252 0151 3301     		.2byte	0x133
+ 253 0153 6B000000 		.4byte	0x6b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 7
+
+
+ 254 0157 15       		.byte	0x15
+ 255 0158 07       		.uleb128 0x7
+ 256 0159 00000000 		.4byte	.LASF19
+ 257 015d 03       		.byte	0x3
+ 258 015e 3601     		.2byte	0x136
+ 259 0160 77000000 		.4byte	0x77
+ 260 0164 18       		.byte	0x18
+ 261 0165 00       		.byte	0
+ 262 0166 04       		.uleb128 0x4
+ 263 0167 33000000 		.4byte	.LASF24
+ 264 016b 03       		.byte	0x3
+ 265 016c 3701     		.2byte	0x137
+ 266 016e F4000000 		.4byte	0xf4
+ 267 0172 09       		.uleb128 0x9
+ 268 0173 01       		.byte	0x1
+ 269 0174 2C000000 		.4byte	0x2c
+ 270 0178 03       		.byte	0x3
+ 271 0179 5401     		.2byte	0x154
+ 272 017b 9E010000 		.4byte	0x19e
+ 273 017f 0A       		.uleb128 0xa
+ 274 0180 B7010000 		.4byte	.LASF25
+ 275 0184 00       		.byte	0
+ 276 0185 0A       		.uleb128 0xa
+ 277 0186 2B020000 		.4byte	.LASF26
+ 278 018a 01       		.byte	0x1
+ 279 018b 0A       		.uleb128 0xa
+ 280 018c 01030000 		.4byte	.LASF27
+ 281 0190 02       		.byte	0x2
+ 282 0191 0A       		.uleb128 0xa
+ 283 0192 8A010000 		.4byte	.LASF28
+ 284 0196 03       		.byte	0x3
+ 285 0197 0A       		.uleb128 0xa
+ 286 0198 7D000000 		.4byte	.LASF29
+ 287 019c 04       		.byte	0x4
+ 288 019d 00       		.byte	0
+ 289 019e 04       		.uleb128 0x4
+ 290 019f 42020000 		.4byte	.LASF30
+ 291 01a3 03       		.byte	0x3
+ 292 01a4 5A01     		.2byte	0x15a
+ 293 01a6 72010000 		.4byte	0x172
+ 294 01aa 0B       		.uleb128 0xb
+ 295 01ab D6020000 		.4byte	.LASF37
+ 296 01af 01       		.byte	0x1
+ 297 01b0 40       		.byte	0x40
+ 298 01b1 9E010000 		.4byte	0x19e
+ 299 01b5 00000000 		.4byte	.LFB0
+ 300 01b9 2C000000 		.4byte	.LFE0-.LFB0
+ 301 01bd 01       		.uleb128 0x1
+ 302 01be 9C       		.byte	0x9c
+ 303 01bf 07020000 		.4byte	0x207
+ 304 01c3 0C       		.uleb128 0xc
+ 305 01c4 19020000 		.4byte	.LASF38
+ 306 01c8 01       		.byte	0x1
+ 307 01c9 40       		.byte	0x40
+ 308 01ca 77000000 		.4byte	0x77
+ 309 01ce 00000000 		.4byte	.LLST0
+ 310 01d2 0D       		.uleb128 0xd
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 8
+
+
+ 311 01d3 72657400 		.ascii	"ret\000"
+ 312 01d7 01       		.byte	0x1
+ 313 01d8 42       		.byte	0x42
+ 314 01d9 9E010000 		.4byte	0x19e
+ 315 01dd 01       		.uleb128 0x1
+ 316 01de 50       		.byte	0x50
+ 317 01df 0E       		.uleb128 0xe
+ 318 01e0 DA010000 		.4byte	.LASF31
+ 319 01e4 01       		.byte	0x1
+ 320 01e5 43       		.byte	0x43
+ 321 01e6 E8000000 		.4byte	0xe8
+ 322 01ea 02       		.uleb128 0x2
+ 323 01eb 91       		.byte	0x91
+ 324 01ec 68       		.sleb128 -24
+ 325 01ed 0F       		.uleb128 0xf
+ 326 01ee 20000000 		.4byte	.LVL2
+ 327 01f2 2E020000 		.4byte	0x22e
+ 328 01f6 10       		.uleb128 0x10
+ 329 01f7 01       		.uleb128 0x1
+ 330 01f8 50       		.byte	0x50
+ 331 01f9 02       		.uleb128 0x2
+ 332 01fa 7D       		.byte	0x7d
+ 333 01fb 00       		.sleb128 0
+ 334 01fc 10       		.uleb128 0x10
+ 335 01fd 01       		.uleb128 0x1
+ 336 01fe 51       		.byte	0x51
+ 337 01ff 05       		.uleb128 0x5
+ 338 0200 03       		.byte	0x3
+ 339 0201 00000000 		.4byte	Em_EEPROM_1_context
+ 340 0205 00       		.byte	0
+ 341 0206 00       		.byte	0
+ 342 0207 11       		.uleb128 0x11
+ 343 0208 06020000 		.4byte	.LASF32
+ 344 020c 01       		.byte	0x1
+ 345 020d 15       		.byte	0x15
+ 346 020e 18020000 		.4byte	0x218
+ 347 0212 05       		.uleb128 0x5
+ 348 0213 03       		.byte	0x3
+ 349 0214 00000000 		.4byte	Em_EEPROM_1_config
+ 350 0218 12       		.uleb128 0x12
+ 351 0219 E8000000 		.4byte	0xe8
+ 352 021d 11       		.uleb128 0x11
+ 353 021e 65020000 		.4byte	.LASF33
+ 354 0222 01       		.byte	0x1
+ 355 0223 22       		.byte	0x22
+ 356 0224 66010000 		.4byte	0x166
+ 357 0228 05       		.uleb128 0x5
+ 358 0229 03       		.byte	0x3
+ 359 022a 00000000 		.4byte	Em_EEPROM_1_context
+ 360 022e 13       		.uleb128 0x13
+ 361 022f 5D010000 		.4byte	.LASF39
+ 362 0233 5D010000 		.4byte	.LASF39
+ 363 0237 03       		.byte	0x3
+ 364 0238 6701     		.2byte	0x167
+ 365 023a 00       		.byte	0
+ 366              		.section	.debug_abbrev,"",%progbits
+ 367              	.Ldebug_abbrev0:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 9
+
+
+ 368 0000 01       		.uleb128 0x1
+ 369 0001 11       		.uleb128 0x11
+ 370 0002 01       		.byte	0x1
+ 371 0003 25       		.uleb128 0x25
+ 372 0004 0E       		.uleb128 0xe
+ 373 0005 13       		.uleb128 0x13
+ 374 0006 0B       		.uleb128 0xb
+ 375 0007 03       		.uleb128 0x3
+ 376 0008 0E       		.uleb128 0xe
+ 377 0009 1B       		.uleb128 0x1b
+ 378 000a 0E       		.uleb128 0xe
+ 379 000b 55       		.uleb128 0x55
+ 380 000c 17       		.uleb128 0x17
+ 381 000d 11       		.uleb128 0x11
+ 382 000e 01       		.uleb128 0x1
+ 383 000f 10       		.uleb128 0x10
+ 384 0010 17       		.uleb128 0x17
+ 385 0011 00       		.byte	0
+ 386 0012 00       		.byte	0
+ 387 0013 02       		.uleb128 0x2
+ 388 0014 24       		.uleb128 0x24
+ 389 0015 00       		.byte	0
+ 390 0016 0B       		.uleb128 0xb
+ 391 0017 0B       		.uleb128 0xb
+ 392 0018 3E       		.uleb128 0x3e
+ 393 0019 0B       		.uleb128 0xb
+ 394 001a 03       		.uleb128 0x3
+ 395 001b 0E       		.uleb128 0xe
+ 396 001c 00       		.byte	0
+ 397 001d 00       		.byte	0
+ 398 001e 03       		.uleb128 0x3
+ 399 001f 24       		.uleb128 0x24
+ 400 0020 00       		.byte	0
+ 401 0021 0B       		.uleb128 0xb
+ 402 0022 0B       		.uleb128 0xb
+ 403 0023 3E       		.uleb128 0x3e
+ 404 0024 0B       		.uleb128 0xb
+ 405 0025 03       		.uleb128 0x3
+ 406 0026 08       		.uleb128 0x8
+ 407 0027 00       		.byte	0
+ 408 0028 00       		.byte	0
+ 409 0029 04       		.uleb128 0x4
+ 410 002a 16       		.uleb128 0x16
+ 411 002b 00       		.byte	0
+ 412 002c 03       		.uleb128 0x3
+ 413 002d 0E       		.uleb128 0xe
+ 414 002e 3A       		.uleb128 0x3a
+ 415 002f 0B       		.uleb128 0xb
+ 416 0030 3B       		.uleb128 0x3b
+ 417 0031 05       		.uleb128 0x5
+ 418 0032 49       		.uleb128 0x49
+ 419 0033 13       		.uleb128 0x13
+ 420 0034 00       		.byte	0
+ 421 0035 00       		.byte	0
+ 422 0036 05       		.uleb128 0x5
+ 423 0037 13       		.uleb128 0x13
+ 424 0038 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 10
+
+
+ 425 0039 0B       		.uleb128 0xb
+ 426 003a 0B       		.uleb128 0xb
+ 427 003b 3A       		.uleb128 0x3a
+ 428 003c 0B       		.uleb128 0xb
+ 429 003d 3B       		.uleb128 0x3b
+ 430 003e 0B       		.uleb128 0xb
+ 431 003f 01       		.uleb128 0x1
+ 432 0040 13       		.uleb128 0x13
+ 433 0041 00       		.byte	0
+ 434 0042 00       		.byte	0
+ 435 0043 06       		.uleb128 0x6
+ 436 0044 0D       		.uleb128 0xd
+ 437 0045 00       		.byte	0
+ 438 0046 03       		.uleb128 0x3
+ 439 0047 0E       		.uleb128 0xe
+ 440 0048 3A       		.uleb128 0x3a
+ 441 0049 0B       		.uleb128 0xb
+ 442 004a 3B       		.uleb128 0x3b
+ 443 004b 0B       		.uleb128 0xb
+ 444 004c 49       		.uleb128 0x49
+ 445 004d 13       		.uleb128 0x13
+ 446 004e 38       		.uleb128 0x38
+ 447 004f 0B       		.uleb128 0xb
+ 448 0050 00       		.byte	0
+ 449 0051 00       		.byte	0
+ 450 0052 07       		.uleb128 0x7
+ 451 0053 0D       		.uleb128 0xd
+ 452 0054 00       		.byte	0
+ 453 0055 03       		.uleb128 0x3
+ 454 0056 0E       		.uleb128 0xe
+ 455 0057 3A       		.uleb128 0x3a
+ 456 0058 0B       		.uleb128 0xb
+ 457 0059 3B       		.uleb128 0x3b
+ 458 005a 05       		.uleb128 0x5
+ 459 005b 49       		.uleb128 0x49
+ 460 005c 13       		.uleb128 0x13
+ 461 005d 38       		.uleb128 0x38
+ 462 005e 0B       		.uleb128 0xb
+ 463 005f 00       		.byte	0
+ 464 0060 00       		.byte	0
+ 465 0061 08       		.uleb128 0x8
+ 466 0062 13       		.uleb128 0x13
+ 467 0063 01       		.byte	0x1
+ 468 0064 0B       		.uleb128 0xb
+ 469 0065 0B       		.uleb128 0xb
+ 470 0066 3A       		.uleb128 0x3a
+ 471 0067 0B       		.uleb128 0xb
+ 472 0068 3B       		.uleb128 0x3b
+ 473 0069 05       		.uleb128 0x5
+ 474 006a 01       		.uleb128 0x1
+ 475 006b 13       		.uleb128 0x13
+ 476 006c 00       		.byte	0
+ 477 006d 00       		.byte	0
+ 478 006e 09       		.uleb128 0x9
+ 479 006f 04       		.uleb128 0x4
+ 480 0070 01       		.byte	0x1
+ 481 0071 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 11
+
+
+ 482 0072 0B       		.uleb128 0xb
+ 483 0073 49       		.uleb128 0x49
+ 484 0074 13       		.uleb128 0x13
+ 485 0075 3A       		.uleb128 0x3a
+ 486 0076 0B       		.uleb128 0xb
+ 487 0077 3B       		.uleb128 0x3b
+ 488 0078 05       		.uleb128 0x5
+ 489 0079 01       		.uleb128 0x1
+ 490 007a 13       		.uleb128 0x13
+ 491 007b 00       		.byte	0
+ 492 007c 00       		.byte	0
+ 493 007d 0A       		.uleb128 0xa
+ 494 007e 28       		.uleb128 0x28
+ 495 007f 00       		.byte	0
+ 496 0080 03       		.uleb128 0x3
+ 497 0081 0E       		.uleb128 0xe
+ 498 0082 1C       		.uleb128 0x1c
+ 499 0083 0B       		.uleb128 0xb
+ 500 0084 00       		.byte	0
+ 501 0085 00       		.byte	0
+ 502 0086 0B       		.uleb128 0xb
+ 503 0087 2E       		.uleb128 0x2e
+ 504 0088 01       		.byte	0x1
+ 505 0089 3F       		.uleb128 0x3f
+ 506 008a 19       		.uleb128 0x19
+ 507 008b 03       		.uleb128 0x3
+ 508 008c 0E       		.uleb128 0xe
+ 509 008d 3A       		.uleb128 0x3a
+ 510 008e 0B       		.uleb128 0xb
+ 511 008f 3B       		.uleb128 0x3b
+ 512 0090 0B       		.uleb128 0xb
+ 513 0091 27       		.uleb128 0x27
+ 514 0092 19       		.uleb128 0x19
+ 515 0093 49       		.uleb128 0x49
+ 516 0094 13       		.uleb128 0x13
+ 517 0095 11       		.uleb128 0x11
+ 518 0096 01       		.uleb128 0x1
+ 519 0097 12       		.uleb128 0x12
+ 520 0098 06       		.uleb128 0x6
+ 521 0099 40       		.uleb128 0x40
+ 522 009a 18       		.uleb128 0x18
+ 523 009b 9742     		.uleb128 0x2117
+ 524 009d 19       		.uleb128 0x19
+ 525 009e 01       		.uleb128 0x1
+ 526 009f 13       		.uleb128 0x13
+ 527 00a0 00       		.byte	0
+ 528 00a1 00       		.byte	0
+ 529 00a2 0C       		.uleb128 0xc
+ 530 00a3 05       		.uleb128 0x5
+ 531 00a4 00       		.byte	0
+ 532 00a5 03       		.uleb128 0x3
+ 533 00a6 0E       		.uleb128 0xe
+ 534 00a7 3A       		.uleb128 0x3a
+ 535 00a8 0B       		.uleb128 0xb
+ 536 00a9 3B       		.uleb128 0x3b
+ 537 00aa 0B       		.uleb128 0xb
+ 538 00ab 49       		.uleb128 0x49
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 12
+
+
+ 539 00ac 13       		.uleb128 0x13
+ 540 00ad 02       		.uleb128 0x2
+ 541 00ae 17       		.uleb128 0x17
+ 542 00af 00       		.byte	0
+ 543 00b0 00       		.byte	0
+ 544 00b1 0D       		.uleb128 0xd
+ 545 00b2 34       		.uleb128 0x34
+ 546 00b3 00       		.byte	0
+ 547 00b4 03       		.uleb128 0x3
+ 548 00b5 08       		.uleb128 0x8
+ 549 00b6 3A       		.uleb128 0x3a
+ 550 00b7 0B       		.uleb128 0xb
+ 551 00b8 3B       		.uleb128 0x3b
+ 552 00b9 0B       		.uleb128 0xb
+ 553 00ba 49       		.uleb128 0x49
+ 554 00bb 13       		.uleb128 0x13
+ 555 00bc 02       		.uleb128 0x2
+ 556 00bd 18       		.uleb128 0x18
+ 557 00be 00       		.byte	0
+ 558 00bf 00       		.byte	0
+ 559 00c0 0E       		.uleb128 0xe
+ 560 00c1 34       		.uleb128 0x34
+ 561 00c2 00       		.byte	0
+ 562 00c3 03       		.uleb128 0x3
+ 563 00c4 0E       		.uleb128 0xe
+ 564 00c5 3A       		.uleb128 0x3a
+ 565 00c6 0B       		.uleb128 0xb
+ 566 00c7 3B       		.uleb128 0x3b
+ 567 00c8 0B       		.uleb128 0xb
+ 568 00c9 49       		.uleb128 0x49
+ 569 00ca 13       		.uleb128 0x13
+ 570 00cb 02       		.uleb128 0x2
+ 571 00cc 18       		.uleb128 0x18
+ 572 00cd 00       		.byte	0
+ 573 00ce 00       		.byte	0
+ 574 00cf 0F       		.uleb128 0xf
+ 575 00d0 898201   		.uleb128 0x4109
+ 576 00d3 01       		.byte	0x1
+ 577 00d4 11       		.uleb128 0x11
+ 578 00d5 01       		.uleb128 0x1
+ 579 00d6 31       		.uleb128 0x31
+ 580 00d7 13       		.uleb128 0x13
+ 581 00d8 00       		.byte	0
+ 582 00d9 00       		.byte	0
+ 583 00da 10       		.uleb128 0x10
+ 584 00db 8A8201   		.uleb128 0x410a
+ 585 00de 00       		.byte	0
+ 586 00df 02       		.uleb128 0x2
+ 587 00e0 18       		.uleb128 0x18
+ 588 00e1 9142     		.uleb128 0x2111
+ 589 00e3 18       		.uleb128 0x18
+ 590 00e4 00       		.byte	0
+ 591 00e5 00       		.byte	0
+ 592 00e6 11       		.uleb128 0x11
+ 593 00e7 34       		.uleb128 0x34
+ 594 00e8 00       		.byte	0
+ 595 00e9 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 13
+
+
+ 596 00ea 0E       		.uleb128 0xe
+ 597 00eb 3A       		.uleb128 0x3a
+ 598 00ec 0B       		.uleb128 0xb
+ 599 00ed 3B       		.uleb128 0x3b
+ 600 00ee 0B       		.uleb128 0xb
+ 601 00ef 49       		.uleb128 0x49
+ 602 00f0 13       		.uleb128 0x13
+ 603 00f1 3F       		.uleb128 0x3f
+ 604 00f2 19       		.uleb128 0x19
+ 605 00f3 02       		.uleb128 0x2
+ 606 00f4 18       		.uleb128 0x18
+ 607 00f5 00       		.byte	0
+ 608 00f6 00       		.byte	0
+ 609 00f7 12       		.uleb128 0x12
+ 610 00f8 26       		.uleb128 0x26
+ 611 00f9 00       		.byte	0
+ 612 00fa 49       		.uleb128 0x49
+ 613 00fb 13       		.uleb128 0x13
+ 614 00fc 00       		.byte	0
+ 615 00fd 00       		.byte	0
+ 616 00fe 13       		.uleb128 0x13
+ 617 00ff 2E       		.uleb128 0x2e
+ 618 0100 00       		.byte	0
+ 619 0101 3F       		.uleb128 0x3f
+ 620 0102 19       		.uleb128 0x19
+ 621 0103 3C       		.uleb128 0x3c
+ 622 0104 19       		.uleb128 0x19
+ 623 0105 6E       		.uleb128 0x6e
+ 624 0106 0E       		.uleb128 0xe
+ 625 0107 03       		.uleb128 0x3
+ 626 0108 0E       		.uleb128 0xe
+ 627 0109 3A       		.uleb128 0x3a
+ 628 010a 0B       		.uleb128 0xb
+ 629 010b 3B       		.uleb128 0x3b
+ 630 010c 05       		.uleb128 0x5
+ 631 010d 00       		.byte	0
+ 632 010e 00       		.byte	0
+ 633 010f 00       		.byte	0
+ 634              		.section	.debug_loc,"",%progbits
+ 635              	.Ldebug_loc0:
+ 636              	.LLST0:
+ 637 0000 00000000 		.4byte	.LVL0
+ 638 0004 18000000 		.4byte	.LVL1
+ 639 0008 0100     		.2byte	0x1
+ 640 000a 50       		.byte	0x50
+ 641 000b 18000000 		.4byte	.LVL1
+ 642 000f 1F000000 		.4byte	.LVL2-1
+ 643 0013 0200     		.2byte	0x2
+ 644 0015 91       		.byte	0x91
+ 645 0016 74       		.sleb128 -12
+ 646 0017 1F000000 		.4byte	.LVL2-1
+ 647 001b 2C000000 		.4byte	.LFE0
+ 648 001f 0400     		.2byte	0x4
+ 649 0021 F3       		.byte	0xf3
+ 650 0022 01       		.uleb128 0x1
+ 651 0023 50       		.byte	0x50
+ 652 0024 9F       		.byte	0x9f
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 14
+
+
+ 653 0025 00000000 		.4byte	0
+ 654 0029 00000000 		.4byte	0
+ 655              		.section	.debug_aranges,"",%progbits
+ 656 0000 1C000000 		.4byte	0x1c
+ 657 0004 0200     		.2byte	0x2
+ 658 0006 00000000 		.4byte	.Ldebug_info0
+ 659 000a 04       		.byte	0x4
+ 660 000b 00       		.byte	0
+ 661 000c 0000     		.2byte	0
+ 662 000e 0000     		.2byte	0
+ 663 0010 00000000 		.4byte	.LFB0
+ 664 0014 2C000000 		.4byte	.LFE0-.LFB0
+ 665 0018 00000000 		.4byte	0
+ 666 001c 00000000 		.4byte	0
+ 667              		.section	.debug_ranges,"",%progbits
+ 668              	.Ldebug_ranges0:
+ 669 0000 00000000 		.4byte	.LFB0
+ 670 0004 2C000000 		.4byte	.LFE0
+ 671 0008 00000000 		.4byte	0
+ 672 000c 00000000 		.4byte	0
+ 673              		.section	.debug_line,"",%progbits
+ 674              	.Ldebug_line0:
+ 675 0000 84000000 		.section	.debug_str,"MS",%progbits,1
+ 675      02005A00 
+ 675      00000201 
+ 675      FB0E0D00 
+ 675      01010101 
+ 676              	.LASF19:
+ 677 0000 75736572 		.ascii	"userFlashStartAddr\000"
+ 677      466C6173 
+ 677      68537461 
+ 677      72744164 
+ 677      647200
+ 678              	.LASF22:
+ 679 0013 6E756D62 		.ascii	"numberOfRows\000"
+ 679      65724F66 
+ 679      526F7773 
+ 679      00
+ 680              	.LASF3:
+ 681 0020 73686F72 		.ascii	"short unsigned int\000"
+ 681      7420756E 
+ 681      7369676E 
+ 681      65642069 
+ 681      6E7400
+ 682              	.LASF24:
+ 683 0033 63795F73 		.ascii	"cy_stc_eeprom_context_t\000"
+ 683      74635F65 
+ 683      6570726F 
+ 683      6D5F636F 
+ 683      6E746578 
+ 684              	.LASF16:
+ 685 004b 77656172 		.ascii	"wearLevelingFactor\000"
+ 685      4C657665 
+ 685      6C696E67 
+ 685      46616374 
+ 685      6F7200
+ 686              	.LASF15:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 15
+
+
+ 687 005e 65657072 		.ascii	"eepromSize\000"
+ 687      6F6D5369 
+ 687      7A6500
+ 688              	.LASF11:
+ 689 0069 666C6F61 		.ascii	"float\000"
+ 689      7400
+ 690              	.LASF1:
+ 691 006f 756E7369 		.ascii	"unsigned char\000"
+ 691      676E6564 
+ 691      20636861 
+ 691      7200
+ 692              	.LASF29:
+ 693 007d 43595F45 		.ascii	"CY_EM_EEPROM_WRITE_FAIL\000"
+ 693      4D5F4545 
+ 693      50524F4D 
+ 693      5F575249 
+ 693      54455F46 
+ 694              	.LASF5:
+ 695 0095 6C6F6E67 		.ascii	"long unsigned int\000"
+ 695      20756E73 
+ 695      69676E65 
+ 695      6420696E 
+ 695      7400
+ 696              	.LASF34:
+ 697 00a7 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 697      43393920 
+ 697      352E342E 
+ 697      31203230 
+ 697      31363036 
+ 698 00da 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 698      20726576 
+ 698      6973696F 
+ 698      6E203233 
+ 698      37373135 
+ 699 010d 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 699      74643D67 
+ 699      6E753939 
+ 699      202D6666 
+ 699      756E6374 
+ 700              	.LASF9:
+ 701 0140 75696E74 		.ascii	"uint8\000"
+ 701      3800
+ 702              	.LASF20:
+ 703 0146 63795F73 		.ascii	"cy_stc_eeprom_config_t\000"
+ 703      74635F65 
+ 703      6570726F 
+ 703      6D5F636F 
+ 703      6E666967 
+ 704              	.LASF39:
+ 705 015d 43795F45 		.ascii	"Cy_Em_EEPROM_Init\000"
+ 705      6D5F4545 
+ 705      50524F4D 
+ 705      5F496E69 
+ 705      7400
+ 706              	.LASF12:
+ 707 016f 646F7562 		.ascii	"double\000"
+ 707      6C6500
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 16
+
+
+ 708              	.LASF10:
+ 709 0176 75696E74 		.ascii	"uint32\000"
+ 709      333200
+ 710              	.LASF8:
+ 711 017d 756E7369 		.ascii	"unsigned int\000"
+ 711      676E6564 
+ 711      20696E74 
+ 711      00
+ 712              	.LASF28:
+ 713 018a 43595F45 		.ascii	"CY_EM_EEPROM_BAD_DATA\000"
+ 713      4D5F4545 
+ 713      50524F4D 
+ 713      5F424144 
+ 713      5F444154 
+ 714              	.LASF7:
+ 715 01a0 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 715      206C6F6E 
+ 715      6720756E 
+ 715      7369676E 
+ 715      65642069 
+ 716              	.LASF25:
+ 717 01b7 43595F45 		.ascii	"CY_EM_EEPROM_SUCCESS\000"
+ 717      4D5F4545 
+ 717      50524F4D 
+ 717      5F535543 
+ 717      43455353 
+ 718              	.LASF18:
+ 719 01cc 626C6F63 		.ascii	"blockingWrite\000"
+ 719      6B696E67 
+ 719      57726974 
+ 719      6500
+ 720              	.LASF31:
+ 721 01da 636F6E66 		.ascii	"config\000"
+ 721      696700
+ 722              	.LASF17:
+ 723 01e1 72656475 		.ascii	"redundantCopy\000"
+ 723      6E64616E 
+ 723      74436F70 
+ 723      7900
+ 724              	.LASF14:
+ 725 01ef 73697A65 		.ascii	"sizetype\000"
+ 725      74797065 
+ 725      00
+ 726              	.LASF6:
+ 727 01f8 6C6F6E67 		.ascii	"long long int\000"
+ 727      206C6F6E 
+ 727      6720696E 
+ 727      7400
+ 728              	.LASF32:
+ 729 0206 456D5F45 		.ascii	"Em_EEPROM_1_config\000"
+ 729      4550524F 
+ 729      4D5F315F 
+ 729      636F6E66 
+ 729      696700
+ 730              	.LASF38:
+ 731 0219 73746172 		.ascii	"startAddress\000"
+ 731      74416464 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 17
+
+
+ 731      72657373 
+ 731      00
+ 732              	.LASF13:
+ 733 0226 63686172 		.ascii	"char\000"
+ 733      00
+ 734              	.LASF26:
+ 735 022b 43595F45 		.ascii	"CY_EM_EEPROM_BAD_PARAM\000"
+ 735      4D5F4545 
+ 735      50524F4D 
+ 735      5F424144 
+ 735      5F504152 
+ 736              	.LASF30:
+ 737 0242 63795F65 		.ascii	"cy_en_em_eeprom_status_t\000"
+ 737      6E5F656D 
+ 737      5F656570 
+ 737      726F6D5F 
+ 737      73746174 
+ 738              	.LASF2:
+ 739 025b 73686F72 		.ascii	"short int\000"
+ 739      7420696E 
+ 739      7400
+ 740              	.LASF33:
+ 741 0265 456D5F45 		.ascii	"Em_EEPROM_1_context\000"
+ 741      4550524F 
+ 741      4D5F315F 
+ 741      636F6E74 
+ 741      65787400 
+ 742              	.LASF35:
+ 743 0279 47656E65 		.ascii	"Generated_Source\\PSoC5\\Em_EEPROM_1.c\000"
+ 743      72617465 
+ 743      645F536F 
+ 743      75726365 
+ 743      5C50536F 
+ 744              	.LASF36:
+ 745 029e 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 745      73657273 
+ 745      5C636865 
+ 745      6D695C55 
+ 745      44335F51 
+ 746              	.LASF21:
+ 747 02c3 776C456E 		.ascii	"wlEndAddr\000"
+ 747      64416464 
+ 747      7200
+ 748              	.LASF4:
+ 749 02cd 6C6F6E67 		.ascii	"long int\000"
+ 749      20696E74 
+ 749      00
+ 750              	.LASF37:
+ 751 02d6 456D5F45 		.ascii	"Em_EEPROM_1_Init\000"
+ 751      4550524F 
+ 751      4D5F315F 
+ 751      496E6974 
+ 751      00
+ 752              	.LASF23:
+ 753 02e7 6C617374 		.ascii	"lastWrRowAddr\000"
+ 753      5772526F 
+ 753      77416464 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccoXbdb3.s 			page 18
+
+
+ 753      7200
+ 754              	.LASF0:
+ 755 02f5 7369676E 		.ascii	"signed char\000"
+ 755      65642063 
+ 755      68617200 
+ 756              	.LASF27:
+ 757 0301 43595F45 		.ascii	"CY_EM_EEPROM_BAD_CHECKSUM\000"
+ 757      4D5F4545 
+ 757      50524F4D 
+ 757      5F424144 
+ 757      5F434845 
+ 758              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

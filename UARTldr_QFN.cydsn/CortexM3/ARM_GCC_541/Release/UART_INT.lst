@@ -1,0 +1,1091 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"UART_INT.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.UART_RXISR,"ax",%progbits
+  20              		.align	1
+  21              		.global	UART_RXISR
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	UART_RXISR, %function
+  25              	UART_RXISR:
+  26              	.LFB0:
+  27              		.file 1 "..\\common\\uart_ldr\\UART_INT.c"
+   1:..\common\uart_ldr/UART_INT.c **** /*******************************************************************************
+   2:..\common\uart_ldr/UART_INT.c **** * File Name: UARTINT.c
+   3:..\common\uart_ldr/UART_INT.c **** * Version 2.50
+   4:..\common\uart_ldr/UART_INT.c **** *
+   5:..\common\uart_ldr/UART_INT.c **** * Description:
+   6:..\common\uart_ldr/UART_INT.c **** *  This file provides all Interrupt Service functionality of the UART component
+   7:..\common\uart_ldr/UART_INT.c **** *
+   8:..\common\uart_ldr/UART_INT.c **** ********************************************************************************
+   9:..\common\uart_ldr/UART_INT.c **** * Copyright 2008-2015, Cypress Semiconductor Corporation.  All rights reserved.
+  10:..\common\uart_ldr/UART_INT.c **** * You may use this file only in accordance with the license, terms, conditions,
+  11:..\common\uart_ldr/UART_INT.c **** * disclaimers, and limitations in the end user license agreement accompanying
+  12:..\common\uart_ldr/UART_INT.c **** * the software package with which this file was provided.
+  13:..\common\uart_ldr/UART_INT.c **** *******************************************************************************/
+  14:..\common\uart_ldr/UART_INT.c **** 
+  15:..\common\uart_ldr/UART_INT.c **** #include "UART.h"
+  16:..\common\uart_ldr/UART_INT.c **** 
+  17:..\common\uart_ldr/UART_INT.c **** 
+  18:..\common\uart_ldr/UART_INT.c **** 
+  19:..\common\uart_ldr/UART_INT.c **** /***************************************
+  20:..\common\uart_ldr/UART_INT.c **** * Custom Declarations
+  21:..\common\uart_ldr/UART_INT.c **** ***************************************/
+  22:..\common\uart_ldr/UART_INT.c **** /* `#START CUSTOM_DECLARATIONS` Place your declaration here */
+  23:..\common\uart_ldr/UART_INT.c **** 
+  24:..\common\uart_ldr/UART_INT.c **** /* `#END` */
+  25:..\common\uart_ldr/UART_INT.c **** 
+  26:..\common\uart_ldr/UART_INT.c **** #if (UART_RX_INTERRUPT_ENABLED && (UART_RX_ENABLED || UART_HD_ENABLED))
+  27:..\common\uart_ldr/UART_INT.c ****     /*******************************************************************************
+  28:..\common\uart_ldr/UART_INT.c ****     * Function Name: UART_RXISR
+  29:..\common\uart_ldr/UART_INT.c ****     ********************************************************************************
+  30:..\common\uart_ldr/UART_INT.c ****     *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 2
+
+
+  31:..\common\uart_ldr/UART_INT.c ****     * Summary:
+  32:..\common\uart_ldr/UART_INT.c ****     *  Interrupt Service Routine for RX portion of the UART
+  33:..\common\uart_ldr/UART_INT.c ****     *
+  34:..\common\uart_ldr/UART_INT.c ****     * Parameters:
+  35:..\common\uart_ldr/UART_INT.c ****     *  None.
+  36:..\common\uart_ldr/UART_INT.c ****     *
+  37:..\common\uart_ldr/UART_INT.c ****     * Return:
+  38:..\common\uart_ldr/UART_INT.c ****     *  None.
+  39:..\common\uart_ldr/UART_INT.c ****     *
+  40:..\common\uart_ldr/UART_INT.c ****     * Global Variables:
+  41:..\common\uart_ldr/UART_INT.c ****     *  UART_rxBuffer - RAM buffer pointer for save received data.
+  42:..\common\uart_ldr/UART_INT.c ****     *  UART_rxBufferWrite - cyclic index for write to rxBuffer,
+  43:..\common\uart_ldr/UART_INT.c ****     *     increments after each byte saved to buffer.
+  44:..\common\uart_ldr/UART_INT.c ****     *  UART_rxBufferRead - cyclic index for read from rxBuffer,
+  45:..\common\uart_ldr/UART_INT.c ****     *     checked to detect overflow condition.
+  46:..\common\uart_ldr/UART_INT.c ****     *  UART_rxBufferOverflow - software overflow flag. Set to one
+  47:..\common\uart_ldr/UART_INT.c ****     *     when UART_rxBufferWrite index overtakes
+  48:..\common\uart_ldr/UART_INT.c ****     *     UART_rxBufferRead index.
+  49:..\common\uart_ldr/UART_INT.c ****     *  UART_rxBufferLoopDetect - additional variable to detect overflow.
+  50:..\common\uart_ldr/UART_INT.c ****     *     Set to one when UART_rxBufferWrite is equal to
+  51:..\common\uart_ldr/UART_INT.c ****     *    UART_rxBufferRead
+  52:..\common\uart_ldr/UART_INT.c ****     *  UART_rxAddressMode - this variable contains the Address mode,
+  53:..\common\uart_ldr/UART_INT.c ****     *     selected in customizer or set by UART_SetRxAddressMode() API.
+  54:..\common\uart_ldr/UART_INT.c ****     *  UART_rxAddressDetected - set to 1 when correct address received,
+  55:..\common\uart_ldr/UART_INT.c ****     *     and analysed to store following addressed data bytes to the buffer.
+  56:..\common\uart_ldr/UART_INT.c ****     *     When not correct address received, set to 0 to skip following data bytes.
+  57:..\common\uart_ldr/UART_INT.c ****     *
+  58:..\common\uart_ldr/UART_INT.c ****     *******************************************************************************/
+  59:..\common\uart_ldr/UART_INT.c ****     CY_ISR(UART_RXISR)
+  60:..\common\uart_ldr/UART_INT.c ****     {
+  28              		.loc 1 60 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+  34              		.cfi_def_cfa_offset 28
+  35              		.cfi_offset 4, -28
+  36              		.cfi_offset 5, -24
+  37              		.cfi_offset 6, -20
+  38              		.cfi_offset 7, -16
+  39              		.cfi_offset 8, -12
+  40              		.cfi_offset 9, -8
+  41              		.cfi_offset 14, -4
+  61:..\common\uart_ldr/UART_INT.c ****         uint8 readData;
+  62:..\common\uart_ldr/UART_INT.c ****         uint8 readStatus;
+  63:..\common\uart_ldr/UART_INT.c ****         uint8 increment_pointer = 0u;
+  64:..\common\uart_ldr/UART_INT.c **** 
+  65:..\common\uart_ldr/UART_INT.c ****     #if(CY_PSOC3)
+  66:..\common\uart_ldr/UART_INT.c ****         uint8 int_en;
+  67:..\common\uart_ldr/UART_INT.c ****     #endif /* (CY_PSOC3) */
+  68:..\common\uart_ldr/UART_INT.c **** 
+  69:..\common\uart_ldr/UART_INT.c ****     #ifdef UART_RXISR_ENTRY_CALLBACK
+  70:..\common\uart_ldr/UART_INT.c ****         UART_RXISR_EntryCallback();
+  71:..\common\uart_ldr/UART_INT.c ****     #endif /* UART_RXISR_ENTRY_CALLBACK */
+  72:..\common\uart_ldr/UART_INT.c **** 
+  73:..\common\uart_ldr/UART_INT.c ****         /* User code required at start of ISR */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 3
+
+
+  74:..\common\uart_ldr/UART_INT.c ****         /* `#START UART_RXISR_START` */
+  75:..\common\uart_ldr/UART_INT.c **** 
+  76:..\common\uart_ldr/UART_INT.c ****         /* `#END` */
+  77:..\common\uart_ldr/UART_INT.c **** 
+  78:..\common\uart_ldr/UART_INT.c ****     #if(CY_PSOC3)   /* Make sure nested interrupt is enabled */
+  79:..\common\uart_ldr/UART_INT.c ****         int_en = EA;
+  80:..\common\uart_ldr/UART_INT.c ****         CyGlobalIntEnable;
+  81:..\common\uart_ldr/UART_INT.c ****     #endif /* (CY_PSOC3) */
+  82:..\common\uart_ldr/UART_INT.c **** 
+  83:..\common\uart_ldr/UART_INT.c ****         do
+  84:..\common\uart_ldr/UART_INT.c ****         {
+  85:..\common\uart_ldr/UART_INT.c ****             /* Read receiver status register */
+  86:..\common\uart_ldr/UART_INT.c ****             readStatus = UART_RXSTATUS_REG;
+  87:..\common\uart_ldr/UART_INT.c ****             /* Copy the same status to readData variable for backward compatibility support 
+  88:..\common\uart_ldr/UART_INT.c ****             *  of the user code in UART_RXISR_ERROR` section. 
+  89:..\common\uart_ldr/UART_INT.c ****             */
+  90:..\common\uart_ldr/UART_INT.c ****             readData = readStatus;
+  91:..\common\uart_ldr/UART_INT.c **** 
+  92:..\common\uart_ldr/UART_INT.c ****             if((readStatus & (UART_RX_STS_BREAK | 
+  93:..\common\uart_ldr/UART_INT.c ****                             UART_RX_STS_PAR_ERROR |
+  94:..\common\uart_ldr/UART_INT.c ****                             UART_RX_STS_STOP_ERROR | 
+  95:..\common\uart_ldr/UART_INT.c ****                             UART_RX_STS_OVERRUN)) != 0u)
+  96:..\common\uart_ldr/UART_INT.c ****             {
+  97:..\common\uart_ldr/UART_INT.c ****                 /* ERROR handling. */
+  98:..\common\uart_ldr/UART_INT.c ****                 UART_errorStatus |= readStatus & ( UART_RX_STS_BREAK | 
+  99:..\common\uart_ldr/UART_INT.c ****                                                             UART_RX_STS_PAR_ERROR | 
+ 100:..\common\uart_ldr/UART_INT.c ****                                                             UART_RX_STS_STOP_ERROR | 
+ 101:..\common\uart_ldr/UART_INT.c ****                                                             UART_RX_STS_OVERRUN);
+ 102:..\common\uart_ldr/UART_INT.c ****                 /* `#START UART_RXISR_ERROR` */
+ 103:..\common\uart_ldr/UART_INT.c **** 
+ 104:..\common\uart_ldr/UART_INT.c ****                 /* `#END` */
+ 105:..\common\uart_ldr/UART_INT.c ****                 
+ 106:..\common\uart_ldr/UART_INT.c ****             #ifdef UART_RXISR_ERROR_CALLBACK
+ 107:..\common\uart_ldr/UART_INT.c ****                 UART_RXISR_ERROR_Callback();
+ 108:..\common\uart_ldr/UART_INT.c ****             #endif /* UART_RXISR_ERROR_CALLBACK */
+ 109:..\common\uart_ldr/UART_INT.c ****             }
+ 110:..\common\uart_ldr/UART_INT.c ****             
+ 111:..\common\uart_ldr/UART_INT.c ****             if((readStatus & UART_RX_STS_FIFO_NOTEMPTY) != 0u)
+ 112:..\common\uart_ldr/UART_INT.c ****             {
+ 113:..\common\uart_ldr/UART_INT.c ****                 /* Read data from the RX data register */
+ 114:..\common\uart_ldr/UART_INT.c ****                 readData = UART_RXDATA_REG;
+ 115:..\common\uart_ldr/UART_INT.c ****             #if (UART_RXHW_ADDRESS_ENABLED)
+ 116:..\common\uart_ldr/UART_INT.c ****                 if(UART_rxAddressMode == (uint8)UART__B_UART__AM_SW_DETECT_TO_BUFFER)
+ 117:..\common\uart_ldr/UART_INT.c ****                 {
+ 118:..\common\uart_ldr/UART_INT.c ****                     if((readStatus & UART_RX_STS_MRKSPC) != 0u)
+ 119:..\common\uart_ldr/UART_INT.c ****                     {
+ 120:..\common\uart_ldr/UART_INT.c ****                         if ((readStatus & UART_RX_STS_ADDR_MATCH) != 0u)
+ 121:..\common\uart_ldr/UART_INT.c ****                         {
+ 122:..\common\uart_ldr/UART_INT.c ****                             UART_rxAddressDetected = 1u;
+ 123:..\common\uart_ldr/UART_INT.c ****                         }
+ 124:..\common\uart_ldr/UART_INT.c ****                         else
+ 125:..\common\uart_ldr/UART_INT.c ****                         {
+ 126:..\common\uart_ldr/UART_INT.c ****                             UART_rxAddressDetected = 0u;
+ 127:..\common\uart_ldr/UART_INT.c ****                         }
+ 128:..\common\uart_ldr/UART_INT.c ****                     }
+ 129:..\common\uart_ldr/UART_INT.c ****                     if(UART_rxAddressDetected != 0u)
+ 130:..\common\uart_ldr/UART_INT.c ****                     {   /* Store only addressed data */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 4
+
+
+ 131:..\common\uart_ldr/UART_INT.c ****                         UART_rxBuffer[UART_rxBufferWrite] = readData;
+ 132:..\common\uart_ldr/UART_INT.c ****                         increment_pointer = 1u;
+ 133:..\common\uart_ldr/UART_INT.c ****                     }
+ 134:..\common\uart_ldr/UART_INT.c ****                 }
+ 135:..\common\uart_ldr/UART_INT.c ****                 else /* Without software addressing */
+ 136:..\common\uart_ldr/UART_INT.c ****                 {
+ 137:..\common\uart_ldr/UART_INT.c ****                     UART_rxBuffer[UART_rxBufferWrite] = readData;
+ 138:..\common\uart_ldr/UART_INT.c ****                     increment_pointer = 1u;
+ 139:..\common\uart_ldr/UART_INT.c ****                 }
+ 140:..\common\uart_ldr/UART_INT.c ****             #else  /* Without addressing */
+ 141:..\common\uart_ldr/UART_INT.c ****                 UART_rxBuffer[UART_rxBufferWrite] = readData;
+  42              		.loc 1 141 0
+  43 0004 1A48     		ldr	r0, .L14
+ 142:..\common\uart_ldr/UART_INT.c ****                 increment_pointer = 1u;
+ 143:..\common\uart_ldr/UART_INT.c ****             #endif /* (UART_RXHW_ADDRESS_ENABLED) */
+ 144:..\common\uart_ldr/UART_INT.c **** 
+ 145:..\common\uart_ldr/UART_INT.c ****                 /* Do not increment buffer pointer when skip not addressed data */
+ 146:..\common\uart_ldr/UART_INT.c ****                 if(increment_pointer != 0u)
+ 147:..\common\uart_ldr/UART_INT.c ****                 {
+ 148:..\common\uart_ldr/UART_INT.c ****                     if(UART_rxBufferLoopDetect != 0u)
+  44              		.loc 1 148 0
+  45 0006 1B4C     		ldr	r4, .L14+4
+  46 0008 0246     		mov	r2, r0
+  47 000a 2546     		mov	r5, r4
+  86:..\common\uart_ldr/UART_INT.c ****             /* Copy the same status to readData variable for backward compatibility support 
+  48              		.loc 1 86 0
+  49 000c 1A4E     		ldr	r6, .L14+8
+  98:..\common\uart_ldr/UART_INT.c ****                                                             UART_RX_STS_PAR_ERROR | 
+  50              		.loc 1 98 0
+  51 000e 1B49     		ldr	r1, .L14+12
+ 114:..\common\uart_ldr/UART_INT.c ****             #if (UART_RXHW_ADDRESS_ENABLED)
+  52              		.loc 1 114 0
+  53 0010 1B4F     		ldr	r7, .L14+16
+ 141:..\common\uart_ldr/UART_INT.c ****                 increment_pointer = 1u;
+  54              		.loc 1 141 0
+  55 0012 DFF874E0 		ldr	lr, .L14+24
+ 149:..\common\uart_ldr/UART_INT.c ****                     {   /* Set Software Buffer status Overflow */
+ 150:..\common\uart_ldr/UART_INT.c ****                         UART_rxBufferOverflow = 1u;
+  56              		.loc 1 150 0
+  57 0016 DFF874C0 		ldr	ip, .L14+28
+  58              	.LVL1:
+  59              	.L6:
+  86:..\common\uart_ldr/UART_INT.c ****             /* Copy the same status to readData variable for backward compatibility support 
+  60              		.loc 1 86 0
+  61 001a 3378     		ldrb	r3, [r6]	@ zero_extendqisi2
+  62 001c DBB2     		uxtb	r3, r3
+  63              	.LVL2:
+  92:..\common\uart_ldr/UART_INT.c ****                             UART_RX_STS_PAR_ERROR |
+  64              		.loc 1 92 0
+  65 001e 13F01E09 		ands	r9, r3, #30
+  98:..\common\uart_ldr/UART_INT.c ****                                                             UART_RX_STS_PAR_ERROR | 
+  66              		.loc 1 98 0
+  67 0022 1EBF     		ittt	ne
+  68 0024 91F80080 		ldrbne	r8, [r1]	@ zero_extendqisi2
+  69 0028 49EA0808 		orrne	r8, r9, r8
+  70 002c 81F80080 		strbne	r8, [r1]
+ 111:..\common\uart_ldr/UART_INT.c ****             {
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 5
+
+
+  71              		.loc 1 111 0
+  72 0030 9B06     		lsls	r3, r3, #26
+  73              	.LVL3:
+  74 0032 1AD5     		bpl	.L1
+ 114:..\common\uart_ldr/UART_INT.c ****             #if (UART_RXHW_ADDRESS_ENABLED)
+  75              		.loc 1 114 0
+  76 0034 97F80080 		ldrb	r8, [r7]	@ zero_extendqisi2
+ 141:..\common\uart_ldr/UART_INT.c ****                 increment_pointer = 1u;
+  77              		.loc 1 141 0
+  78 0038 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 114:..\common\uart_ldr/UART_INT.c ****             #if (UART_RXHW_ADDRESS_ENABLED)
+  79              		.loc 1 114 0
+  80 003a 5FFA88F8 		uxtb	r8, r8
+  81              	.LVL4:
+ 141:..\common\uart_ldr/UART_INT.c ****                 increment_pointer = 1u;
+  82              		.loc 1 141 0
+  83 003e DBB2     		uxtb	r3, r3
+  84 0040 0EF80380 		strb	r8, [lr, r3]
+  85              	.LVL5:
+ 148:..\common\uart_ldr/UART_INT.c ****                     {   /* Set Software Buffer status Overflow */
+  86              		.loc 1 148 0
+  87 0044 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+  88 0046 13B1     		cbz	r3, .L4
+  89              		.loc 1 150 0
+  90 0048 0123     		movs	r3, #1
+  91 004a 8CF80030 		strb	r3, [ip]
+  92              	.L4:
+ 151:..\common\uart_ldr/UART_INT.c ****                     }
+ 152:..\common\uart_ldr/UART_INT.c ****                     /* Set next pointer. */
+ 153:..\common\uart_ldr/UART_INT.c ****                     UART_rxBufferWrite++;
+  93              		.loc 1 153 0
+  94 004e 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  95 0050 0133     		adds	r3, r3, #1
+  96 0052 DBB2     		uxtb	r3, r3
+  97 0054 1370     		strb	r3, [r2]
+ 154:..\common\uart_ldr/UART_INT.c **** 
+ 155:..\common\uart_ldr/UART_INT.c ****                     /* Check pointer for a loop condition */
+ 156:..\common\uart_ldr/UART_INT.c ****                     if(UART_rxBufferWrite >= UART_RX_BUFFER_SIZE)
+  98              		.loc 1 156 0
+  99 0056 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 157:..\common\uart_ldr/UART_INT.c ****                     {
+ 158:..\common\uart_ldr/UART_INT.c ****                         UART_rxBufferWrite = 0u;
+ 159:..\common\uart_ldr/UART_INT.c ****                     }
+ 160:..\common\uart_ldr/UART_INT.c **** 
+ 161:..\common\uart_ldr/UART_INT.c ****                     /* Detect pre-overload condition and set flag */
+ 162:..\common\uart_ldr/UART_INT.c ****                     if(UART_rxBufferWrite == UART_rxBufferRead)
+ 100              		.loc 1 162 0
+ 101 0058 0A4B     		ldr	r3, .L14+20
+ 102 005a 92F80080 		ldrb	r8, [r2]	@ zero_extendqisi2
+ 103              	.LVL6:
+ 104 005e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 105 0060 9845     		cmp	r8, r3
+ 106 0062 DAD1     		bne	.L6
+ 163:..\common\uart_ldr/UART_INT.c ****                     {
+ 164:..\common\uart_ldr/UART_INT.c ****                         UART_rxBufferLoopDetect = 1u;
+ 107              		.loc 1 164 0
+ 108 0064 0123     		movs	r3, #1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 6
+
+
+ 109 0066 2B70     		strb	r3, [r5]
+ 110 0068 D7E7     		b	.L6
+ 111              	.LVL7:
+ 112              	.L1:
+ 113 006a BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 114              	.L15:
+ 115 006e 00BF     		.align	2
+ 116              	.L14:
+ 117 0070 00000000 		.word	UART_rxBufferWrite
+ 118 0074 00000000 		.word	UART_rxBufferLoopDetect
+ 119 0078 6B650040 		.word	1073767787
+ 120 007c 00000000 		.word	UART_errorStatus
+ 121 0080 48650040 		.word	1073767752
+ 122 0084 00000000 		.word	UART_rxBufferRead
+ 123 0088 00000000 		.word	UART_rxBuffer
+ 124 008c 00000000 		.word	UART_rxBufferOverflow
+ 125              		.cfi_endproc
+ 126              	.LFE0:
+ 127              		.size	UART_RXISR, .-UART_RXISR
+ 128              		.section	.text.UART_TXISR,"ax",%progbits
+ 129              		.align	1
+ 130              		.global	UART_TXISR
+ 131              		.thumb
+ 132              		.thumb_func
+ 133              		.type	UART_TXISR, %function
+ 134              	UART_TXISR:
+ 135              	.LFB1:
+ 165:..\common\uart_ldr/UART_INT.c ****                         /* When Hardware Flow Control selected */
+ 166:..\common\uart_ldr/UART_INT.c ****                         #if (UART_FLOW_CONTROL != 0u)
+ 167:..\common\uart_ldr/UART_INT.c ****                             /* Disable RX interrupt mask, it is enabled when user read data from th
+ 168:..\common\uart_ldr/UART_INT.c ****                             UART_RXSTATUS_MASK_REG  &= (uint8)~UART_RX_STS_FIFO_NOTEMPTY;
+ 169:..\common\uart_ldr/UART_INT.c ****                             CyIntClearPending(UART_RX_VECT_NUM);
+ 170:..\common\uart_ldr/UART_INT.c ****                             break; /* Break the reading of the FIFO loop, leave the data there for 
+ 171:..\common\uart_ldr/UART_INT.c ****                         #endif /* (UART_FLOW_CONTROL != 0u) */
+ 172:..\common\uart_ldr/UART_INT.c ****                     }
+ 173:..\common\uart_ldr/UART_INT.c ****                 }
+ 174:..\common\uart_ldr/UART_INT.c ****             }
+ 175:..\common\uart_ldr/UART_INT.c ****         }while((readStatus & UART_RX_STS_FIFO_NOTEMPTY) != 0u);
+ 176:..\common\uart_ldr/UART_INT.c **** 
+ 177:..\common\uart_ldr/UART_INT.c ****         /* User code required at end of ISR (Optional) */
+ 178:..\common\uart_ldr/UART_INT.c ****         /* `#START UART_RXISR_END` */
+ 179:..\common\uart_ldr/UART_INT.c **** 
+ 180:..\common\uart_ldr/UART_INT.c ****         /* `#END` */
+ 181:..\common\uart_ldr/UART_INT.c **** 
+ 182:..\common\uart_ldr/UART_INT.c ****     #ifdef UART_RXISR_EXIT_CALLBACK
+ 183:..\common\uart_ldr/UART_INT.c ****         UART_RXISR_ExitCallback();
+ 184:..\common\uart_ldr/UART_INT.c ****     #endif /* UART_RXISR_EXIT_CALLBACK */
+ 185:..\common\uart_ldr/UART_INT.c **** 
+ 186:..\common\uart_ldr/UART_INT.c ****     #if(CY_PSOC3)
+ 187:..\common\uart_ldr/UART_INT.c ****         EA = int_en;
+ 188:..\common\uart_ldr/UART_INT.c ****     #endif /* (CY_PSOC3) */
+ 189:..\common\uart_ldr/UART_INT.c ****     }
+ 190:..\common\uart_ldr/UART_INT.c ****     
+ 191:..\common\uart_ldr/UART_INT.c **** #endif /* (UART_RX_INTERRUPT_ENABLED && (UART_RX_ENABLED || UART_HD_ENABLED)) */
+ 192:..\common\uart_ldr/UART_INT.c **** 
+ 193:..\common\uart_ldr/UART_INT.c **** 
+ 194:..\common\uart_ldr/UART_INT.c **** #if (UART_TX_INTERRUPT_ENABLED && UART_TX_ENABLED)
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 7
+
+
+ 195:..\common\uart_ldr/UART_INT.c ****     /*******************************************************************************
+ 196:..\common\uart_ldr/UART_INT.c ****     * Function Name: UART_TXISR
+ 197:..\common\uart_ldr/UART_INT.c ****     ********************************************************************************
+ 198:..\common\uart_ldr/UART_INT.c ****     *
+ 199:..\common\uart_ldr/UART_INT.c ****     * Summary:
+ 200:..\common\uart_ldr/UART_INT.c ****     * Interrupt Service Routine for the TX portion of the UART
+ 201:..\common\uart_ldr/UART_INT.c ****     *
+ 202:..\common\uart_ldr/UART_INT.c ****     * Parameters:
+ 203:..\common\uart_ldr/UART_INT.c ****     *  None.
+ 204:..\common\uart_ldr/UART_INT.c ****     *
+ 205:..\common\uart_ldr/UART_INT.c ****     * Return:
+ 206:..\common\uart_ldr/UART_INT.c ****     *  None.
+ 207:..\common\uart_ldr/UART_INT.c ****     *
+ 208:..\common\uart_ldr/UART_INT.c ****     * Global Variables:
+ 209:..\common\uart_ldr/UART_INT.c ****     *  UART_txBuffer - RAM buffer pointer for transmit data from.
+ 210:..\common\uart_ldr/UART_INT.c ****     *  UART_txBufferRead - cyclic index for read and transmit data
+ 211:..\common\uart_ldr/UART_INT.c ****     *     from txBuffer, increments after each transmitted byte.
+ 212:..\common\uart_ldr/UART_INT.c ****     *  UART_rxBufferWrite - cyclic index for write to txBuffer,
+ 213:..\common\uart_ldr/UART_INT.c ****     *     checked to detect available for transmission bytes.
+ 214:..\common\uart_ldr/UART_INT.c ****     *
+ 215:..\common\uart_ldr/UART_INT.c ****     *******************************************************************************/
+ 216:..\common\uart_ldr/UART_INT.c ****     CY_ISR(UART_TXISR)
+ 217:..\common\uart_ldr/UART_INT.c ****     {
+ 136              		.loc 1 217 0
+ 137              		.cfi_startproc
+ 138              		@ args = 0, pretend = 0, frame = 0
+ 139              		@ frame_needed = 0, uses_anonymous_args = 0
+ 140 0000 70B5     		push	{r4, r5, r6, lr}
+ 141              		.cfi_def_cfa_offset 16
+ 142              		.cfi_offset 4, -16
+ 143              		.cfi_offset 5, -12
+ 144              		.cfi_offset 6, -8
+ 145              		.cfi_offset 14, -4
+ 218:..\common\uart_ldr/UART_INT.c ****     #if(CY_PSOC3)
+ 219:..\common\uart_ldr/UART_INT.c ****         uint8 int_en;
+ 220:..\common\uart_ldr/UART_INT.c ****     #endif /* (CY_PSOC3) */
+ 221:..\common\uart_ldr/UART_INT.c **** 
+ 222:..\common\uart_ldr/UART_INT.c ****     #ifdef UART_TXISR_ENTRY_CALLBACK
+ 223:..\common\uart_ldr/UART_INT.c ****         UART_TXISR_EntryCallback();
+ 224:..\common\uart_ldr/UART_INT.c ****     #endif /* UART_TXISR_ENTRY_CALLBACK */
+ 225:..\common\uart_ldr/UART_INT.c **** 
+ 226:..\common\uart_ldr/UART_INT.c ****         /* User code required at start of ISR */
+ 227:..\common\uart_ldr/UART_INT.c ****         /* `#START UART_TXISR_START` */
+ 228:..\common\uart_ldr/UART_INT.c **** 
+ 229:..\common\uart_ldr/UART_INT.c ****         /* `#END` */
+ 230:..\common\uart_ldr/UART_INT.c **** 
+ 231:..\common\uart_ldr/UART_INT.c ****     #if(CY_PSOC3)   /* Make sure nested interrupt is enabled */
+ 232:..\common\uart_ldr/UART_INT.c ****         int_en = EA;
+ 233:..\common\uart_ldr/UART_INT.c ****         CyGlobalIntEnable;
+ 234:..\common\uart_ldr/UART_INT.c ****     #endif /* (CY_PSOC3) */
+ 235:..\common\uart_ldr/UART_INT.c **** 
+ 236:..\common\uart_ldr/UART_INT.c ****         while((UART_txBufferRead != UART_txBufferWrite) &&
+ 146              		.loc 1 236 0
+ 147 0002 0C4B     		ldr	r3, .L20
+ 148 0004 0C48     		ldr	r0, .L20+4
+ 237:..\common\uart_ldr/UART_INT.c ****              ((UART_TXSTATUS_REG & UART_TX_STS_FIFO_FULL) == 0u))
+ 149              		.loc 1 237 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 8
+
+
+ 150 0006 0D49     		ldr	r1, .L20+8
+ 238:..\common\uart_ldr/UART_INT.c ****         {
+ 239:..\common\uart_ldr/UART_INT.c ****             /* Check pointer wrap around */
+ 240:..\common\uart_ldr/UART_INT.c ****             if(UART_txBufferRead >= UART_TX_BUFFER_SIZE)
+ 241:..\common\uart_ldr/UART_INT.c ****             {
+ 242:..\common\uart_ldr/UART_INT.c ****                 UART_txBufferRead = 0u;
+ 243:..\common\uart_ldr/UART_INT.c ****             }
+ 244:..\common\uart_ldr/UART_INT.c **** 
+ 245:..\common\uart_ldr/UART_INT.c ****             UART_TXDATA_REG = UART_txBuffer[UART_txBufferRead];
+ 151              		.loc 1 245 0
+ 152 0008 0D4C     		ldr	r4, .L20+12
+ 153 000a 0E4D     		ldr	r5, .L20+16
+ 154              	.L17:
+ 236:..\common\uart_ldr/UART_INT.c ****              ((UART_TXSTATUS_REG & UART_TX_STS_FIFO_FULL) == 0u))
+ 155              		.loc 1 236 0
+ 156 000c 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 157 000e 0678     		ldrb	r6, [r0]	@ zero_extendqisi2
+ 158 0010 9642     		cmp	r6, r2
+ 159 0012 0DD0     		beq	.L16
+ 237:..\common\uart_ldr/UART_INT.c ****              ((UART_TXSTATUS_REG & UART_TX_STS_FIFO_FULL) == 0u))
+ 160              		.loc 1 237 0 discriminator 1
+ 161 0014 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+ 236:..\common\uart_ldr/UART_INT.c ****              ((UART_TXSTATUS_REG & UART_TX_STS_FIFO_FULL) == 0u))
+ 162              		.loc 1 236 0 discriminator 1
+ 163 0016 5207     		lsls	r2, r2, #29
+ 164 0018 0AD4     		bmi	.L16
+ 240:..\common\uart_ldr/UART_INT.c ****             {
+ 165              		.loc 1 240 0
+ 166 001a 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 167              		.loc 1 245 0
+ 168 001c 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 169 001e D2B2     		uxtb	r2, r2
+ 170 0020 A25C     		ldrb	r2, [r4, r2]	@ zero_extendqisi2
+ 171 0022 D2B2     		uxtb	r2, r2
+ 172 0024 2A70     		strb	r2, [r5]
+ 246:..\common\uart_ldr/UART_INT.c **** 
+ 247:..\common\uart_ldr/UART_INT.c ****             /* Set next pointer */
+ 248:..\common\uart_ldr/UART_INT.c ****             UART_txBufferRead++;
+ 173              		.loc 1 248 0
+ 174 0026 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 175 0028 0132     		adds	r2, r2, #1
+ 176 002a D2B2     		uxtb	r2, r2
+ 177 002c 1A70     		strb	r2, [r3]
+ 178 002e EDE7     		b	.L17
+ 179              	.L16:
+ 180 0030 70BD     		pop	{r4, r5, r6, pc}
+ 181              	.L21:
+ 182 0032 00BF     		.align	2
+ 183              	.L20:
+ 184 0034 00000000 		.word	UART_txBufferRead
+ 185 0038 00000000 		.word	UART_txBufferWrite
+ 186 003c 69640040 		.word	1073767529
+ 187 0040 00000000 		.word	UART_txBuffer
+ 188 0044 49640040 		.word	1073767497
+ 189              		.cfi_endproc
+ 190              	.LFE1:
+ 191              		.size	UART_TXISR, .-UART_TXISR
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 9
+
+
+ 192              		.text
+ 193              	.Letext0:
+ 194              		.file 2 "Generated_Source\\PSoC5/cytypes.h"
+ 195              		.file 3 "..\\common\\uart_ldr\\UART.h"
+ 196              		.section	.debug_info,"",%progbits
+ 197              	.Ldebug_info0:
+ 198 0000 83010000 		.4byte	0x183
+ 199 0004 0400     		.2byte	0x4
+ 200 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 201 000a 04       		.byte	0x4
+ 202 000b 01       		.uleb128 0x1
+ 203 000c A5000000 		.4byte	.LASF28
+ 204 0010 0C       		.byte	0xc
+ 205 0011 00000000 		.4byte	.LASF29
+ 206 0015 57000000 		.4byte	.LASF30
+ 207 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 208 001d 00000000 		.4byte	0
+ 209 0021 00000000 		.4byte	.Ldebug_line0
+ 210 0025 02       		.uleb128 0x2
+ 211 0026 01       		.byte	0x1
+ 212 0027 06       		.byte	0x6
+ 213 0028 53020000 		.4byte	.LASF0
+ 214 002c 02       		.uleb128 0x2
+ 215 002d 01       		.byte	0x1
+ 216 002e 08       		.byte	0x8
+ 217 002f 92000000 		.4byte	.LASF1
+ 218 0033 02       		.uleb128 0x2
+ 219 0034 02       		.byte	0x2
+ 220 0035 05       		.byte	0x5
+ 221 0036 16020000 		.4byte	.LASF2
+ 222 003a 02       		.uleb128 0x2
+ 223 003b 02       		.byte	0x2
+ 224 003c 07       		.byte	0x7
+ 225 003d 44000000 		.4byte	.LASF3
+ 226 0041 02       		.uleb128 0x2
+ 227 0042 04       		.byte	0x4
+ 228 0043 05       		.byte	0x5
+ 229 0044 33020000 		.4byte	.LASF4
+ 230 0048 02       		.uleb128 0x2
+ 231 0049 04       		.byte	0x4
+ 232 004a 07       		.byte	0x7
+ 233 004b 72010000 		.4byte	.LASF5
+ 234 004f 02       		.uleb128 0x2
+ 235 0050 08       		.byte	0x8
+ 236 0051 05       		.byte	0x5
+ 237 0052 D3010000 		.4byte	.LASF6
+ 238 0056 02       		.uleb128 0x2
+ 239 0057 08       		.byte	0x8
+ 240 0058 07       		.byte	0x7
+ 241 0059 91010000 		.4byte	.LASF7
+ 242 005d 03       		.uleb128 0x3
+ 243 005e 04       		.byte	0x4
+ 244 005f 05       		.byte	0x5
+ 245 0060 696E7400 		.ascii	"int\000"
+ 246 0064 02       		.uleb128 0x2
+ 247 0065 04       		.byte	0x4
+ 248 0066 07       		.byte	0x7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 10
+
+
+ 249 0067 84010000 		.4byte	.LASF8
+ 250 006b 04       		.uleb128 0x4
+ 251 006c 33010000 		.4byte	.LASF12
+ 252 0070 02       		.byte	0x2
+ 253 0071 9201     		.2byte	0x192
+ 254 0073 2C000000 		.4byte	0x2c
+ 255 0077 02       		.uleb128 0x2
+ 256 0078 04       		.byte	0x4
+ 257 0079 04       		.byte	0x4
+ 258 007a 30000000 		.4byte	.LASF9
+ 259 007e 02       		.uleb128 0x2
+ 260 007f 08       		.byte	0x8
+ 261 0080 04       		.byte	0x4
+ 262 0081 47010000 		.4byte	.LASF10
+ 263 0085 02       		.uleb128 0x2
+ 264 0086 01       		.byte	0x1
+ 265 0087 08       		.byte	0x8
+ 266 0088 3C020000 		.4byte	.LASF11
+ 267 008c 04       		.uleb128 0x4
+ 268 008d A0000000 		.4byte	.LASF13
+ 269 0091 02       		.byte	0x2
+ 270 0092 3C02     		.2byte	0x23c
+ 271 0094 98000000 		.4byte	0x98
+ 272 0098 05       		.uleb128 0x5
+ 273 0099 6B000000 		.4byte	0x6b
+ 274 009d 02       		.uleb128 0x2
+ 275 009e 08       		.byte	0x8
+ 276 009f 04       		.byte	0x4
+ 277 00a0 BE010000 		.4byte	.LASF14
+ 278 00a4 02       		.uleb128 0x2
+ 279 00a5 04       		.byte	0x4
+ 280 00a6 07       		.byte	0x7
+ 281 00a7 CA010000 		.4byte	.LASF15
+ 282 00ab 06       		.uleb128 0x6
+ 283 00ac 7C000000 		.4byte	.LASF31
+ 284 00b0 01       		.byte	0x1
+ 285 00b1 3B       		.byte	0x3b
+ 286 00b2 00000000 		.4byte	.LFB0
+ 287 00b6 90000000 		.4byte	.LFE0-.LFB0
+ 288 00ba 01       		.uleb128 0x1
+ 289 00bb 9C       		.byte	0x9c
+ 290 00bc EE000000 		.4byte	0xee
+ 291 00c0 07       		.uleb128 0x7
+ 292 00c1 5F020000 		.4byte	.LASF16
+ 293 00c5 01       		.byte	0x1
+ 294 00c6 3D       		.byte	0x3d
+ 295 00c7 6B000000 		.4byte	0x6b
+ 296 00cb 00000000 		.4byte	.LLST0
+ 297 00cf 07       		.uleb128 0x7
+ 298 00d0 87000000 		.4byte	.LASF17
+ 299 00d4 01       		.byte	0x1
+ 300 00d5 3E       		.byte	0x3e
+ 301 00d6 6B000000 		.4byte	0x6b
+ 302 00da 1E000000 		.4byte	.LLST1
+ 303 00de 07       		.uleb128 0x7
+ 304 00df EC010000 		.4byte	.LASF18
+ 305 00e3 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 11
+
+
+ 306 00e4 3F       		.byte	0x3f
+ 307 00e5 6B000000 		.4byte	0x6b
+ 308 00e9 31000000 		.4byte	.LLST2
+ 309 00ed 00       		.byte	0
+ 310 00ee 08       		.uleb128 0x8
+ 311 00ef E1010000 		.4byte	.LASF32
+ 312 00f3 01       		.byte	0x1
+ 313 00f4 D8       		.byte	0xd8
+ 314 00f5 00000000 		.4byte	.LFB1
+ 315 00f9 48000000 		.4byte	.LFE1-.LFB1
+ 316 00fd 01       		.uleb128 0x1
+ 317 00fe 9C       		.byte	0x9c
+ 318 00ff 09       		.uleb128 0x9
+ 319 0100 98000000 		.4byte	0x98
+ 320 0104 10010000 		.4byte	0x110
+ 321 0108 0A       		.uleb128 0xa
+ 322 0109 A4000000 		.4byte	0xa4
+ 323 010d FF03     		.2byte	0x3ff
+ 324 010f 00       		.byte	0
+ 325 0110 0B       		.uleb128 0xb
+ 326 0111 36000000 		.4byte	.LASF19
+ 327 0115 03       		.byte	0x3
+ 328 0116 3E01     		.2byte	0x13e
+ 329 0118 1C010000 		.4byte	0x11c
+ 330 011c 05       		.uleb128 0x5
+ 331 011d FF000000 		.4byte	0xff
+ 332 0121 0B       		.uleb128 0xb
+ 333 0122 41020000 		.4byte	.LASF20
+ 334 0126 03       		.byte	0x3
+ 335 0127 3F01     		.2byte	0x13f
+ 336 0129 98000000 		.4byte	0x98
+ 337 012d 0B       		.uleb128 0xb
+ 338 012e 20020000 		.4byte	.LASF21
+ 339 0132 03       		.byte	0x3
+ 340 0133 4001     		.2byte	0x140
+ 341 0135 6B000000 		.4byte	0x6b
+ 342 0139 0B       		.uleb128 0xb
+ 343 013a 4E010000 		.4byte	.LASF22
+ 344 013e 03       		.byte	0x3
+ 345 013f 4301     		.2byte	0x143
+ 346 0141 6B000000 		.4byte	0x6b
+ 347 0145 0B       		.uleb128 0xb
+ 348 0146 39010000 		.4byte	.LASF23
+ 349 014a 03       		.byte	0x3
+ 350 014b 4401     		.2byte	0x144
+ 351 014d 51010000 		.4byte	0x151
+ 352 0151 05       		.uleb128 0x5
+ 353 0152 FF000000 		.4byte	0xff
+ 354 0156 0B       		.uleb128 0xb
+ 355 0157 1E000000 		.4byte	.LASF24
+ 356 015b 03       		.byte	0x3
+ 357 015c 4501     		.2byte	0x145
+ 358 015e 98000000 		.4byte	0x98
+ 359 0162 0B       		.uleb128 0xb
+ 360 0163 5F010000 		.4byte	.LASF25
+ 361 0167 03       		.byte	0x3
+ 362 0168 4601     		.2byte	0x146
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 12
+
+
+ 363 016a 98000000 		.4byte	0x98
+ 364 016e 0B       		.uleb128 0xb
+ 365 016f FE010000 		.4byte	.LASF26
+ 366 0173 03       		.byte	0x3
+ 367 0174 4701     		.2byte	0x147
+ 368 0176 98000000 		.4byte	0x98
+ 369 017a 0B       		.uleb128 0xb
+ 370 017b A8010000 		.4byte	.LASF27
+ 371 017f 03       		.byte	0x3
+ 372 0180 4801     		.2byte	0x148
+ 373 0182 98000000 		.4byte	0x98
+ 374 0186 00       		.byte	0
+ 375              		.section	.debug_abbrev,"",%progbits
+ 376              	.Ldebug_abbrev0:
+ 377 0000 01       		.uleb128 0x1
+ 378 0001 11       		.uleb128 0x11
+ 379 0002 01       		.byte	0x1
+ 380 0003 25       		.uleb128 0x25
+ 381 0004 0E       		.uleb128 0xe
+ 382 0005 13       		.uleb128 0x13
+ 383 0006 0B       		.uleb128 0xb
+ 384 0007 03       		.uleb128 0x3
+ 385 0008 0E       		.uleb128 0xe
+ 386 0009 1B       		.uleb128 0x1b
+ 387 000a 0E       		.uleb128 0xe
+ 388 000b 55       		.uleb128 0x55
+ 389 000c 17       		.uleb128 0x17
+ 390 000d 11       		.uleb128 0x11
+ 391 000e 01       		.uleb128 0x1
+ 392 000f 10       		.uleb128 0x10
+ 393 0010 17       		.uleb128 0x17
+ 394 0011 00       		.byte	0
+ 395 0012 00       		.byte	0
+ 396 0013 02       		.uleb128 0x2
+ 397 0014 24       		.uleb128 0x24
+ 398 0015 00       		.byte	0
+ 399 0016 0B       		.uleb128 0xb
+ 400 0017 0B       		.uleb128 0xb
+ 401 0018 3E       		.uleb128 0x3e
+ 402 0019 0B       		.uleb128 0xb
+ 403 001a 03       		.uleb128 0x3
+ 404 001b 0E       		.uleb128 0xe
+ 405 001c 00       		.byte	0
+ 406 001d 00       		.byte	0
+ 407 001e 03       		.uleb128 0x3
+ 408 001f 24       		.uleb128 0x24
+ 409 0020 00       		.byte	0
+ 410 0021 0B       		.uleb128 0xb
+ 411 0022 0B       		.uleb128 0xb
+ 412 0023 3E       		.uleb128 0x3e
+ 413 0024 0B       		.uleb128 0xb
+ 414 0025 03       		.uleb128 0x3
+ 415 0026 08       		.uleb128 0x8
+ 416 0027 00       		.byte	0
+ 417 0028 00       		.byte	0
+ 418 0029 04       		.uleb128 0x4
+ 419 002a 16       		.uleb128 0x16
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 13
+
+
+ 420 002b 00       		.byte	0
+ 421 002c 03       		.uleb128 0x3
+ 422 002d 0E       		.uleb128 0xe
+ 423 002e 3A       		.uleb128 0x3a
+ 424 002f 0B       		.uleb128 0xb
+ 425 0030 3B       		.uleb128 0x3b
+ 426 0031 05       		.uleb128 0x5
+ 427 0032 49       		.uleb128 0x49
+ 428 0033 13       		.uleb128 0x13
+ 429 0034 00       		.byte	0
+ 430 0035 00       		.byte	0
+ 431 0036 05       		.uleb128 0x5
+ 432 0037 35       		.uleb128 0x35
+ 433 0038 00       		.byte	0
+ 434 0039 49       		.uleb128 0x49
+ 435 003a 13       		.uleb128 0x13
+ 436 003b 00       		.byte	0
+ 437 003c 00       		.byte	0
+ 438 003d 06       		.uleb128 0x6
+ 439 003e 2E       		.uleb128 0x2e
+ 440 003f 01       		.byte	0x1
+ 441 0040 3F       		.uleb128 0x3f
+ 442 0041 19       		.uleb128 0x19
+ 443 0042 03       		.uleb128 0x3
+ 444 0043 0E       		.uleb128 0xe
+ 445 0044 3A       		.uleb128 0x3a
+ 446 0045 0B       		.uleb128 0xb
+ 447 0046 3B       		.uleb128 0x3b
+ 448 0047 0B       		.uleb128 0xb
+ 449 0048 27       		.uleb128 0x27
+ 450 0049 19       		.uleb128 0x19
+ 451 004a 11       		.uleb128 0x11
+ 452 004b 01       		.uleb128 0x1
+ 453 004c 12       		.uleb128 0x12
+ 454 004d 06       		.uleb128 0x6
+ 455 004e 40       		.uleb128 0x40
+ 456 004f 18       		.uleb128 0x18
+ 457 0050 9742     		.uleb128 0x2117
+ 458 0052 19       		.uleb128 0x19
+ 459 0053 01       		.uleb128 0x1
+ 460 0054 13       		.uleb128 0x13
+ 461 0055 00       		.byte	0
+ 462 0056 00       		.byte	0
+ 463 0057 07       		.uleb128 0x7
+ 464 0058 34       		.uleb128 0x34
+ 465 0059 00       		.byte	0
+ 466 005a 03       		.uleb128 0x3
+ 467 005b 0E       		.uleb128 0xe
+ 468 005c 3A       		.uleb128 0x3a
+ 469 005d 0B       		.uleb128 0xb
+ 470 005e 3B       		.uleb128 0x3b
+ 471 005f 0B       		.uleb128 0xb
+ 472 0060 49       		.uleb128 0x49
+ 473 0061 13       		.uleb128 0x13
+ 474 0062 02       		.uleb128 0x2
+ 475 0063 17       		.uleb128 0x17
+ 476 0064 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 14
+
+
+ 477 0065 00       		.byte	0
+ 478 0066 08       		.uleb128 0x8
+ 479 0067 2E       		.uleb128 0x2e
+ 480 0068 00       		.byte	0
+ 481 0069 3F       		.uleb128 0x3f
+ 482 006a 19       		.uleb128 0x19
+ 483 006b 03       		.uleb128 0x3
+ 484 006c 0E       		.uleb128 0xe
+ 485 006d 3A       		.uleb128 0x3a
+ 486 006e 0B       		.uleb128 0xb
+ 487 006f 3B       		.uleb128 0x3b
+ 488 0070 0B       		.uleb128 0xb
+ 489 0071 27       		.uleb128 0x27
+ 490 0072 19       		.uleb128 0x19
+ 491 0073 11       		.uleb128 0x11
+ 492 0074 01       		.uleb128 0x1
+ 493 0075 12       		.uleb128 0x12
+ 494 0076 06       		.uleb128 0x6
+ 495 0077 40       		.uleb128 0x40
+ 496 0078 18       		.uleb128 0x18
+ 497 0079 9742     		.uleb128 0x2117
+ 498 007b 19       		.uleb128 0x19
+ 499 007c 00       		.byte	0
+ 500 007d 00       		.byte	0
+ 501 007e 09       		.uleb128 0x9
+ 502 007f 01       		.uleb128 0x1
+ 503 0080 01       		.byte	0x1
+ 504 0081 49       		.uleb128 0x49
+ 505 0082 13       		.uleb128 0x13
+ 506 0083 01       		.uleb128 0x1
+ 507 0084 13       		.uleb128 0x13
+ 508 0085 00       		.byte	0
+ 509 0086 00       		.byte	0
+ 510 0087 0A       		.uleb128 0xa
+ 511 0088 21       		.uleb128 0x21
+ 512 0089 00       		.byte	0
+ 513 008a 49       		.uleb128 0x49
+ 514 008b 13       		.uleb128 0x13
+ 515 008c 2F       		.uleb128 0x2f
+ 516 008d 05       		.uleb128 0x5
+ 517 008e 00       		.byte	0
+ 518 008f 00       		.byte	0
+ 519 0090 0B       		.uleb128 0xb
+ 520 0091 34       		.uleb128 0x34
+ 521 0092 00       		.byte	0
+ 522 0093 03       		.uleb128 0x3
+ 523 0094 0E       		.uleb128 0xe
+ 524 0095 3A       		.uleb128 0x3a
+ 525 0096 0B       		.uleb128 0xb
+ 526 0097 3B       		.uleb128 0x3b
+ 527 0098 05       		.uleb128 0x5
+ 528 0099 49       		.uleb128 0x49
+ 529 009a 13       		.uleb128 0x13
+ 530 009b 3F       		.uleb128 0x3f
+ 531 009c 19       		.uleb128 0x19
+ 532 009d 3C       		.uleb128 0x3c
+ 533 009e 19       		.uleb128 0x19
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 15
+
+
+ 534 009f 00       		.byte	0
+ 535 00a0 00       		.byte	0
+ 536 00a1 00       		.byte	0
+ 537              		.section	.debug_loc,"",%progbits
+ 538              	.Ldebug_loc0:
+ 539              	.LLST0:
+ 540 0000 1E000000 		.4byte	.LVL2
+ 541 0004 32000000 		.4byte	.LVL3
+ 542 0008 0100     		.2byte	0x1
+ 543 000a 53       		.byte	0x53
+ 544 000b 3E000000 		.4byte	.LVL4
+ 545 000f 5E000000 		.4byte	.LVL6
+ 546 0013 0100     		.2byte	0x1
+ 547 0015 58       		.byte	0x58
+ 548 0016 00000000 		.4byte	0
+ 549 001a 00000000 		.4byte	0
+ 550              	.LLST1:
+ 551 001e 1E000000 		.4byte	.LVL2
+ 552 0022 32000000 		.4byte	.LVL3
+ 553 0026 0100     		.2byte	0x1
+ 554 0028 53       		.byte	0x53
+ 555 0029 00000000 		.4byte	0
+ 556 002d 00000000 		.4byte	0
+ 557              	.LLST2:
+ 558 0031 00000000 		.4byte	.LVL0
+ 559 0035 1A000000 		.4byte	.LVL1
+ 560 0039 0200     		.2byte	0x2
+ 561 003b 30       		.byte	0x30
+ 562 003c 9F       		.byte	0x9f
+ 563 003d 44000000 		.4byte	.LVL5
+ 564 0041 6A000000 		.4byte	.LVL7
+ 565 0045 0200     		.2byte	0x2
+ 566 0047 31       		.byte	0x31
+ 567 0048 9F       		.byte	0x9f
+ 568 0049 00000000 		.4byte	0
+ 569 004d 00000000 		.4byte	0
+ 570              		.section	.debug_aranges,"",%progbits
+ 571 0000 24000000 		.4byte	0x24
+ 572 0004 0200     		.2byte	0x2
+ 573 0006 00000000 		.4byte	.Ldebug_info0
+ 574 000a 04       		.byte	0x4
+ 575 000b 00       		.byte	0
+ 576 000c 0000     		.2byte	0
+ 577 000e 0000     		.2byte	0
+ 578 0010 00000000 		.4byte	.LFB0
+ 579 0014 90000000 		.4byte	.LFE0-.LFB0
+ 580 0018 00000000 		.4byte	.LFB1
+ 581 001c 48000000 		.4byte	.LFE1-.LFB1
+ 582 0020 00000000 		.4byte	0
+ 583 0024 00000000 		.4byte	0
+ 584              		.section	.debug_ranges,"",%progbits
+ 585              	.Ldebug_ranges0:
+ 586 0000 00000000 		.4byte	.LFB0
+ 587 0004 90000000 		.4byte	.LFE0
+ 588 0008 00000000 		.4byte	.LFB1
+ 589 000c 48000000 		.4byte	.LFE1
+ 590 0010 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 16
+
+
+ 591 0014 00000000 		.4byte	0
+ 592              		.section	.debug_line,"",%progbits
+ 593              	.Ldebug_line0:
+ 594 0000 C7000000 		.section	.debug_str,"MS",%progbits,1
+ 594      02006200 
+ 594      00000201 
+ 594      FB0E0D00 
+ 594      01010101 
+ 595              	.LASF29:
+ 596 0000 2E2E5C63 		.ascii	"..\\common\\uart_ldr\\UART_INT.c\000"
+ 596      6F6D6D6F 
+ 596      6E5C7561 
+ 596      72745F6C 
+ 596      64725C55 
+ 597              	.LASF24:
+ 598 001e 55415254 		.ascii	"UART_rxBufferRead\000"
+ 598      5F727842 
+ 598      75666665 
+ 598      72526561 
+ 598      6400
+ 599              	.LASF9:
+ 600 0030 666C6F61 		.ascii	"float\000"
+ 600      7400
+ 601              	.LASF19:
+ 602 0036 55415254 		.ascii	"UART_txBuffer\000"
+ 602      5F747842 
+ 602      75666665 
+ 602      7200
+ 603              	.LASF3:
+ 604 0044 73686F72 		.ascii	"short unsigned int\000"
+ 604      7420756E 
+ 604      7369676E 
+ 604      65642069 
+ 604      6E7400
+ 605              	.LASF30:
+ 606 0057 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3\\UARTldr_QFN.cydsn\000"
+ 606      73657273 
+ 606      5C636865 
+ 606      6D695C55 
+ 606      44335C55 
+ 607              	.LASF31:
+ 608 007c 55415254 		.ascii	"UART_RXISR\000"
+ 608      5F525849 
+ 608      535200
+ 609              	.LASF17:
+ 610 0087 72656164 		.ascii	"readStatus\000"
+ 610      53746174 
+ 610      757300
+ 611              	.LASF1:
+ 612 0092 756E7369 		.ascii	"unsigned char\000"
+ 612      676E6564 
+ 612      20636861 
+ 612      7200
+ 613              	.LASF13:
+ 614 00a0 72656738 		.ascii	"reg8\000"
+ 614      00
+ 615              	.LASF28:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 17
+
+
+ 616 00a5 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 616      43313120 
+ 616      352E342E 
+ 616      31203230 
+ 616      31363036 
+ 617 00d8 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 617      20726576 
+ 617      6973696F 
+ 617      6E203233 
+ 617      37373135 
+ 618 010b 73202D66 		.ascii	"s -ffunction-sections -ffat-lto-objects\000"
+ 618      66756E63 
+ 618      74696F6E 
+ 618      2D736563 
+ 618      74696F6E 
+ 619              	.LASF12:
+ 620 0133 75696E74 		.ascii	"uint8\000"
+ 620      3800
+ 621              	.LASF23:
+ 622 0139 55415254 		.ascii	"UART_rxBuffer\000"
+ 622      5F727842 
+ 622      75666665 
+ 622      7200
+ 623              	.LASF10:
+ 624 0147 646F7562 		.ascii	"double\000"
+ 624      6C6500
+ 625              	.LASF22:
+ 626 014e 55415254 		.ascii	"UART_errorStatus\000"
+ 626      5F657272 
+ 626      6F725374 
+ 626      61747573 
+ 626      00
+ 627              	.LASF25:
+ 628 015f 55415254 		.ascii	"UART_rxBufferWrite\000"
+ 628      5F727842 
+ 628      75666665 
+ 628      72577269 
+ 628      746500
+ 629              	.LASF5:
+ 630 0172 6C6F6E67 		.ascii	"long unsigned int\000"
+ 630      20756E73 
+ 630      69676E65 
+ 630      6420696E 
+ 630      7400
+ 631              	.LASF8:
+ 632 0184 756E7369 		.ascii	"unsigned int\000"
+ 632      676E6564 
+ 632      20696E74 
+ 632      00
+ 633              	.LASF7:
+ 634 0191 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 634      206C6F6E 
+ 634      6720756E 
+ 634      7369676E 
+ 634      65642069 
+ 635              	.LASF27:
+ 636 01a8 55415254 		.ascii	"UART_rxBufferOverflow\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 18
+
+
+ 636      5F727842 
+ 636      75666665 
+ 636      724F7665 
+ 636      72666C6F 
+ 637              	.LASF14:
+ 638 01be 6C6F6E67 		.ascii	"long double\000"
+ 638      20646F75 
+ 638      626C6500 
+ 639              	.LASF15:
+ 640 01ca 73697A65 		.ascii	"sizetype\000"
+ 640      74797065 
+ 640      00
+ 641              	.LASF6:
+ 642 01d3 6C6F6E67 		.ascii	"long long int\000"
+ 642      206C6F6E 
+ 642      6720696E 
+ 642      7400
+ 643              	.LASF32:
+ 644 01e1 55415254 		.ascii	"UART_TXISR\000"
+ 644      5F545849 
+ 644      535200
+ 645              	.LASF18:
+ 646 01ec 696E6372 		.ascii	"increment_pointer\000"
+ 646      656D656E 
+ 646      745F706F 
+ 646      696E7465 
+ 646      7200
+ 647              	.LASF26:
+ 648 01fe 55415254 		.ascii	"UART_rxBufferLoopDetect\000"
+ 648      5F727842 
+ 648      75666665 
+ 648      724C6F6F 
+ 648      70446574 
+ 649              	.LASF2:
+ 650 0216 73686F72 		.ascii	"short int\000"
+ 650      7420696E 
+ 650      7400
+ 651              	.LASF21:
+ 652 0220 55415254 		.ascii	"UART_txBufferWrite\000"
+ 652      5F747842 
+ 652      75666665 
+ 652      72577269 
+ 652      746500
+ 653              	.LASF4:
+ 654 0233 6C6F6E67 		.ascii	"long int\000"
+ 654      20696E74 
+ 654      00
+ 655              	.LASF11:
+ 656 023c 63686172 		.ascii	"char\000"
+ 656      00
+ 657              	.LASF20:
+ 658 0241 55415254 		.ascii	"UART_txBufferRead\000"
+ 658      5F747842 
+ 658      75666665 
+ 658      72526561 
+ 658      6400
+ 659              	.LASF0:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccmZKEsm.s 			page 19
+
+
+ 660 0253 7369676E 		.ascii	"signed char\000"
+ 660      65642063 
+ 660      68617200 
+ 661              	.LASF16:
+ 662 025f 72656164 		.ascii	"readData\000"
+ 662      44617461 
+ 662      00
+ 663              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

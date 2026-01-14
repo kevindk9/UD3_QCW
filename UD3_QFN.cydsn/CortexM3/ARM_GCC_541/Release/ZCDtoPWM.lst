@@ -1,0 +1,3731 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"ZCDtoPWM.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.global	__aeabi_ui2f
+  20              		.global	__aeabi_i2f
+  21              		.global	__aeabi_fdiv
+  22              		.global	__aeabi_fmul
+  23              		.global	__aeabi_f2d
+  24              		.global	__aeabi_ddiv
+  25              		.global	__aeabi_d2f
+  26              		.global	__aeabi_fcmpgt
+  27              		.global	__aeabi_d2uiz
+  28              		.section	.text.configure_CT1,"ax",%progbits
+  29              		.align	1
+  30              		.global	configure_CT1
+  31              		.thumb
+  32              		.thumb_func
+  33              		.type	configure_CT1, %function
+  34              	configure_CT1:
+  35              	.LFB69:
+  36              		.file 1 "..\\common\\ud3core\\ZCDtoPWM.c"
+   1:..\common\ud3core/ZCDtoPWM.c **** /*
+   2:..\common\ud3core/ZCDtoPWM.c ****  * UD3
+   3:..\common\ud3core/ZCDtoPWM.c ****  *
+   4:..\common\ud3core/ZCDtoPWM.c ****  * Copyright (c) 2018 Jens Kerrinnes
+   5:..\common\ud3core/ZCDtoPWM.c ****  * Copyright (c) 2015 Steve Ward
+   6:..\common\ud3core/ZCDtoPWM.c ****  *
+   7:..\common\ud3core/ZCDtoPWM.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   8:..\common\ud3core/ZCDtoPWM.c ****  * this software and associated documentation files (the "Software"), to deal in
+   9:..\common\ud3core/ZCDtoPWM.c ****  * the Software without restriction, including without limitation the rights to
+  10:..\common\ud3core/ZCDtoPWM.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+  11:..\common\ud3core/ZCDtoPWM.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  12:..\common\ud3core/ZCDtoPWM.c ****  * subject to the following conditions:
+  13:..\common\ud3core/ZCDtoPWM.c ****  *
+  14:..\common\ud3core/ZCDtoPWM.c ****  * The above copyright notice and this permission notice shall be included in all
+  15:..\common\ud3core/ZCDtoPWM.c ****  * copies or substantial portions of the Software.
+  16:..\common\ud3core/ZCDtoPWM.c ****  *
+  17:..\common\ud3core/ZCDtoPWM.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  18:..\common\ud3core/ZCDtoPWM.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  19:..\common\ud3core/ZCDtoPWM.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  20:..\common\ud3core/ZCDtoPWM.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  21:..\common\ud3core/ZCDtoPWM.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 2
+
+
+  22:..\common\ud3core/ZCDtoPWM.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  23:..\common\ud3core/ZCDtoPWM.c **** */
+  24:..\common\ud3core/ZCDtoPWM.c **** 
+  25:..\common\ud3core/ZCDtoPWM.c **** #include "ZCDtoPWM.h"
+  26:..\common\ud3core/ZCDtoPWM.c **** #include "cli_common.h"
+  27:..\common\ud3core/ZCDtoPWM.c **** #include "interrupter.h"
+  28:..\common\ud3core/ZCDtoPWM.c **** #include "tasks/tsk_fault.h"
+  29:..\common\ud3core/ZCDtoPWM.c **** #include <device.h>
+  30:..\common\ud3core/ZCDtoPWM.c **** #include <math.h>
+  31:..\common\ud3core/ZCDtoPWM.c **** 
+  32:..\common\ud3core/ZCDtoPWM.c **** uint16_t fb_filter_in=1;
+  33:..\common\ud3core/ZCDtoPWM.c **** uint16_t fb_filter_out=1;
+  34:..\common\ud3core/ZCDtoPWM.c **** 
+  35:..\common\ud3core/ZCDtoPWM.c **** void initialize_ZCD_to_PWM(void) {
+  36:..\common\ud3core/ZCDtoPWM.c **** 	//initialize all the timers/counters/PWMs
+  37:..\common\ud3core/ZCDtoPWM.c **** 	PWMA_Start();
+  38:..\common\ud3core/ZCDtoPWM.c **** 	PWMB_Start();
+  39:..\common\ud3core/ZCDtoPWM.c **** 	FB_capture_Start();
+  40:..\common\ud3core/ZCDtoPWM.c **** 	ZCD_counter_Start();
+  41:..\common\ud3core/ZCDtoPWM.c **** 	FB_glitch_detect_Start();
+  42:..\common\ud3core/ZCDtoPWM.c **** 
+  43:..\common\ud3core/ZCDtoPWM.c **** 	//initialize all comparators
+  44:..\common\ud3core/ZCDtoPWM.c **** 	ZCD_compA_Start();
+  45:..\common\ud3core/ZCDtoPWM.c **** 	ZCD_compB_Start();
+  46:..\common\ud3core/ZCDtoPWM.c **** 	CT1_comp_Start();
+  47:..\common\ud3core/ZCDtoPWM.c **** 
+  48:..\common\ud3core/ZCDtoPWM.c **** 	//initialize the DACs
+  49:..\common\ud3core/ZCDtoPWM.c **** 	CT1_dac_Start();
+  50:..\common\ud3core/ZCDtoPWM.c **** 	ZCDref_Start();
+  51:..\common\ud3core/ZCDtoPWM.c **** 	FB_THRSH_DAC_Start();
+  52:..\common\ud3core/ZCDtoPWM.c ****     Opamp_1_Start();
+  53:..\common\ud3core/ZCDtoPWM.c **** 
+  54:..\common\ud3core/ZCDtoPWM.c **** 	//start the feedback filter block
+  55:..\common\ud3core/ZCDtoPWM.c **** 	FB_Filter_Start();
+  56:..\common\ud3core/ZCDtoPWM.c **** 	FB_Filter_SetCoherency(FB_Filter_CHANNEL_A, FB_Filter_KEY_MID);
+  57:..\common\ud3core/ZCDtoPWM.c **** 
+  58:..\common\ud3core/ZCDtoPWM.c **** 	configure_ZCD_to_PWM();
+  59:..\common\ud3core/ZCDtoPWM.c **** }
+  60:..\common\ud3core/ZCDtoPWM.c **** 
+  61:..\common\ud3core/ZCDtoPWM.c **** void configure_CT1(void) {
+  37              		.loc 1 61 0
+  38              		.cfi_startproc
+  39              		@ args = 0, pretend = 0, frame = 0
+  40              		@ frame_needed = 0, uses_anonymous_args = 0
+  41 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+  42              		.cfi_def_cfa_offset 24
+  43              		.cfi_offset 4, -24
+  44              		.cfi_offset 5, -20
+  45              		.cfi_offset 6, -16
+  46              		.cfi_offset 7, -12
+  47              		.cfi_offset 8, -8
+  48              		.cfi_offset 14, -4
+  62:..\common\ud3core/ZCDtoPWM.c **** 
+  63:..\common\ud3core/ZCDtoPWM.c **** 	float max_tr_cl_dac_val_temp;
+  64:..\common\ud3core/ZCDtoPWM.c **** 	float max_qcw_cl_dac_val_temp;
+  65:..\common\ud3core/ZCDtoPWM.c **** 	float min_tr_cl_dac_val_temp;
+  66:..\common\ud3core/ZCDtoPWM.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 3
+
+
+  67:..\common\ud3core/ZCDtoPWM.c **** 	//figure out the CT setups
+  68:..\common\ud3core/ZCDtoPWM.c **** 	max_tr_cl_dac_val_temp = (((float)configuration.max_tr_current / (float)configuration.ct1_ratio) *
+  49              		.loc 1 68 0
+  50 0004 404C     		ldr	r4, .L12+8
+  51 0006 608A     		ldrh	r0, [r4, #18]
+  52 0008 FFF7FEFF 		bl	__aeabi_ui2f
+  53              	.LVL0:
+  54 000c 0746     		mov	r7, r0
+  55 000e E08A     		ldrh	r0, [r4, #22]
+  56 0010 FFF7FEFF 		bl	__aeabi_i2f
+  57              	.LVL1:
+  58 0014 0646     		mov	r6, r0
+  59 0016 6089     		ldrh	r0, [r4, #10]
+  60 0018 FFF7FEFF 		bl	__aeabi_ui2f
+  61              	.LVL2:
+  62 001c 3946     		mov	r1, r7
+  63 001e FFF7FEFF 		bl	__aeabi_fdiv
+  64              	.LVL3:
+  65 0022 3146     		mov	r1, r6
+  66 0024 FFF7FEFF 		bl	__aeabi_fmul
+  67              	.LVL4:
+  68 0028 FFF7FEFF 		bl	__aeabi_f2d
+  69              	.LVL5:
+  70 002c 34A3     		adr	r3, .L12
+  71 002e D3E90023 		ldrd	r2, [r3]
+  72 0032 FFF7FEFF 		bl	__aeabi_ddiv
+  73              	.LVL6:
+  74 0036 FFF7FEFF 		bl	__aeabi_d2f
+  75              	.LVL7:
+  69:..\common\ud3core/ZCDtoPWM.c **** 	if (max_tr_cl_dac_val_temp > 255) {
+  76              		.loc 1 69 0
+  77 003a 3449     		ldr	r1, .L12+12
+  68:..\common\ud3core/ZCDtoPWM.c **** 	if (max_tr_cl_dac_val_temp > 255) {
+  78              		.loc 1 68 0
+  79 003c 8046     		mov	r8, r0
+  80              	.LVL8:
+  81              		.loc 1 69 0
+  82 003e FFF7FEFF 		bl	__aeabi_fcmpgt
+  83              	.LVL9:
+  84 0042 2546     		mov	r5, r4
+  85 0044 08B1     		cbz	r0, .L2
+  70:..\common\ud3core/ZCDtoPWM.c **** 		max_tr_cl_dac_val_temp = 255;
+  86              		.loc 1 70 0
+  87 0046 DFF8C480 		ldr	r8, .L12+12
+  88              	.LVL10:
+  89              	.L2:
+  71:..\common\ud3core/ZCDtoPWM.c **** 	}
+  72:..\common\ud3core/ZCDtoPWM.c ****     
+  73:..\common\ud3core/ZCDtoPWM.c ****     params.max_tr_cl_dac_val = round(max_tr_cl_dac_val_temp);
+  90              		.loc 1 73 0
+  91 004a 4046     		mov	r0, r8
+  92 004c FFF7FEFF 		bl	__aeabi_f2d
+  93              	.LVL11:
+  94 0050 FFF7FEFF 		bl	round
+  95              	.LVL12:
+  96 0054 FFF7FEFF 		bl	__aeabi_d2uiz
+  97              	.LVL13:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 4
+
+
+  98 0058 2D4C     		ldr	r4, .L12+16
+  99 005a C0B2     		uxtb	r0, r0
+ 100 005c 2070     		strb	r0, [r4]
+  74:..\common\ud3core/ZCDtoPWM.c **** 
+  75:..\common\ud3core/ZCDtoPWM.c **** 	max_qcw_cl_dac_val_temp = (((float)configuration.max_qcw_current / (float)configuration.ct1_ratio)
+ 101              		.loc 1 75 0
+ 102 005e E889     		ldrh	r0, [r5, #14]
+ 103 0060 FFF7FEFF 		bl	__aeabi_ui2f
+ 104              	.LVL14:
+ 105 0064 3946     		mov	r1, r7
+ 106 0066 FFF7FEFF 		bl	__aeabi_fdiv
+ 107              	.LVL15:
+ 108 006a 3146     		mov	r1, r6
+ 109 006c FFF7FEFF 		bl	__aeabi_fmul
+ 110              	.LVL16:
+ 111 0070 FFF7FEFF 		bl	__aeabi_f2d
+ 112              	.LVL17:
+ 113 0074 22A3     		adr	r3, .L12
+ 114 0076 D3E90023 		ldrd	r2, [r3]
+ 115 007a FFF7FEFF 		bl	__aeabi_ddiv
+ 116              	.LVL18:
+ 117 007e FFF7FEFF 		bl	__aeabi_d2f
+ 118              	.LVL19:
+  76:..\common\ud3core/ZCDtoPWM.c **** 	if (max_qcw_cl_dac_val_temp > 255) {
+ 119              		.loc 1 76 0
+ 120 0082 2249     		ldr	r1, .L12+12
+  75:..\common\ud3core/ZCDtoPWM.c **** 	if (max_qcw_cl_dac_val_temp > 255) {
+ 121              		.loc 1 75 0
+ 122 0084 8046     		mov	r8, r0
+ 123              	.LVL20:
+ 124              		.loc 1 76 0
+ 125 0086 FFF7FEFF 		bl	__aeabi_fcmpgt
+ 126              	.LVL21:
+ 127 008a 08B1     		cbz	r0, .L4
+  77:..\common\ud3core/ZCDtoPWM.c **** 		max_qcw_cl_dac_val_temp = 255;
+ 128              		.loc 1 77 0
+ 129 008c DFF87C80 		ldr	r8, .L12+12
+ 130              	.LVL22:
+ 131              	.L4:
+  78:..\common\ud3core/ZCDtoPWM.c **** 	}
+  79:..\common\ud3core/ZCDtoPWM.c **** 
+  80:..\common\ud3core/ZCDtoPWM.c **** 	min_tr_cl_dac_val_temp = (((float)configuration.min_tr_current / (float)configuration.ct1_ratio) *
+ 132              		.loc 1 80 0
+ 133 0090 A889     		ldrh	r0, [r5, #12]
+ 134 0092 FFF7FEFF 		bl	__aeabi_ui2f
+ 135              	.LVL23:
+ 136 0096 3946     		mov	r1, r7
+ 137 0098 FFF7FEFF 		bl	__aeabi_fdiv
+ 138              	.LVL24:
+ 139 009c 3146     		mov	r1, r6
+ 140 009e FFF7FEFF 		bl	__aeabi_fmul
+ 141              	.LVL25:
+ 142 00a2 FFF7FEFF 		bl	__aeabi_f2d
+ 143              	.LVL26:
+ 144 00a6 16A3     		adr	r3, .L12
+ 145 00a8 D3E90023 		ldrd	r2, [r3]
+ 146 00ac FFF7FEFF 		bl	__aeabi_ddiv
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 5
+
+
+ 147              	.LVL27:
+ 148 00b0 FFF7FEFF 		bl	__aeabi_d2f
+ 149              	.LVL28:
+  81:..\common\ud3core/ZCDtoPWM.c **** 	if (min_tr_cl_dac_val_temp > 255) {
+ 150              		.loc 1 81 0
+ 151 00b4 1549     		ldr	r1, .L12+12
+  80:..\common\ud3core/ZCDtoPWM.c **** 	if (min_tr_cl_dac_val_temp > 255) {
+ 152              		.loc 1 80 0
+ 153 00b6 0546     		mov	r5, r0
+ 154              	.LVL29:
+ 155              		.loc 1 81 0
+ 156 00b8 FFF7FEFF 		bl	__aeabi_fcmpgt
+ 157              	.LVL30:
+ 158 00bc 00B1     		cbz	r0, .L6
+  82:..\common\ud3core/ZCDtoPWM.c **** 		min_tr_cl_dac_val_temp = 255;
+ 159              		.loc 1 82 0
+ 160 00be 134D     		ldr	r5, .L12+12
+ 161              	.LVL31:
+ 162              	.L6:
+  83:..\common\ud3core/ZCDtoPWM.c **** 	}
+  84:..\common\ud3core/ZCDtoPWM.c **** 	params.min_tr_cl_dac_val = round(min_tr_cl_dac_val_temp);
+ 163              		.loc 1 84 0
+ 164 00c0 2846     		mov	r0, r5
+ 165 00c2 FFF7FEFF 		bl	__aeabi_f2d
+ 166              	.LVL32:
+ 167 00c6 FFF7FEFF 		bl	round
+ 168              	.LVL33:
+ 169 00ca FFF7FEFF 		bl	__aeabi_d2uiz
+ 170              	.LVL34:
+ 171 00ce C0B2     		uxtb	r0, r0
+ 172 00d0 2075     		strb	r0, [r4, #20]
+  85:..\common\ud3core/ZCDtoPWM.c **** 
+  86:..\common\ud3core/ZCDtoPWM.c **** 	ct1_dac_val[0] = params.max_tr_cl_dac_val;
+ 173              		.loc 1 86 0
+ 174 00d2 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 175 00d4 0F4D     		ldr	r5, .L12+20
+ 176              	.LVL35:
+  87:..\common\ud3core/ZCDtoPWM.c **** 	ct1_dac_val[1] = params.max_tr_cl_dac_val;
+  88:..\common\ud3core/ZCDtoPWM.c **** 	ct1_dac_val[2] = round(max_qcw_cl_dac_val_temp);
+ 177              		.loc 1 88 0
+ 178 00d6 4046     		mov	r0, r8
+  86:..\common\ud3core/ZCDtoPWM.c **** 	ct1_dac_val[1] = params.max_tr_cl_dac_val;
+ 179              		.loc 1 86 0
+ 180 00d8 2B70     		strb	r3, [r5]
+  87:..\common\ud3core/ZCDtoPWM.c **** 	ct1_dac_val[1] = params.max_tr_cl_dac_val;
+ 181              		.loc 1 87 0
+ 182 00da 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 183 00dc 6B70     		strb	r3, [r5, #1]
+ 184              		.loc 1 88 0
+ 185 00de FFF7FEFF 		bl	__aeabi_f2d
+ 186              	.LVL36:
+ 187 00e2 FFF7FEFF 		bl	round
+ 188              	.LVL37:
+ 189 00e6 FFF7FEFF 		bl	__aeabi_d2uiz
+ 190              	.LVL38:
+  89:..\common\ud3core/ZCDtoPWM.c **** 
+  90:..\common\ud3core/ZCDtoPWM.c **** 	params.diff_tr_cl_dac_val = params.max_tr_cl_dac_val - params.min_tr_cl_dac_val;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 6
+
+
+ 191              		.loc 1 90 0
+ 192 00ea 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 193 00ec 227D     		ldrb	r2, [r4, #20]	@ zero_extendqisi2
+  88:..\common\ud3core/ZCDtoPWM.c **** 
+ 194              		.loc 1 88 0
+ 195 00ee A870     		strb	r0, [r5, #2]
+ 196              		.loc 1 90 0
+ 197 00f0 9B1A     		subs	r3, r3, r2
+ 198 00f2 DBB2     		uxtb	r3, r3
+ 199 00f4 6375     		strb	r3, [r4, #21]
+ 200 00f6 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 201              	.LVL39:
+ 202              	.L13:
+ 203 00fa 00BFAFF3 		.align	3
+ 203      0080
+ 204              	.L12:
+ 205 0100 7B14AE47 		.word	1202590843
+ 206 0104 E17AC43F 		.word	1069841121
+ 207 0108 00000000 		.word	configuration
+ 208 010c 00007F43 		.word	1132396544
+ 209 0110 00000000 		.word	params
+ 210 0114 00000000 		.word	ct1_dac_val
+ 211              		.cfi_endproc
+ 212              	.LFE69:
+ 213              		.size	configure_CT1, .-configure_CT1
+ 214              		.section	.text.configure_CT2,"ax",%progbits
+ 215              		.align	1
+ 216              		.global	configure_CT2
+ 217              		.thumb
+ 218              		.thumb_func
+ 219              		.type	configure_CT2, %function
+ 220              	configure_CT2:
+ 221              	.LFB70:
+  91:..\common\ud3core/ZCDtoPWM.c **** }
+  92:..\common\ud3core/ZCDtoPWM.c **** 
+  93:..\common\ud3core/ZCDtoPWM.c **** void configure_CT2(void) {
+ 222              		.loc 1 93 0
+ 223              		.cfi_startproc
+ 224              		@ args = 0, pretend = 0, frame = 0
+ 225              		@ frame_needed = 0, uses_anonymous_args = 0
+ 226 0000 30B5     		push	{r4, r5, lr}
+ 227              		.cfi_def_cfa_offset 12
+ 228              		.cfi_offset 4, -12
+ 229              		.cfi_offset 5, -8
+ 230              		.cfi_offset 14, -4
+  94:..\common\ud3core/ZCDtoPWM.c ****     if(configuration.ct2_type==CT2_TYPE_CURRENT){
+ 231              		.loc 1 94 0
+ 232 0002 1449     		ldr	r1, .L18
+ 233 0004 1448     		ldr	r0, .L18+4
+ 234 0006 91F84C30 		ldrb	r3, [r1, #76]	@ zero_extendqisi2
+ 235 000a 4BB9     		cbnz	r3, .L15
+ 236              	.LBB7:
+ 237              	.LBB8:
+  95:..\common\ud3core/ZCDtoPWM.c ****         //DC CT mA_Count
+  96:..\common\ud3core/ZCDtoPWM.c ****         params.idc_ma_count = (uint32_t)((configuration.ct2_ratio * 50 * 1000) / configuration.ct2_
+ 238              		.loc 1 96 0
+ 239 000c 4CF25033 		movw	r3, #50000
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 7
+
+
+ 240 0010 8A8A     		ldrh	r2, [r1, #20]
+ 241 0012 5343     		muls	r3, r2, r3
+ 242 0014 0A8B     		ldrh	r2, [r1, #24]
+ 243 0016 93FBF2F3 		sdiv	r3, r3, r2
+ 244 001a C3F30F33 		ubfx	r3, r3, #12, #16
+ 245 001e 17E0     		b	.L17
+ 246              	.L15:
+ 247              	.LBE8:
+ 248              	.LBE7:
+ 249              	.LBB9:
+  97:..\common\ud3core/ZCDtoPWM.c ****     }else{
+  98:..\common\ud3core/ZCDtoPWM.c ****         params.ct2_offset_cnt = (uint32_t)(4096ul*(uint32_t)configuration.ct2_offset)/5000ul;
+ 250              		.loc 1 98 0
+ 251 0020 41F28833 		movw	r3, #5000
+ 252 0024 B1F85220 		ldrh	r2, [r1, #82]
+  99:..\common\ud3core/ZCDtoPWM.c ****         uint32_t cnt_fs = ((4096ul*(uint32_t)configuration.ct2_voltage)/5000ul)-params.ct2_offset_c
+ 100:..\common\ud3core/ZCDtoPWM.c ****         params.idc_ma_count = (((uint32_t)configuration.ct2_current*100ul) / cnt_fs);   
+ 253              		.loc 1 100 0
+ 254 0028 B1F84E50 		ldrh	r5, [r1, #78]
+  98:..\common\ud3core/ZCDtoPWM.c ****         uint32_t cnt_fs = ((4096ul*(uint32_t)configuration.ct2_voltage)/5000ul)-params.ct2_offset_c
+ 255              		.loc 1 98 0
+ 256 002c 1203     		lsls	r2, r2, #12
+ 257 002e B2FBF3F2 		udiv	r2, r2, r3
+ 258              		.loc 1 100 0
+ 259 0032 B1F85010 		ldrh	r1, [r1, #80]
+  98:..\common\ud3core/ZCDtoPWM.c ****         uint32_t cnt_fs = ((4096ul*(uint32_t)configuration.ct2_voltage)/5000ul)-params.ct2_offset_c
+ 260              		.loc 1 98 0
+ 261 0036 92B2     		uxth	r2, r2
+ 262              		.loc 1 100 0
+ 263 0038 0903     		lsls	r1, r1, #12
+ 264 003a B1FBF3F3 		udiv	r3, r1, r3
+  98:..\common\ud3core/ZCDtoPWM.c ****         uint32_t cnt_fs = ((4096ul*(uint32_t)configuration.ct2_voltage)/5000ul)-params.ct2_offset_c
+ 265              		.loc 1 98 0
+ 266 003e 0283     		strh	r2, [r0, #24]	@ movhi
+ 267              		.loc 1 100 0
+ 268 0040 6422     		movs	r2, #100
+  99:..\common\ud3core/ZCDtoPWM.c ****         uint32_t cnt_fs = ((4096ul*(uint32_t)configuration.ct2_voltage)/5000ul)-params.ct2_offset_c
+ 269              		.loc 1 99 0
+ 270 0042 048B     		ldrh	r4, [r0, #24]
+ 271              		.loc 1 100 0
+ 272 0044 6A43     		muls	r2, r5, r2
+  99:..\common\ud3core/ZCDtoPWM.c ****         uint32_t cnt_fs = ((4096ul*(uint32_t)configuration.ct2_voltage)/5000ul)-params.ct2_offset_c
+ 273              		.loc 1 99 0
+ 274 0046 A4B2     		uxth	r4, r4
+ 275              	.LVL40:
+ 276              		.loc 1 100 0
+ 277 0048 1B1B     		subs	r3, r3, r4
+ 278 004a B2FBF3F3 		udiv	r3, r2, r3
+ 279 004e 9BB2     		uxth	r3, r3
+ 280              	.LVL41:
+ 281              	.L17:
+ 282 0050 C382     		strh	r3, [r0, #22]	@ movhi
+ 283 0052 30BD     		pop	{r4, r5, pc}
+ 284              	.L19:
+ 285              		.align	2
+ 286              	.L18:
+ 287 0054 00000000 		.word	configuration
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 8
+
+
+ 288 0058 00000000 		.word	params
+ 289              	.LBE9:
+ 290              		.cfi_endproc
+ 291              	.LFE70:
+ 292              		.size	configure_CT2, .-configure_CT2
+ 293              		.global	__aeabi_fadd
+ 294              		.global	__aeabi_fsub
+ 295              		.global	__aeabi_f2uiz
+ 296              		.global	__aeabi_i2d
+ 297              		.global	__aeabi_dsub
+ 298              		.section	.text.configure_ZCD_to_PWM,"ax",%progbits
+ 299              		.align	1
+ 300              		.global	configure_ZCD_to_PWM
+ 301              		.thumb
+ 302              		.thumb_func
+ 303              		.type	configure_ZCD_to_PWM, %function
+ 304              	configure_ZCD_to_PWM:
+ 305              	.LFB71:
+ 101:..\common\ud3core/ZCDtoPWM.c ****     }
+ 102:..\common\ud3core/ZCDtoPWM.c **** }
+ 103:..\common\ud3core/ZCDtoPWM.c **** 
+ 104:..\common\ud3core/ZCDtoPWM.c **** void configure_ZCD_to_PWM(void) {
+ 306              		.loc 1 104 0
+ 307              		.cfi_startproc
+ 308              		@ args = 0, pretend = 0, frame = 0
+ 309              		@ frame_needed = 0, uses_anonymous_args = 0
+ 310 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 311              		.cfi_def_cfa_offset 24
+ 312              		.cfi_offset 4, -24
+ 313              		.cfi_offset 5, -20
+ 314              		.cfi_offset 6, -16
+ 315              		.cfi_offset 7, -12
+ 316              		.cfi_offset 8, -8
+ 317              		.cfi_offset 14, -4
+ 105:..\common\ud3core/ZCDtoPWM.c **** 	//this function calculates the variables used at run-time for the ZCD to PWM hardware
+ 106:..\common\ud3core/ZCDtoPWM.c **** 	//it also initializes that hardware so its ready for interrupter control
+ 107:..\common\ud3core/ZCDtoPWM.c **** 
+ 108:..\common\ud3core/ZCDtoPWM.c **** 	
+ 109:..\common\ud3core/ZCDtoPWM.c **** 	float pwm_start_prd_temp;
+ 110:..\common\ud3core/ZCDtoPWM.c ****     uint16 fb_glitch_cmp;
+ 111:..\common\ud3core/ZCDtoPWM.c **** 
+ 112:..\common\ud3core/ZCDtoPWM.c **** 	configure_CT1();
+ 113:..\common\ud3core/ZCDtoPWM.c **** 	configure_CT2();
+ 114:..\common\ud3core/ZCDtoPWM.c **** 
+ 115:..\common\ud3core/ZCDtoPWM.c **** 	//initialize the ZCD counter
+ 116:..\common\ud3core/ZCDtoPWM.c **** 	if (configuration.start_cycles == 0) {
+ 318              		.loc 1 116 0
+ 319 0004 684D     		ldr	r5, .L29+8
+ 112:..\common\ud3core/ZCDtoPWM.c **** 	configure_CT2();
+ 320              		.loc 1 112 0
+ 321 0006 FFF7FEFF 		bl	configure_CT1
+ 322              	.LVL42:
+ 113:..\common\ud3core/ZCDtoPWM.c **** 
+ 323              		.loc 1 113 0
+ 324 000a FFF7FEFF 		bl	configure_CT2
+ 325              	.LVL43:
+ 326              		.loc 1 116 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 9
+
+
+ 327 000e A87F     		ldrb	r0, [r5, #30]	@ zero_extendqisi2
+ 328 0010 38B9     		cbnz	r0, .L21
+ 117:..\common\ud3core/ZCDtoPWM.c **** 		ZCD_counter_WritePeriod(1);
+ 329              		.loc 1 117 0
+ 330 0012 0120     		movs	r0, #1
+ 331 0014 FFF7FEFF 		bl	ZCD_counter_WritePeriod
+ 332              	.LVL44:
+ 118:..\common\ud3core/ZCDtoPWM.c **** 		ZCD_counter_WriteCompare(1);
+ 333              		.loc 1 118 0
+ 334 0018 0120     		movs	r0, #1
+ 335 001a FFF7FEFF 		bl	ZCD_counter_WriteCompare
+ 336              	.LVL45:
+ 119:..\common\ud3core/ZCDtoPWM.c ****         set_switch_without_fb(pdTRUE);
+ 337              		.loc 1 119 0
+ 338 001e 0120     		movs	r0, #1
+ 339 0020 08E0     		b	.L28
+ 340              	.L21:
+ 120:..\common\ud3core/ZCDtoPWM.c **** 	} else {
+ 121:..\common\ud3core/ZCDtoPWM.c **** 		ZCD_counter_WritePeriod(configuration.start_cycles * 2);
+ 341              		.loc 1 121 0
+ 342 0022 4000     		lsls	r0, r0, #1
+ 343 0024 00F0FE00 		and	r0, r0, #254
+ 344 0028 FFF7FEFF 		bl	ZCD_counter_WritePeriod
+ 345              	.LVL46:
+ 122:..\common\ud3core/ZCDtoPWM.c **** 		ZCD_counter_WriteCompare(4);
+ 346              		.loc 1 122 0
+ 347 002c 0420     		movs	r0, #4
+ 348 002e FFF7FEFF 		bl	ZCD_counter_WriteCompare
+ 349              	.LVL47:
+ 123:..\common\ud3core/ZCDtoPWM.c ****         set_switch_without_fb(pdFALSE);
+ 350              		.loc 1 123 0
+ 351 0032 0020     		movs	r0, #0
+ 352              	.L28:
+ 353 0034 FFF7FEFF 		bl	set_switch_without_fb
+ 354              	.LVL48:
+ 124:..\common\ud3core/ZCDtoPWM.c **** 	}
+ 125:..\common\ud3core/ZCDtoPWM.c ****     
+ 126:..\common\ud3core/ZCDtoPWM.c ****     uint32_t lead_time_temp;
+ 127:..\common\ud3core/ZCDtoPWM.c **** 	//calculate lead time in cycles
+ 128:..\common\ud3core/ZCDtoPWM.c **** 	lead_time_temp = (configuration.lead_time*1000) / (1000000/BCLK__BUS_CLK__MHZ);
+ 355              		.loc 1 128 0
+ 356 0038 6E8B     		ldrh	r6, [r5, #26]
+ 357 003a 4FF47A73 		mov	r3, #1000
+ 358 003e 7343     		muls	r3, r6, r3
+ 359 0040 43F60956 		movw	r6, #15625
+ 129:..\common\ud3core/ZCDtoPWM.c **** 
+ 130:..\common\ud3core/ZCDtoPWM.c **** 	//calculate starting period
+ 131:..\common\ud3core/ZCDtoPWM.c **** 	pwm_start_prd_temp = BCLK__BUS_CLK__HZ / (configuration.start_freq * 200); //why 200? well 2 becau
+ 360              		.loc 1 131 0
+ 361 0044 A88B     		ldrh	r0, [r5, #28]
+ 128:..\common\ud3core/ZCDtoPWM.c **** 
+ 362              		.loc 1 128 0
+ 363 0046 B3FBF6F6 		udiv	r6, r3, r6
+ 364              	.LVL49:
+ 365              		.loc 1 131 0
+ 366 004a C823     		movs	r3, #200
+ 367 004c 4343     		muls	r3, r0, r3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 10
+
+
+ 368 004e 5748     		ldr	r0, .L29+12
+ 132:..\common\ud3core/ZCDtoPWM.c **** 	params.pwm_top = round(pwm_start_prd_temp * 2);								  //top value for FB capture and pwm genera
+ 369              		.loc 1 132 0
+ 370 0050 574C     		ldr	r4, .L29+16
+ 131:..\common\ud3core/ZCDtoPWM.c **** 	params.pwm_top = round(pwm_start_prd_temp * 2);								  //top value for FB capture and pwm genera
+ 371              		.loc 1 131 0
+ 372 0052 B0FBF3F0 		udiv	r0, r0, r3
+ 373 0056 FFF7FEFF 		bl	__aeabi_ui2f
+ 374              	.LVL50:
+ 375              		.loc 1 132 0
+ 376 005a 0146     		mov	r1, r0
+ 131:..\common\ud3core/ZCDtoPWM.c **** 	params.pwm_top = round(pwm_start_prd_temp * 2);								  //top value for FB capture and pwm genera
+ 377              		.loc 1 131 0
+ 378 005c 8046     		mov	r8, r0
+ 379              	.LVL51:
+ 380              		.loc 1 132 0
+ 381 005e FFF7FEFF 		bl	__aeabi_fadd
+ 382              	.LVL52:
+ 383 0062 FFF7FEFF 		bl	__aeabi_f2d
+ 384              	.LVL53:
+ 385 0066 FFF7FEFF 		bl	round
+ 386              	.LVL54:
+ 387 006a FFF7FEFF 		bl	__aeabi_d2uiz
+ 388              	.LVL55:
+ 389 006e 80B2     		uxth	r0, r0
+ 390 0070 6081     		strh	r0, [r4, #10]	@ movhi
+ 133:..\common\ud3core/ZCDtoPWM.c **** 	params.pwma_start_prd = params.pwm_top - lead_time_temp;
+ 391              		.loc 1 133 0
+ 392 0072 6289     		ldrh	r2, [r4, #10]
+ 393 0074 931B     		subs	r3, r2, r6
+ 394 0076 9BB2     		uxth	r3, r3
+ 395 0078 6380     		strh	r3, [r4, #2]	@ movhi
+ 134:..\common\ud3core/ZCDtoPWM.c **** 	params.pwma_start_cmp = params.pwm_top - pwm_start_prd_temp + 4; //untested, was just 4;
+ 396              		.loc 1 134 0
+ 397 007a 6089     		ldrh	r0, [r4, #10]
+ 398 007c 80B2     		uxth	r0, r0
+ 399 007e FFF7FEFF 		bl	__aeabi_i2f
+ 400              	.LVL56:
+ 401 0082 4146     		mov	r1, r8
+ 402 0084 FFF7FEFF 		bl	__aeabi_fsub
+ 403              	.LVL57:
+ 404 0088 4FF08141 		mov	r1, #1082130432
+ 405 008c FFF7FEFF 		bl	__aeabi_fadd
+ 406              	.LVL58:
+ 407 0090 FFF7FEFF 		bl	__aeabi_f2uiz
+ 408              	.LVL59:
+ 409 0094 80B2     		uxth	r0, r0
+ 410 0096 A080     		strh	r0, [r4, #4]	@ movhi
+ 135:..\common\ud3core/ZCDtoPWM.c ****     
+ 136:..\common\ud3core/ZCDtoPWM.c **** 	params.pwmb_start_prd = round(pwm_start_prd_temp); //experimental start up mode, 2 cycles of high 
+ 411              		.loc 1 136 0
+ 412 0098 4046     		mov	r0, r8
+ 413 009a FFF7FEFF 		bl	__aeabi_f2d
+ 414              	.LVL60:
+ 415 009e FFF7FEFF 		bl	round
+ 416              	.LVL61:
+ 417 00a2 0F46     		mov	r7, r1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 11
+
+
+ 418 00a4 0646     		mov	r6, r0
+ 419              	.LVL62:
+ 420 00a6 FFF7FEFF 		bl	__aeabi_d2uiz
+ 421              	.LVL63:
+ 137:..\common\ud3core/ZCDtoPWM.c **** 	params.pwmb_start_cmp = 4;
+ 422              		.loc 1 137 0
+ 423 00aa 0423     		movs	r3, #4
+ 136:..\common\ud3core/ZCDtoPWM.c **** 	params.pwmb_start_cmp = 4;
+ 424              		.loc 1 136 0
+ 425 00ac 80B2     		uxth	r0, r0
+ 426 00ae E080     		strh	r0, [r4, #6]	@ movhi
+ 427              		.loc 1 137 0
+ 428 00b0 2381     		strh	r3, [r4, #8]	@ movhi
+ 138:..\common\ud3core/ZCDtoPWM.c **** 	params.pwmb_start_psb_val = 15;				   //config.psb_start_val;// params.pwmb_start_prd>>3;
+ 429              		.loc 1 138 0
+ 430 00b2 0F23     		movs	r3, #15
+ 431 00b4 2382     		strh	r3, [r4, #16]	@ movhi
+ 139:..\common\ud3core/ZCDtoPWM.c **** 												   //Set up FB_GLITCH PWM
+ 140:..\common\ud3core/ZCDtoPWM.c **** 	fb_glitch_cmp = pwm_start_prd_temp / 4; //set the lock out period to be 1/4 of a cycle long
+ 432              		.loc 1 140 0
+ 433 00b6 4FF07A51 		mov	r1, #1048576000
+ 434 00ba 4046     		mov	r0, r8
+ 435 00bc FFF7FEFF 		bl	__aeabi_fmul
+ 436              	.LVL64:
+ 437 00c0 FFF7FEFF 		bl	__aeabi_f2uiz
+ 438              	.LVL65:
+ 439 00c4 1FFA80F8 		uxth	r8, r0
+ 440              	.LVL66:
+ 141:..\common\ud3core/ZCDtoPWM.c **** 	if (fb_glitch_cmp > 255) {
+ 142:..\common\ud3core/ZCDtoPWM.c **** 		fb_glitch_cmp = 255;
+ 143:..\common\ud3core/ZCDtoPWM.c **** 	}
+ 144:..\common\ud3core/ZCDtoPWM.c **** 	FB_glitch_detect_WritePeriod(255);
+ 441              		.loc 1 144 0
+ 442 00c8 FF20     		movs	r0, #255
+ 443 00ca FFF7FEFF 		bl	FB_glitch_detect_WritePeriod
+ 444              	.LVL67:
+ 145:..\common\ud3core/ZCDtoPWM.c **** 	FB_glitch_detect_WriteCompare1(255 - fb_glitch_cmp);
+ 445              		.loc 1 145 0
+ 446 00ce B8F1FF0F 		cmp	r8, #255
+ 447 00d2 28BF     		it	cs
+ 448 00d4 4FF0FF08 		movcs	r8, #255
+ 449              	.LVL68:
+ 450 00d8 6FEA0800 		mvn	r0, r8
+ 451 00dc C0B2     		uxtb	r0, r0
+ 452 00de FFF7FEFF 		bl	FB_glitch_detect_WriteCompare1
+ 453              	.LVL69:
+ 146:..\common\ud3core/ZCDtoPWM.c **** 	FB_glitch_detect_WriteCompare2(255);
+ 454              		.loc 1 146 0
+ 455 00e2 FF20     		movs	r0, #255
+ 456 00e4 FFF7FEFF 		bl	FB_glitch_detect_WriteCompare2
+ 457              	.LVL70:
+ 147:..\common\ud3core/ZCDtoPWM.c **** 
+ 148:..\common\ud3core/ZCDtoPWM.c **** 	//initialize PWM generator
+ 149:..\common\ud3core/ZCDtoPWM.c **** 	PWMA_WritePeriod(params.pwma_start_prd);
+ 458              		.loc 1 149 0
+ 459 00e8 6088     		ldrh	r0, [r4, #2]
+ 150:..\common\ud3core/ZCDtoPWM.c **** 	PWMA_WriteCompare(params.pwma_start_cmp);
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 12
+
+
+ 151:..\common\ud3core/ZCDtoPWM.c **** 
+ 152:..\common\ud3core/ZCDtoPWM.c **** 	//start up oscillator
+ 153:..\common\ud3core/ZCDtoPWM.c **** 	PWMB_WritePeriod(params.pwmb_start_prd);
+ 154:..\common\ud3core/ZCDtoPWM.c **** 	PWMB_WriteCompare(params.pwmb_start_cmp);
+ 155:..\common\ud3core/ZCDtoPWM.c **** 	//initialize FB Capture period to account for 10 count offset in timing due to reset delay.
+ 156:..\common\ud3core/ZCDtoPWM.c **** 	FB_capture_WritePeriod(params.pwm_top - 10);
+ 460              		.loc 1 156 0
+ 461 00ea 4FF00508 		mov	r8, #5
+ 149:..\common\ud3core/ZCDtoPWM.c **** 	PWMA_WriteCompare(params.pwma_start_cmp);
+ 462              		.loc 1 149 0
+ 463 00ee 80B2     		uxth	r0, r0
+ 464 00f0 FFF7FEFF 		bl	PWMA_WritePeriod
+ 465              	.LVL71:
+ 150:..\common\ud3core/ZCDtoPWM.c **** 	PWMA_WriteCompare(params.pwma_start_cmp);
+ 466              		.loc 1 150 0
+ 467 00f4 A088     		ldrh	r0, [r4, #4]
+ 468 00f6 80B2     		uxth	r0, r0
+ 469 00f8 FFF7FEFF 		bl	PWMA_WriteCompare
+ 470              	.LVL72:
+ 153:..\common\ud3core/ZCDtoPWM.c **** 	PWMB_WriteCompare(params.pwmb_start_cmp);
+ 471              		.loc 1 153 0
+ 472 00fc E088     		ldrh	r0, [r4, #6]
+ 473 00fe 80B2     		uxth	r0, r0
+ 474 0100 FFF7FEFF 		bl	PWMB_WritePeriod
+ 475              	.LVL73:
+ 154:..\common\ud3core/ZCDtoPWM.c **** 	//initialize FB Capture period to account for 10 count offset in timing due to reset delay.
+ 476              		.loc 1 154 0
+ 477 0104 2089     		ldrh	r0, [r4, #8]
+ 478 0106 80B2     		uxth	r0, r0
+ 479 0108 FFF7FEFF 		bl	PWMB_WriteCompare
+ 480              	.LVL74:
+ 481              		.loc 1 156 0
+ 482 010c 6089     		ldrh	r0, [r4, #10]
+ 483 010e 0A38     		subs	r0, r0, #10
+ 484 0110 80B2     		uxth	r0, r0
+ 485 0112 FFF7FEFF 		bl	FB_capture_WritePeriod
+ 486              	.LVL75:
+ 487              	.L23:
+ 488              	.LBB10:
+ 157:..\common\ud3core/ZCDtoPWM.c **** 
+ 158:..\common\ud3core/ZCDtoPWM.c **** 	//prime the feedback filter with fake values so that the first time we use it, its not absolutely 
+ 159:..\common\ud3core/ZCDtoPWM.c **** 	for (uint8_t z = 0; z < 5; z++) {
+ 160:..\common\ud3core/ZCDtoPWM.c **** 		FB_Filter_Write24(FB_Filter_CHANNEL_A, params.pwm_top - round(pwm_start_prd_temp));
+ 489              		.loc 1 160 0 discriminator 3
+ 490 0116 6089     		ldrh	r0, [r4, #10]
+ 491 0118 08F1FF38 		add	r8, r8, #-1
+ 492              	.LVL76:
+ 493 011c 80B2     		uxth	r0, r0
+ 494 011e FFF7FEFF 		bl	__aeabi_i2d
+ 495              	.LVL77:
+ 496 0122 3246     		mov	r2, r6
+ 497 0124 3B46     		mov	r3, r7
+ 498 0126 FFF7FEFF 		bl	__aeabi_dsub
+ 499              	.LVL78:
+ 500 012a FFF7FEFF 		bl	__aeabi_d2uiz
+ 501              	.LVL79:
+ 502 012e 0146     		mov	r1, r0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 13
+
+
+ 503 0130 0020     		movs	r0, #0
+ 504 0132 FFF7FEFF 		bl	FB_Filter_Write24
+ 505              	.LVL80:
+ 161:..\common\ud3core/ZCDtoPWM.c ****         CyDelayUs(4);
+ 506              		.loc 1 161 0 discriminator 3
+ 507 0136 0420     		movs	r0, #4
+ 508 0138 FFF7FEFF 		bl	CyDelayUs
+ 509              	.LVL81:
+ 159:..\common\ud3core/ZCDtoPWM.c **** 		FB_Filter_Write24(FB_Filter_CHANNEL_A, params.pwm_top - round(pwm_start_prd_temp));
+ 510              		.loc 1 159 0 discriminator 3
+ 511 013c 18F0FF08 		ands	r8, r8, #255
+ 512 0140 E9D1     		bne	.L23
+ 513              	.LBE10:
+ 162:..\common\ud3core/ZCDtoPWM.c **** 	}
+ 163:..\common\ud3core/ZCDtoPWM.c **** 
+ 164:..\common\ud3core/ZCDtoPWM.c **** 	//set reference voltage for zero current detector comparators
+ 165:..\common\ud3core/ZCDtoPWM.c **** 	ZCDref_Data = 25;
+ 514              		.loc 1 165 0
+ 515 0142 1C4B     		ldr	r3, .L29+20
+ 516 0144 1922     		movs	r2, #25
+ 517 0146 1A70     		strb	r2, [r3]
+ 166:..\common\ud3core/ZCDtoPWM.c ****     
+ 167:..\common\ud3core/ZCDtoPWM.c ****     //write value for minimum feedback current
+ 168:..\common\ud3core/ZCDtoPWM.c **** 	float FB_THRSH_DAC_value = ((((float)configuration.min_fb_current / (float)configuration.ct1_ratio
+ 518              		.loc 1 168 0
+ 519 0148 95F87200 		ldrb	r0, [r5, #114]	@ zero_extendqisi2
+ 520 014c FFF7FEFF 		bl	__aeabi_ui2f
+ 521              	.LVL82:
+ 522 0150 0446     		mov	r4, r0
+ 523 0152 688A     		ldrh	r0, [r5, #18]
+ 524 0154 FFF7FEFF 		bl	__aeabi_ui2f
+ 525              	.LVL83:
+ 526 0158 0146     		mov	r1, r0
+ 527 015a 2046     		mov	r0, r4
+ 528 015c FFF7FEFF 		bl	__aeabi_fdiv
+ 529              	.LVL84:
+ 530 0160 0446     		mov	r4, r0
+ 531 0162 E88A     		ldrh	r0, [r5, #22]
+ 532 0164 FFF7FEFF 		bl	__aeabi_i2f
+ 533              	.LVL85:
+ 534 0168 0146     		mov	r1, r0
+ 535 016a 2046     		mov	r0, r4
+ 536 016c FFF7FEFF 		bl	__aeabi_fmul
+ 537              	.LVL86:
+ 538 0170 FFF7FEFF 		bl	__aeabi_f2d
+ 539              	.LVL87:
+ 540 0174 0AA3     		adr	r3, .L29
+ 541 0176 D3E90023 		ldrd	r2, [r3]
+ 542 017a FFF7FEFF 		bl	__aeabi_ddiv
+ 543              	.LVL88:
+ 544 017e FFF7FEFF 		bl	__aeabi_d2f
+ 545              	.LVL89:
+ 169:..\common\ud3core/ZCDtoPWM.c **** 	if (FB_THRSH_DAC_value > 255) {
+ 546              		.loc 1 169 0
+ 547 0182 0D49     		ldr	r1, .L29+24
+ 168:..\common\ud3core/ZCDtoPWM.c **** 	if (FB_THRSH_DAC_value > 255) {
+ 548              		.loc 1 168 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 14
+
+
+ 549 0184 0446     		mov	r4, r0
+ 550              	.LVL90:
+ 551              		.loc 1 169 0
+ 552 0186 FFF7FEFF 		bl	__aeabi_fcmpgt
+ 553              	.LVL91:
+ 554 018a 00B1     		cbz	r0, .L24
+ 170:..\common\ud3core/ZCDtoPWM.c **** 		FB_THRSH_DAC_value = 255;
+ 555              		.loc 1 170 0
+ 556 018c 0A4C     		ldr	r4, .L29+24
+ 557              	.LVL92:
+ 558              	.L24:
+ 171:..\common\ud3core/ZCDtoPWM.c **** 	}
+ 172:..\common\ud3core/ZCDtoPWM.c ****     
+ 173:..\common\ud3core/ZCDtoPWM.c ****     FB_THRSH_DAC_Data = (uint8_t) FB_THRSH_DAC_value;
+ 559              		.loc 1 173 0
+ 560 018e 2046     		mov	r0, r4
+ 561 0190 FFF7FEFF 		bl	__aeabi_f2uiz
+ 562              	.LVL93:
+ 563 0194 094B     		ldr	r3, .L29+28
+ 564 0196 C0B2     		uxtb	r0, r0
+ 565 0198 1870     		strb	r0, [r3]
+ 566 019a BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 567              	.LVL94:
+ 568              	.L30:
+ 569 019e 00BF     		.align	3
+ 570              	.L29:
+ 571 01a0 7B14AE47 		.word	1202590843
+ 572 01a4 E17AC43F 		.word	1069841121
+ 573 01a8 00000000 		.word	configuration
+ 574 01ac 0090D003 		.word	64000000
+ 575 01b0 00000000 		.word	params
+ 576 01b4 815B0040 		.word	1073765249
+ 577 01b8 00007F43 		.word	1132396544
+ 578 01bc 835B0040 		.word	1073765251
+ 579              		.cfi_endproc
+ 580              	.LFE71:
+ 581              		.size	configure_ZCD_to_PWM, .-configure_ZCD_to_PWM
+ 582              		.section	.text.initialize_ZCD_to_PWM,"ax",%progbits
+ 583              		.align	1
+ 584              		.global	initialize_ZCD_to_PWM
+ 585              		.thumb
+ 586              		.thumb_func
+ 587              		.type	initialize_ZCD_to_PWM, %function
+ 588              	initialize_ZCD_to_PWM:
+ 589              	.LFB68:
+  35:..\common\ud3core/ZCDtoPWM.c **** 	//initialize all the timers/counters/PWMs
+ 590              		.loc 1 35 0
+ 591              		.cfi_startproc
+ 592              		@ args = 0, pretend = 0, frame = 0
+ 593              		@ frame_needed = 0, uses_anonymous_args = 0
+ 594 0000 08B5     		push	{r3, lr}
+ 595              		.cfi_def_cfa_offset 8
+ 596              		.cfi_offset 3, -8
+ 597              		.cfi_offset 14, -4
+  37:..\common\ud3core/ZCDtoPWM.c **** 	PWMB_Start();
+ 598              		.loc 1 37 0
+ 599 0002 FFF7FEFF 		bl	PWMA_Start
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 15
+
+
+ 600              	.LVL95:
+  38:..\common\ud3core/ZCDtoPWM.c **** 	FB_capture_Start();
+ 601              		.loc 1 38 0
+ 602 0006 FFF7FEFF 		bl	PWMB_Start
+ 603              	.LVL96:
+  39:..\common\ud3core/ZCDtoPWM.c **** 	ZCD_counter_Start();
+ 604              		.loc 1 39 0
+ 605 000a FFF7FEFF 		bl	FB_capture_Start
+ 606              	.LVL97:
+  40:..\common\ud3core/ZCDtoPWM.c **** 	FB_glitch_detect_Start();
+ 607              		.loc 1 40 0
+ 608 000e FFF7FEFF 		bl	ZCD_counter_Start
+ 609              	.LVL98:
+  41:..\common\ud3core/ZCDtoPWM.c **** 
+ 610              		.loc 1 41 0
+ 611 0012 FFF7FEFF 		bl	FB_glitch_detect_Start
+ 612              	.LVL99:
+  44:..\common\ud3core/ZCDtoPWM.c **** 	ZCD_compB_Start();
+ 613              		.loc 1 44 0
+ 614 0016 FFF7FEFF 		bl	ZCD_compA_Start
+ 615              	.LVL100:
+  45:..\common\ud3core/ZCDtoPWM.c **** 	CT1_comp_Start();
+ 616              		.loc 1 45 0
+ 617 001a FFF7FEFF 		bl	ZCD_compB_Start
+ 618              	.LVL101:
+  46:..\common\ud3core/ZCDtoPWM.c **** 
+ 619              		.loc 1 46 0
+ 620 001e FFF7FEFF 		bl	CT1_comp_Start
+ 621              	.LVL102:
+  49:..\common\ud3core/ZCDtoPWM.c **** 	ZCDref_Start();
+ 622              		.loc 1 49 0
+ 623 0022 FFF7FEFF 		bl	CT1_dac_Start
+ 624              	.LVL103:
+  50:..\common\ud3core/ZCDtoPWM.c **** 	FB_THRSH_DAC_Start();
+ 625              		.loc 1 50 0
+ 626 0026 FFF7FEFF 		bl	ZCDref_Start
+ 627              	.LVL104:
+  51:..\common\ud3core/ZCDtoPWM.c ****     Opamp_1_Start();
+ 628              		.loc 1 51 0
+ 629 002a FFF7FEFF 		bl	FB_THRSH_DAC_Start
+ 630              	.LVL105:
+  52:..\common\ud3core/ZCDtoPWM.c **** 
+ 631              		.loc 1 52 0
+ 632 002e FFF7FEFF 		bl	Opamp_1_Start
+ 633              	.LVL106:
+  55:..\common\ud3core/ZCDtoPWM.c **** 	FB_Filter_SetCoherency(FB_Filter_CHANNEL_A, FB_Filter_KEY_MID);
+ 634              		.loc 1 55 0
+ 635 0032 FFF7FEFF 		bl	FB_Filter_Start
+ 636              	.LVL107:
+  56:..\common\ud3core/ZCDtoPWM.c **** 
+ 637              		.loc 1 56 0
+ 638 0036 0121     		movs	r1, #1
+ 639 0038 0020     		movs	r0, #0
+ 640 003a FFF7FEFF 		bl	FB_Filter_SetCoherency
+ 641              	.LVL108:
+  59:..\common\ud3core/ZCDtoPWM.c **** 
+ 642              		.loc 1 59 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 16
+
+
+ 643 003e BDE80840 		pop	{r3, lr}
+ 644              		.cfi_restore 14
+ 645              		.cfi_restore 3
+ 646              		.cfi_def_cfa_offset 0
+  58:..\common\ud3core/ZCDtoPWM.c **** }
+ 647              		.loc 1 58 0
+ 648 0042 FFF7FEBF 		b	configure_ZCD_to_PWM
+ 649              	.LVL109:
+ 650              		.cfi_endproc
+ 651              	.LFE68:
+ 652              		.size	initialize_ZCD_to_PWM, .-initialize_ZCD_to_PWM
+ 653              		.global	fb_filter_out
+ 654              		.global	fb_filter_in
+ 655              		.comm	interrupter,12,4
+ 656              		.comm	ct1_dac_val,3,1
+ 657              		.comm	params,26,2
+ 658              		.data
+ 659              		.align	1
+ 660              		.type	fb_filter_out, %object
+ 661              		.size	fb_filter_out, 2
+ 662              	fb_filter_out:
+ 663 0000 0100     		.short	1
+ 664              		.type	fb_filter_in, %object
+ 665              		.size	fb_filter_in, 2
+ 666              	fb_filter_in:
+ 667 0002 0100     		.short	1
+ 668              		.text
+ 669              	.Letext0:
+ 670              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 671              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 672              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 673              		.file 5 "..\\common\\ud3core\\ZCDtoPWM.h"
+ 674              		.file 6 "..\\common\\rtos\\portable\\GCC\\ARM_CM3/portmacro.h"
+ 675              		.file 7 "..\\common\\rtos\\include/timers.h"
+ 676              		.file 8 "..\\common\\ud3core\\cli_common.h"
+ 677              		.file 9 "..\\common\\ud3core\\interrupter.h"
+ 678              		.file 10 "Generated_Source\\PSoC5/core_cm3.h"
+ 679              		.file 11 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4
+ 680              		.file 12 "Generated_Source\\PSoC5/FB_Filter.h"
+ 681              		.file 13 "Generated_Source\\PSoC5/CyLib.h"
+ 682              		.file 14 "Generated_Source\\PSoC5/ZCD_counter.h"
+ 683              		.file 15 "..\\common\\ud3core\\tasks/tsk_fault.h"
+ 684              		.file 16 "Generated_Source\\PSoC5/FB_glitch_detect.h"
+ 685              		.file 17 "Generated_Source\\PSoC5/PWMA.h"
+ 686              		.file 18 "Generated_Source\\PSoC5/PWMB.h"
+ 687              		.file 19 "Generated_Source\\PSoC5/FB_capture.h"
+ 688              		.file 20 "Generated_Source\\PSoC5/ZCD_compA.h"
+ 689              		.file 21 "Generated_Source\\PSoC5/ZCD_compB.h"
+ 690              		.file 22 "Generated_Source\\PSoC5/CT1_comp.h"
+ 691              		.file 23 "Generated_Source\\PSoC5/CT1_dac.h"
+ 692              		.file 24 "Generated_Source\\PSoC5/ZCDref.h"
+ 693              		.file 25 "Generated_Source\\PSoC5/FB_THRSH_DAC.h"
+ 694              		.file 26 "Generated_Source\\PSoC5/Opamp_1.h"
+ 695              		.section	.debug_info,"",%progbits
+ 696              	.Ldebug_info0:
+ 697 0000 FC090000 		.4byte	0x9fc
+ 698 0004 0400     		.2byte	0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 17
+
+
+ 699 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 700 000a 04       		.byte	0x4
+ 701 000b 01       		.uleb128 0x1
+ 702 000c 6F020000 		.4byte	.LASF162
+ 703 0010 0C       		.byte	0xc
+ 704 0011 40090000 		.4byte	.LASF163
+ 705 0015 71000000 		.4byte	.LASF164
+ 706 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 707 001d 00000000 		.4byte	0
+ 708 0021 00000000 		.4byte	.Ldebug_line0
+ 709 0025 02       		.uleb128 0x2
+ 710 0026 01       		.byte	0x1
+ 711 0027 06       		.byte	0x6
+ 712 0028 32010000 		.4byte	.LASF0
+ 713 002c 03       		.uleb128 0x3
+ 714 002d 12000000 		.4byte	.LASF3
+ 715 0031 02       		.byte	0x2
+ 716 0032 1D       		.byte	0x1d
+ 717 0033 37000000 		.4byte	0x37
+ 718 0037 02       		.uleb128 0x2
+ 719 0038 01       		.byte	0x1
+ 720 0039 08       		.byte	0x8
+ 721 003a 7B060000 		.4byte	.LASF1
+ 722 003e 02       		.uleb128 0x2
+ 723 003f 02       		.byte	0x2
+ 724 0040 05       		.byte	0x5
+ 725 0041 A0060000 		.4byte	.LASF2
+ 726 0045 03       		.uleb128 0x3
+ 727 0046 7E070000 		.4byte	.LASF4
+ 728 004a 02       		.byte	0x2
+ 729 004b 2B       		.byte	0x2b
+ 730 004c 50000000 		.4byte	0x50
+ 731 0050 02       		.uleb128 0x2
+ 732 0051 02       		.byte	0x2
+ 733 0052 07       		.byte	0x7
+ 734 0053 9E030000 		.4byte	.LASF5
+ 735 0057 03       		.uleb128 0x3
+ 736 0058 E9000000 		.4byte	.LASF6
+ 737 005c 02       		.byte	0x2
+ 738 005d 3F       		.byte	0x3f
+ 739 005e 62000000 		.4byte	0x62
+ 740 0062 02       		.uleb128 0x2
+ 741 0063 04       		.byte	0x4
+ 742 0064 05       		.byte	0x5
+ 743 0065 86010000 		.4byte	.LASF7
+ 744 0069 03       		.uleb128 0x3
+ 745 006a 64020000 		.4byte	.LASF8
+ 746 006e 02       		.byte	0x2
+ 747 006f 41       		.byte	0x41
+ 748 0070 74000000 		.4byte	0x74
+ 749 0074 02       		.uleb128 0x2
+ 750 0075 04       		.byte	0x4
+ 751 0076 07       		.byte	0x7
+ 752 0077 51030000 		.4byte	.LASF9
+ 753 007b 02       		.uleb128 0x2
+ 754 007c 08       		.byte	0x8
+ 755 007d 05       		.byte	0x5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 18
+
+
+ 756 007e 24010000 		.4byte	.LASF10
+ 757 0082 02       		.uleb128 0x2
+ 758 0083 08       		.byte	0x8
+ 759 0084 07       		.byte	0x7
+ 760 0085 96000000 		.4byte	.LASF11
+ 761 0089 04       		.uleb128 0x4
+ 762 008a 04       		.byte	0x4
+ 763 008b 05       		.byte	0x5
+ 764 008c 696E7400 		.ascii	"int\000"
+ 765 0090 02       		.uleb128 0x2
+ 766 0091 04       		.byte	0x4
+ 767 0092 07       		.byte	0x7
+ 768 0093 2E030000 		.4byte	.LASF12
+ 769 0097 03       		.uleb128 0x3
+ 770 0098 D8080000 		.4byte	.LASF13
+ 771 009c 03       		.byte	0x3
+ 772 009d 18       		.byte	0x18
+ 773 009e 2C000000 		.4byte	0x2c
+ 774 00a2 03       		.uleb128 0x3
+ 775 00a3 3B030000 		.4byte	.LASF14
+ 776 00a7 03       		.byte	0x3
+ 777 00a8 24       		.byte	0x24
+ 778 00a9 45000000 		.4byte	0x45
+ 779 00ad 03       		.uleb128 0x3
+ 780 00ae 73060000 		.4byte	.LASF15
+ 781 00b2 03       		.byte	0x3
+ 782 00b3 2C       		.byte	0x2c
+ 783 00b4 57000000 		.4byte	0x57
+ 784 00b8 03       		.uleb128 0x3
+ 785 00b9 36070000 		.4byte	.LASF16
+ 786 00bd 03       		.byte	0x3
+ 787 00be 30       		.byte	0x30
+ 788 00bf 69000000 		.4byte	0x69
+ 789 00c3 05       		.uleb128 0x5
+ 790 00c4 D0010000 		.4byte	.LASF17
+ 791 00c8 04       		.byte	0x4
+ 792 00c9 9201     		.2byte	0x192
+ 793 00cb 37000000 		.4byte	0x37
+ 794 00cf 05       		.uleb128 0x5
+ 795 00d0 0B000000 		.4byte	.LASF18
+ 796 00d4 04       		.byte	0x4
+ 797 00d5 9301     		.2byte	0x193
+ 798 00d7 50000000 		.4byte	0x50
+ 799 00db 02       		.uleb128 0x2
+ 800 00dc 04       		.byte	0x4
+ 801 00dd 04       		.byte	0x4
+ 802 00de EE050000 		.4byte	.LASF19
+ 803 00e2 02       		.uleb128 0x2
+ 804 00e3 08       		.byte	0x8
+ 805 00e4 04       		.byte	0x4
+ 806 00e5 EC010000 		.4byte	.LASF20
+ 807 00e9 02       		.uleb128 0x2
+ 808 00ea 01       		.byte	0x1
+ 809 00eb 08       		.byte	0x8
+ 810 00ec 5B070000 		.4byte	.LASF21
+ 811 00f0 05       		.uleb128 0x5
+ 812 00f1 67010000 		.4byte	.LASF22
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 19
+
+
+ 813 00f5 04       		.byte	0x4
+ 814 00f6 3C02     		.2byte	0x23c
+ 815 00f8 FC000000 		.4byte	0xfc
+ 816 00fc 06       		.uleb128 0x6
+ 817 00fd C3000000 		.4byte	0xc3
+ 818 0101 02       		.uleb128 0x2
+ 819 0102 04       		.byte	0x4
+ 820 0103 07       		.byte	0x7
+ 821 0104 EC040000 		.4byte	.LASF23
+ 822 0108 07       		.uleb128 0x7
+ 823 0109 1A       		.byte	0x1a
+ 824 010a 05       		.byte	0x5
+ 825 010b 21       		.byte	0x21
+ 826 010c B9010000 		.4byte	0x1b9
+ 827 0110 08       		.uleb128 0x8
+ 828 0111 D0060000 		.4byte	.LASF24
+ 829 0115 05       		.byte	0x5
+ 830 0116 23       		.byte	0x23
+ 831 0117 C3000000 		.4byte	0xc3
+ 832 011b 00       		.byte	0
+ 833 011c 08       		.uleb128 0x8
+ 834 011d 24050000 		.4byte	.LASF25
+ 835 0121 05       		.byte	0x5
+ 836 0122 24       		.byte	0x24
+ 837 0123 CF000000 		.4byte	0xcf
+ 838 0127 02       		.byte	0x2
+ 839 0128 08       		.uleb128 0x8
+ 840 0129 94070000 		.4byte	.LASF26
+ 841 012d 05       		.byte	0x5
+ 842 012e 25       		.byte	0x25
+ 843 012f CF000000 		.4byte	0xcf
+ 844 0133 04       		.byte	0x4
+ 845 0134 08       		.uleb128 0x8
+ 846 0135 F5040000 		.4byte	.LASF27
+ 847 0139 05       		.byte	0x5
+ 848 013a 26       		.byte	0x26
+ 849 013b CF000000 		.4byte	0xcf
+ 850 013f 06       		.byte	0x6
+ 851 0140 08       		.uleb128 0x8
+ 852 0141 D6010000 		.4byte	.LASF28
+ 853 0145 05       		.byte	0x5
+ 854 0146 27       		.byte	0x27
+ 855 0147 CF000000 		.4byte	0xcf
+ 856 014b 08       		.byte	0x8
+ 857 014c 08       		.uleb128 0x8
+ 858 014d 6C010000 		.4byte	.LASF29
+ 859 0151 05       		.byte	0x5
+ 860 0152 28       		.byte	0x28
+ 861 0153 CF000000 		.4byte	0xcf
+ 862 0157 0A       		.byte	0xa
+ 863 0158 08       		.uleb128 0x8
+ 864 0159 BC000000 		.4byte	.LASF30
+ 865 015d 05       		.byte	0x5
+ 866 015e 29       		.byte	0x29
+ 867 015f CF000000 		.4byte	0xcf
+ 868 0163 0C       		.byte	0xc
+ 869 0164 08       		.uleb128 0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 20
+
+
+ 870 0165 71070000 		.4byte	.LASF31
+ 871 0169 05       		.byte	0x5
+ 872 016a 2A       		.byte	0x2a
+ 873 016b CF000000 		.4byte	0xcf
+ 874 016f 0E       		.byte	0xe
+ 875 0170 08       		.uleb128 0x8
+ 876 0171 32040000 		.4byte	.LASF32
+ 877 0175 05       		.byte	0x5
+ 878 0176 2B       		.byte	0x2b
+ 879 0177 CF000000 		.4byte	0xcf
+ 880 017b 10       		.byte	0x10
+ 881 017c 08       		.uleb128 0x8
+ 882 017d B1030000 		.4byte	.LASF33
+ 883 0181 05       		.byte	0x5
+ 884 0182 2C       		.byte	0x2c
+ 885 0183 CF000000 		.4byte	0xcf
+ 886 0187 12       		.byte	0x12
+ 887 0188 08       		.uleb128 0x8
+ 888 0189 74010000 		.4byte	.LASF34
+ 889 018d 05       		.byte	0x5
+ 890 018e 2D       		.byte	0x2d
+ 891 018f C3000000 		.4byte	0xc3
+ 892 0193 14       		.byte	0x14
+ 893 0194 08       		.uleb128 0x8
+ 894 0195 01080000 		.4byte	.LASF35
+ 895 0199 05       		.byte	0x5
+ 896 019a 2E       		.byte	0x2e
+ 897 019b C3000000 		.4byte	0xc3
+ 898 019f 15       		.byte	0x15
+ 899 01a0 08       		.uleb128 0x8
+ 900 01a1 A7080000 		.4byte	.LASF36
+ 901 01a5 05       		.byte	0x5
+ 902 01a6 2F       		.byte	0x2f
+ 903 01a7 A2000000 		.4byte	0xa2
+ 904 01ab 16       		.byte	0x16
+ 905 01ac 08       		.uleb128 0x8
+ 906 01ad 85080000 		.4byte	.LASF37
+ 907 01b1 05       		.byte	0x5
+ 908 01b2 30       		.byte	0x30
+ 909 01b3 A2000000 		.4byte	0xa2
+ 910 01b7 18       		.byte	0x18
+ 911 01b8 00       		.byte	0
+ 912 01b9 03       		.uleb128 0x3
+ 913 01ba DE000000 		.4byte	.LASF38
+ 914 01be 05       		.byte	0x5
+ 915 01bf 31       		.byte	0x31
+ 916 01c0 08010000 		.4byte	0x108
+ 917 01c4 03       		.uleb128 0x3
+ 918 01c5 03020000 		.4byte	.LASF39
+ 919 01c9 06       		.byte	0x6
+ 920 01ca 38       		.byte	0x38
+ 921 01cb 62000000 		.4byte	0x62
+ 922 01cf 03       		.uleb128 0x3
+ 923 01d0 63030000 		.4byte	.LASF40
+ 924 01d4 07       		.byte	0x7
+ 925 01d5 4E       		.byte	0x4e
+ 926 01d6 DA010000 		.4byte	0x1da
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 21
+
+
+ 927 01da 09       		.uleb128 0x9
+ 928 01db 04       		.byte	0x4
+ 929 01dc E0010000 		.4byte	0x1e0
+ 930 01e0 0A       		.uleb128 0xa
+ 931 01e1 4E000000 		.4byte	.LASF165
+ 932 01e5 0B       		.uleb128 0xb
+ 933 01e6 20030000 		.4byte	.LASF166
+ 934 01ea 7C       		.byte	0x7c
+ 935 01eb 08       		.byte	0x8
+ 936 01ec 4B       		.byte	0x4b
+ 937 01ed 92040000 		.4byte	0x492
+ 938 01f1 08       		.uleb128 0x8
+ 939 01f2 B0050000 		.4byte	.LASF41
+ 940 01f6 08       		.byte	0x8
+ 941 01f7 4C       		.byte	0x4c
+ 942 01f8 97000000 		.4byte	0x97
+ 943 01fc 00       		.byte	0
+ 944 01fd 08       		.uleb128 0x8
+ 945 01fe B4010000 		.4byte	.LASF42
+ 946 0202 08       		.byte	0x8
+ 947 0203 4D       		.byte	0x4d
+ 948 0204 A2000000 		.4byte	0xa2
+ 949 0208 02       		.byte	0x2
+ 950 0209 08       		.uleb128 0x8
+ 951 020a 0F060000 		.4byte	.LASF43
+ 952 020e 08       		.byte	0x8
+ 953 020f 4E       		.byte	0x4e
+ 954 0210 A2000000 		.4byte	0xa2
+ 955 0214 04       		.byte	0x4
+ 956 0215 08       		.uleb128 0x8
+ 957 0216 89070000 		.4byte	.LASF44
+ 958 021a 08       		.byte	0x8
+ 959 021b 4F       		.byte	0x4f
+ 960 021c A2000000 		.4byte	0xa2
+ 961 0220 06       		.byte	0x6
+ 962 0221 08       		.uleb128 0x8
+ 963 0222 CD080000 		.4byte	.LASF45
+ 964 0226 08       		.byte	0x8
+ 965 0227 50       		.byte	0x50
+ 966 0228 A2000000 		.4byte	0xa2
+ 967 022c 08       		.byte	0x8
+ 968 022d 08       		.uleb128 0x8
+ 969 022e AD000000 		.4byte	.LASF46
+ 970 0232 08       		.byte	0x8
+ 971 0233 51       		.byte	0x51
+ 972 0234 A2000000 		.4byte	0xa2
+ 973 0238 0A       		.byte	0xa
+ 974 0239 08       		.uleb128 0x8
+ 975 023a 59060000 		.4byte	.LASF47
+ 976 023e 08       		.byte	0x8
+ 977 023f 52       		.byte	0x52
+ 978 0240 A2000000 		.4byte	0xa2
+ 979 0244 0C       		.byte	0xc
+ 980 0245 08       		.uleb128 0x8
+ 981 0246 FF050000 		.4byte	.LASF48
+ 982 024a 08       		.byte	0x8
+ 983 024b 53       		.byte	0x53
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 22
+
+
+ 984 024c A2000000 		.4byte	0xa2
+ 985 0250 0E       		.byte	0xe
+ 986 0251 08       		.uleb128 0x8
+ 987 0252 83030000 		.4byte	.LASF49
+ 988 0256 08       		.byte	0x8
+ 989 0257 54       		.byte	0x54
+ 990 0258 97000000 		.4byte	0x97
+ 991 025c 10       		.byte	0x10
+ 992 025d 08       		.uleb128 0x8
+ 993 025e A7090000 		.4byte	.LASF50
+ 994 0262 08       		.byte	0x8
+ 995 0263 55       		.byte	0x55
+ 996 0264 97000000 		.4byte	0x97
+ 997 0268 11       		.byte	0x11
+ 998 0269 08       		.uleb128 0x8
+ 999 026a 30060000 		.4byte	.LASF51
+ 1000 026e 08       		.byte	0x8
+ 1001 026f 56       		.byte	0x56
+ 1002 0270 A2000000 		.4byte	0xa2
+ 1003 0274 12       		.byte	0x12
+ 1004 0275 08       		.uleb128 0x8
+ 1005 0276 8D030000 		.4byte	.LASF52
+ 1006 027a 08       		.byte	0x8
+ 1007 027b 57       		.byte	0x57
+ 1008 027c A2000000 		.4byte	0xa2
+ 1009 0280 14       		.byte	0x14
+ 1010 0281 08       		.uleb128 0x8
+ 1011 0282 21070000 		.4byte	.LASF53
+ 1012 0286 08       		.byte	0x8
+ 1013 0287 58       		.byte	0x58
+ 1014 0288 A2000000 		.4byte	0xa2
+ 1015 028c 16       		.byte	0x16
+ 1016 028d 08       		.uleb128 0x8
+ 1017 028e F4050000 		.4byte	.LASF54
+ 1018 0292 08       		.byte	0x8
+ 1019 0293 59       		.byte	0x59
+ 1020 0294 A2000000 		.4byte	0xa2
+ 1021 0298 18       		.byte	0x18
+ 1022 0299 08       		.uleb128 0x8
+ 1023 029a 8F010000 		.4byte	.LASF55
+ 1024 029e 08       		.byte	0x8
+ 1025 029f 5A       		.byte	0x5a
+ 1026 02a0 A2000000 		.4byte	0xa2
+ 1027 02a4 1A       		.byte	0x1a
+ 1028 02a5 08       		.uleb128 0x8
+ 1029 02a6 E0080000 		.4byte	.LASF56
+ 1030 02aa 08       		.byte	0x8
+ 1031 02ab 5B       		.byte	0x5b
+ 1032 02ac A2000000 		.4byte	0xa2
+ 1033 02b0 1C       		.byte	0x1c
+ 1034 02b1 08       		.uleb128 0x8
+ 1035 02b2 6E090000 		.4byte	.LASF57
+ 1036 02b6 08       		.byte	0x8
+ 1037 02b7 5C       		.byte	0x5c
+ 1038 02b8 97000000 		.4byte	0x97
+ 1039 02bc 1E       		.byte	0x1e
+ 1040 02bd 08       		.uleb128 0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 23
+
+
+ 1041 02be C9040000 		.4byte	.LASF58
+ 1042 02c2 08       		.byte	0x8
+ 1043 02c3 5D       		.byte	0x5d
+ 1044 02c4 A2000000 		.4byte	0xa2
+ 1045 02c8 20       		.byte	0x20
+ 1046 02c9 08       		.uleb128 0x8
+ 1047 02ca 25080000 		.4byte	.LASF59
+ 1048 02ce 08       		.byte	0x8
+ 1049 02cf 5E       		.byte	0x5e
+ 1050 02d0 A2000000 		.4byte	0xa2
+ 1051 02d4 22       		.byte	0x22
+ 1052 02d5 08       		.uleb128 0x8
+ 1053 02d6 28020000 		.4byte	.LASF60
+ 1054 02da 08       		.byte	0x8
+ 1055 02db 5F       		.byte	0x5f
+ 1056 02dc A2000000 		.4byte	0xa2
+ 1057 02e0 24       		.byte	0x24
+ 1058 02e1 08       		.uleb128 0x8
+ 1059 02e2 37020000 		.4byte	.LASF61
+ 1060 02e6 08       		.byte	0x8
+ 1061 02e7 60       		.byte	0x60
+ 1062 02e8 A2000000 		.4byte	0xa2
+ 1063 02ec 26       		.byte	0x26
+ 1064 02ed 08       		.uleb128 0x8
+ 1065 02ee 1B020000 		.4byte	.LASF62
+ 1066 02f2 08       		.byte	0x8
+ 1067 02f3 61       		.byte	0x61
+ 1068 02f4 A2000000 		.4byte	0xa2
+ 1069 02f8 28       		.byte	0x28
+ 1070 02f9 08       		.uleb128 0x8
+ 1071 02fa 2E000000 		.4byte	.LASF63
+ 1072 02fe 08       		.byte	0x8
+ 1073 02ff 62       		.byte	0x62
+ 1074 0300 97000000 		.4byte	0x97
+ 1075 0304 2A       		.byte	0x2a
+ 1076 0305 08       		.uleb128 0x8
+ 1077 0306 1E090000 		.4byte	.LASF64
+ 1078 030a 08       		.byte	0x8
+ 1079 030b 63       		.byte	0x63
+ 1080 030c DB000000 		.4byte	0xdb
+ 1081 0310 2C       		.byte	0x2c
+ 1082 0311 08       		.uleb128 0x8
+ 1083 0312 07090000 		.4byte	.LASF65
+ 1084 0316 08       		.byte	0x8
+ 1085 0317 64       		.byte	0x64
+ 1086 0318 DB000000 		.4byte	0xdb
+ 1087 031c 30       		.byte	0x30
+ 1088 031d 08       		.uleb128 0x8
+ 1089 031e 68060000 		.4byte	.LASF66
+ 1090 0322 08       		.byte	0x8
+ 1091 0323 65       		.byte	0x65
+ 1092 0324 97000000 		.4byte	0x97
+ 1093 0328 34       		.byte	0x34
+ 1094 0329 08       		.uleb128 0x8
+ 1095 032a 2C070000 		.4byte	.LASF67
+ 1096 032e 08       		.byte	0x8
+ 1097 032f 66       		.byte	0x66
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 24
+
+
+ 1098 0330 97000000 		.4byte	0x97
+ 1099 0334 35       		.byte	0x35
+ 1100 0335 08       		.uleb128 0x8
+ 1101 0336 C5010000 		.4byte	.LASF68
+ 1102 033a 08       		.byte	0x8
+ 1103 033b 67       		.byte	0x67
+ 1104 033c 97000000 		.4byte	0x97
+ 1105 0340 36       		.byte	0x36
+ 1106 0341 08       		.uleb128 0x8
+ 1107 0342 1F060000 		.4byte	.LASF69
+ 1108 0346 08       		.byte	0x8
+ 1109 0347 68       		.byte	0x68
+ 1110 0348 92040000 		.4byte	0x492
+ 1111 034c 37       		.byte	0x37
+ 1112 034d 08       		.uleb128 0x8
+ 1113 034e 5E010000 		.4byte	.LASF70
+ 1114 0352 08       		.byte	0x8
+ 1115 0353 69       		.byte	0x69
+ 1116 0354 B8000000 		.4byte	0xb8
+ 1117 0358 48       		.byte	0x48
+ 1118 0359 08       		.uleb128 0x8
+ 1119 035a 99010000 		.4byte	.LASF71
+ 1120 035e 08       		.byte	0x8
+ 1121 035f 6A       		.byte	0x6a
+ 1122 0360 97000000 		.4byte	0x97
+ 1123 0364 4C       		.byte	0x4c
+ 1124 0365 08       		.uleb128 0x8
+ 1125 0366 C1080000 		.4byte	.LASF72
+ 1126 036a 08       		.byte	0x8
+ 1127 036b 6B       		.byte	0x6b
+ 1128 036c A2000000 		.4byte	0xa2
+ 1129 0370 4E       		.byte	0x4e
+ 1130 0371 08       		.uleb128 0x8
+ 1131 0372 65070000 		.4byte	.LASF73
+ 1132 0376 08       		.byte	0x8
+ 1133 0377 6C       		.byte	0x6c
+ 1134 0378 A2000000 		.4byte	0xa2
+ 1135 037c 50       		.byte	0x50
+ 1136 037d 08       		.uleb128 0x8
+ 1137 037e E3050000 		.4byte	.LASF74
+ 1138 0382 08       		.byte	0x8
+ 1139 0383 6D       		.byte	0x6d
+ 1140 0384 A2000000 		.4byte	0xa2
+ 1141 0388 52       		.byte	0x52
+ 1142 0389 08       		.uleb128 0x8
+ 1143 038a C8070000 		.4byte	.LASF75
+ 1144 038e 08       		.byte	0x8
+ 1145 038f 6E       		.byte	0x6e
+ 1146 0390 B8000000 		.4byte	0xb8
+ 1147 0394 54       		.byte	0x54
+ 1148 0395 08       		.uleb128 0x8
+ 1149 0396 12090000 		.4byte	.LASF76
+ 1150 039a 08       		.byte	0x8
+ 1151 039b 6F       		.byte	0x6f
+ 1152 039c A2000000 		.4byte	0xa2
+ 1153 03a0 58       		.byte	0x58
+ 1154 03a1 08       		.uleb128 0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 25
+
+
+ 1155 03a2 0D040000 		.4byte	.LASF77
+ 1156 03a6 08       		.byte	0x8
+ 1157 03a7 70       		.byte	0x70
+ 1158 03a8 97000000 		.4byte	0x97
+ 1159 03ac 5A       		.byte	0x5a
+ 1160 03ad 08       		.uleb128 0x8
+ 1161 03ae F3010000 		.4byte	.LASF78
+ 1162 03b2 08       		.byte	0x8
+ 1163 03b3 71       		.byte	0x71
+ 1164 03b4 97000000 		.4byte	0x97
+ 1165 03b8 5B       		.byte	0x5b
+ 1166 03b9 08       		.uleb128 0x8
+ 1167 03ba 1D050000 		.4byte	.LASF79
+ 1168 03be 08       		.byte	0x8
+ 1169 03bf 72       		.byte	0x72
+ 1170 03c0 97000000 		.4byte	0x97
+ 1171 03c4 5C       		.byte	0x5c
+ 1172 03c5 08       		.uleb128 0x8
+ 1173 03c6 F9030000 		.4byte	.LASF80
+ 1174 03ca 08       		.byte	0x8
+ 1175 03cb 73       		.byte	0x73
+ 1176 03cc 97000000 		.4byte	0x97
+ 1177 03d0 5D       		.byte	0x5d
+ 1178 03d1 08       		.uleb128 0x8
+ 1179 03d2 CE070000 		.4byte	.LASF81
+ 1180 03d6 08       		.byte	0x8
+ 1181 03d7 74       		.byte	0x74
+ 1182 03d8 A2000000 		.4byte	0xa2
+ 1183 03dc 5E       		.byte	0x5e
+ 1184 03dd 08       		.uleb128 0x8
+ 1185 03de 19060000 		.4byte	.LASF82
+ 1186 03e2 08       		.byte	0x8
+ 1187 03e3 75       		.byte	0x75
+ 1188 03e4 A2000000 		.4byte	0xa2
+ 1189 03e8 60       		.byte	0x60
+ 1190 03e9 08       		.uleb128 0x8
+ 1191 03ea F1030000 		.4byte	.LASF83
+ 1192 03ee 08       		.byte	0x8
+ 1193 03ef 76       		.byte	0x76
+ 1194 03f0 A2000000 		.4byte	0xa2
+ 1195 03f4 62       		.byte	0x62
+ 1196 03f5 08       		.uleb128 0x8
+ 1197 03f6 B4070000 		.4byte	.LASF84
+ 1198 03fa 08       		.byte	0x8
+ 1199 03fb 77       		.byte	0x77
+ 1200 03fc A2000000 		.4byte	0xa2
+ 1201 0400 64       		.byte	0x64
+ 1202 0401 08       		.uleb128 0x8
+ 1203 0402 AA060000 		.4byte	.LASF85
+ 1204 0406 08       		.byte	0x8
+ 1205 0407 78       		.byte	0x78
+ 1206 0408 97000000 		.4byte	0x97
+ 1207 040c 66       		.byte	0x66
+ 1208 040d 08       		.uleb128 0x8
+ 1209 040e 18010000 		.4byte	.LASF86
+ 1210 0412 08       		.byte	0x8
+ 1211 0413 79       		.byte	0x79
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 26
+
+
+ 1212 0414 A2000000 		.4byte	0xa2
+ 1213 0418 68       		.byte	0x68
+ 1214 0419 08       		.uleb128 0x8
+ 1215 041a 0B070000 		.4byte	.LASF87
+ 1216 041e 08       		.byte	0x8
+ 1217 041f 7A       		.byte	0x7a
+ 1218 0420 DB000000 		.4byte	0xdb
+ 1219 0424 6C       		.byte	0x6c
+ 1220 0425 08       		.uleb128 0x8
+ 1221 0426 B1090000 		.4byte	.LASF88
+ 1222 042a 08       		.byte	0x8
+ 1223 042b 7B       		.byte	0x7b
+ 1224 042c 97000000 		.4byte	0x97
+ 1225 0430 70       		.byte	0x70
+ 1226 0431 08       		.uleb128 0x8
+ 1227 0432 96060000 		.4byte	.LASF89
+ 1228 0436 08       		.byte	0x8
+ 1229 0437 7C       		.byte	0x7c
+ 1230 0438 97000000 		.4byte	0x97
+ 1231 043c 71       		.byte	0x71
+ 1232 043d 08       		.uleb128 0x8
+ 1233 043e B9070000 		.4byte	.LASF90
+ 1234 0442 08       		.byte	0x8
+ 1235 0443 7D       		.byte	0x7d
+ 1236 0444 97000000 		.4byte	0x97
+ 1237 0448 72       		.byte	0x72
+ 1238 0449 08       		.uleb128 0x8
+ 1239 044a 60050000 		.4byte	.LASF91
+ 1240 044e 08       		.byte	0x8
+ 1241 044f 7F       		.byte	0x7f
+ 1242 0450 97000000 		.4byte	0x97
+ 1243 0454 73       		.byte	0x73
+ 1244 0455 08       		.uleb128 0x8
+ 1245 0456 A3070000 		.4byte	.LASF92
+ 1246 045a 08       		.byte	0x8
+ 1247 045b 81       		.byte	0x81
+ 1248 045c 97000000 		.4byte	0x97
+ 1249 0460 74       		.byte	0x74
+ 1250 0461 08       		.uleb128 0x8
+ 1251 0462 D0050000 		.4byte	.LASF93
+ 1252 0466 08       		.byte	0x8
+ 1253 0467 82       		.byte	0x82
+ 1254 0468 97000000 		.4byte	0x97
+ 1255 046c 75       		.byte	0x75
+ 1256 046d 08       		.uleb128 0x8
+ 1257 046e 3E010000 		.4byte	.LASF94
+ 1258 0472 08       		.byte	0x8
+ 1259 0473 83       		.byte	0x83
+ 1260 0474 97000000 		.4byte	0x97
+ 1261 0478 76       		.byte	0x76
+ 1262 0479 08       		.uleb128 0x8
+ 1263 047a 04050000 		.4byte	.LASF95
+ 1264 047e 08       		.byte	0x8
+ 1265 047f 84       		.byte	0x84
+ 1266 0480 97000000 		.4byte	0x97
+ 1267 0484 77       		.byte	0x77
+ 1268 0485 08       		.uleb128 0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 27
+
+
+ 1269 0486 0E020000 		.4byte	.LASF96
+ 1270 048a 08       		.byte	0x8
+ 1271 048b 86       		.byte	0x86
+ 1272 048c DB000000 		.4byte	0xdb
+ 1273 0490 78       		.byte	0x78
+ 1274 0491 00       		.byte	0
+ 1275 0492 0C       		.uleb128 0xc
+ 1276 0493 E9000000 		.4byte	0xe9
+ 1277 0497 A2040000 		.4byte	0x4a2
+ 1278 049b 0D       		.uleb128 0xd
+ 1279 049c 01010000 		.4byte	0x101
+ 1280 04a0 0F       		.byte	0xf
+ 1281 04a1 00       		.byte	0
+ 1282 04a2 03       		.uleb128 0x3
+ 1283 04a3 F6070000 		.4byte	.LASF97
+ 1284 04a7 08       		.byte	0x8
+ 1285 04a8 88       		.byte	0x88
+ 1286 04a9 E5010000 		.4byte	0x1e5
+ 1287 04ad 0E       		.uleb128 0xe
+ 1288 04ae 54020000 		.4byte	.LASF100
+ 1289 04b2 01       		.byte	0x1
+ 1290 04b3 37000000 		.4byte	0x37
+ 1291 04b7 09       		.byte	0x9
+ 1292 04b8 38       		.byte	0x38
+ 1293 04b9 CA040000 		.4byte	0x4ca
+ 1294 04bd 0F       		.uleb128 0xf
+ 1295 04be BD040000 		.4byte	.LASF98
+ 1296 04c2 00       		.byte	0
+ 1297 04c3 0F       		.uleb128 0xf
+ 1298 04c4 C3060000 		.4byte	.LASF99
+ 1299 04c8 01       		.byte	0x1
+ 1300 04c9 00       		.byte	0
+ 1301 04ca 0E       		.uleb128 0xe
+ 1302 04cb 58040000 		.4byte	.LASF101
+ 1303 04cf 01       		.byte	0x1
+ 1304 04d0 37000000 		.4byte	0x37
+ 1305 04d4 09       		.byte	0x9
+ 1306 04d5 3D       		.byte	0x3d
+ 1307 04d6 ED040000 		.4byte	0x4ed
+ 1308 04da 0F       		.uleb128 0xf
+ 1309 04db 52050000 		.4byte	.LASF102
+ 1310 04df 00       		.byte	0
+ 1311 04e0 0F       		.uleb128 0xf
+ 1312 04e1 B4080000 		.4byte	.LASF103
+ 1313 04e5 01       		.byte	0x1
+ 1314 04e6 0F       		.uleb128 0xf
+ 1315 04e7 3C000000 		.4byte	.LASF104
+ 1316 04eb 02       		.byte	0x2
+ 1317 04ec 00       		.byte	0
+ 1318 04ed 0E       		.uleb128 0xe
+ 1319 04ee 73080000 		.4byte	.LASF105
+ 1320 04f2 01       		.byte	0x1
+ 1321 04f3 37000000 		.4byte	0x37
+ 1322 04f7 09       		.byte	0x9
+ 1323 04f8 43       		.byte	0x43
+ 1324 04f9 0A050000 		.4byte	0x50a
+ 1325 04fd 0F       		.uleb128 0xf
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 28
+
+
+ 1326 04fe 27060000 		.4byte	.LASF106
+ 1327 0502 00       		.byte	0
+ 1328 0503 0F       		.uleb128 0xf
+ 1329 0504 7F040000 		.4byte	.LASF107
+ 1330 0508 01       		.byte	0x1
+ 1331 0509 00       		.byte	0
+ 1332 050a 0E       		.uleb128 0xe
+ 1333 050b D5040000 		.4byte	.LASF108
+ 1334 050f 01       		.byte	0x1
+ 1335 0510 37000000 		.4byte	0x37
+ 1336 0514 09       		.byte	0x9
+ 1337 0515 49       		.byte	0x49
+ 1338 0516 27050000 		.4byte	0x527
+ 1339 051a 0F       		.uleb128 0xf
+ 1340 051b EB080000 		.4byte	.LASF109
+ 1341 051f 00       		.byte	0
+ 1342 0520 0F       		.uleb128 0xf
+ 1343 0521 51010000 		.4byte	.LASF110
+ 1344 0525 01       		.byte	0x1
+ 1345 0526 00       		.byte	0
+ 1346 0527 07       		.uleb128 0x7
+ 1347 0528 0C       		.byte	0xc
+ 1348 0529 09       		.byte	0x9
+ 1349 052a 4E       		.byte	0x4e
+ 1350 052b 83050000 		.4byte	0x583
+ 1351 052f 10       		.uleb128 0x10
+ 1352 0530 707700   		.ascii	"pw\000"
+ 1353 0533 09       		.byte	0x9
+ 1354 0534 50       		.byte	0x50
+ 1355 0535 A2000000 		.4byte	0xa2
+ 1356 0539 00       		.byte	0
+ 1357 053a 10       		.uleb128 0x10
+ 1358 053b 70726400 		.ascii	"prd\000"
+ 1359 053f 09       		.byte	0x9
+ 1360 0540 51       		.byte	0x51
+ 1361 0541 A2000000 		.4byte	0xa2
+ 1362 0545 02       		.byte	0x2
+ 1363 0546 08       		.uleb128 0x8
+ 1364 0547 60070000 		.4byte	.LASF111
+ 1365 054b 09       		.byte	0x9
+ 1366 054c 52       		.byte	0x52
+ 1367 054d CA040000 		.4byte	0x4ca
+ 1368 0551 04       		.byte	0x4
+ 1369 0552 08       		.uleb128 0x8
+ 1370 0553 1C000000 		.4byte	.LASF112
+ 1371 0557 09       		.byte	0x9
+ 1372 0558 53       		.byte	0x53
+ 1373 0559 ED040000 		.4byte	0x4ed
+ 1374 055d 05       		.byte	0x5
+ 1375 055e 10       		.uleb128 0x10
+ 1376 055f 6D6F6400 		.ascii	"mod\000"
+ 1377 0563 09       		.byte	0x9
+ 1378 0564 54       		.byte	0x54
+ 1379 0565 0A050000 		.4byte	0x50a
+ 1380 0569 06       		.byte	0x6
+ 1381 056a 08       		.uleb128 0x8
+ 1382 056b 80050000 		.4byte	.LASF113
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 29
+
+
+ 1383 056f 09       		.byte	0x9
+ 1384 0570 55       		.byte	0x55
+ 1385 0571 AD040000 		.4byte	0x4ad
+ 1386 0575 07       		.byte	0x7
+ 1387 0576 08       		.uleb128 0x8
+ 1388 0577 73050000 		.4byte	.LASF114
+ 1389 057b 09       		.byte	0x9
+ 1390 057c 56       		.byte	0x56
+ 1391 057d CF010000 		.4byte	0x1cf
+ 1392 0581 08       		.byte	0x8
+ 1393 0582 00       		.byte	0
+ 1394 0583 03       		.uleb128 0x3
+ 1395 0584 5E000000 		.4byte	.LASF115
+ 1396 0588 09       		.byte	0x9
+ 1397 0589 57       		.byte	0x57
+ 1398 058a 27050000 		.4byte	0x527
+ 1399 058e 02       		.uleb128 0x2
+ 1400 058f 08       		.byte	0x8
+ 1401 0590 04       		.byte	0x4
+ 1402 0591 3F070000 		.4byte	.LASF116
+ 1403 0595 11       		.uleb128 0x11
+ 1404 0596 24040000 		.4byte	.LASF167
+ 1405 059a 01       		.byte	0x1
+ 1406 059b 5D       		.byte	0x5d
+ 1407 059c 01       		.byte	0x1
+ 1408 059d AF050000 		.4byte	0x5af
+ 1409 05a1 12       		.uleb128 0x12
+ 1410 05a2 13       		.uleb128 0x13
+ 1411 05a3 97030000 		.4byte	.LASF168
+ 1412 05a7 01       		.byte	0x1
+ 1413 05a8 63       		.byte	0x63
+ 1414 05a9 B8000000 		.4byte	0xb8
+ 1415 05ad 00       		.byte	0
+ 1416 05ae 00       		.byte	0
+ 1417 05af 14       		.uleb128 0x14
+ 1418 05b0 16040000 		.4byte	.LASF120
+ 1419 05b4 01       		.byte	0x1
+ 1420 05b5 3D       		.byte	0x3d
+ 1421 05b6 00000000 		.4byte	.LFB69
+ 1422 05ba 18010000 		.4byte	.LFE69-.LFB69
+ 1423 05be 01       		.uleb128 0x1
+ 1424 05bf 9C       		.byte	0x9c
+ 1425 05c0 0D060000 		.4byte	0x60d
+ 1426 05c4 15       		.uleb128 0x15
+ 1427 05c5 B9050000 		.4byte	.LASF117
+ 1428 05c9 01       		.byte	0x1
+ 1429 05ca 3F       		.byte	0x3f
+ 1430 05cb DB000000 		.4byte	0xdb
+ 1431 05cf 00000000 		.4byte	.LLST0
+ 1432 05d3 15       		.uleb128 0x15
+ 1433 05d4 49080000 		.4byte	.LASF118
+ 1434 05d8 01       		.byte	0x1
+ 1435 05d9 40       		.byte	0x40
+ 1436 05da DB000000 		.4byte	0xdb
+ 1437 05de 1E000000 		.4byte	.LLST1
+ 1438 05e2 15       		.uleb128 0x15
+ 1439 05e3 29090000 		.4byte	.LASF119
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 30
+
+
+ 1440 05e7 01       		.byte	0x1
+ 1441 05e8 41       		.byte	0x41
+ 1442 05e9 DB000000 		.4byte	0xdb
+ 1443 05ed 3C000000 		.4byte	.LLST2
+ 1444 05f1 16       		.uleb128 0x16
+ 1445 05f2 54000000 		.4byte	.LVL12
+ 1446 05f6 CA080000 		.4byte	0x8ca
+ 1447 05fa 16       		.uleb128 0x16
+ 1448 05fb CA000000 		.4byte	.LVL33
+ 1449 05ff CA080000 		.4byte	0x8ca
+ 1450 0603 16       		.uleb128 0x16
+ 1451 0604 E6000000 		.4byte	.LVL37
+ 1452 0608 CA080000 		.4byte	0x8ca
+ 1453 060c 00       		.byte	0
+ 1454 060d 17       		.uleb128 0x17
+ 1455 060e 95050000 		.4byte	0x595
+ 1456 0612 00000000 		.4byte	.LFB70
+ 1457 0616 5C000000 		.4byte	.LFE70-.LFB70
+ 1458 061a 01       		.uleb128 0x1
+ 1459 061b 9C       		.byte	0x9c
+ 1460 061c 30060000 		.4byte	0x630
+ 1461 0620 18       		.uleb128 0x18
+ 1462 0621 20000000 		.4byte	.LBB9
+ 1463 0625 3C000000 		.4byte	.LBE9-.LBB9
+ 1464 0629 19       		.uleb128 0x19
+ 1465 062a A2050000 		.4byte	0x5a2
+ 1466 062e 00       		.byte	0
+ 1467 062f 00       		.byte	0
+ 1468 0630 14       		.uleb128 0x14
+ 1469 0631 C9000000 		.4byte	.LASF121
+ 1470 0635 01       		.byte	0x1
+ 1471 0636 68       		.byte	0x68
+ 1472 0637 00000000 		.4byte	.LFB71
+ 1473 063b C0010000 		.4byte	.LFE71-.LFB71
+ 1474 063f 01       		.uleb128 0x1
+ 1475 0640 9C       		.byte	0x9c
+ 1476 0641 98070000 		.4byte	0x798
+ 1477 0645 15       		.uleb128 0x15
+ 1478 0646 9F040000 		.4byte	.LASF122
+ 1479 064a 01       		.byte	0x1
+ 1480 064b 6D       		.byte	0x6d
+ 1481 064c DB000000 		.4byte	0xdb
+ 1482 0650 5A000000 		.4byte	.LLST3
+ 1483 0654 15       		.uleb128 0x15
+ 1484 0655 E8070000 		.4byte	.LASF123
+ 1485 0659 01       		.byte	0x1
+ 1486 065a 6E       		.byte	0x6e
+ 1487 065b CF000000 		.4byte	0xcf
+ 1488 065f 78000000 		.4byte	.LLST4
+ 1489 0663 15       		.uleb128 0x15
+ 1490 0664 7B090000 		.4byte	.LASF124
+ 1491 0668 01       		.byte	0x1
+ 1492 0669 7E       		.byte	0x7e
+ 1493 066a B8000000 		.4byte	0xb8
+ 1494 066e A0000000 		.4byte	.LLST5
+ 1495 0672 15       		.uleb128 0x15
+ 1496 0673 94080000 		.4byte	.LASF125
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 31
+
+
+ 1497 0677 01       		.byte	0x1
+ 1498 0678 A8       		.byte	0xa8
+ 1499 0679 DB000000 		.4byte	0xdb
+ 1500 067d B3000000 		.4byte	.LLST6
+ 1501 0681 1A       		.uleb128 0x1a
+ 1502 0682 16010000 		.4byte	.LBB10
+ 1503 0686 2C000000 		.4byte	.LBE10-.LBB10
+ 1504 068a BE060000 		.4byte	0x6be
+ 1505 068e 1B       		.uleb128 0x1b
+ 1506 068f 7A00     		.ascii	"z\000"
+ 1507 0691 01       		.byte	0x1
+ 1508 0692 9F       		.byte	0x9f
+ 1509 0693 97000000 		.4byte	0x97
+ 1510 0697 D1000000 		.4byte	.LLST7
+ 1511 069b 1C       		.uleb128 0x1c
+ 1512 069c 36010000 		.4byte	.LVL80
+ 1513 06a0 D6080000 		.4byte	0x8d6
+ 1514 06a4 AE060000 		.4byte	0x6ae
+ 1515 06a8 1D       		.uleb128 0x1d
+ 1516 06a9 01       		.uleb128 0x1
+ 1517 06aa 50       		.byte	0x50
+ 1518 06ab 01       		.uleb128 0x1
+ 1519 06ac 30       		.byte	0x30
+ 1520 06ad 00       		.byte	0
+ 1521 06ae 1E       		.uleb128 0x1e
+ 1522 06af 3C010000 		.4byte	.LVL81
+ 1523 06b3 E1080000 		.4byte	0x8e1
+ 1524 06b7 1D       		.uleb128 0x1d
+ 1525 06b8 01       		.uleb128 0x1
+ 1526 06b9 50       		.byte	0x50
+ 1527 06ba 01       		.uleb128 0x1
+ 1528 06bb 34       		.byte	0x34
+ 1529 06bc 00       		.byte	0
+ 1530 06bd 00       		.byte	0
+ 1531 06be 16       		.uleb128 0x16
+ 1532 06bf 0A000000 		.4byte	.LVL42
+ 1533 06c3 AF050000 		.4byte	0x5af
+ 1534 06c7 16       		.uleb128 0x16
+ 1535 06c8 0E000000 		.4byte	.LVL43
+ 1536 06cc 95050000 		.4byte	0x595
+ 1537 06d0 1C       		.uleb128 0x1c
+ 1538 06d1 18000000 		.4byte	.LVL44
+ 1539 06d5 EC080000 		.4byte	0x8ec
+ 1540 06d9 E3060000 		.4byte	0x6e3
+ 1541 06dd 1D       		.uleb128 0x1d
+ 1542 06de 01       		.uleb128 0x1
+ 1543 06df 50       		.byte	0x50
+ 1544 06e0 01       		.uleb128 0x1
+ 1545 06e1 31       		.byte	0x31
+ 1546 06e2 00       		.byte	0
+ 1547 06e3 1C       		.uleb128 0x1c
+ 1548 06e4 1E000000 		.4byte	.LVL45
+ 1549 06e8 F7080000 		.4byte	0x8f7
+ 1550 06ec F6060000 		.4byte	0x6f6
+ 1551 06f0 1D       		.uleb128 0x1d
+ 1552 06f1 01       		.uleb128 0x1
+ 1553 06f2 50       		.byte	0x50
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 32
+
+
+ 1554 06f3 01       		.uleb128 0x1
+ 1555 06f4 31       		.byte	0x31
+ 1556 06f5 00       		.byte	0
+ 1557 06f6 16       		.uleb128 0x16
+ 1558 06f7 2C000000 		.4byte	.LVL46
+ 1559 06fb EC080000 		.4byte	0x8ec
+ 1560 06ff 1C       		.uleb128 0x1c
+ 1561 0700 32000000 		.4byte	.LVL47
+ 1562 0704 F7080000 		.4byte	0x8f7
+ 1563 0708 12070000 		.4byte	0x712
+ 1564 070c 1D       		.uleb128 0x1d
+ 1565 070d 01       		.uleb128 0x1
+ 1566 070e 50       		.byte	0x50
+ 1567 070f 01       		.uleb128 0x1
+ 1568 0710 34       		.byte	0x34
+ 1569 0711 00       		.byte	0
+ 1570 0712 16       		.uleb128 0x16
+ 1571 0713 38000000 		.4byte	.LVL48
+ 1572 0717 02090000 		.4byte	0x902
+ 1573 071b 16       		.uleb128 0x16
+ 1574 071c 6A000000 		.4byte	.LVL54
+ 1575 0720 CA080000 		.4byte	0x8ca
+ 1576 0724 16       		.uleb128 0x16
+ 1577 0725 A2000000 		.4byte	.LVL61
+ 1578 0729 CA080000 		.4byte	0x8ca
+ 1579 072d 1C       		.uleb128 0x1c
+ 1580 072e CE000000 		.4byte	.LVL67
+ 1581 0732 0D090000 		.4byte	0x90d
+ 1582 0736 41070000 		.4byte	0x741
+ 1583 073a 1D       		.uleb128 0x1d
+ 1584 073b 01       		.uleb128 0x1
+ 1585 073c 50       		.byte	0x50
+ 1586 073d 02       		.uleb128 0x2
+ 1587 073e 09       		.byte	0x9
+ 1588 073f FF       		.byte	0xff
+ 1589 0740 00       		.byte	0
+ 1590 0741 1C       		.uleb128 0x1c
+ 1591 0742 E2000000 		.4byte	.LVL69
+ 1592 0746 18090000 		.4byte	0x918
+ 1593 074a 56070000 		.4byte	0x756
+ 1594 074e 1D       		.uleb128 0x1d
+ 1595 074f 01       		.uleb128 0x1
+ 1596 0750 50       		.byte	0x50
+ 1597 0751 03       		.uleb128 0x3
+ 1598 0752 78       		.byte	0x78
+ 1599 0753 00       		.sleb128 0
+ 1600 0754 20       		.byte	0x20
+ 1601 0755 00       		.byte	0
+ 1602 0756 1C       		.uleb128 0x1c
+ 1603 0757 E8000000 		.4byte	.LVL70
+ 1604 075b 23090000 		.4byte	0x923
+ 1605 075f 6A070000 		.4byte	0x76a
+ 1606 0763 1D       		.uleb128 0x1d
+ 1607 0764 01       		.uleb128 0x1
+ 1608 0765 50       		.byte	0x50
+ 1609 0766 02       		.uleb128 0x2
+ 1610 0767 09       		.byte	0x9
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 33
+
+
+ 1611 0768 FF       		.byte	0xff
+ 1612 0769 00       		.byte	0
+ 1613 076a 16       		.uleb128 0x16
+ 1614 076b F4000000 		.4byte	.LVL71
+ 1615 076f 2E090000 		.4byte	0x92e
+ 1616 0773 16       		.uleb128 0x16
+ 1617 0774 FC000000 		.4byte	.LVL72
+ 1618 0778 39090000 		.4byte	0x939
+ 1619 077c 16       		.uleb128 0x16
+ 1620 077d 04010000 		.4byte	.LVL73
+ 1621 0781 44090000 		.4byte	0x944
+ 1622 0785 16       		.uleb128 0x16
+ 1623 0786 0C010000 		.4byte	.LVL74
+ 1624 078a 4F090000 		.4byte	0x94f
+ 1625 078e 16       		.uleb128 0x16
+ 1626 078f 16010000 		.4byte	.LVL75
+ 1627 0793 5A090000 		.4byte	0x95a
+ 1628 0797 00       		.byte	0
+ 1629 0798 1F       		.uleb128 0x1f
+ 1630 0799 89040000 		.4byte	.LASF126
+ 1631 079d 01       		.byte	0x1
+ 1632 079e 23       		.byte	0x23
+ 1633 079f 00000000 		.4byte	.LFB68
+ 1634 07a3 46000000 		.4byte	.LFE68-.LFB68
+ 1635 07a7 01       		.uleb128 0x1
+ 1636 07a8 9C       		.byte	0x9c
+ 1637 07a9 44080000 		.4byte	0x844
+ 1638 07ad 16       		.uleb128 0x16
+ 1639 07ae 06000000 		.4byte	.LVL95
+ 1640 07b2 65090000 		.4byte	0x965
+ 1641 07b6 16       		.uleb128 0x16
+ 1642 07b7 0A000000 		.4byte	.LVL96
+ 1643 07bb 70090000 		.4byte	0x970
+ 1644 07bf 16       		.uleb128 0x16
+ 1645 07c0 0E000000 		.4byte	.LVL97
+ 1646 07c4 7B090000 		.4byte	0x97b
+ 1647 07c8 16       		.uleb128 0x16
+ 1648 07c9 12000000 		.4byte	.LVL98
+ 1649 07cd 86090000 		.4byte	0x986
+ 1650 07d1 16       		.uleb128 0x16
+ 1651 07d2 16000000 		.4byte	.LVL99
+ 1652 07d6 91090000 		.4byte	0x991
+ 1653 07da 16       		.uleb128 0x16
+ 1654 07db 1A000000 		.4byte	.LVL100
+ 1655 07df 9C090000 		.4byte	0x99c
+ 1656 07e3 16       		.uleb128 0x16
+ 1657 07e4 1E000000 		.4byte	.LVL101
+ 1658 07e8 A7090000 		.4byte	0x9a7
+ 1659 07ec 16       		.uleb128 0x16
+ 1660 07ed 22000000 		.4byte	.LVL102
+ 1661 07f1 B2090000 		.4byte	0x9b2
+ 1662 07f5 16       		.uleb128 0x16
+ 1663 07f6 26000000 		.4byte	.LVL103
+ 1664 07fa BD090000 		.4byte	0x9bd
+ 1665 07fe 16       		.uleb128 0x16
+ 1666 07ff 2A000000 		.4byte	.LVL104
+ 1667 0803 C8090000 		.4byte	0x9c8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 34
+
+
+ 1668 0807 16       		.uleb128 0x16
+ 1669 0808 2E000000 		.4byte	.LVL105
+ 1670 080c D3090000 		.4byte	0x9d3
+ 1671 0810 16       		.uleb128 0x16
+ 1672 0811 32000000 		.4byte	.LVL106
+ 1673 0815 DE090000 		.4byte	0x9de
+ 1674 0819 16       		.uleb128 0x16
+ 1675 081a 36000000 		.4byte	.LVL107
+ 1676 081e E9090000 		.4byte	0x9e9
+ 1677 0822 1C       		.uleb128 0x1c
+ 1678 0823 3E000000 		.4byte	.LVL108
+ 1679 0827 F4090000 		.4byte	0x9f4
+ 1680 082b 3A080000 		.4byte	0x83a
+ 1681 082f 1D       		.uleb128 0x1d
+ 1682 0830 01       		.uleb128 0x1
+ 1683 0831 50       		.byte	0x50
+ 1684 0832 01       		.uleb128 0x1
+ 1685 0833 30       		.byte	0x30
+ 1686 0834 1D       		.uleb128 0x1d
+ 1687 0835 01       		.uleb128 0x1
+ 1688 0836 51       		.byte	0x51
+ 1689 0837 01       		.uleb128 0x1
+ 1690 0838 31       		.byte	0x31
+ 1691 0839 00       		.byte	0
+ 1692 083a 20       		.uleb128 0x20
+ 1693 083b 46000000 		.4byte	.LVL109
+ 1694 083f 30060000 		.4byte	0x630
+ 1695 0843 00       		.byte	0
+ 1696 0844 21       		.uleb128 0x21
+ 1697 0845 89060000 		.4byte	.LASF127
+ 1698 0849 0A       		.byte	0xa
+ 1699 084a 1207     		.2byte	0x712
+ 1700 084c 50080000 		.4byte	0x850
+ 1701 0850 06       		.uleb128 0x6
+ 1702 0851 AD000000 		.4byte	0xad
+ 1703 0855 22       		.uleb128 0x22
+ 1704 0856 E5010000 		.4byte	.LASF128
+ 1705 085a 05       		.byte	0x5
+ 1706 085b 32       		.byte	0x32
+ 1707 085c 66080000 		.4byte	0x866
+ 1708 0860 05       		.uleb128 0x5
+ 1709 0861 03       		.byte	0x3
+ 1710 0862 00000000 		.4byte	params
+ 1711 0866 06       		.uleb128 0x6
+ 1712 0867 B9010000 		.4byte	0x1b9
+ 1713 086b 22       		.uleb128 0x22
+ 1714 086c E2060000 		.4byte	.LASF129
+ 1715 0870 01       		.byte	0x1
+ 1716 0871 20       		.byte	0x20
+ 1717 0872 A2000000 		.4byte	0xa2
+ 1718 0876 05       		.uleb128 0x5
+ 1719 0877 03       		.byte	0x3
+ 1720 0878 00000000 		.4byte	fb_filter_in
+ 1721 087c 22       		.uleb128 0x22
+ 1722 087d A2050000 		.4byte	.LASF130
+ 1723 0881 01       		.byte	0x1
+ 1724 0882 21       		.byte	0x21
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 35
+
+
+ 1725 0883 A2000000 		.4byte	0xa2
+ 1726 0887 05       		.uleb128 0x5
+ 1727 0888 03       		.byte	0x3
+ 1728 0889 00000000 		.4byte	fb_filter_out
+ 1729 088d 0C       		.uleb128 0xc
+ 1730 088e 97000000 		.4byte	0x97
+ 1731 0892 9D080000 		.4byte	0x89d
+ 1732 0896 0D       		.uleb128 0xd
+ 1733 0897 01010000 		.4byte	0x101
+ 1734 089b 02       		.byte	0x2
+ 1735 089c 00       		.byte	0
+ 1736 089d 22       		.uleb128 0x22
+ 1737 089e DC070000 		.4byte	.LASF131
+ 1738 08a2 05       		.byte	0x5
+ 1739 08a3 37       		.byte	0x37
+ 1740 08a4 8D080000 		.4byte	0x88d
+ 1741 08a8 05       		.uleb128 0x5
+ 1742 08a9 03       		.byte	0x3
+ 1743 08aa 00000000 		.4byte	ct1_dac_val
+ 1744 08ae 23       		.uleb128 0x23
+ 1745 08af CC030000 		.4byte	.LASF132
+ 1746 08b3 08       		.byte	0x8
+ 1747 08b4 A1       		.byte	0xa1
+ 1748 08b5 A2040000 		.4byte	0x4a2
+ 1749 08b9 22       		.uleb128 0x22
+ 1750 08ba 01040000 		.4byte	.LASF133
+ 1751 08be 09       		.byte	0x9
+ 1752 08bf 59       		.byte	0x59
+ 1753 08c0 83050000 		.4byte	0x583
+ 1754 08c4 05       		.uleb128 0x5
+ 1755 08c5 03       		.byte	0x3
+ 1756 08c6 00000000 		.4byte	interrupter
+ 1757 08ca 24       		.uleb128 0x24
+ 1758 08cb 28000000 		.4byte	.LASF134
+ 1759 08cf 28000000 		.4byte	.LASF134
+ 1760 08d3 0B       		.byte	0xb
+ 1761 08d4 4B01     		.2byte	0x14b
+ 1762 08d6 25       		.uleb128 0x25
+ 1763 08d7 61080000 		.4byte	.LASF135
+ 1764 08db 61080000 		.4byte	.LASF135
+ 1765 08df 0C       		.byte	0xc
+ 1766 08e0 43       		.byte	0x43
+ 1767 08e1 25       		.uleb128 0x25
+ 1768 08e2 EF060000 		.4byte	.LASF136
+ 1769 08e6 EF060000 		.4byte	.LASF136
+ 1770 08ea 0D       		.byte	0xd
+ 1771 08eb 77       		.byte	0x77
+ 1772 08ec 25       		.uleb128 0x25
+ 1773 08ed 08030000 		.4byte	.LASF137
+ 1774 08f1 08030000 		.4byte	.LASF137
+ 1775 08f5 0E       		.byte	0xe
+ 1776 08f6 5F       		.byte	0x5f
+ 1777 08f7 25       		.uleb128 0x25
+ 1778 08f8 89050000 		.4byte	.LASF138
+ 1779 08fc 89050000 		.4byte	.LASF138
+ 1780 0900 0E       		.byte	0xe
+ 1781 0901 63       		.byte	0x63
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 36
+
+
+ 1782 0902 25       		.uleb128 0x25
+ 1783 0903 69040000 		.4byte	.LASF139
+ 1784 0907 69040000 		.4byte	.LASF139
+ 1785 090b 0F       		.byte	0xf
+ 1786 090c 3E       		.byte	0x3e
+ 1787 090d 25       		.uleb128 0x25
+ 1788 090e 8A090000 		.4byte	.LASF140
+ 1789 0912 8A090000 		.4byte	.LASF140
+ 1790 0916 10       		.byte	0x10
+ 1791 0917 BE       		.byte	0xbe
+ 1792 0918 25       		.uleb128 0x25
+ 1793 0919 3A060000 		.4byte	.LASF141
+ 1794 091d 3A060000 		.4byte	.LASF141
+ 1795 0921 10       		.byte	0x10
+ 1796 0922 C7       		.byte	0xc7
+ 1797 0923 25       		.uleb128 0x25
+ 1798 0924 33050000 		.4byte	.LASF142
+ 1799 0928 33050000 		.4byte	.LASF142
+ 1800 092c 10       		.byte	0x10
+ 1801 092d CA       		.byte	0xca
+ 1802 092e 25       		.uleb128 0x25
+ 1803 092f B2060000 		.4byte	.LASF143
+ 1804 0933 B2060000 		.4byte	.LASF143
+ 1805 0937 11       		.byte	0x11
+ 1806 0938 BE       		.byte	0xbe
+ 1807 0939 25       		.uleb128 0x25
+ 1808 093a 71030000 		.4byte	.LASF144
+ 1809 093e 71030000 		.4byte	.LASF144
+ 1810 0942 11       		.byte	0x11
+ 1811 0943 C3       		.byte	0xc3
+ 1812 0944 25       		.uleb128 0x25
+ 1813 0945 5D090000 		.4byte	.LASF145
+ 1814 0949 5D090000 		.4byte	.LASF145
+ 1815 094d 12       		.byte	0x12
+ 1816 094e BE       		.byte	0xbe
+ 1817 094f 25       		.uleb128 0x25
+ 1818 0950 A2010000 		.4byte	.LASF146
+ 1819 0954 A2010000 		.4byte	.LASF146
+ 1820 0958 12       		.byte	0x12
+ 1821 0959 C3       		.byte	0xc3
+ 1822 095a 25       		.uleb128 0x25
+ 1823 095b F3000000 		.4byte	.LASF147
+ 1824 095f F3000000 		.4byte	.LASF147
+ 1825 0963 13       		.byte	0x13
+ 1826 0964 68       		.byte	0x68
+ 1827 0965 25       		.uleb128 0x25
+ 1828 0966 B2040000 		.4byte	.LASF148
+ 1829 096a B2040000 		.4byte	.LASF148
+ 1830 096e 11       		.byte	0x11
+ 1831 096f 92       		.byte	0x92
+ 1832 0970 25       		.uleb128 0x25
+ 1833 0971 00000000 		.4byte	.LASF149
+ 1834 0975 00000000 		.4byte	.LASF149
+ 1835 0979 12       		.byte	0x12
+ 1836 097a 92       		.byte	0x92
+ 1837 097b 25       		.uleb128 0x25
+ 1838 097c 14080000 		.4byte	.LASF150
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 37
+
+
+ 1839 0980 14080000 		.4byte	.LASF150
+ 1840 0984 13       		.byte	0x13
+ 1841 0985 5A       		.byte	0x5a
+ 1842 0986 25       		.uleb128 0x25
+ 1843 0987 F9060000 		.4byte	.LASF151
+ 1844 098b F9060000 		.4byte	.LASF151
+ 1845 098f 0E       		.byte	0xe
+ 1846 0990 4F       		.byte	0x4f
+ 1847 0991 25       		.uleb128 0x25
+ 1848 0992 32080000 		.4byte	.LASF152
+ 1849 0996 32080000 		.4byte	.LASF152
+ 1850 099a 10       		.byte	0x10
+ 1851 099b 92       		.byte	0x92
+ 1852 099c 25       		.uleb128 0x25
+ 1853 099d BC030000 		.4byte	.LASF153
+ 1854 09a1 BC030000 		.4byte	.LASF153
+ 1855 09a5 14       		.byte	0x14
+ 1856 09a6 3F       		.byte	0x3f
+ 1857 09a7 25       		.uleb128 0x25
+ 1858 09a8 F7080000 		.4byte	.LASF154
+ 1859 09ac F7080000 		.4byte	.LASF154
+ 1860 09b0 15       		.byte	0x15
+ 1861 09b1 3F       		.byte	0x3f
+ 1862 09b2 25       		.uleb128 0x25
+ 1863 09b3 12070000 		.4byte	.LASF155
+ 1864 09b7 12070000 		.4byte	.LASF155
+ 1865 09bb 16       		.byte	0x16
+ 1866 09bc 3F       		.byte	0x3f
+ 1867 09bd 25       		.uleb128 0x25
+ 1868 09be 0A010000 		.4byte	.LASF156
+ 1869 09c2 0A010000 		.4byte	.LASF156
+ 1870 09c6 17       		.byte	0x17
+ 1871 09c7 33       		.byte	0x33
+ 1872 09c8 25       		.uleb128 0x25
+ 1873 09c9 44030000 		.4byte	.LASF157
+ 1874 09cd 44030000 		.4byte	.LASF157
+ 1875 09d1 18       		.byte	0x18
+ 1876 09d2 33       		.byte	0x33
+ 1877 09d3 25       		.uleb128 0x25
+ 1878 09d4 45040000 		.4byte	.LASF158
+ 1879 09d8 45040000 		.4byte	.LASF158
+ 1880 09dc 19       		.byte	0x19
+ 1881 09dd 33       		.byte	0x33
+ 1882 09de 25       		.uleb128 0x25
+ 1883 09df 46020000 		.4byte	.LASF159
+ 1884 09e3 46020000 		.4byte	.LASF159
+ 1885 09e7 1A       		.byte	0x1a
+ 1886 09e8 33       		.byte	0x33
+ 1887 09e9 25       		.uleb128 0x25
+ 1888 09ea 4B070000 		.4byte	.LASF160
+ 1889 09ee 4B070000 		.4byte	.LASF160
+ 1890 09f2 0C       		.byte	0xc
+ 1891 09f3 3C       		.byte	0x3c
+ 1892 09f4 25       		.uleb128 0x25
+ 1893 09f5 DA030000 		.4byte	.LASF161
+ 1894 09f9 DA030000 		.4byte	.LASF161
+ 1895 09fd 0C       		.byte	0xc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 38
+
+
+ 1896 09fe 4A       		.byte	0x4a
+ 1897 09ff 00       		.byte	0
+ 1898              		.section	.debug_abbrev,"",%progbits
+ 1899              	.Ldebug_abbrev0:
+ 1900 0000 01       		.uleb128 0x1
+ 1901 0001 11       		.uleb128 0x11
+ 1902 0002 01       		.byte	0x1
+ 1903 0003 25       		.uleb128 0x25
+ 1904 0004 0E       		.uleb128 0xe
+ 1905 0005 13       		.uleb128 0x13
+ 1906 0006 0B       		.uleb128 0xb
+ 1907 0007 03       		.uleb128 0x3
+ 1908 0008 0E       		.uleb128 0xe
+ 1909 0009 1B       		.uleb128 0x1b
+ 1910 000a 0E       		.uleb128 0xe
+ 1911 000b 55       		.uleb128 0x55
+ 1912 000c 17       		.uleb128 0x17
+ 1913 000d 11       		.uleb128 0x11
+ 1914 000e 01       		.uleb128 0x1
+ 1915 000f 10       		.uleb128 0x10
+ 1916 0010 17       		.uleb128 0x17
+ 1917 0011 00       		.byte	0
+ 1918 0012 00       		.byte	0
+ 1919 0013 02       		.uleb128 0x2
+ 1920 0014 24       		.uleb128 0x24
+ 1921 0015 00       		.byte	0
+ 1922 0016 0B       		.uleb128 0xb
+ 1923 0017 0B       		.uleb128 0xb
+ 1924 0018 3E       		.uleb128 0x3e
+ 1925 0019 0B       		.uleb128 0xb
+ 1926 001a 03       		.uleb128 0x3
+ 1927 001b 0E       		.uleb128 0xe
+ 1928 001c 00       		.byte	0
+ 1929 001d 00       		.byte	0
+ 1930 001e 03       		.uleb128 0x3
+ 1931 001f 16       		.uleb128 0x16
+ 1932 0020 00       		.byte	0
+ 1933 0021 03       		.uleb128 0x3
+ 1934 0022 0E       		.uleb128 0xe
+ 1935 0023 3A       		.uleb128 0x3a
+ 1936 0024 0B       		.uleb128 0xb
+ 1937 0025 3B       		.uleb128 0x3b
+ 1938 0026 0B       		.uleb128 0xb
+ 1939 0027 49       		.uleb128 0x49
+ 1940 0028 13       		.uleb128 0x13
+ 1941 0029 00       		.byte	0
+ 1942 002a 00       		.byte	0
+ 1943 002b 04       		.uleb128 0x4
+ 1944 002c 24       		.uleb128 0x24
+ 1945 002d 00       		.byte	0
+ 1946 002e 0B       		.uleb128 0xb
+ 1947 002f 0B       		.uleb128 0xb
+ 1948 0030 3E       		.uleb128 0x3e
+ 1949 0031 0B       		.uleb128 0xb
+ 1950 0032 03       		.uleb128 0x3
+ 1951 0033 08       		.uleb128 0x8
+ 1952 0034 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 39
+
+
+ 1953 0035 00       		.byte	0
+ 1954 0036 05       		.uleb128 0x5
+ 1955 0037 16       		.uleb128 0x16
+ 1956 0038 00       		.byte	0
+ 1957 0039 03       		.uleb128 0x3
+ 1958 003a 0E       		.uleb128 0xe
+ 1959 003b 3A       		.uleb128 0x3a
+ 1960 003c 0B       		.uleb128 0xb
+ 1961 003d 3B       		.uleb128 0x3b
+ 1962 003e 05       		.uleb128 0x5
+ 1963 003f 49       		.uleb128 0x49
+ 1964 0040 13       		.uleb128 0x13
+ 1965 0041 00       		.byte	0
+ 1966 0042 00       		.byte	0
+ 1967 0043 06       		.uleb128 0x6
+ 1968 0044 35       		.uleb128 0x35
+ 1969 0045 00       		.byte	0
+ 1970 0046 49       		.uleb128 0x49
+ 1971 0047 13       		.uleb128 0x13
+ 1972 0048 00       		.byte	0
+ 1973 0049 00       		.byte	0
+ 1974 004a 07       		.uleb128 0x7
+ 1975 004b 13       		.uleb128 0x13
+ 1976 004c 01       		.byte	0x1
+ 1977 004d 0B       		.uleb128 0xb
+ 1978 004e 0B       		.uleb128 0xb
+ 1979 004f 3A       		.uleb128 0x3a
+ 1980 0050 0B       		.uleb128 0xb
+ 1981 0051 3B       		.uleb128 0x3b
+ 1982 0052 0B       		.uleb128 0xb
+ 1983 0053 01       		.uleb128 0x1
+ 1984 0054 13       		.uleb128 0x13
+ 1985 0055 00       		.byte	0
+ 1986 0056 00       		.byte	0
+ 1987 0057 08       		.uleb128 0x8
+ 1988 0058 0D       		.uleb128 0xd
+ 1989 0059 00       		.byte	0
+ 1990 005a 03       		.uleb128 0x3
+ 1991 005b 0E       		.uleb128 0xe
+ 1992 005c 3A       		.uleb128 0x3a
+ 1993 005d 0B       		.uleb128 0xb
+ 1994 005e 3B       		.uleb128 0x3b
+ 1995 005f 0B       		.uleb128 0xb
+ 1996 0060 49       		.uleb128 0x49
+ 1997 0061 13       		.uleb128 0x13
+ 1998 0062 38       		.uleb128 0x38
+ 1999 0063 0B       		.uleb128 0xb
+ 2000 0064 00       		.byte	0
+ 2001 0065 00       		.byte	0
+ 2002 0066 09       		.uleb128 0x9
+ 2003 0067 0F       		.uleb128 0xf
+ 2004 0068 00       		.byte	0
+ 2005 0069 0B       		.uleb128 0xb
+ 2006 006a 0B       		.uleb128 0xb
+ 2007 006b 49       		.uleb128 0x49
+ 2008 006c 13       		.uleb128 0x13
+ 2009 006d 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 40
+
+
+ 2010 006e 00       		.byte	0
+ 2011 006f 0A       		.uleb128 0xa
+ 2012 0070 13       		.uleb128 0x13
+ 2013 0071 00       		.byte	0
+ 2014 0072 03       		.uleb128 0x3
+ 2015 0073 0E       		.uleb128 0xe
+ 2016 0074 3C       		.uleb128 0x3c
+ 2017 0075 19       		.uleb128 0x19
+ 2018 0076 00       		.byte	0
+ 2019 0077 00       		.byte	0
+ 2020 0078 0B       		.uleb128 0xb
+ 2021 0079 13       		.uleb128 0x13
+ 2022 007a 01       		.byte	0x1
+ 2023 007b 03       		.uleb128 0x3
+ 2024 007c 0E       		.uleb128 0xe
+ 2025 007d 0B       		.uleb128 0xb
+ 2026 007e 0B       		.uleb128 0xb
+ 2027 007f 3A       		.uleb128 0x3a
+ 2028 0080 0B       		.uleb128 0xb
+ 2029 0081 3B       		.uleb128 0x3b
+ 2030 0082 0B       		.uleb128 0xb
+ 2031 0083 01       		.uleb128 0x1
+ 2032 0084 13       		.uleb128 0x13
+ 2033 0085 00       		.byte	0
+ 2034 0086 00       		.byte	0
+ 2035 0087 0C       		.uleb128 0xc
+ 2036 0088 01       		.uleb128 0x1
+ 2037 0089 01       		.byte	0x1
+ 2038 008a 49       		.uleb128 0x49
+ 2039 008b 13       		.uleb128 0x13
+ 2040 008c 01       		.uleb128 0x1
+ 2041 008d 13       		.uleb128 0x13
+ 2042 008e 00       		.byte	0
+ 2043 008f 00       		.byte	0
+ 2044 0090 0D       		.uleb128 0xd
+ 2045 0091 21       		.uleb128 0x21
+ 2046 0092 00       		.byte	0
+ 2047 0093 49       		.uleb128 0x49
+ 2048 0094 13       		.uleb128 0x13
+ 2049 0095 2F       		.uleb128 0x2f
+ 2050 0096 0B       		.uleb128 0xb
+ 2051 0097 00       		.byte	0
+ 2052 0098 00       		.byte	0
+ 2053 0099 0E       		.uleb128 0xe
+ 2054 009a 04       		.uleb128 0x4
+ 2055 009b 01       		.byte	0x1
+ 2056 009c 03       		.uleb128 0x3
+ 2057 009d 0E       		.uleb128 0xe
+ 2058 009e 0B       		.uleb128 0xb
+ 2059 009f 0B       		.uleb128 0xb
+ 2060 00a0 49       		.uleb128 0x49
+ 2061 00a1 13       		.uleb128 0x13
+ 2062 00a2 3A       		.uleb128 0x3a
+ 2063 00a3 0B       		.uleb128 0xb
+ 2064 00a4 3B       		.uleb128 0x3b
+ 2065 00a5 0B       		.uleb128 0xb
+ 2066 00a6 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 41
+
+
+ 2067 00a7 13       		.uleb128 0x13
+ 2068 00a8 00       		.byte	0
+ 2069 00a9 00       		.byte	0
+ 2070 00aa 0F       		.uleb128 0xf
+ 2071 00ab 28       		.uleb128 0x28
+ 2072 00ac 00       		.byte	0
+ 2073 00ad 03       		.uleb128 0x3
+ 2074 00ae 0E       		.uleb128 0xe
+ 2075 00af 1C       		.uleb128 0x1c
+ 2076 00b0 0B       		.uleb128 0xb
+ 2077 00b1 00       		.byte	0
+ 2078 00b2 00       		.byte	0
+ 2079 00b3 10       		.uleb128 0x10
+ 2080 00b4 0D       		.uleb128 0xd
+ 2081 00b5 00       		.byte	0
+ 2082 00b6 03       		.uleb128 0x3
+ 2083 00b7 08       		.uleb128 0x8
+ 2084 00b8 3A       		.uleb128 0x3a
+ 2085 00b9 0B       		.uleb128 0xb
+ 2086 00ba 3B       		.uleb128 0x3b
+ 2087 00bb 0B       		.uleb128 0xb
+ 2088 00bc 49       		.uleb128 0x49
+ 2089 00bd 13       		.uleb128 0x13
+ 2090 00be 38       		.uleb128 0x38
+ 2091 00bf 0B       		.uleb128 0xb
+ 2092 00c0 00       		.byte	0
+ 2093 00c1 00       		.byte	0
+ 2094 00c2 11       		.uleb128 0x11
+ 2095 00c3 2E       		.uleb128 0x2e
+ 2096 00c4 01       		.byte	0x1
+ 2097 00c5 3F       		.uleb128 0x3f
+ 2098 00c6 19       		.uleb128 0x19
+ 2099 00c7 03       		.uleb128 0x3
+ 2100 00c8 0E       		.uleb128 0xe
+ 2101 00c9 3A       		.uleb128 0x3a
+ 2102 00ca 0B       		.uleb128 0xb
+ 2103 00cb 3B       		.uleb128 0x3b
+ 2104 00cc 0B       		.uleb128 0xb
+ 2105 00cd 27       		.uleb128 0x27
+ 2106 00ce 19       		.uleb128 0x19
+ 2107 00cf 20       		.uleb128 0x20
+ 2108 00d0 0B       		.uleb128 0xb
+ 2109 00d1 01       		.uleb128 0x1
+ 2110 00d2 13       		.uleb128 0x13
+ 2111 00d3 00       		.byte	0
+ 2112 00d4 00       		.byte	0
+ 2113 00d5 12       		.uleb128 0x12
+ 2114 00d6 0B       		.uleb128 0xb
+ 2115 00d7 01       		.byte	0x1
+ 2116 00d8 00       		.byte	0
+ 2117 00d9 00       		.byte	0
+ 2118 00da 13       		.uleb128 0x13
+ 2119 00db 34       		.uleb128 0x34
+ 2120 00dc 00       		.byte	0
+ 2121 00dd 03       		.uleb128 0x3
+ 2122 00de 0E       		.uleb128 0xe
+ 2123 00df 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 42
+
+
+ 2124 00e0 0B       		.uleb128 0xb
+ 2125 00e1 3B       		.uleb128 0x3b
+ 2126 00e2 0B       		.uleb128 0xb
+ 2127 00e3 49       		.uleb128 0x49
+ 2128 00e4 13       		.uleb128 0x13
+ 2129 00e5 00       		.byte	0
+ 2130 00e6 00       		.byte	0
+ 2131 00e7 14       		.uleb128 0x14
+ 2132 00e8 2E       		.uleb128 0x2e
+ 2133 00e9 01       		.byte	0x1
+ 2134 00ea 3F       		.uleb128 0x3f
+ 2135 00eb 19       		.uleb128 0x19
+ 2136 00ec 03       		.uleb128 0x3
+ 2137 00ed 0E       		.uleb128 0xe
+ 2138 00ee 3A       		.uleb128 0x3a
+ 2139 00ef 0B       		.uleb128 0xb
+ 2140 00f0 3B       		.uleb128 0x3b
+ 2141 00f1 0B       		.uleb128 0xb
+ 2142 00f2 27       		.uleb128 0x27
+ 2143 00f3 19       		.uleb128 0x19
+ 2144 00f4 11       		.uleb128 0x11
+ 2145 00f5 01       		.uleb128 0x1
+ 2146 00f6 12       		.uleb128 0x12
+ 2147 00f7 06       		.uleb128 0x6
+ 2148 00f8 40       		.uleb128 0x40
+ 2149 00f9 18       		.uleb128 0x18
+ 2150 00fa 9642     		.uleb128 0x2116
+ 2151 00fc 19       		.uleb128 0x19
+ 2152 00fd 01       		.uleb128 0x1
+ 2153 00fe 13       		.uleb128 0x13
+ 2154 00ff 00       		.byte	0
+ 2155 0100 00       		.byte	0
+ 2156 0101 15       		.uleb128 0x15
+ 2157 0102 34       		.uleb128 0x34
+ 2158 0103 00       		.byte	0
+ 2159 0104 03       		.uleb128 0x3
+ 2160 0105 0E       		.uleb128 0xe
+ 2161 0106 3A       		.uleb128 0x3a
+ 2162 0107 0B       		.uleb128 0xb
+ 2163 0108 3B       		.uleb128 0x3b
+ 2164 0109 0B       		.uleb128 0xb
+ 2165 010a 49       		.uleb128 0x49
+ 2166 010b 13       		.uleb128 0x13
+ 2167 010c 02       		.uleb128 0x2
+ 2168 010d 17       		.uleb128 0x17
+ 2169 010e 00       		.byte	0
+ 2170 010f 00       		.byte	0
+ 2171 0110 16       		.uleb128 0x16
+ 2172 0111 898201   		.uleb128 0x4109
+ 2173 0114 00       		.byte	0
+ 2174 0115 11       		.uleb128 0x11
+ 2175 0116 01       		.uleb128 0x1
+ 2176 0117 31       		.uleb128 0x31
+ 2177 0118 13       		.uleb128 0x13
+ 2178 0119 00       		.byte	0
+ 2179 011a 00       		.byte	0
+ 2180 011b 17       		.uleb128 0x17
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 43
+
+
+ 2181 011c 2E       		.uleb128 0x2e
+ 2182 011d 01       		.byte	0x1
+ 2183 011e 31       		.uleb128 0x31
+ 2184 011f 13       		.uleb128 0x13
+ 2185 0120 11       		.uleb128 0x11
+ 2186 0121 01       		.uleb128 0x1
+ 2187 0122 12       		.uleb128 0x12
+ 2188 0123 06       		.uleb128 0x6
+ 2189 0124 40       		.uleb128 0x40
+ 2190 0125 18       		.uleb128 0x18
+ 2191 0126 9742     		.uleb128 0x2117
+ 2192 0128 19       		.uleb128 0x19
+ 2193 0129 01       		.uleb128 0x1
+ 2194 012a 13       		.uleb128 0x13
+ 2195 012b 00       		.byte	0
+ 2196 012c 00       		.byte	0
+ 2197 012d 18       		.uleb128 0x18
+ 2198 012e 0B       		.uleb128 0xb
+ 2199 012f 01       		.byte	0x1
+ 2200 0130 11       		.uleb128 0x11
+ 2201 0131 01       		.uleb128 0x1
+ 2202 0132 12       		.uleb128 0x12
+ 2203 0133 06       		.uleb128 0x6
+ 2204 0134 00       		.byte	0
+ 2205 0135 00       		.byte	0
+ 2206 0136 19       		.uleb128 0x19
+ 2207 0137 34       		.uleb128 0x34
+ 2208 0138 00       		.byte	0
+ 2209 0139 31       		.uleb128 0x31
+ 2210 013a 13       		.uleb128 0x13
+ 2211 013b 00       		.byte	0
+ 2212 013c 00       		.byte	0
+ 2213 013d 1A       		.uleb128 0x1a
+ 2214 013e 0B       		.uleb128 0xb
+ 2215 013f 01       		.byte	0x1
+ 2216 0140 11       		.uleb128 0x11
+ 2217 0141 01       		.uleb128 0x1
+ 2218 0142 12       		.uleb128 0x12
+ 2219 0143 06       		.uleb128 0x6
+ 2220 0144 01       		.uleb128 0x1
+ 2221 0145 13       		.uleb128 0x13
+ 2222 0146 00       		.byte	0
+ 2223 0147 00       		.byte	0
+ 2224 0148 1B       		.uleb128 0x1b
+ 2225 0149 34       		.uleb128 0x34
+ 2226 014a 00       		.byte	0
+ 2227 014b 03       		.uleb128 0x3
+ 2228 014c 08       		.uleb128 0x8
+ 2229 014d 3A       		.uleb128 0x3a
+ 2230 014e 0B       		.uleb128 0xb
+ 2231 014f 3B       		.uleb128 0x3b
+ 2232 0150 0B       		.uleb128 0xb
+ 2233 0151 49       		.uleb128 0x49
+ 2234 0152 13       		.uleb128 0x13
+ 2235 0153 02       		.uleb128 0x2
+ 2236 0154 17       		.uleb128 0x17
+ 2237 0155 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 44
+
+
+ 2238 0156 00       		.byte	0
+ 2239 0157 1C       		.uleb128 0x1c
+ 2240 0158 898201   		.uleb128 0x4109
+ 2241 015b 01       		.byte	0x1
+ 2242 015c 11       		.uleb128 0x11
+ 2243 015d 01       		.uleb128 0x1
+ 2244 015e 31       		.uleb128 0x31
+ 2245 015f 13       		.uleb128 0x13
+ 2246 0160 01       		.uleb128 0x1
+ 2247 0161 13       		.uleb128 0x13
+ 2248 0162 00       		.byte	0
+ 2249 0163 00       		.byte	0
+ 2250 0164 1D       		.uleb128 0x1d
+ 2251 0165 8A8201   		.uleb128 0x410a
+ 2252 0168 00       		.byte	0
+ 2253 0169 02       		.uleb128 0x2
+ 2254 016a 18       		.uleb128 0x18
+ 2255 016b 9142     		.uleb128 0x2111
+ 2256 016d 18       		.uleb128 0x18
+ 2257 016e 00       		.byte	0
+ 2258 016f 00       		.byte	0
+ 2259 0170 1E       		.uleb128 0x1e
+ 2260 0171 898201   		.uleb128 0x4109
+ 2261 0174 01       		.byte	0x1
+ 2262 0175 11       		.uleb128 0x11
+ 2263 0176 01       		.uleb128 0x1
+ 2264 0177 31       		.uleb128 0x31
+ 2265 0178 13       		.uleb128 0x13
+ 2266 0179 00       		.byte	0
+ 2267 017a 00       		.byte	0
+ 2268 017b 1F       		.uleb128 0x1f
+ 2269 017c 2E       		.uleb128 0x2e
+ 2270 017d 01       		.byte	0x1
+ 2271 017e 3F       		.uleb128 0x3f
+ 2272 017f 19       		.uleb128 0x19
+ 2273 0180 03       		.uleb128 0x3
+ 2274 0181 0E       		.uleb128 0xe
+ 2275 0182 3A       		.uleb128 0x3a
+ 2276 0183 0B       		.uleb128 0xb
+ 2277 0184 3B       		.uleb128 0x3b
+ 2278 0185 0B       		.uleb128 0xb
+ 2279 0186 27       		.uleb128 0x27
+ 2280 0187 19       		.uleb128 0x19
+ 2281 0188 11       		.uleb128 0x11
+ 2282 0189 01       		.uleb128 0x1
+ 2283 018a 12       		.uleb128 0x12
+ 2284 018b 06       		.uleb128 0x6
+ 2285 018c 40       		.uleb128 0x40
+ 2286 018d 18       		.uleb128 0x18
+ 2287 018e 9742     		.uleb128 0x2117
+ 2288 0190 19       		.uleb128 0x19
+ 2289 0191 01       		.uleb128 0x1
+ 2290 0192 13       		.uleb128 0x13
+ 2291 0193 00       		.byte	0
+ 2292 0194 00       		.byte	0
+ 2293 0195 20       		.uleb128 0x20
+ 2294 0196 898201   		.uleb128 0x4109
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 45
+
+
+ 2295 0199 00       		.byte	0
+ 2296 019a 11       		.uleb128 0x11
+ 2297 019b 01       		.uleb128 0x1
+ 2298 019c 9542     		.uleb128 0x2115
+ 2299 019e 19       		.uleb128 0x19
+ 2300 019f 31       		.uleb128 0x31
+ 2301 01a0 13       		.uleb128 0x13
+ 2302 01a1 00       		.byte	0
+ 2303 01a2 00       		.byte	0
+ 2304 01a3 21       		.uleb128 0x21
+ 2305 01a4 34       		.uleb128 0x34
+ 2306 01a5 00       		.byte	0
+ 2307 01a6 03       		.uleb128 0x3
+ 2308 01a7 0E       		.uleb128 0xe
+ 2309 01a8 3A       		.uleb128 0x3a
+ 2310 01a9 0B       		.uleb128 0xb
+ 2311 01aa 3B       		.uleb128 0x3b
+ 2312 01ab 05       		.uleb128 0x5
+ 2313 01ac 49       		.uleb128 0x49
+ 2314 01ad 13       		.uleb128 0x13
+ 2315 01ae 3F       		.uleb128 0x3f
+ 2316 01af 19       		.uleb128 0x19
+ 2317 01b0 3C       		.uleb128 0x3c
+ 2318 01b1 19       		.uleb128 0x19
+ 2319 01b2 00       		.byte	0
+ 2320 01b3 00       		.byte	0
+ 2321 01b4 22       		.uleb128 0x22
+ 2322 01b5 34       		.uleb128 0x34
+ 2323 01b6 00       		.byte	0
+ 2324 01b7 03       		.uleb128 0x3
+ 2325 01b8 0E       		.uleb128 0xe
+ 2326 01b9 3A       		.uleb128 0x3a
+ 2327 01ba 0B       		.uleb128 0xb
+ 2328 01bb 3B       		.uleb128 0x3b
+ 2329 01bc 0B       		.uleb128 0xb
+ 2330 01bd 49       		.uleb128 0x49
+ 2331 01be 13       		.uleb128 0x13
+ 2332 01bf 3F       		.uleb128 0x3f
+ 2333 01c0 19       		.uleb128 0x19
+ 2334 01c1 02       		.uleb128 0x2
+ 2335 01c2 18       		.uleb128 0x18
+ 2336 01c3 00       		.byte	0
+ 2337 01c4 00       		.byte	0
+ 2338 01c5 23       		.uleb128 0x23
+ 2339 01c6 34       		.uleb128 0x34
+ 2340 01c7 00       		.byte	0
+ 2341 01c8 03       		.uleb128 0x3
+ 2342 01c9 0E       		.uleb128 0xe
+ 2343 01ca 3A       		.uleb128 0x3a
+ 2344 01cb 0B       		.uleb128 0xb
+ 2345 01cc 3B       		.uleb128 0x3b
+ 2346 01cd 0B       		.uleb128 0xb
+ 2347 01ce 49       		.uleb128 0x49
+ 2348 01cf 13       		.uleb128 0x13
+ 2349 01d0 3F       		.uleb128 0x3f
+ 2350 01d1 19       		.uleb128 0x19
+ 2351 01d2 3C       		.uleb128 0x3c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 46
+
+
+ 2352 01d3 19       		.uleb128 0x19
+ 2353 01d4 00       		.byte	0
+ 2354 01d5 00       		.byte	0
+ 2355 01d6 24       		.uleb128 0x24
+ 2356 01d7 2E       		.uleb128 0x2e
+ 2357 01d8 00       		.byte	0
+ 2358 01d9 3F       		.uleb128 0x3f
+ 2359 01da 19       		.uleb128 0x19
+ 2360 01db 3C       		.uleb128 0x3c
+ 2361 01dc 19       		.uleb128 0x19
+ 2362 01dd 6E       		.uleb128 0x6e
+ 2363 01de 0E       		.uleb128 0xe
+ 2364 01df 03       		.uleb128 0x3
+ 2365 01e0 0E       		.uleb128 0xe
+ 2366 01e1 3A       		.uleb128 0x3a
+ 2367 01e2 0B       		.uleb128 0xb
+ 2368 01e3 3B       		.uleb128 0x3b
+ 2369 01e4 05       		.uleb128 0x5
+ 2370 01e5 00       		.byte	0
+ 2371 01e6 00       		.byte	0
+ 2372 01e7 25       		.uleb128 0x25
+ 2373 01e8 2E       		.uleb128 0x2e
+ 2374 01e9 00       		.byte	0
+ 2375 01ea 3F       		.uleb128 0x3f
+ 2376 01eb 19       		.uleb128 0x19
+ 2377 01ec 3C       		.uleb128 0x3c
+ 2378 01ed 19       		.uleb128 0x19
+ 2379 01ee 6E       		.uleb128 0x6e
+ 2380 01ef 0E       		.uleb128 0xe
+ 2381 01f0 03       		.uleb128 0x3
+ 2382 01f1 0E       		.uleb128 0xe
+ 2383 01f2 3A       		.uleb128 0x3a
+ 2384 01f3 0B       		.uleb128 0xb
+ 2385 01f4 3B       		.uleb128 0x3b
+ 2386 01f5 0B       		.uleb128 0xb
+ 2387 01f6 00       		.byte	0
+ 2388 01f7 00       		.byte	0
+ 2389 01f8 00       		.byte	0
+ 2390              		.section	.debug_loc,"",%progbits
+ 2391              	.Ldebug_loc0:
+ 2392              	.LLST0:
+ 2393 0000 3E000000 		.4byte	.LVL8
+ 2394 0004 41000000 		.4byte	.LVL9-1
+ 2395 0008 0100     		.2byte	0x1
+ 2396 000a 50       		.byte	0x50
+ 2397 000b 41000000 		.4byte	.LVL9-1
+ 2398 000f 86000000 		.4byte	.LVL20
+ 2399 0013 0100     		.2byte	0x1
+ 2400 0015 58       		.byte	0x58
+ 2401 0016 00000000 		.4byte	0
+ 2402 001a 00000000 		.4byte	0
+ 2403              	.LLST1:
+ 2404 001e 86000000 		.4byte	.LVL20
+ 2405 0022 89000000 		.4byte	.LVL21-1
+ 2406 0026 0100     		.2byte	0x1
+ 2407 0028 50       		.byte	0x50
+ 2408 0029 89000000 		.4byte	.LVL21-1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 47
+
+
+ 2409 002d FA000000 		.4byte	.LVL39
+ 2410 0031 0100     		.2byte	0x1
+ 2411 0033 58       		.byte	0x58
+ 2412 0034 00000000 		.4byte	0
+ 2413 0038 00000000 		.4byte	0
+ 2414              	.LLST2:
+ 2415 003c B8000000 		.4byte	.LVL29
+ 2416 0040 BB000000 		.4byte	.LVL30-1
+ 2417 0044 0100     		.2byte	0x1
+ 2418 0046 50       		.byte	0x50
+ 2419 0047 BB000000 		.4byte	.LVL30-1
+ 2420 004b D6000000 		.4byte	.LVL35
+ 2421 004f 0100     		.2byte	0x1
+ 2422 0051 55       		.byte	0x55
+ 2423 0052 00000000 		.4byte	0
+ 2424 0056 00000000 		.4byte	0
+ 2425              	.LLST3:
+ 2426 005a 5E000000 		.4byte	.LVL51
+ 2427 005e 61000000 		.4byte	.LVL52-1
+ 2428 0062 0100     		.2byte	0x1
+ 2429 0064 50       		.byte	0x50
+ 2430 0065 61000000 		.4byte	.LVL52-1
+ 2431 0069 C8000000 		.4byte	.LVL66
+ 2432 006d 0100     		.2byte	0x1
+ 2433 006f 58       		.byte	0x58
+ 2434 0070 00000000 		.4byte	0
+ 2435 0074 00000000 		.4byte	0
+ 2436              	.LLST4:
+ 2437 0078 C8000000 		.4byte	.LVL66
+ 2438 007c D8000000 		.4byte	.LVL68
+ 2439 0080 1600     		.2byte	0x16
+ 2440 0082 78       		.byte	0x78
+ 2441 0083 00       		.sleb128 0
+ 2442 0084 12       		.byte	0x12
+ 2443 0085 0A       		.byte	0xa
+ 2444 0086 FFFF     		.2byte	0xffff
+ 2445 0088 1A       		.byte	0x1a
+ 2446 0089 08       		.byte	0x8
+ 2447 008a FF       		.byte	0xff
+ 2448 008b 16       		.byte	0x16
+ 2449 008c 14       		.byte	0x14
+ 2450 008d 0A       		.byte	0xa
+ 2451 008e FFFF     		.2byte	0xffff
+ 2452 0090 1A       		.byte	0x1a
+ 2453 0091 2D       		.byte	0x2d
+ 2454 0092 28       		.byte	0x28
+ 2455 0093 0100     		.2byte	0x1
+ 2456 0095 16       		.byte	0x16
+ 2457 0096 13       		.byte	0x13
+ 2458 0097 9F       		.byte	0x9f
+ 2459 0098 00000000 		.4byte	0
+ 2460 009c 00000000 		.4byte	0
+ 2461              	.LLST5:
+ 2462 00a0 4A000000 		.4byte	.LVL49
+ 2463 00a4 A6000000 		.4byte	.LVL62
+ 2464 00a8 0100     		.2byte	0x1
+ 2465 00aa 56       		.byte	0x56
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 48
+
+
+ 2466 00ab 00000000 		.4byte	0
+ 2467 00af 00000000 		.4byte	0
+ 2468              	.LLST6:
+ 2469 00b3 86010000 		.4byte	.LVL90
+ 2470 00b7 89010000 		.4byte	.LVL91-1
+ 2471 00bb 0100     		.2byte	0x1
+ 2472 00bd 50       		.byte	0x50
+ 2473 00be 89010000 		.4byte	.LVL91-1
+ 2474 00c2 9E010000 		.4byte	.LVL94
+ 2475 00c6 0100     		.2byte	0x1
+ 2476 00c8 54       		.byte	0x54
+ 2477 00c9 00000000 		.4byte	0
+ 2478 00cd 00000000 		.4byte	0
+ 2479              	.LLST7:
+ 2480 00d1 16010000 		.4byte	.LVL75
+ 2481 00d5 1C010000 		.4byte	.LVL76
+ 2482 00d9 0500     		.2byte	0x5
+ 2483 00db 35       		.byte	0x35
+ 2484 00dc 78       		.byte	0x78
+ 2485 00dd 00       		.sleb128 0
+ 2486 00de 1C       		.byte	0x1c
+ 2487 00df 9F       		.byte	0x9f
+ 2488 00e0 00000000 		.4byte	0
+ 2489 00e4 00000000 		.4byte	0
+ 2490              		.section	.debug_aranges,"",%progbits
+ 2491 0000 34000000 		.4byte	0x34
+ 2492 0004 0200     		.2byte	0x2
+ 2493 0006 00000000 		.4byte	.Ldebug_info0
+ 2494 000a 04       		.byte	0x4
+ 2495 000b 00       		.byte	0
+ 2496 000c 0000     		.2byte	0
+ 2497 000e 0000     		.2byte	0
+ 2498 0010 00000000 		.4byte	.LFB69
+ 2499 0014 18010000 		.4byte	.LFE69-.LFB69
+ 2500 0018 00000000 		.4byte	.LFB70
+ 2501 001c 5C000000 		.4byte	.LFE70-.LFB70
+ 2502 0020 00000000 		.4byte	.LFB71
+ 2503 0024 C0010000 		.4byte	.LFE71-.LFB71
+ 2504 0028 00000000 		.4byte	.LFB68
+ 2505 002c 46000000 		.4byte	.LFE68-.LFB68
+ 2506 0030 00000000 		.4byte	0
+ 2507 0034 00000000 		.4byte	0
+ 2508              		.section	.debug_ranges,"",%progbits
+ 2509              	.Ldebug_ranges0:
+ 2510 0000 00000000 		.4byte	.LFB69
+ 2511 0004 18010000 		.4byte	.LFE69
+ 2512 0008 00000000 		.4byte	.LFB70
+ 2513 000c 5C000000 		.4byte	.LFE70
+ 2514 0010 00000000 		.4byte	.LFB71
+ 2515 0014 C0010000 		.4byte	.LFE71
+ 2516 0018 00000000 		.4byte	.LFB68
+ 2517 001c 46000000 		.4byte	.LFE68
+ 2518 0020 00000000 		.4byte	0
+ 2519 0024 00000000 		.4byte	0
+ 2520              		.section	.debug_line,"",%progbits
+ 2521              	.Ldebug_line0:
+ 2522 0000 07040000 		.section	.debug_str,"MS",%progbits,1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 49
+
+
+ 2522      02004903 
+ 2522      00000201 
+ 2522      FB0E0D00 
+ 2522      01010101 
+ 2523              	.LASF149:
+ 2524 0000 50574D42 		.ascii	"PWMB_Start\000"
+ 2524      5F537461 
+ 2524      727400
+ 2525              	.LASF18:
+ 2526 000b 75696E74 		.ascii	"uint16\000"
+ 2526      313600
+ 2527              	.LASF3:
+ 2528 0012 5F5F7569 		.ascii	"__uint8_t\000"
+ 2528      6E74385F 
+ 2528      7400
+ 2529              	.LASF112:
+ 2530 001c 62757273 		.ascii	"burst_state\000"
+ 2530      745F7374 
+ 2530      61746500 
+ 2531              	.LASF134:
+ 2532 0028 726F756E 		.ascii	"round\000"
+ 2532      6400
+ 2533              	.LASF63:
+ 2534 002e 7069645F 		.ascii	"pid_temp_mode\000"
+ 2534      74656D70 
+ 2534      5F6D6F64 
+ 2534      6500
+ 2535              	.LASF104:
+ 2536 003c 494E5452 		.ascii	"INTR_MODE_BLOCKED\000"
+ 2536      5F4D4F44 
+ 2536      455F424C 
+ 2536      4F434B45 
+ 2536      4400
+ 2537              	.LASF165:
+ 2538 004e 746D7254 		.ascii	"tmrTimerControl\000"
+ 2538      696D6572 
+ 2538      436F6E74 
+ 2538      726F6C00 
+ 2539              	.LASF115:
+ 2540 005e 696E7465 		.ascii	"interrupter_params\000"
+ 2540      72727570 
+ 2540      7465725F 
+ 2540      70617261 
+ 2540      6D7300
+ 2541              	.LASF164:
+ 2542 0071 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 2542      73657273 
+ 2542      5C636865 
+ 2542      6D695C55 
+ 2542      44335F51 
+ 2543              	.LASF11:
+ 2544 0096 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2544      206C6F6E 
+ 2544      6720756E 
+ 2544      7369676E 
+ 2544      65642069 
+ 2545              	.LASF46:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 50
+
+
+ 2546 00ad 6D61785F 		.ascii	"max_tr_current\000"
+ 2546      74725F63 
+ 2546      75727265 
+ 2546      6E7400
+ 2547              	.LASF30:
+ 2548 00bc 70776D62 		.ascii	"pwmb_psb_prd\000"
+ 2548      5F707362 
+ 2548      5F707264 
+ 2548      00
+ 2549              	.LASF121:
+ 2550 00c9 636F6E66 		.ascii	"configure_ZCD_to_PWM\000"
+ 2550      69677572 
+ 2550      655F5A43 
+ 2550      445F746F 
+ 2550      5F50574D 
+ 2551              	.LASF38:
+ 2552 00de 70617261 		.ascii	"parameters\000"
+ 2552      6D657465 
+ 2552      727300
+ 2553              	.LASF6:
+ 2554 00e9 5F5F696E 		.ascii	"__int32_t\000"
+ 2554      7433325F 
+ 2554      7400
+ 2555              	.LASF147:
+ 2556 00f3 46425F63 		.ascii	"FB_capture_WritePeriod\000"
+ 2556      61707475 
+ 2556      72655F57 
+ 2556      72697465 
+ 2556      50657269 
+ 2557              	.LASF156:
+ 2558 010a 4354315F 		.ascii	"CT1_dac_Start\000"
+ 2558      6461635F 
+ 2558      53746172 
+ 2558      7400
+ 2559              	.LASF86:
+ 2560 0118 75766C6F 		.ascii	"uvlo_analog\000"
+ 2560      5F616E61 
+ 2560      6C6F6700 
+ 2561              	.LASF10:
+ 2562 0124 6C6F6E67 		.ascii	"long long int\000"
+ 2562      206C6F6E 
+ 2562      6720696E 
+ 2562      7400
+ 2563              	.LASF0:
+ 2564 0132 7369676E 		.ascii	"signed char\000"
+ 2564      65642063 
+ 2564      68617200 
+ 2565              	.LASF94:
+ 2566 013e 636F6D70 		.ascii	"compressor_release\000"
+ 2566      72657373 
+ 2566      6F725F72 
+ 2566      656C6561 
+ 2566      736500
+ 2567              	.LASF110:
+ 2568 0151 494E5452 		.ascii	"INTR_MOD_CUR\000"
+ 2568      5F4D4F44 
+ 2568      5F435552 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 51
+
+
+ 2568      00
+ 2569              	.LASF70:
+ 2570 015e 62617564 		.ascii	"baudrate\000"
+ 2570      72617465 
+ 2570      00
+ 2571              	.LASF22:
+ 2572 0167 72656738 		.ascii	"reg8\000"
+ 2572      00
+ 2573              	.LASF29:
+ 2574 016c 70776D5F 		.ascii	"pwm_top\000"
+ 2574      746F7000 
+ 2575              	.LASF34:
+ 2576 0174 6D696E5F 		.ascii	"min_tr_cl_dac_val\000"
+ 2576      74725F63 
+ 2576      6C5F6461 
+ 2576      635F7661 
+ 2576      6C00
+ 2577              	.LASF7:
+ 2578 0186 6C6F6E67 		.ascii	"long int\000"
+ 2578      20696E74 
+ 2578      00
+ 2579              	.LASF55:
+ 2580 018f 6C656164 		.ascii	"lead_time\000"
+ 2580      5F74696D 
+ 2580      6500
+ 2581              	.LASF71:
+ 2582 0199 6374325F 		.ascii	"ct2_type\000"
+ 2582      74797065 
+ 2582      00
+ 2583              	.LASF146:
+ 2584 01a2 50574D42 		.ascii	"PWMB_WriteCompare\000"
+ 2584      5F577269 
+ 2584      7465436F 
+ 2584      6D706172 
+ 2584      6500
+ 2585              	.LASF42:
+ 2586 01b4 77617463 		.ascii	"watchdog_timeout\000"
+ 2586      68646F67 
+ 2586      5F74696D 
+ 2586      656F7574 
+ 2586      00
+ 2587              	.LASF68:
+ 2588 01c5 6175746F 		.ascii	"autotune_s\000"
+ 2588      74756E65 
+ 2588      5F7300
+ 2589              	.LASF17:
+ 2590 01d0 75696E74 		.ascii	"uint8\000"
+ 2590      3800
+ 2591              	.LASF28:
+ 2592 01d6 70776D62 		.ascii	"pwmb_start_cmp\000"
+ 2592      5F737461 
+ 2592      72745F63 
+ 2592      6D7000
+ 2593              	.LASF128:
+ 2594 01e5 70617261 		.ascii	"params\000"
+ 2594      6D7300
+ 2595              	.LASF20:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 52
+
+
+ 2596 01ec 646F7562 		.ascii	"double\000"
+ 2596      6C6500
+ 2597              	.LASF78:
+ 2598 01f3 6578745F 		.ascii	"ext_interrupter\000"
+ 2598      696E7465 
+ 2598      72727570 
+ 2598      74657200 
+ 2599              	.LASF39:
+ 2600 0203 42617365 		.ascii	"BaseType_t\000"
+ 2600      54797065 
+ 2600      5F7400
+ 2601              	.LASF96:
+ 2602 020e 64726976 		.ascii	"drive_factor\000"
+ 2602      655F6661 
+ 2602      63746F72 
+ 2602      00
+ 2603              	.LASF62:
+ 2604 021b 7069645F 		.ascii	"pid_temp_set\000"
+ 2604      74656D70 
+ 2604      5F736574 
+ 2604      00
+ 2605              	.LASF60:
+ 2606 0228 74656D70 		.ascii	"temp1_setpoint\000"
+ 2606      315F7365 
+ 2606      74706F69 
+ 2606      6E7400
+ 2607              	.LASF61:
+ 2608 0237 74656D70 		.ascii	"temp2_setpoint\000"
+ 2608      325F7365 
+ 2608      74706F69 
+ 2608      6E7400
+ 2609              	.LASF159:
+ 2610 0246 4F70616D 		.ascii	"Opamp_1_Start\000"
+ 2610      705F315F 
+ 2610      53746172 
+ 2610      7400
+ 2611              	.LASF100:
+ 2612 0254 696E7465 		.ascii	"interrupter_DMA\000"
+ 2612      72727570 
+ 2612      7465725F 
+ 2612      444D4100 
+ 2613              	.LASF8:
+ 2614 0264 5F5F7569 		.ascii	"__uint32_t\000"
+ 2614      6E743332 
+ 2614      5F7400
+ 2615              	.LASF162:
+ 2616 026f 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2616      43393920 
+ 2616      352E342E 
+ 2616      31203230 
+ 2616      31363036 
+ 2617 02a2 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2617      20726576 
+ 2617      6973696F 
+ 2617      6E203233 
+ 2617      37373135 
+ 2618 02d5 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 53
+
+
+ 2618      74643D67 
+ 2618      6E753939 
+ 2618      202D6666 
+ 2618      756E6374 
+ 2619              	.LASF137:
+ 2620 0308 5A43445F 		.ascii	"ZCD_counter_WritePeriod\000"
+ 2620      636F756E 
+ 2620      7465725F 
+ 2620      57726974 
+ 2620      65506572 
+ 2621              	.LASF166:
+ 2622 0320 636F6E66 		.ascii	"config_struct\000"
+ 2622      69675F73 
+ 2622      74727563 
+ 2622      7400
+ 2623              	.LASF12:
+ 2624 032e 756E7369 		.ascii	"unsigned int\000"
+ 2624      676E6564 
+ 2624      20696E74 
+ 2624      00
+ 2625              	.LASF14:
+ 2626 033b 75696E74 		.ascii	"uint16_t\000"
+ 2626      31365F74 
+ 2626      00
+ 2627              	.LASF157:
+ 2628 0344 5A434472 		.ascii	"ZCDref_Start\000"
+ 2628      65665F53 
+ 2628      74617274 
+ 2628      00
+ 2629              	.LASF9:
+ 2630 0351 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2630      20756E73 
+ 2630      69676E65 
+ 2630      6420696E 
+ 2630      7400
+ 2631              	.LASF40:
+ 2632 0363 54696D65 		.ascii	"TimerHandle_t\000"
+ 2632      7248616E 
+ 2632      646C655F 
+ 2632      7400
+ 2633              	.LASF144:
+ 2634 0371 50574D41 		.ascii	"PWMA_WriteCompare\000"
+ 2634      5F577269 
+ 2634      7465436F 
+ 2634      6D706172 
+ 2634      6500
+ 2635              	.LASF49:
+ 2636 0383 74656D70 		.ascii	"temp1_max\000"
+ 2636      315F6D61 
+ 2636      7800
+ 2637              	.LASF52:
+ 2638 038d 6374325F 		.ascii	"ct2_ratio\000"
+ 2638      72617469 
+ 2638      6F00
+ 2639              	.LASF168:
+ 2640 0397 636E745F 		.ascii	"cnt_fs\000"
+ 2640      667300
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 54
+
+
+ 2641              	.LASF5:
+ 2642 039e 73686F72 		.ascii	"short unsigned int\000"
+ 2642      7420756E 
+ 2642      7369676E 
+ 2642      65642069 
+ 2642      6E7400
+ 2643              	.LASF33:
+ 2644 03b1 6D696E5F 		.ascii	"min_tr_prd\000"
+ 2644      74725F70 
+ 2644      726400
+ 2645              	.LASF153:
+ 2646 03bc 5A43445F 		.ascii	"ZCD_compA_Start\000"
+ 2646      636F6D70 
+ 2646      415F5374 
+ 2646      61727400 
+ 2647              	.LASF132:
+ 2648 03cc 636F6E66 		.ascii	"configuration\000"
+ 2648      69677572 
+ 2648      6174696F 
+ 2648      6E00
+ 2649              	.LASF161:
+ 2650 03da 46425F46 		.ascii	"FB_Filter_SetCoherency\000"
+ 2650      696C7465 
+ 2650      725F5365 
+ 2650      74436F68 
+ 2650      6572656E 
+ 2651              	.LASF83:
+ 2652 03f1 6E74635F 		.ascii	"ntc_r25\000"
+ 2652      72323500 
+ 2653              	.LASF80:
+ 2654 03f9 70636139 		.ascii	"pca9685\000"
+ 2654      36383500 
+ 2655              	.LASF133:
+ 2656 0401 696E7465 		.ascii	"interrupter\000"
+ 2656      72727570 
+ 2656      74657200 
+ 2657              	.LASF77:
+ 2658 040d 69766F5F 		.ascii	"ivo_uart\000"
+ 2658      75617274 
+ 2658      00
+ 2659              	.LASF120:
+ 2660 0416 636F6E66 		.ascii	"configure_CT1\000"
+ 2660      69677572 
+ 2660      655F4354 
+ 2660      3100
+ 2661              	.LASF167:
+ 2662 0424 636F6E66 		.ascii	"configure_CT2\000"
+ 2662      69677572 
+ 2662      655F4354 
+ 2662      3200
+ 2663              	.LASF32:
+ 2664 0432 70776D62 		.ascii	"pwmb_start_psb_val\000"
+ 2664      5F737461 
+ 2664      72745F70 
+ 2664      73625F76 
+ 2664      616C00
+ 2665              	.LASF158:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 55
+
+
+ 2666 0445 46425F54 		.ascii	"FB_THRSH_DAC_Start\000"
+ 2666      48525348 
+ 2666      5F444143 
+ 2666      5F537461 
+ 2666      727400
+ 2667              	.LASF101:
+ 2668 0458 696E7465 		.ascii	"interrupter_mode\000"
+ 2668      72727570 
+ 2668      7465725F 
+ 2668      6D6F6465 
+ 2668      00
+ 2669              	.LASF139:
+ 2670 0469 7365745F 		.ascii	"set_switch_without_fb\000"
+ 2670      73776974 
+ 2670      63685F77 
+ 2670      6974686F 
+ 2670      75745F66 
+ 2671              	.LASF107:
+ 2672 047f 42555253 		.ascii	"BURST_OFF\000"
+ 2672      545F4F46 
+ 2672      4600
+ 2673              	.LASF126:
+ 2674 0489 696E6974 		.ascii	"initialize_ZCD_to_PWM\000"
+ 2674      69616C69 
+ 2674      7A655F5A 
+ 2674      43445F74 
+ 2674      6F5F5057 
+ 2675              	.LASF122:
+ 2676 049f 70776D5F 		.ascii	"pwm_start_prd_temp\000"
+ 2676      73746172 
+ 2676      745F7072 
+ 2676      645F7465 
+ 2676      6D7000
+ 2677              	.LASF148:
+ 2678 04b2 50574D41 		.ascii	"PWMA_Start\000"
+ 2678      5F537461 
+ 2678      727400
+ 2679              	.LASF98:
+ 2680 04bd 494E5452 		.ascii	"INTR_DMA_TR\000"
+ 2680      5F444D41 
+ 2680      5F545200 
+ 2681              	.LASF58:
+ 2682 04c9 6D61785F 		.ascii	"max_tr_duty\000"
+ 2682      74725F64 
+ 2682      75747900 
+ 2683              	.LASF108:
+ 2684 04d5 696E7465 		.ascii	"interrupter_modulation\000"
+ 2684      72727570 
+ 2684      7465725F 
+ 2684      6D6F6475 
+ 2684      6C617469 
+ 2685              	.LASF23:
+ 2686 04ec 73697A65 		.ascii	"sizetype\000"
+ 2686      74797065 
+ 2686      00
+ 2687              	.LASF27:
+ 2688 04f5 70776D62 		.ascii	"pwmb_start_prd\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 56
+
+
+ 2688      5F737461 
+ 2688      72745F70 
+ 2688      726400
+ 2689              	.LASF95:
+ 2690 0504 636F6D70 		.ascii	"compressor_maxDutyOffset\000"
+ 2690      72657373 
+ 2690      6F725F6D 
+ 2690      61784475 
+ 2690      74794F66 
+ 2691              	.LASF79:
+ 2692 051d 69735F71 		.ascii	"is_qcw\000"
+ 2692      637700
+ 2693              	.LASF25:
+ 2694 0524 70776D61 		.ascii	"pwma_start_prd\000"
+ 2694      5F737461 
+ 2694      72745F70 
+ 2694      726400
+ 2695              	.LASF142:
+ 2696 0533 46425F67 		.ascii	"FB_glitch_detect_WriteCompare2\000"
+ 2696      6C697463 
+ 2696      685F6465 
+ 2696      74656374 
+ 2696      5F577269 
+ 2697              	.LASF102:
+ 2698 0552 494E5452 		.ascii	"INTR_MODE_OFF\000"
+ 2698      5F4D4F44 
+ 2698      455F4F46 
+ 2698      4600
+ 2699              	.LASF91:
+ 2700 0560 53696747 		.ascii	"SigGen_minOtOffset\000"
+ 2700      656E5F6D 
+ 2700      696E4F74 
+ 2700      4F666673 
+ 2700      657400
+ 2701              	.LASF114:
+ 2702 0573 78427572 		.ascii	"xBurst_Timer\000"
+ 2702      73745F54 
+ 2702      696D6572 
+ 2702      00
+ 2703              	.LASF113:
+ 2704 0580 646D615F 		.ascii	"dma_mode\000"
+ 2704      6D6F6465 
+ 2704      00
+ 2705              	.LASF138:
+ 2706 0589 5A43445F 		.ascii	"ZCD_counter_WriteCompare\000"
+ 2706      636F756E 
+ 2706      7465725F 
+ 2706      57726974 
+ 2706      65436F6D 
+ 2707              	.LASF130:
+ 2708 05a2 66625F66 		.ascii	"fb_filter_out\000"
+ 2708      696C7465 
+ 2708      725F6F75 
+ 2708      7400
+ 2709              	.LASF41:
+ 2710 05b0 77617463 		.ascii	"watchdog\000"
+ 2710      68646F67 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 57
+
+
+ 2710      00
+ 2711              	.LASF117:
+ 2712 05b9 6D61785F 		.ascii	"max_tr_cl_dac_val_temp\000"
+ 2712      74725F63 
+ 2712      6C5F6461 
+ 2712      635F7661 
+ 2712      6C5F7465 
+ 2713              	.LASF93:
+ 2714 05d0 636F6D70 		.ascii	"compressor_sustain\000"
+ 2714      72657373 
+ 2714      6F725F73 
+ 2714      75737461 
+ 2714      696E00
+ 2715              	.LASF74:
+ 2716 05e3 6374325F 		.ascii	"ct2_offset\000"
+ 2716      6F666673 
+ 2716      657400
+ 2717              	.LASF19:
+ 2718 05ee 666C6F61 		.ascii	"float\000"
+ 2718      7400
+ 2719              	.LASF54:
+ 2720 05f4 6374325F 		.ascii	"ct2_burden\000"
+ 2720      62757264 
+ 2720      656E00
+ 2721              	.LASF48:
+ 2722 05ff 6D61785F 		.ascii	"max_qcw_current\000"
+ 2722      7163775F 
+ 2722      63757272 
+ 2722      656E7400 
+ 2723              	.LASF43:
+ 2724 060f 6D61785F 		.ascii	"max_tr_pw\000"
+ 2724      74725F70 
+ 2724      7700
+ 2725              	.LASF82:
+ 2726 0619 6E74635F 		.ascii	"ntc_b\000"
+ 2726      6200
+ 2727              	.LASF69:
+ 2728 061f 75645F6E 		.ascii	"ud_name\000"
+ 2728      616D6500 
+ 2729              	.LASF106:
+ 2730 0627 42555253 		.ascii	"BURST_ON\000"
+ 2730      545F4F4E 
+ 2730      00
+ 2731              	.LASF51:
+ 2732 0630 6374315F 		.ascii	"ct1_ratio\000"
+ 2732      72617469 
+ 2732      6F00
+ 2733              	.LASF141:
+ 2734 063a 46425F67 		.ascii	"FB_glitch_detect_WriteCompare1\000"
+ 2734      6C697463 
+ 2734      685F6465 
+ 2734      74656374 
+ 2734      5F577269 
+ 2735              	.LASF47:
+ 2736 0659 6D696E5F 		.ascii	"min_tr_current\000"
+ 2736      74725F63 
+ 2736      75727265 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 58
+
+
+ 2736      6E7400
+ 2737              	.LASF66:
+ 2738 0668 74656D70 		.ascii	"temp2_mode\000"
+ 2738      325F6D6F 
+ 2738      646500
+ 2739              	.LASF15:
+ 2740 0673 696E7433 		.ascii	"int32_t\000"
+ 2740      325F7400 
+ 2741              	.LASF1:
+ 2742 067b 756E7369 		.ascii	"unsigned char\000"
+ 2742      676E6564 
+ 2742      20636861 
+ 2742      7200
+ 2743              	.LASF127:
+ 2744 0689 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 2744      52784275 
+ 2744      66666572 
+ 2744      00
+ 2745              	.LASF89:
+ 2746 0696 6175746F 		.ascii	"autostart\000"
+ 2746      73746172 
+ 2746      7400
+ 2747              	.LASF2:
+ 2748 06a0 73686F72 		.ascii	"short int\000"
+ 2748      7420696E 
+ 2748      7400
+ 2749              	.LASF85:
+ 2750 06aa 69766F5F 		.ascii	"ivo_led\000"
+ 2750      6C656400 
+ 2751              	.LASF143:
+ 2752 06b2 50574D41 		.ascii	"PWMA_WritePeriod\000"
+ 2752      5F577269 
+ 2752      74655065 
+ 2752      72696F64 
+ 2752      00
+ 2753              	.LASF99:
+ 2754 06c3 494E5452 		.ascii	"INTR_DMA_DDS\000"
+ 2754      5F444D41 
+ 2754      5F444453 
+ 2754      00
+ 2755              	.LASF24:
+ 2756 06d0 6D61785F 		.ascii	"max_tr_cl_dac_val\000"
+ 2756      74725F63 
+ 2756      6C5F6461 
+ 2756      635F7661 
+ 2756      6C00
+ 2757              	.LASF129:
+ 2758 06e2 66625F66 		.ascii	"fb_filter_in\000"
+ 2758      696C7465 
+ 2758      725F696E 
+ 2758      00
+ 2759              	.LASF136:
+ 2760 06ef 43794465 		.ascii	"CyDelayUs\000"
+ 2760      6C617955 
+ 2760      7300
+ 2761              	.LASF151:
+ 2762 06f9 5A43445F 		.ascii	"ZCD_counter_Start\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 59
+
+
+ 2762      636F756E 
+ 2762      7465725F 
+ 2762      53746172 
+ 2762      7400
+ 2763              	.LASF87:
+ 2764 070b 76647269 		.ascii	"vdrive\000"
+ 2764      766500
+ 2765              	.LASF155:
+ 2766 0712 4354315F 		.ascii	"CT1_comp_Start\000"
+ 2766      636F6D70 
+ 2766      5F537461 
+ 2766      727400
+ 2767              	.LASF53:
+ 2768 0721 6374315F 		.ascii	"ct1_burden\000"
+ 2768      62757264 
+ 2768      656E00
+ 2769              	.LASF67:
+ 2770 072c 70735F73 		.ascii	"ps_scheme\000"
+ 2770      6368656D 
+ 2770      6500
+ 2771              	.LASF16:
+ 2772 0736 75696E74 		.ascii	"uint32_t\000"
+ 2772      33325F74 
+ 2772      00
+ 2773              	.LASF116:
+ 2774 073f 6C6F6E67 		.ascii	"long double\000"
+ 2774      20646F75 
+ 2774      626C6500 
+ 2775              	.LASF160:
+ 2776 074b 46425F46 		.ascii	"FB_Filter_Start\000"
+ 2776      696C7465 
+ 2776      725F5374 
+ 2776      61727400 
+ 2777              	.LASF21:
+ 2778 075b 63686172 		.ascii	"char\000"
+ 2778      00
+ 2779              	.LASF111:
+ 2780 0760 6D6F6465 		.ascii	"mode\000"
+ 2780      00
+ 2781              	.LASF73:
+ 2782 0765 6374325F 		.ascii	"ct2_voltage\000"
+ 2782      766F6C74 
+ 2782      61676500 
+ 2783              	.LASF31:
+ 2784 0771 70776D62 		.ascii	"pwmb_psb_val\000"
+ 2784      5F707362 
+ 2784      5F76616C 
+ 2784      00
+ 2785              	.LASF4:
+ 2786 077e 5F5F7569 		.ascii	"__uint16_t\000"
+ 2786      6E743136 
+ 2786      5F7400
+ 2787              	.LASF44:
+ 2788 0789 6D61785F 		.ascii	"max_tr_prf\000"
+ 2788      74725F70 
+ 2788      726600
+ 2789              	.LASF26:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 60
+
+
+ 2790 0794 70776D61 		.ascii	"pwma_start_cmp\000"
+ 2790      5F737461 
+ 2790      72745F63 
+ 2790      6D7000
+ 2791              	.LASF92:
+ 2792 07a3 636F6D70 		.ascii	"compressor_attac\000"
+ 2792      72657373 
+ 2792      6F725F61 
+ 2792      74746163 
+ 2792      00
+ 2793              	.LASF84:
+ 2794 07b4 69646163 		.ascii	"idac\000"
+ 2794      00
+ 2795              	.LASF90:
+ 2796 07b9 6D696E5F 		.ascii	"min_fb_current\000"
+ 2796      66625F63 
+ 2796      75727265 
+ 2796      6E7400
+ 2797              	.LASF75:
+ 2798 07c8 725F746F 		.ascii	"r_top\000"
+ 2798      7000
+ 2799              	.LASF81:
+ 2800 07ce 6D61785F 		.ascii	"max_fb_errors\000"
+ 2800      66625F65 
+ 2800      72726F72 
+ 2800      7300
+ 2801              	.LASF131:
+ 2802 07dc 6374315F 		.ascii	"ct1_dac_val\000"
+ 2802      6461635F 
+ 2802      76616C00 
+ 2803              	.LASF123:
+ 2804 07e8 66625F67 		.ascii	"fb_glitch_cmp\000"
+ 2804      6C697463 
+ 2804      685F636D 
+ 2804      7000
+ 2805              	.LASF97:
+ 2806 07f6 636C695F 		.ascii	"cli_config\000"
+ 2806      636F6E66 
+ 2806      696700
+ 2807              	.LASF35:
+ 2808 0801 64696666 		.ascii	"diff_tr_cl_dac_val\000"
+ 2808      5F74725F 
+ 2808      636C5F64 
+ 2808      61635F76 
+ 2808      616C00
+ 2809              	.LASF150:
+ 2810 0814 46425F63 		.ascii	"FB_capture_Start\000"
+ 2810      61707475 
+ 2810      72655F53 
+ 2810      74617274 
+ 2810      00
+ 2811              	.LASF59:
+ 2812 0825 6D61785F 		.ascii	"max_qcw_duty\000"
+ 2812      7163775F 
+ 2812      64757479 
+ 2812      00
+ 2813              	.LASF152:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 61
+
+
+ 2814 0832 46425F67 		.ascii	"FB_glitch_detect_Start\000"
+ 2814      6C697463 
+ 2814      685F6465 
+ 2814      74656374 
+ 2814      5F537461 
+ 2815              	.LASF118:
+ 2816 0849 6D61785F 		.ascii	"max_qcw_cl_dac_val_temp\000"
+ 2816      7163775F 
+ 2816      636C5F64 
+ 2816      61635F76 
+ 2816      616C5F74 
+ 2817              	.LASF135:
+ 2818 0861 46425F46 		.ascii	"FB_Filter_Write24\000"
+ 2818      696C7465 
+ 2818      725F5772 
+ 2818      69746532 
+ 2818      3400
+ 2819              	.LASF105:
+ 2820 0873 696E7465 		.ascii	"interrupter_burst\000"
+ 2820      72727570 
+ 2820      7465725F 
+ 2820      62757273 
+ 2820      7400
+ 2821              	.LASF37:
+ 2822 0885 6374325F 		.ascii	"ct2_offset_cnt\000"
+ 2822      6F666673 
+ 2822      65745F63 
+ 2822      6E7400
+ 2823              	.LASF125:
+ 2824 0894 46425F54 		.ascii	"FB_THRSH_DAC_value\000"
+ 2824      48525348 
+ 2824      5F444143 
+ 2824      5F76616C 
+ 2824      756500
+ 2825              	.LASF36:
+ 2826 08a7 6964635F 		.ascii	"idc_ma_count\000"
+ 2826      6D615F63 
+ 2826      6F756E74 
+ 2826      00
+ 2827              	.LASF103:
+ 2828 08b4 494E5452 		.ascii	"INTR_MODE_TR\000"
+ 2828      5F4D4F44 
+ 2828      455F5452 
+ 2828      00
+ 2829              	.LASF72:
+ 2830 08c1 6374325F 		.ascii	"ct2_current\000"
+ 2830      63757272 
+ 2830      656E7400 
+ 2831              	.LASF45:
+ 2832 08cd 6D61785F 		.ascii	"max_qcw_pw\000"
+ 2832      7163775F 
+ 2832      707700
+ 2833              	.LASF13:
+ 2834 08d8 75696E74 		.ascii	"uint8_t\000"
+ 2834      385F7400 
+ 2835              	.LASF56:
+ 2836 08e0 73746172 		.ascii	"start_freq\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 62
+
+
+ 2836      745F6672 
+ 2836      657100
+ 2837              	.LASF109:
+ 2838 08eb 494E5452 		.ascii	"INTR_MOD_PW\000"
+ 2838      5F4D4F44 
+ 2838      5F505700 
+ 2839              	.LASF154:
+ 2840 08f7 5A43445F 		.ascii	"ZCD_compB_Start\000"
+ 2840      636F6D70 
+ 2840      425F5374 
+ 2840      61727400 
+ 2841              	.LASF65:
+ 2842 0907 7069645F 		.ascii	"pid_temp_i\000"
+ 2842      74656D70 
+ 2842      5F6900
+ 2843              	.LASF76:
+ 2844 0912 63686172 		.ascii	"chargedelay\000"
+ 2844      67656465 
+ 2844      6C617900 
+ 2845              	.LASF64:
+ 2846 091e 7069645F 		.ascii	"pid_temp_p\000"
+ 2846      74656D70 
+ 2846      5F7000
+ 2847              	.LASF119:
+ 2848 0929 6D696E5F 		.ascii	"min_tr_cl_dac_val_temp\000"
+ 2848      74725F63 
+ 2848      6C5F6461 
+ 2848      635F7661 
+ 2848      6C5F7465 
+ 2849              	.LASF163:
+ 2850 0940 2E2E5C63 		.ascii	"..\\common\\ud3core\\ZCDtoPWM.c\000"
+ 2850      6F6D6D6F 
+ 2850      6E5C7564 
+ 2850      33636F72 
+ 2850      655C5A43 
+ 2851              	.LASF145:
+ 2852 095d 50574D42 		.ascii	"PWMB_WritePeriod\000"
+ 2852      5F577269 
+ 2852      74655065 
+ 2852      72696F64 
+ 2852      00
+ 2853              	.LASF57:
+ 2854 096e 73746172 		.ascii	"start_cycles\000"
+ 2854      745F6379 
+ 2854      636C6573 
+ 2854      00
+ 2855              	.LASF124:
+ 2856 097b 6C656164 		.ascii	"lead_time_temp\000"
+ 2856      5F74696D 
+ 2856      655F7465 
+ 2856      6D7000
+ 2857              	.LASF140:
+ 2858 098a 46425F67 		.ascii	"FB_glitch_detect_WritePeriod\000"
+ 2858      6C697463 
+ 2858      685F6465 
+ 2858      74656374 
+ 2858      5F577269 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYgzjWZ.s 			page 63
+
+
+ 2859              	.LASF50:
+ 2860 09a7 74656D70 		.ascii	"temp2_max\000"
+ 2860      325F6D61 
+ 2860      7800
+ 2861              	.LASF88:
+ 2862 09b1 68775F72 		.ascii	"hw_rev\000"
+ 2862      657600
+ 2863              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

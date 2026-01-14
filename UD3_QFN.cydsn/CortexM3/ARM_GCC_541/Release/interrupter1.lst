@@ -1,0 +1,2604 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"interrupter1.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.interrupter1_Init,"ax",%progbits
+  20              		.align	1
+  21              		.global	interrupter1_Init
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	interrupter1_Init, %function
+  25              	interrupter1_Init:
+  26              	.LFB1:
+  27              		.file 1 "Generated_Source\\PSoC5\\interrupter1.c"
+   1:Generated_Source\PSoC5/interrupter1.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/interrupter1.c **** * File Name: interrupter1.c
+   3:Generated_Source\PSoC5/interrupter1.c **** * Version 3.30
+   4:Generated_Source\PSoC5/interrupter1.c **** *
+   5:Generated_Source\PSoC5/interrupter1.c **** * Description:
+   6:Generated_Source\PSoC5/interrupter1.c **** *  The PWM User Module consist of an 8 or 16-bit counter with two 8 or 16-bit
+   7:Generated_Source\PSoC5/interrupter1.c **** *  comparitors. Each instance of this user module is capable of generating
+   8:Generated_Source\PSoC5/interrupter1.c **** *  two PWM outputs with the same period. The pulse width is selectable between
+   9:Generated_Source\PSoC5/interrupter1.c **** *  1 and 255/65535. The period is selectable between 2 and 255/65536 clocks.
+  10:Generated_Source\PSoC5/interrupter1.c **** *  The compare value output may be configured to be active when the present
+  11:Generated_Source\PSoC5/interrupter1.c **** *  counter is less than or less than/equal to the compare value.
+  12:Generated_Source\PSoC5/interrupter1.c **** *  A terminal count output is also provided. It generates a pulse one clock
+  13:Generated_Source\PSoC5/interrupter1.c **** *  width wide when the counter is equal to zero.
+  14:Generated_Source\PSoC5/interrupter1.c **** *
+  15:Generated_Source\PSoC5/interrupter1.c **** * Note:
+  16:Generated_Source\PSoC5/interrupter1.c **** *
+  17:Generated_Source\PSoC5/interrupter1.c **** *******************************************************************************
+  18:Generated_Source\PSoC5/interrupter1.c **** * Copyright 2008-2014, Cypress Semiconductor Corporation.  All rights reserved.
+  19:Generated_Source\PSoC5/interrupter1.c **** * You may use this file only in accordance with the license, terms, conditions,
+  20:Generated_Source\PSoC5/interrupter1.c **** * disclaimers, and limitations in the end user license agreement accompanying
+  21:Generated_Source\PSoC5/interrupter1.c **** * the software package with which this file was provided.
+  22:Generated_Source\PSoC5/interrupter1.c **** ********************************************************************************/
+  23:Generated_Source\PSoC5/interrupter1.c **** 
+  24:Generated_Source\PSoC5/interrupter1.c **** #include "interrupter1.h"
+  25:Generated_Source\PSoC5/interrupter1.c **** 
+  26:Generated_Source\PSoC5/interrupter1.c **** /* Error message for removed <resource> through optimization */
+  27:Generated_Source\PSoC5/interrupter1.c **** #ifdef interrupter1_PWMUDB_genblk1_ctrlreg__REMOVED
+  28:Generated_Source\PSoC5/interrupter1.c ****     #error PWM_v3_30 detected with a constant 0 for the enable or \
+  29:Generated_Source\PSoC5/interrupter1.c ****          constant 1 for reset. This will prevent the component from operating.
+  30:Generated_Source\PSoC5/interrupter1.c **** #endif /* interrupter1_PWMUDB_genblk1_ctrlreg__REMOVED */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 2
+
+
+  31:Generated_Source\PSoC5/interrupter1.c **** 
+  32:Generated_Source\PSoC5/interrupter1.c **** uint8 interrupter1_initVar = 0u;
+  33:Generated_Source\PSoC5/interrupter1.c **** 
+  34:Generated_Source\PSoC5/interrupter1.c **** 
+  35:Generated_Source\PSoC5/interrupter1.c **** /*******************************************************************************
+  36:Generated_Source\PSoC5/interrupter1.c **** * Function Name: interrupter1_Start
+  37:Generated_Source\PSoC5/interrupter1.c **** ********************************************************************************
+  38:Generated_Source\PSoC5/interrupter1.c **** *
+  39:Generated_Source\PSoC5/interrupter1.c **** * Summary:
+  40:Generated_Source\PSoC5/interrupter1.c **** *  The start function initializes the pwm with the default values, the
+  41:Generated_Source\PSoC5/interrupter1.c **** *  enables the counter to begin counting.  It does not enable interrupts,
+  42:Generated_Source\PSoC5/interrupter1.c **** *  the EnableInt command should be called if interrupt generation is required.
+  43:Generated_Source\PSoC5/interrupter1.c **** *
+  44:Generated_Source\PSoC5/interrupter1.c **** * Parameters:
+  45:Generated_Source\PSoC5/interrupter1.c **** *  None
+  46:Generated_Source\PSoC5/interrupter1.c **** *
+  47:Generated_Source\PSoC5/interrupter1.c **** * Return:
+  48:Generated_Source\PSoC5/interrupter1.c **** *  None
+  49:Generated_Source\PSoC5/interrupter1.c **** *
+  50:Generated_Source\PSoC5/interrupter1.c **** * Global variables:
+  51:Generated_Source\PSoC5/interrupter1.c **** *  interrupter1_initVar: Is modified when this function is called for the
+  52:Generated_Source\PSoC5/interrupter1.c **** *   first time. Is used to ensure that initialization happens only once.
+  53:Generated_Source\PSoC5/interrupter1.c **** *
+  54:Generated_Source\PSoC5/interrupter1.c **** *******************************************************************************/
+  55:Generated_Source\PSoC5/interrupter1.c **** void interrupter1_Start(void) 
+  56:Generated_Source\PSoC5/interrupter1.c **** {
+  57:Generated_Source\PSoC5/interrupter1.c ****     /* If not Initialized then initialize all required hardware and software */
+  58:Generated_Source\PSoC5/interrupter1.c ****     if(interrupter1_initVar == 0u)
+  59:Generated_Source\PSoC5/interrupter1.c ****     {
+  60:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_Init();
+  61:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_initVar = 1u;
+  62:Generated_Source\PSoC5/interrupter1.c ****     }
+  63:Generated_Source\PSoC5/interrupter1.c ****     interrupter1_Enable();
+  64:Generated_Source\PSoC5/interrupter1.c **** 
+  65:Generated_Source\PSoC5/interrupter1.c **** }
+  66:Generated_Source\PSoC5/interrupter1.c **** 
+  67:Generated_Source\PSoC5/interrupter1.c **** 
+  68:Generated_Source\PSoC5/interrupter1.c **** /*******************************************************************************
+  69:Generated_Source\PSoC5/interrupter1.c **** * Function Name: interrupter1_Init
+  70:Generated_Source\PSoC5/interrupter1.c **** ********************************************************************************
+  71:Generated_Source\PSoC5/interrupter1.c **** *
+  72:Generated_Source\PSoC5/interrupter1.c **** * Summary:
+  73:Generated_Source\PSoC5/interrupter1.c **** *  Initialize component's parameters to the parameters set by user in the
+  74:Generated_Source\PSoC5/interrupter1.c **** *  customizer of the component placed onto schematic. Usually called in
+  75:Generated_Source\PSoC5/interrupter1.c **** *  interrupter1_Start().
+  76:Generated_Source\PSoC5/interrupter1.c **** *
+  77:Generated_Source\PSoC5/interrupter1.c **** * Parameters:
+  78:Generated_Source\PSoC5/interrupter1.c **** *  None
+  79:Generated_Source\PSoC5/interrupter1.c **** *
+  80:Generated_Source\PSoC5/interrupter1.c **** * Return:
+  81:Generated_Source\PSoC5/interrupter1.c **** *  None
+  82:Generated_Source\PSoC5/interrupter1.c **** *
+  83:Generated_Source\PSoC5/interrupter1.c **** *******************************************************************************/
+  84:Generated_Source\PSoC5/interrupter1.c **** void interrupter1_Init(void) 
+  85:Generated_Source\PSoC5/interrupter1.c **** {
+  28              		.loc 1 85 0
+  29              		.cfi_startproc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 3
+
+
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  86:Generated_Source\PSoC5/interrupter1.c ****     #if (interrupter1_UsingFixedFunction || interrupter1_UseControl)
+  87:Generated_Source\PSoC5/interrupter1.c ****         uint8 ctrl;
+  88:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UsingFixedFunction || interrupter1_UseControl) */
+  89:Generated_Source\PSoC5/interrupter1.c **** 
+  90:Generated_Source\PSoC5/interrupter1.c ****     #if(!interrupter1_UsingFixedFunction)
+  91:Generated_Source\PSoC5/interrupter1.c ****         #if(interrupter1_UseStatus)
+  92:Generated_Source\PSoC5/interrupter1.c ****             /* Interrupt State Backup for Critical Region*/
+  93:Generated_Source\PSoC5/interrupter1.c ****             uint8 interrupter1_interruptState;
+  94:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_UseStatus) */
+  95:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (!interrupter1_UsingFixedFunction) */
+  96:Generated_Source\PSoC5/interrupter1.c **** 
+  97:Generated_Source\PSoC5/interrupter1.c ****     #if (interrupter1_UsingFixedFunction)
+  98:Generated_Source\PSoC5/interrupter1.c ****         /* You are allowed to write the compare value (FF only) */
+  99:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_CONTROL |= interrupter1_CFG0_MODE;
+ 100:Generated_Source\PSoC5/interrupter1.c ****         #if (interrupter1_DeadBand2_4)
+ 101:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_CONTROL |= interrupter1_CFG0_DB;
+ 102:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_DeadBand2_4) */
+ 103:Generated_Source\PSoC5/interrupter1.c **** 
+ 104:Generated_Source\PSoC5/interrupter1.c ****         ctrl = interrupter1_CONTROL3 & ((uint8 )(~interrupter1_CTRL_CMPMODE1_MASK));
+ 105:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_CONTROL3 = ctrl | interrupter1_DEFAULT_COMPARE1_MODE;
+ 106:Generated_Source\PSoC5/interrupter1.c **** 
+ 107:Generated_Source\PSoC5/interrupter1.c ****          /* Clear and Set SYNCTC and SYNCCMP bits of RT1 register */
+ 108:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_RT1 &= ((uint8)(~interrupter1_RT1_MASK));
+ 109:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_RT1 |= interrupter1_SYNC;
+ 110:Generated_Source\PSoC5/interrupter1.c **** 
+ 111:Generated_Source\PSoC5/interrupter1.c ****         /*Enable DSI Sync all all inputs of the PWM*/
+ 112:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_RT1 &= ((uint8)(~interrupter1_SYNCDSI_MASK));
+ 113:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_RT1 |= interrupter1_SYNCDSI_EN;
+ 114:Generated_Source\PSoC5/interrupter1.c **** 
+ 115:Generated_Source\PSoC5/interrupter1.c ****     #elif (interrupter1_UseControl)
+ 116:Generated_Source\PSoC5/interrupter1.c ****         /* Set the default compare mode defined in the parameter */
+ 117:Generated_Source\PSoC5/interrupter1.c ****         ctrl = interrupter1_CONTROL & ((uint8)(~interrupter1_CTRL_CMPMODE2_MASK)) &
+  33              		.loc 1 117 0
+  34 0000 0E4A     		ldr	r2, .L2
+  35 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  36              	.LVL0:
+ 118:Generated_Source\PSoC5/interrupter1.c ****                 ((uint8)(~interrupter1_CTRL_CMPMODE1_MASK));
+ 119:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_CONTROL = ctrl | interrupter1_DEFAULT_COMPARE2_MODE |
+  37              		.loc 1 119 0
+  38 0004 03F0C003 		and	r3, r3, #192
+  39              	.LVL1:
+  40 0008 43F00B03 		orr	r3, r3, #11
+  41 000c 1370     		strb	r3, [r2]
+ 120:Generated_Source\PSoC5/interrupter1.c ****                                    interrupter1_DEFAULT_COMPARE1_MODE;
+ 121:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UsingFixedFunction) */
+ 122:Generated_Source\PSoC5/interrupter1.c **** 
+ 123:Generated_Source\PSoC5/interrupter1.c ****     #if (!interrupter1_UsingFixedFunction)
+ 124:Generated_Source\PSoC5/interrupter1.c ****         #if (interrupter1_Resolution == 8)
+ 125:Generated_Source\PSoC5/interrupter1.c ****             /* Set FIFO 0 to 1 byte register for period*/
+ 126:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_AUX_CONTROLDP0 |= (interrupter1_AUX_CTRL_FIFO0_CLR);
+ 127:Generated_Source\PSoC5/interrupter1.c ****         #else /* (interrupter1_Resolution == 16)*/
+ 128:Generated_Source\PSoC5/interrupter1.c ****             /* Set FIFO 0 to 1 byte register for period */
+ 129:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_AUX_CONTROLDP0 |= (interrupter1_AUX_CTRL_FIFO0_CLR);
+  42              		.loc 1 129 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 4
+
+
+  43 000e 92F82C30 		ldrb	r3, [r2, #44]	@ zero_extendqisi2
+  44 0012 43F00103 		orr	r3, r3, #1
+  45 0016 82F82C30 		strb	r3, [r2, #44]
+ 130:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_AUX_CONTROLDP1 |= (interrupter1_AUX_CTRL_FIFO0_CLR);
+  46              		.loc 1 130 0
+  47 001a 92F82D30 		ldrb	r3, [r2, #45]	@ zero_extendqisi2
+  48 001e 43F00103 		orr	r3, r3, #1
+  49 0022 82F82D30 		strb	r3, [r2, #45]
+  50              	.LVL2:
+  51              	.LBB10:
+  52              	.LBB11:
+ 131:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_Resolution == 8) */
+ 132:Generated_Source\PSoC5/interrupter1.c **** 
+ 133:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_WriteCounter(interrupter1_INIT_PERIOD_VALUE);
+ 134:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (!interrupter1_UsingFixedFunction) */
+ 135:Generated_Source\PSoC5/interrupter1.c **** 
+ 136:Generated_Source\PSoC5/interrupter1.c ****     interrupter1_WritePeriod(interrupter1_INIT_PERIOD_VALUE);
+ 137:Generated_Source\PSoC5/interrupter1.c **** 
+ 138:Generated_Source\PSoC5/interrupter1.c ****         #if (interrupter1_UseOneCompareMode)
+ 139:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_WriteCompare(interrupter1_INIT_COMPARE_VALUE1);
+ 140:Generated_Source\PSoC5/interrupter1.c ****         #else
+ 141:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_WriteCompare1(interrupter1_INIT_COMPARE_VALUE1);
+ 142:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_WriteCompare2(interrupter1_INIT_COMPARE_VALUE2);
+ 143:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_UseOneCompareMode) */
+ 144:Generated_Source\PSoC5/interrupter1.c **** 
+ 145:Generated_Source\PSoC5/interrupter1.c ****         #if (interrupter1_KillModeMinTime)
+ 146:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_WriteKillTime(interrupter1_MinimumKillTime);
+ 147:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_KillModeMinTime) */
+ 148:Generated_Source\PSoC5/interrupter1.c **** 
+ 149:Generated_Source\PSoC5/interrupter1.c ****         #if (interrupter1_DeadBandUsed)
+ 150:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_WriteDeadTime(interrupter1_INIT_DEAD_TIME);
+ 151:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_DeadBandUsed) */
+ 152:Generated_Source\PSoC5/interrupter1.c **** 
+ 153:Generated_Source\PSoC5/interrupter1.c ****     #if (interrupter1_UseStatus || interrupter1_UsingFixedFunction)
+ 154:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_SetInterruptMode(interrupter1_INIT_INTERRUPTS_MODE);
+ 155:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UseStatus || interrupter1_UsingFixedFunction) */
+ 156:Generated_Source\PSoC5/interrupter1.c **** 
+ 157:Generated_Source\PSoC5/interrupter1.c ****     #if (interrupter1_UsingFixedFunction)
+ 158:Generated_Source\PSoC5/interrupter1.c ****         /* Globally Enable the Fixed Function Block chosen */
+ 159:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_GLOBAL_ENABLE |= interrupter1_BLOCK_EN_MASK;
+ 160:Generated_Source\PSoC5/interrupter1.c ****         /* Set the Interrupt source to come from the status register */
+ 161:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_CONTROL2 |= interrupter1_CTRL2_IRQ_SEL;
+ 162:Generated_Source\PSoC5/interrupter1.c ****     #else
+ 163:Generated_Source\PSoC5/interrupter1.c ****         #if(interrupter1_UseStatus)
+ 164:Generated_Source\PSoC5/interrupter1.c **** 
+ 165:Generated_Source\PSoC5/interrupter1.c ****             /* CyEnterCriticalRegion and CyExitCriticalRegion are used to mark following region cri
+ 166:Generated_Source\PSoC5/interrupter1.c ****             /* Enter Critical Region*/
+ 167:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_interruptState = CyEnterCriticalSection();
+ 168:Generated_Source\PSoC5/interrupter1.c ****             /* Use the interrupt output of the status register for IRQ output */
+ 169:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_STATUS_AUX_CTRL |= interrupter1_STATUS_ACTL_INT_EN_MASK;
+ 170:Generated_Source\PSoC5/interrupter1.c **** 
+ 171:Generated_Source\PSoC5/interrupter1.c ****              /* Exit Critical Region*/
+ 172:Generated_Source\PSoC5/interrupter1.c ****             CyExitCriticalSection(interrupter1_interruptState);
+ 173:Generated_Source\PSoC5/interrupter1.c **** 
+ 174:Generated_Source\PSoC5/interrupter1.c ****             /* Clear the FIFO to enable the interrupter1_STATUS_FIFOFULL
+ 175:Generated_Source\PSoC5/interrupter1.c ****                    bit to be set on FIFO full. */
+ 176:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_ClearFIFO();
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 5
+
+
+ 177:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_UseStatus) */
+ 178:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UsingFixedFunction) */
+ 179:Generated_Source\PSoC5/interrupter1.c **** }
+ 180:Generated_Source\PSoC5/interrupter1.c **** 
+ 181:Generated_Source\PSoC5/interrupter1.c **** 
+ 182:Generated_Source\PSoC5/interrupter1.c **** /*******************************************************************************
+ 183:Generated_Source\PSoC5/interrupter1.c **** * Function Name: interrupter1_Enable
+ 184:Generated_Source\PSoC5/interrupter1.c **** ********************************************************************************
+ 185:Generated_Source\PSoC5/interrupter1.c **** *
+ 186:Generated_Source\PSoC5/interrupter1.c **** * Summary:
+ 187:Generated_Source\PSoC5/interrupter1.c **** *  Enables the PWM block operation
+ 188:Generated_Source\PSoC5/interrupter1.c **** *
+ 189:Generated_Source\PSoC5/interrupter1.c **** * Parameters:
+ 190:Generated_Source\PSoC5/interrupter1.c **** *  None
+ 191:Generated_Source\PSoC5/interrupter1.c **** *
+ 192:Generated_Source\PSoC5/interrupter1.c **** * Return:
+ 193:Generated_Source\PSoC5/interrupter1.c **** *  None
+ 194:Generated_Source\PSoC5/interrupter1.c **** *
+ 195:Generated_Source\PSoC5/interrupter1.c **** * Side Effects:
+ 196:Generated_Source\PSoC5/interrupter1.c **** *  This works only if software enable mode is chosen
+ 197:Generated_Source\PSoC5/interrupter1.c **** *
+ 198:Generated_Source\PSoC5/interrupter1.c **** *******************************************************************************/
+ 199:Generated_Source\PSoC5/interrupter1.c **** void interrupter1_Enable(void) 
+ 200:Generated_Source\PSoC5/interrupter1.c **** {
+ 201:Generated_Source\PSoC5/interrupter1.c ****     /* Globally Enable the Fixed Function Block chosen */
+ 202:Generated_Source\PSoC5/interrupter1.c ****     #if (interrupter1_UsingFixedFunction)
+ 203:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_GLOBAL_ENABLE |= interrupter1_BLOCK_EN_MASK;
+ 204:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_GLOBAL_STBY_ENABLE |= interrupter1_BLOCK_STBY_EN_MASK;
+ 205:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UsingFixedFunction) */
+ 206:Generated_Source\PSoC5/interrupter1.c **** 
+ 207:Generated_Source\PSoC5/interrupter1.c ****     /* Enable the PWM from the control register  */
+ 208:Generated_Source\PSoC5/interrupter1.c ****     #if (interrupter1_UseControl || interrupter1_UsingFixedFunction)
+ 209:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_CONTROL |= interrupter1_CTRL_ENABLE;
+ 210:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UseControl || interrupter1_UsingFixedFunction) */
+ 211:Generated_Source\PSoC5/interrupter1.c **** }
+ 212:Generated_Source\PSoC5/interrupter1.c **** 
+ 213:Generated_Source\PSoC5/interrupter1.c **** 
+ 214:Generated_Source\PSoC5/interrupter1.c **** /*******************************************************************************
+ 215:Generated_Source\PSoC5/interrupter1.c **** * Function Name: interrupter1_Stop
+ 216:Generated_Source\PSoC5/interrupter1.c **** ********************************************************************************
+ 217:Generated_Source\PSoC5/interrupter1.c **** *
+ 218:Generated_Source\PSoC5/interrupter1.c **** * Summary:
+ 219:Generated_Source\PSoC5/interrupter1.c **** *  The stop function halts the PWM, but does not change any modes or disable
+ 220:Generated_Source\PSoC5/interrupter1.c **** *  interrupts.
+ 221:Generated_Source\PSoC5/interrupter1.c **** *
+ 222:Generated_Source\PSoC5/interrupter1.c **** * Parameters:
+ 223:Generated_Source\PSoC5/interrupter1.c **** *  None
+ 224:Generated_Source\PSoC5/interrupter1.c **** *
+ 225:Generated_Source\PSoC5/interrupter1.c **** * Return:
+ 226:Generated_Source\PSoC5/interrupter1.c **** *  None
+ 227:Generated_Source\PSoC5/interrupter1.c **** *
+ 228:Generated_Source\PSoC5/interrupter1.c **** * Side Effects:
+ 229:Generated_Source\PSoC5/interrupter1.c **** *  If the Enable mode is set to Hardware only then this function
+ 230:Generated_Source\PSoC5/interrupter1.c **** *  has no effect on the operation of the PWM
+ 231:Generated_Source\PSoC5/interrupter1.c **** *
+ 232:Generated_Source\PSoC5/interrupter1.c **** *******************************************************************************/
+ 233:Generated_Source\PSoC5/interrupter1.c **** void interrupter1_Stop(void) 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 6
+
+
+ 234:Generated_Source\PSoC5/interrupter1.c **** {
+ 235:Generated_Source\PSoC5/interrupter1.c ****     #if (interrupter1_UseControl || interrupter1_UsingFixedFunction)
+ 236:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_CONTROL &= ((uint8)(~interrupter1_CTRL_ENABLE));
+ 237:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UseControl || interrupter1_UsingFixedFunction) */
+ 238:Generated_Source\PSoC5/interrupter1.c **** 
+ 239:Generated_Source\PSoC5/interrupter1.c ****     /* Globally disable the Fixed Function Block chosen */
+ 240:Generated_Source\PSoC5/interrupter1.c ****     #if (interrupter1_UsingFixedFunction)
+ 241:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_GLOBAL_ENABLE &= ((uint8)(~interrupter1_BLOCK_EN_MASK));
+ 242:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_GLOBAL_STBY_ENABLE &= ((uint8)(~interrupter1_BLOCK_STBY_EN_MASK));
+ 243:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UsingFixedFunction) */
+ 244:Generated_Source\PSoC5/interrupter1.c **** }
+ 245:Generated_Source\PSoC5/interrupter1.c **** 
+ 246:Generated_Source\PSoC5/interrupter1.c **** #if (interrupter1_UseOneCompareMode)
+ 247:Generated_Source\PSoC5/interrupter1.c ****     #if (interrupter1_CompareMode1SW)
+ 248:Generated_Source\PSoC5/interrupter1.c **** 
+ 249:Generated_Source\PSoC5/interrupter1.c **** 
+ 250:Generated_Source\PSoC5/interrupter1.c ****         /*******************************************************************************
+ 251:Generated_Source\PSoC5/interrupter1.c ****         * Function Name: interrupter1_SetCompareMode
+ 252:Generated_Source\PSoC5/interrupter1.c ****         ********************************************************************************
+ 253:Generated_Source\PSoC5/interrupter1.c ****         *
+ 254:Generated_Source\PSoC5/interrupter1.c ****         * Summary:
+ 255:Generated_Source\PSoC5/interrupter1.c ****         *  This function writes the Compare Mode for the pwm output when in Dither mode,
+ 256:Generated_Source\PSoC5/interrupter1.c ****         *  Center Align Mode or One Output Mode.
+ 257:Generated_Source\PSoC5/interrupter1.c ****         *
+ 258:Generated_Source\PSoC5/interrupter1.c ****         * Parameters:
+ 259:Generated_Source\PSoC5/interrupter1.c ****         *  comparemode:  The new compare mode for the PWM output. Use the compare types
+ 260:Generated_Source\PSoC5/interrupter1.c ****         *                defined in the H file as input arguments.
+ 261:Generated_Source\PSoC5/interrupter1.c ****         *
+ 262:Generated_Source\PSoC5/interrupter1.c ****         * Return:
+ 263:Generated_Source\PSoC5/interrupter1.c ****         *  None
+ 264:Generated_Source\PSoC5/interrupter1.c ****         *
+ 265:Generated_Source\PSoC5/interrupter1.c ****         *******************************************************************************/
+ 266:Generated_Source\PSoC5/interrupter1.c ****         void interrupter1_SetCompareMode(uint8 comparemode) 
+ 267:Generated_Source\PSoC5/interrupter1.c ****         {
+ 268:Generated_Source\PSoC5/interrupter1.c ****             #if(interrupter1_UsingFixedFunction)
+ 269:Generated_Source\PSoC5/interrupter1.c **** 
+ 270:Generated_Source\PSoC5/interrupter1.c ****                 #if(0 != interrupter1_CTRL_CMPMODE1_SHIFT)
+ 271:Generated_Source\PSoC5/interrupter1.c ****                     uint8 comparemodemasked = ((uint8)((uint8)comparemode << interrupter1_CTRL_CMPM
+ 272:Generated_Source\PSoC5/interrupter1.c ****                 #else
+ 273:Generated_Source\PSoC5/interrupter1.c ****                     uint8 comparemodemasked = comparemode;
+ 274:Generated_Source\PSoC5/interrupter1.c ****                 #endif /* (0 != interrupter1_CTRL_CMPMODE1_SHIFT) */
+ 275:Generated_Source\PSoC5/interrupter1.c **** 
+ 276:Generated_Source\PSoC5/interrupter1.c ****                 interrupter1_CONTROL3 &= ((uint8)(~interrupter1_CTRL_CMPMODE1_MASK)); /*Clear Exist
+ 277:Generated_Source\PSoC5/interrupter1.c ****                 interrupter1_CONTROL3 |= comparemodemasked;
+ 278:Generated_Source\PSoC5/interrupter1.c **** 
+ 279:Generated_Source\PSoC5/interrupter1.c ****             #elif (interrupter1_UseControl)
+ 280:Generated_Source\PSoC5/interrupter1.c **** 
+ 281:Generated_Source\PSoC5/interrupter1.c ****                 #if(0 != interrupter1_CTRL_CMPMODE1_SHIFT)
+ 282:Generated_Source\PSoC5/interrupter1.c ****                     uint8 comparemode1masked = ((uint8)((uint8)comparemode << interrupter1_CTRL_CMP
+ 283:Generated_Source\PSoC5/interrupter1.c ****                                                 interrupter1_CTRL_CMPMODE1_MASK;
+ 284:Generated_Source\PSoC5/interrupter1.c ****                 #else
+ 285:Generated_Source\PSoC5/interrupter1.c ****                     uint8 comparemode1masked = comparemode & interrupter1_CTRL_CMPMODE1_MASK;
+ 286:Generated_Source\PSoC5/interrupter1.c ****                 #endif /* (0 != interrupter1_CTRL_CMPMODE1_SHIFT) */
+ 287:Generated_Source\PSoC5/interrupter1.c **** 
+ 288:Generated_Source\PSoC5/interrupter1.c ****                 #if(0 != interrupter1_CTRL_CMPMODE2_SHIFT)
+ 289:Generated_Source\PSoC5/interrupter1.c ****                     uint8 comparemode2masked = ((uint8)((uint8)comparemode << interrupter1_CTRL_CMP
+ 290:Generated_Source\PSoC5/interrupter1.c ****                                                interrupter1_CTRL_CMPMODE2_MASK;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 7
+
+
+ 291:Generated_Source\PSoC5/interrupter1.c ****                 #else
+ 292:Generated_Source\PSoC5/interrupter1.c ****                     uint8 comparemode2masked = comparemode & interrupter1_CTRL_CMPMODE2_MASK;
+ 293:Generated_Source\PSoC5/interrupter1.c ****                 #endif /* (0 != interrupter1_CTRL_CMPMODE2_SHIFT) */
+ 294:Generated_Source\PSoC5/interrupter1.c **** 
+ 295:Generated_Source\PSoC5/interrupter1.c ****                 /*Clear existing mode */
+ 296:Generated_Source\PSoC5/interrupter1.c ****                 interrupter1_CONTROL &= ((uint8)(~(interrupter1_CTRL_CMPMODE1_MASK |
+ 297:Generated_Source\PSoC5/interrupter1.c ****                                             interrupter1_CTRL_CMPMODE2_MASK)));
+ 298:Generated_Source\PSoC5/interrupter1.c ****                 interrupter1_CONTROL |= (comparemode1masked | comparemode2masked);
+ 299:Generated_Source\PSoC5/interrupter1.c **** 
+ 300:Generated_Source\PSoC5/interrupter1.c ****             #else
+ 301:Generated_Source\PSoC5/interrupter1.c ****                 uint8 temp = comparemode;
+ 302:Generated_Source\PSoC5/interrupter1.c ****             #endif /* (interrupter1_UsingFixedFunction) */
+ 303:Generated_Source\PSoC5/interrupter1.c ****         }
+ 304:Generated_Source\PSoC5/interrupter1.c ****     #endif /* interrupter1_CompareMode1SW */
+ 305:Generated_Source\PSoC5/interrupter1.c **** 
+ 306:Generated_Source\PSoC5/interrupter1.c **** #else /* UseOneCompareMode */
+ 307:Generated_Source\PSoC5/interrupter1.c **** 
+ 308:Generated_Source\PSoC5/interrupter1.c ****     #if (interrupter1_CompareMode1SW)
+ 309:Generated_Source\PSoC5/interrupter1.c **** 
+ 310:Generated_Source\PSoC5/interrupter1.c **** 
+ 311:Generated_Source\PSoC5/interrupter1.c ****         /*******************************************************************************
+ 312:Generated_Source\PSoC5/interrupter1.c ****         * Function Name: interrupter1_SetCompareMode1
+ 313:Generated_Source\PSoC5/interrupter1.c ****         ********************************************************************************
+ 314:Generated_Source\PSoC5/interrupter1.c ****         *
+ 315:Generated_Source\PSoC5/interrupter1.c ****         * Summary:
+ 316:Generated_Source\PSoC5/interrupter1.c ****         *  This function writes the Compare Mode for the pwm or pwm1 output
+ 317:Generated_Source\PSoC5/interrupter1.c ****         *
+ 318:Generated_Source\PSoC5/interrupter1.c ****         * Parameters:
+ 319:Generated_Source\PSoC5/interrupter1.c ****         *  comparemode:  The new compare mode for the PWM output. Use the compare types
+ 320:Generated_Source\PSoC5/interrupter1.c ****         *                defined in the H file as input arguments.
+ 321:Generated_Source\PSoC5/interrupter1.c ****         *
+ 322:Generated_Source\PSoC5/interrupter1.c ****         * Return:
+ 323:Generated_Source\PSoC5/interrupter1.c ****         *  None
+ 324:Generated_Source\PSoC5/interrupter1.c ****         *
+ 325:Generated_Source\PSoC5/interrupter1.c ****         *******************************************************************************/
+ 326:Generated_Source\PSoC5/interrupter1.c ****         void interrupter1_SetCompareMode1(uint8 comparemode) 
+ 327:Generated_Source\PSoC5/interrupter1.c ****         {
+ 328:Generated_Source\PSoC5/interrupter1.c ****             #if(0 != interrupter1_CTRL_CMPMODE1_SHIFT)
+ 329:Generated_Source\PSoC5/interrupter1.c ****                 uint8 comparemodemasked = ((uint8)((uint8)comparemode << interrupter1_CTRL_CMPMODE1
+ 330:Generated_Source\PSoC5/interrupter1.c ****                                            interrupter1_CTRL_CMPMODE1_MASK;
+ 331:Generated_Source\PSoC5/interrupter1.c ****             #else
+ 332:Generated_Source\PSoC5/interrupter1.c ****                 uint8 comparemodemasked = comparemode & interrupter1_CTRL_CMPMODE1_MASK;
+ 333:Generated_Source\PSoC5/interrupter1.c ****             #endif /* (0 != interrupter1_CTRL_CMPMODE1_SHIFT) */
+ 334:Generated_Source\PSoC5/interrupter1.c **** 
+ 335:Generated_Source\PSoC5/interrupter1.c ****             #if (interrupter1_UseControl)
+ 336:Generated_Source\PSoC5/interrupter1.c ****                 interrupter1_CONTROL &= ((uint8)(~interrupter1_CTRL_CMPMODE1_MASK)); /*Clear existi
+ 337:Generated_Source\PSoC5/interrupter1.c ****                 interrupter1_CONTROL |= comparemodemasked;
+ 338:Generated_Source\PSoC5/interrupter1.c ****             #endif /* (interrupter1_UseControl) */
+ 339:Generated_Source\PSoC5/interrupter1.c ****         }
+ 340:Generated_Source\PSoC5/interrupter1.c ****     #endif /* interrupter1_CompareMode1SW */
+ 341:Generated_Source\PSoC5/interrupter1.c **** 
+ 342:Generated_Source\PSoC5/interrupter1.c **** #if (interrupter1_CompareMode2SW)
+ 343:Generated_Source\PSoC5/interrupter1.c **** 
+ 344:Generated_Source\PSoC5/interrupter1.c **** 
+ 345:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 346:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_SetCompareMode2
+ 347:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 8
+
+
+ 348:Generated_Source\PSoC5/interrupter1.c ****     *
+ 349:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 350:Generated_Source\PSoC5/interrupter1.c ****     *  This function writes the Compare Mode for the pwm or pwm2 output
+ 351:Generated_Source\PSoC5/interrupter1.c ****     *
+ 352:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 353:Generated_Source\PSoC5/interrupter1.c ****     *  comparemode:  The new compare mode for the PWM output. Use the compare types
+ 354:Generated_Source\PSoC5/interrupter1.c ****     *                defined in the H file as input arguments.
+ 355:Generated_Source\PSoC5/interrupter1.c ****     *
+ 356:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 357:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 358:Generated_Source\PSoC5/interrupter1.c ****     *
+ 359:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 360:Generated_Source\PSoC5/interrupter1.c ****     void interrupter1_SetCompareMode2(uint8 comparemode) 
+ 361:Generated_Source\PSoC5/interrupter1.c ****     {
+ 362:Generated_Source\PSoC5/interrupter1.c **** 
+ 363:Generated_Source\PSoC5/interrupter1.c ****         #if(0 != interrupter1_CTRL_CMPMODE2_SHIFT)
+ 364:Generated_Source\PSoC5/interrupter1.c ****             uint8 comparemodemasked = ((uint8)((uint8)comparemode << interrupter1_CTRL_CMPMODE2_SHI
+ 365:Generated_Source\PSoC5/interrupter1.c ****                                                  interrupter1_CTRL_CMPMODE2_MASK;
+ 366:Generated_Source\PSoC5/interrupter1.c ****         #else
+ 367:Generated_Source\PSoC5/interrupter1.c ****             uint8 comparemodemasked = comparemode & interrupter1_CTRL_CMPMODE2_MASK;
+ 368:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (0 != interrupter1_CTRL_CMPMODE2_SHIFT) */
+ 369:Generated_Source\PSoC5/interrupter1.c **** 
+ 370:Generated_Source\PSoC5/interrupter1.c ****         #if (interrupter1_UseControl)
+ 371:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_CONTROL &= ((uint8)(~interrupter1_CTRL_CMPMODE2_MASK)); /*Clear existing m
+ 372:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_CONTROL |= comparemodemasked;
+ 373:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_UseControl) */
+ 374:Generated_Source\PSoC5/interrupter1.c ****     }
+ 375:Generated_Source\PSoC5/interrupter1.c ****     #endif /*interrupter1_CompareMode2SW */
+ 376:Generated_Source\PSoC5/interrupter1.c **** 
+ 377:Generated_Source\PSoC5/interrupter1.c **** #endif /* UseOneCompareMode */
+ 378:Generated_Source\PSoC5/interrupter1.c **** 
+ 379:Generated_Source\PSoC5/interrupter1.c **** 
+ 380:Generated_Source\PSoC5/interrupter1.c **** #if (!interrupter1_UsingFixedFunction)
+ 381:Generated_Source\PSoC5/interrupter1.c **** 
+ 382:Generated_Source\PSoC5/interrupter1.c **** 
+ 383:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 384:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_WriteCounter
+ 385:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 386:Generated_Source\PSoC5/interrupter1.c ****     *
+ 387:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 388:Generated_Source\PSoC5/interrupter1.c ****     *  Writes a new counter value directly to the counter register. This will be
+ 389:Generated_Source\PSoC5/interrupter1.c ****     *  implemented for that currently running period and only that period. This API
+ 390:Generated_Source\PSoC5/interrupter1.c ****     *  is valid only for UDB implementation and not available for fixed function
+ 391:Generated_Source\PSoC5/interrupter1.c ****     *  PWM implementation.
+ 392:Generated_Source\PSoC5/interrupter1.c ****     *
+ 393:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 394:Generated_Source\PSoC5/interrupter1.c ****     *  counter:  The period new period counter value.
+ 395:Generated_Source\PSoC5/interrupter1.c ****     *
+ 396:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 397:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 398:Generated_Source\PSoC5/interrupter1.c ****     *
+ 399:Generated_Source\PSoC5/interrupter1.c ****     * Side Effects:
+ 400:Generated_Source\PSoC5/interrupter1.c ****     *  The PWM Period will be reloaded when a counter value will be a zero
+ 401:Generated_Source\PSoC5/interrupter1.c ****     *
+ 402:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 403:Generated_Source\PSoC5/interrupter1.c ****     void interrupter1_WriteCounter(uint16 counter) \
+ 404:Generated_Source\PSoC5/interrupter1.c ****                                        
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 9
+
+
+ 405:Generated_Source\PSoC5/interrupter1.c ****     {
+ 406:Generated_Source\PSoC5/interrupter1.c ****         CY_SET_REG16(interrupter1_COUNTER_LSB_PTR, counter);
+  53              		.loc 1 406 0
+  54 0026 4FF6E853 		movw	r3, #65000
+  55 002a A2F8A833 		strh	r3, [r2, #936]	@ movhi
+  56              	.LVL3:
+  57              	.LBE11:
+  58              	.LBE10:
+  59              	.LBB12:
+  60              	.LBB13:
+ 407:Generated_Source\PSoC5/interrupter1.c ****     }
+ 408:Generated_Source\PSoC5/interrupter1.c **** 
+ 409:Generated_Source\PSoC5/interrupter1.c **** 
+ 410:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 411:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_ReadCounter
+ 412:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 413:Generated_Source\PSoC5/interrupter1.c ****     *
+ 414:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 415:Generated_Source\PSoC5/interrupter1.c ****     *  This function returns the current value of the counter.  It doesn't matter
+ 416:Generated_Source\PSoC5/interrupter1.c ****     *  if the counter is enabled or running.
+ 417:Generated_Source\PSoC5/interrupter1.c ****     *
+ 418:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 419:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 420:Generated_Source\PSoC5/interrupter1.c ****     *
+ 421:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 422:Generated_Source\PSoC5/interrupter1.c ****     *  The current value of the counter.
+ 423:Generated_Source\PSoC5/interrupter1.c ****     *
+ 424:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 425:Generated_Source\PSoC5/interrupter1.c ****     uint16 interrupter1_ReadCounter(void) 
+ 426:Generated_Source\PSoC5/interrupter1.c ****     {
+ 427:Generated_Source\PSoC5/interrupter1.c ****         /* Force capture by reading Accumulator */
+ 428:Generated_Source\PSoC5/interrupter1.c ****         /* Must first do a software capture to be able to read the counter */
+ 429:Generated_Source\PSoC5/interrupter1.c ****         /* It is up to the user code to make sure there isn't already captured data in the FIFO */
+ 430:Generated_Source\PSoC5/interrupter1.c ****           (void)CY_GET_REG8(interrupter1_COUNTERCAP_LSB_PTR_8BIT);
+ 431:Generated_Source\PSoC5/interrupter1.c **** 
+ 432:Generated_Source\PSoC5/interrupter1.c ****         /* Read the data from the FIFO */
+ 433:Generated_Source\PSoC5/interrupter1.c ****         return (CY_GET_REG16(interrupter1_CAPTURE_LSB_PTR));
+ 434:Generated_Source\PSoC5/interrupter1.c ****     }
+ 435:Generated_Source\PSoC5/interrupter1.c **** 
+ 436:Generated_Source\PSoC5/interrupter1.c ****     #if (interrupter1_UseStatus)
+ 437:Generated_Source\PSoC5/interrupter1.c **** 
+ 438:Generated_Source\PSoC5/interrupter1.c **** 
+ 439:Generated_Source\PSoC5/interrupter1.c ****         /*******************************************************************************
+ 440:Generated_Source\PSoC5/interrupter1.c ****         * Function Name: interrupter1_ClearFIFO
+ 441:Generated_Source\PSoC5/interrupter1.c ****         ********************************************************************************
+ 442:Generated_Source\PSoC5/interrupter1.c ****         *
+ 443:Generated_Source\PSoC5/interrupter1.c ****         * Summary:
+ 444:Generated_Source\PSoC5/interrupter1.c ****         *  This function clears all capture data from the capture FIFO
+ 445:Generated_Source\PSoC5/interrupter1.c ****         *
+ 446:Generated_Source\PSoC5/interrupter1.c ****         * Parameters:
+ 447:Generated_Source\PSoC5/interrupter1.c ****         *  None
+ 448:Generated_Source\PSoC5/interrupter1.c ****         *
+ 449:Generated_Source\PSoC5/interrupter1.c ****         * Return:
+ 450:Generated_Source\PSoC5/interrupter1.c ****         *  None
+ 451:Generated_Source\PSoC5/interrupter1.c ****         *
+ 452:Generated_Source\PSoC5/interrupter1.c ****         *******************************************************************************/
+ 453:Generated_Source\PSoC5/interrupter1.c ****         void interrupter1_ClearFIFO(void) 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 10
+
+
+ 454:Generated_Source\PSoC5/interrupter1.c ****         {
+ 455:Generated_Source\PSoC5/interrupter1.c ****             while(0u != (interrupter1_ReadStatusRegister() & interrupter1_STATUS_FIFONEMPTY))
+ 456:Generated_Source\PSoC5/interrupter1.c ****             {
+ 457:Generated_Source\PSoC5/interrupter1.c ****                 (void)interrupter1_ReadCapture();
+ 458:Generated_Source\PSoC5/interrupter1.c ****             }
+ 459:Generated_Source\PSoC5/interrupter1.c ****         }
+ 460:Generated_Source\PSoC5/interrupter1.c **** 
+ 461:Generated_Source\PSoC5/interrupter1.c ****     #endif /* interrupter1_UseStatus */
+ 462:Generated_Source\PSoC5/interrupter1.c **** 
+ 463:Generated_Source\PSoC5/interrupter1.c **** #endif /* !interrupter1_UsingFixedFunction */
+ 464:Generated_Source\PSoC5/interrupter1.c **** 
+ 465:Generated_Source\PSoC5/interrupter1.c **** 
+ 466:Generated_Source\PSoC5/interrupter1.c **** /*******************************************************************************
+ 467:Generated_Source\PSoC5/interrupter1.c **** * Function Name: interrupter1_WritePeriod
+ 468:Generated_Source\PSoC5/interrupter1.c **** ********************************************************************************
+ 469:Generated_Source\PSoC5/interrupter1.c **** *
+ 470:Generated_Source\PSoC5/interrupter1.c **** * Summary:
+ 471:Generated_Source\PSoC5/interrupter1.c **** *  This function is used to change the period of the counter.  The new period
+ 472:Generated_Source\PSoC5/interrupter1.c **** *  will be loaded the next time terminal count is detected.
+ 473:Generated_Source\PSoC5/interrupter1.c **** *
+ 474:Generated_Source\PSoC5/interrupter1.c **** * Parameters:
+ 475:Generated_Source\PSoC5/interrupter1.c **** *  period:  Period value. May be between 1 and (2^Resolution)-1.  A value of 0
+ 476:Generated_Source\PSoC5/interrupter1.c **** *           will result in the counter remaining at zero.
+ 477:Generated_Source\PSoC5/interrupter1.c **** *
+ 478:Generated_Source\PSoC5/interrupter1.c **** * Return:
+ 479:Generated_Source\PSoC5/interrupter1.c **** *  None
+ 480:Generated_Source\PSoC5/interrupter1.c **** *
+ 481:Generated_Source\PSoC5/interrupter1.c **** *******************************************************************************/
+ 482:Generated_Source\PSoC5/interrupter1.c **** void interrupter1_WritePeriod(uint16 period) 
+ 483:Generated_Source\PSoC5/interrupter1.c **** {
+ 484:Generated_Source\PSoC5/interrupter1.c ****     #if(interrupter1_UsingFixedFunction)
+ 485:Generated_Source\PSoC5/interrupter1.c ****         CY_SET_REG16(interrupter1_PERIOD_LSB_PTR, (uint16)period);
+ 486:Generated_Source\PSoC5/interrupter1.c ****     #else
+ 487:Generated_Source\PSoC5/interrupter1.c ****         CY_SET_REG16(interrupter1_PERIOD_LSB_PTR, period);
+  61              		.loc 1 487 0
+  62 002e A2F82834 		strh	r3, [r2, #1064]	@ movhi
+  63              	.LVL4:
+  64              	.LBE13:
+  65              	.LBE12:
+  66              	.LBB14:
+  67              	.LBB15:
+ 488:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UsingFixedFunction) */
+ 489:Generated_Source\PSoC5/interrupter1.c **** }
+ 490:Generated_Source\PSoC5/interrupter1.c **** 
+ 491:Generated_Source\PSoC5/interrupter1.c **** #if (interrupter1_UseOneCompareMode)
+ 492:Generated_Source\PSoC5/interrupter1.c **** 
+ 493:Generated_Source\PSoC5/interrupter1.c **** 
+ 494:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 495:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_WriteCompare
+ 496:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 497:Generated_Source\PSoC5/interrupter1.c ****     *
+ 498:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 499:Generated_Source\PSoC5/interrupter1.c ****     *  This funtion is used to change the compare1 value when the PWM is in Dither
+ 500:Generated_Source\PSoC5/interrupter1.c ****     *  mode. The compare output will reflect the new value on the next UDB clock.
+ 501:Generated_Source\PSoC5/interrupter1.c ****     *  The compare output will be driven high when the present counter value is
+ 502:Generated_Source\PSoC5/interrupter1.c ****     *  compared to the compare value based on the compare mode defined in
+ 503:Generated_Source\PSoC5/interrupter1.c ****     *  Dither Mode.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 11
+
+
+ 504:Generated_Source\PSoC5/interrupter1.c ****     *
+ 505:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 506:Generated_Source\PSoC5/interrupter1.c ****     *  compare:  New compare value.
+ 507:Generated_Source\PSoC5/interrupter1.c ****     *
+ 508:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 509:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 510:Generated_Source\PSoC5/interrupter1.c ****     *
+ 511:Generated_Source\PSoC5/interrupter1.c ****     * Side Effects:
+ 512:Generated_Source\PSoC5/interrupter1.c ****     *  This function is only available if the PWM mode parameter is set to
+ 513:Generated_Source\PSoC5/interrupter1.c ****     *  Dither Mode, Center Aligned Mode or One Output Mode
+ 514:Generated_Source\PSoC5/interrupter1.c ****     *
+ 515:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 516:Generated_Source\PSoC5/interrupter1.c ****     void interrupter1_WriteCompare(uint16 compare) \
+ 517:Generated_Source\PSoC5/interrupter1.c ****                                        
+ 518:Generated_Source\PSoC5/interrupter1.c ****     {
+ 519:Generated_Source\PSoC5/interrupter1.c ****         #if(interrupter1_UsingFixedFunction)
+ 520:Generated_Source\PSoC5/interrupter1.c ****             CY_SET_REG16(interrupter1_COMPARE1_LSB_PTR, (uint16)compare);
+ 521:Generated_Source\PSoC5/interrupter1.c ****         #else
+ 522:Generated_Source\PSoC5/interrupter1.c ****             CY_SET_REG16(interrupter1_COMPARE1_LSB_PTR, compare);
+ 523:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_UsingFixedFunction) */
+ 524:Generated_Source\PSoC5/interrupter1.c **** 
+ 525:Generated_Source\PSoC5/interrupter1.c ****         #if (interrupter1_PWMMode == interrupter1__B_PWM__DITHER)
+ 526:Generated_Source\PSoC5/interrupter1.c ****             #if(interrupter1_UsingFixedFunction)
+ 527:Generated_Source\PSoC5/interrupter1.c ****                 CY_SET_REG16(interrupter1_COMPARE2_LSB_PTR, (uint16)(compare + 1u));
+ 528:Generated_Source\PSoC5/interrupter1.c ****             #else
+ 529:Generated_Source\PSoC5/interrupter1.c ****                 CY_SET_REG16(interrupter1_COMPARE2_LSB_PTR, (compare + 1u));
+ 530:Generated_Source\PSoC5/interrupter1.c ****             #endif /* (interrupter1_UsingFixedFunction) */
+ 531:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_PWMMode == interrupter1__B_PWM__DITHER) */
+ 532:Generated_Source\PSoC5/interrupter1.c ****     }
+ 533:Generated_Source\PSoC5/interrupter1.c **** 
+ 534:Generated_Source\PSoC5/interrupter1.c **** 
+ 535:Generated_Source\PSoC5/interrupter1.c **** #else
+ 536:Generated_Source\PSoC5/interrupter1.c **** 
+ 537:Generated_Source\PSoC5/interrupter1.c **** 
+ 538:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 539:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_WriteCompare1
+ 540:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 541:Generated_Source\PSoC5/interrupter1.c ****     *
+ 542:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 543:Generated_Source\PSoC5/interrupter1.c ****     *  This funtion is used to change the compare1 value.  The compare output will
+ 544:Generated_Source\PSoC5/interrupter1.c ****     *  reflect the new value on the next UDB clock.  The compare output will be
+ 545:Generated_Source\PSoC5/interrupter1.c ****     *  driven high when the present counter value is less than or less than or
+ 546:Generated_Source\PSoC5/interrupter1.c ****     *  equal to the compare register, depending on the mode.
+ 547:Generated_Source\PSoC5/interrupter1.c ****     *
+ 548:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 549:Generated_Source\PSoC5/interrupter1.c ****     *  compare:  New compare value.
+ 550:Generated_Source\PSoC5/interrupter1.c ****     *
+ 551:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 552:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 553:Generated_Source\PSoC5/interrupter1.c ****     *
+ 554:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 555:Generated_Source\PSoC5/interrupter1.c ****     void interrupter1_WriteCompare1(uint16 compare) \
+ 556:Generated_Source\PSoC5/interrupter1.c ****                                         
+ 557:Generated_Source\PSoC5/interrupter1.c ****     {
+ 558:Generated_Source\PSoC5/interrupter1.c ****         #if(interrupter1_UsingFixedFunction)
+ 559:Generated_Source\PSoC5/interrupter1.c ****             CY_SET_REG16(interrupter1_COMPARE1_LSB_PTR, (uint16)compare);
+ 560:Generated_Source\PSoC5/interrupter1.c ****         #else
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 12
+
+
+ 561:Generated_Source\PSoC5/interrupter1.c ****             CY_SET_REG16(interrupter1_COMPARE1_LSB_PTR, compare);
+  68              		.loc 1 561 0
+  69 0032 A2F8E833 		strh	r3, [r2, #1000]	@ movhi
+  70              	.LVL5:
+  71              	.LBE15:
+  72              	.LBE14:
+  73              	.LBB16:
+  74              	.LBB17:
+ 562:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_UsingFixedFunction) */
+ 563:Generated_Source\PSoC5/interrupter1.c ****     }
+ 564:Generated_Source\PSoC5/interrupter1.c **** 
+ 565:Generated_Source\PSoC5/interrupter1.c **** 
+ 566:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 567:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_WriteCompare2
+ 568:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 569:Generated_Source\PSoC5/interrupter1.c ****     *
+ 570:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 571:Generated_Source\PSoC5/interrupter1.c ****     *  This funtion is used to change the compare value, for compare1 output.
+ 572:Generated_Source\PSoC5/interrupter1.c ****     *  The compare output will reflect the new value on the next UDB clock.
+ 573:Generated_Source\PSoC5/interrupter1.c ****     *  The compare output will be driven high when the present counter value is
+ 574:Generated_Source\PSoC5/interrupter1.c ****     *  less than or less than or equal to the compare register, depending on the
+ 575:Generated_Source\PSoC5/interrupter1.c ****     *  mode.
+ 576:Generated_Source\PSoC5/interrupter1.c ****     *
+ 577:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 578:Generated_Source\PSoC5/interrupter1.c ****     *  compare:  New compare value.
+ 579:Generated_Source\PSoC5/interrupter1.c ****     *
+ 580:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 581:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 582:Generated_Source\PSoC5/interrupter1.c ****     *
+ 583:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 584:Generated_Source\PSoC5/interrupter1.c ****     void interrupter1_WriteCompare2(uint16 compare) \
+ 585:Generated_Source\PSoC5/interrupter1.c ****                                         
+ 586:Generated_Source\PSoC5/interrupter1.c ****     {
+ 587:Generated_Source\PSoC5/interrupter1.c ****         #if(interrupter1_UsingFixedFunction)
+ 588:Generated_Source\PSoC5/interrupter1.c ****             CY_SET_REG16(interrupter1_COMPARE2_LSB_PTR, compare);
+ 589:Generated_Source\PSoC5/interrupter1.c ****         #else
+ 590:Generated_Source\PSoC5/interrupter1.c ****             CY_SET_REG16(interrupter1_COMPARE2_LSB_PTR, compare);
+  75              		.loc 1 590 0
+  76 0036 A2F80834 		strh	r3, [r2, #1032]	@ movhi
+  77              	.LVL6:
+  78 003a 7047     		bx	lr
+  79              	.L3:
+  80              		.align	2
+  81              	.L2:
+  82 003c 70640040 		.word	1073767536
+  83              	.LBE17:
+  84              	.LBE16:
+  85              		.cfi_endproc
+  86              	.LFE1:
+  87              		.size	interrupter1_Init, .-interrupter1_Init
+  88              		.section	.text.interrupter1_Enable,"ax",%progbits
+  89              		.align	1
+  90              		.global	interrupter1_Enable
+  91              		.thumb
+  92              		.thumb_func
+  93              		.type	interrupter1_Enable, %function
+  94              	interrupter1_Enable:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 13
+
+
+  95              	.LFB2:
+ 200:Generated_Source\PSoC5/interrupter1.c ****     /* Globally Enable the Fixed Function Block chosen */
+  96              		.loc 1 200 0
+  97              		.cfi_startproc
+  98              		@ args = 0, pretend = 0, frame = 0
+  99              		@ frame_needed = 0, uses_anonymous_args = 0
+ 100              		@ link register save eliminated.
+ 209:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UseControl || interrupter1_UsingFixedFunction) */
+ 101              		.loc 1 209 0
+ 102 0000 024A     		ldr	r2, .L5
+ 103 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 104 0004 43F08003 		orr	r3, r3, #128
+ 105 0008 1370     		strb	r3, [r2]
+ 106 000a 7047     		bx	lr
+ 107              	.L6:
+ 108              		.align	2
+ 109              	.L5:
+ 110 000c 70640040 		.word	1073767536
+ 111              		.cfi_endproc
+ 112              	.LFE2:
+ 113              		.size	interrupter1_Enable, .-interrupter1_Enable
+ 114              		.section	.text.interrupter1_Start,"ax",%progbits
+ 115              		.align	1
+ 116              		.global	interrupter1_Start
+ 117              		.thumb
+ 118              		.thumb_func
+ 119              		.type	interrupter1_Start, %function
+ 120              	interrupter1_Start:
+ 121              	.LFB0:
+  56:Generated_Source\PSoC5/interrupter1.c ****     /* If not Initialized then initialize all required hardware and software */
+ 122              		.loc 1 56 0
+ 123              		.cfi_startproc
+ 124              		@ args = 0, pretend = 0, frame = 0
+ 125              		@ frame_needed = 0, uses_anonymous_args = 0
+ 126 0000 08B5     		push	{r3, lr}
+ 127              		.cfi_def_cfa_offset 8
+ 128              		.cfi_offset 3, -8
+ 129              		.cfi_offset 14, -4
+  58:Generated_Source\PSoC5/interrupter1.c ****     {
+ 130              		.loc 1 58 0
+ 131 0002 0549     		ldr	r1, .L10
+ 132 0004 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 133 0006 1BB9     		cbnz	r3, .L8
+  60:Generated_Source\PSoC5/interrupter1.c ****         interrupter1_initVar = 1u;
+ 134              		.loc 1 60 0
+ 135 0008 FFF7FEFF 		bl	interrupter1_Init
+ 136              	.LVL7:
+  61:Generated_Source\PSoC5/interrupter1.c ****     }
+ 137              		.loc 1 61 0
+ 138 000c 0123     		movs	r3, #1
+ 139 000e 0B70     		strb	r3, [r1]
+ 140              	.L8:
+  65:Generated_Source\PSoC5/interrupter1.c **** 
+ 141              		.loc 1 65 0
+ 142 0010 BDE80840 		pop	{r3, lr}
+ 143              		.cfi_restore 14
+ 144              		.cfi_restore 3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 14
+
+
+ 145              		.cfi_def_cfa_offset 0
+  63:Generated_Source\PSoC5/interrupter1.c **** 
+ 146              		.loc 1 63 0
+ 147 0014 FFF7FEBF 		b	interrupter1_Enable
+ 148              	.LVL8:
+ 149              	.L11:
+ 150              		.align	2
+ 151              	.L10:
+ 152 0018 00000000 		.word	.LANCHOR0
+ 153              		.cfi_endproc
+ 154              	.LFE0:
+ 155              		.size	interrupter1_Start, .-interrupter1_Start
+ 156              		.section	.text.interrupter1_Stop,"ax",%progbits
+ 157              		.align	1
+ 158              		.global	interrupter1_Stop
+ 159              		.thumb
+ 160              		.thumb_func
+ 161              		.type	interrupter1_Stop, %function
+ 162              	interrupter1_Stop:
+ 163              	.LFB3:
+ 234:Generated_Source\PSoC5/interrupter1.c ****     #if (interrupter1_UseControl || interrupter1_UsingFixedFunction)
+ 164              		.loc 1 234 0
+ 165              		.cfi_startproc
+ 166              		@ args = 0, pretend = 0, frame = 0
+ 167              		@ frame_needed = 0, uses_anonymous_args = 0
+ 168              		@ link register save eliminated.
+ 236:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UseControl || interrupter1_UsingFixedFunction) */
+ 169              		.loc 1 236 0
+ 170 0000 024A     		ldr	r2, .L13
+ 171 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 172 0004 03F07F03 		and	r3, r3, #127
+ 173 0008 1370     		strb	r3, [r2]
+ 174 000a 7047     		bx	lr
+ 175              	.L14:
+ 176              		.align	2
+ 177              	.L13:
+ 178 000c 70640040 		.word	1073767536
+ 179              		.cfi_endproc
+ 180              	.LFE3:
+ 181              		.size	interrupter1_Stop, .-interrupter1_Stop
+ 182              		.section	.text.interrupter1_WriteCounter,"ax",%progbits
+ 183              		.align	1
+ 184              		.global	interrupter1_WriteCounter
+ 185              		.thumb
+ 186              		.thumb_func
+ 187              		.type	interrupter1_WriteCounter, %function
+ 188              	interrupter1_WriteCounter:
+ 189              	.LFB4:
+ 405:Generated_Source\PSoC5/interrupter1.c ****         CY_SET_REG16(interrupter1_COUNTER_LSB_PTR, counter);
+ 190              		.loc 1 405 0
+ 191              		.cfi_startproc
+ 192              		@ args = 0, pretend = 0, frame = 0
+ 193              		@ frame_needed = 0, uses_anonymous_args = 0
+ 194              		@ link register save eliminated.
+ 195              	.LVL9:
+ 406:Generated_Source\PSoC5/interrupter1.c ****     }
+ 196              		.loc 1 406 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 15
+
+
+ 197 0000 014B     		ldr	r3, .L16
+ 198 0002 1880     		strh	r0, [r3]	@ movhi
+ 199 0004 7047     		bx	lr
+ 200              	.L17:
+ 201 0006 00BF     		.align	2
+ 202              	.L16:
+ 203 0008 18680040 		.word	1073768472
+ 204              		.cfi_endproc
+ 205              	.LFE4:
+ 206              		.size	interrupter1_WriteCounter, .-interrupter1_WriteCounter
+ 207              		.section	.text.interrupter1_ReadCounter,"ax",%progbits
+ 208              		.align	1
+ 209              		.global	interrupter1_ReadCounter
+ 210              		.thumb
+ 211              		.thumb_func
+ 212              		.type	interrupter1_ReadCounter, %function
+ 213              	interrupter1_ReadCounter:
+ 214              	.LFB5:
+ 426:Generated_Source\PSoC5/interrupter1.c ****         /* Force capture by reading Accumulator */
+ 215              		.loc 1 426 0
+ 216              		.cfi_startproc
+ 217              		@ args = 0, pretend = 0, frame = 0
+ 218              		@ frame_needed = 0, uses_anonymous_args = 0
+ 219              		@ link register save eliminated.
+ 430:Generated_Source\PSoC5/interrupter1.c **** 
+ 220              		.loc 1 430 0
+ 221 0000 024B     		ldr	r3, .L19
+ 222 0002 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 433:Generated_Source\PSoC5/interrupter1.c ****     }
+ 223              		.loc 1 433 0
+ 224 0004 024B     		ldr	r3, .L19+4
+ 225 0006 1888     		ldrh	r0, [r3]
+ 434:Generated_Source\PSoC5/interrupter1.c **** 
+ 226              		.loc 1 434 0
+ 227 0008 80B2     		uxth	r0, r0
+ 228 000a 7047     		bx	lr
+ 229              	.L20:
+ 230              		.align	2
+ 231              	.L19:
+ 232 000c 1C640040 		.word	1073767452
+ 233 0010 B8680040 		.word	1073768632
+ 234              		.cfi_endproc
+ 235              	.LFE5:
+ 236              		.size	interrupter1_ReadCounter, .-interrupter1_ReadCounter
+ 237              		.section	.text.interrupter1_WritePeriod,"ax",%progbits
+ 238              		.align	1
+ 239              		.global	interrupter1_WritePeriod
+ 240              		.thumb
+ 241              		.thumb_func
+ 242              		.type	interrupter1_WritePeriod, %function
+ 243              	interrupter1_WritePeriod:
+ 244              	.LFB6:
+ 483:Generated_Source\PSoC5/interrupter1.c ****     #if(interrupter1_UsingFixedFunction)
+ 245              		.loc 1 483 0
+ 246              		.cfi_startproc
+ 247              		@ args = 0, pretend = 0, frame = 0
+ 248              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 16
+
+
+ 249              		@ link register save eliminated.
+ 250              	.LVL10:
+ 487:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UsingFixedFunction) */
+ 251              		.loc 1 487 0
+ 252 0000 014B     		ldr	r3, .L22
+ 253 0002 1880     		strh	r0, [r3]	@ movhi
+ 254 0004 7047     		bx	lr
+ 255              	.L23:
+ 256 0006 00BF     		.align	2
+ 257              	.L22:
+ 258 0008 98680040 		.word	1073768600
+ 259              		.cfi_endproc
+ 260              	.LFE6:
+ 261              		.size	interrupter1_WritePeriod, .-interrupter1_WritePeriod
+ 262              		.section	.text.interrupter1_WriteCompare1,"ax",%progbits
+ 263              		.align	1
+ 264              		.global	interrupter1_WriteCompare1
+ 265              		.thumb
+ 266              		.thumb_func
+ 267              		.type	interrupter1_WriteCompare1, %function
+ 268              	interrupter1_WriteCompare1:
+ 269              	.LFB7:
+ 557:Generated_Source\PSoC5/interrupter1.c ****         #if(interrupter1_UsingFixedFunction)
+ 270              		.loc 1 557 0
+ 271              		.cfi_startproc
+ 272              		@ args = 0, pretend = 0, frame = 0
+ 273              		@ frame_needed = 0, uses_anonymous_args = 0
+ 274              		@ link register save eliminated.
+ 275              	.LVL11:
+ 561:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_UsingFixedFunction) */
+ 276              		.loc 1 561 0
+ 277 0000 014B     		ldr	r3, .L25
+ 278 0002 1880     		strh	r0, [r3]	@ movhi
+ 279 0004 7047     		bx	lr
+ 280              	.L26:
+ 281 0006 00BF     		.align	2
+ 282              	.L25:
+ 283 0008 58680040 		.word	1073768536
+ 284              		.cfi_endproc
+ 285              	.LFE7:
+ 286              		.size	interrupter1_WriteCompare1, .-interrupter1_WriteCompare1
+ 287              		.section	.text.interrupter1_WriteCompare2,"ax",%progbits
+ 288              		.align	1
+ 289              		.global	interrupter1_WriteCompare2
+ 290              		.thumb
+ 291              		.thumb_func
+ 292              		.type	interrupter1_WriteCompare2, %function
+ 293              	interrupter1_WriteCompare2:
+ 294              	.LFB8:
+ 586:Generated_Source\PSoC5/interrupter1.c ****         #if(interrupter1_UsingFixedFunction)
+ 295              		.loc 1 586 0
+ 296              		.cfi_startproc
+ 297              		@ args = 0, pretend = 0, frame = 0
+ 298              		@ frame_needed = 0, uses_anonymous_args = 0
+ 299              		@ link register save eliminated.
+ 300              	.LVL12:
+ 301              		.loc 1 590 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 17
+
+
+ 302 0000 014B     		ldr	r3, .L28
+ 303 0002 1880     		strh	r0, [r3]	@ movhi
+ 304 0004 7047     		bx	lr
+ 305              	.L29:
+ 306 0006 00BF     		.align	2
+ 307              	.L28:
+ 308 0008 78680040 		.word	1073768568
+ 309              		.cfi_endproc
+ 310              	.LFE8:
+ 311              		.size	interrupter1_WriteCompare2, .-interrupter1_WriteCompare2
+ 312              		.section	.text.interrupter1_ReadControlRegister,"ax",%progbits
+ 313              		.align	1
+ 314              		.global	interrupter1_ReadControlRegister
+ 315              		.thumb
+ 316              		.thumb_func
+ 317              		.type	interrupter1_ReadControlRegister, %function
+ 318              	interrupter1_ReadControlRegister:
+ 319              	.LFB9:
+ 591:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_UsingFixedFunction) */
+ 592:Generated_Source\PSoC5/interrupter1.c ****     }
+ 593:Generated_Source\PSoC5/interrupter1.c **** #endif /* UseOneCompareMode */
+ 594:Generated_Source\PSoC5/interrupter1.c **** 
+ 595:Generated_Source\PSoC5/interrupter1.c **** #if (interrupter1_DeadBandUsed)
+ 596:Generated_Source\PSoC5/interrupter1.c **** 
+ 597:Generated_Source\PSoC5/interrupter1.c **** 
+ 598:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 599:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_WriteDeadTime
+ 600:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 601:Generated_Source\PSoC5/interrupter1.c ****     *
+ 602:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 603:Generated_Source\PSoC5/interrupter1.c ****     *  This function writes the dead-band counts to the corresponding register
+ 604:Generated_Source\PSoC5/interrupter1.c ****     *
+ 605:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 606:Generated_Source\PSoC5/interrupter1.c ****     *  deadtime:  Number of counts for dead time
+ 607:Generated_Source\PSoC5/interrupter1.c ****     *
+ 608:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 609:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 610:Generated_Source\PSoC5/interrupter1.c ****     *
+ 611:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 612:Generated_Source\PSoC5/interrupter1.c ****     void interrupter1_WriteDeadTime(uint8 deadtime) 
+ 613:Generated_Source\PSoC5/interrupter1.c ****     {
+ 614:Generated_Source\PSoC5/interrupter1.c ****         /* If using the Dead Band 1-255 mode then just write the register */
+ 615:Generated_Source\PSoC5/interrupter1.c ****         #if(!interrupter1_DeadBand2_4)
+ 616:Generated_Source\PSoC5/interrupter1.c ****             CY_SET_REG8(interrupter1_DEADBAND_COUNT_PTR, deadtime);
+ 617:Generated_Source\PSoC5/interrupter1.c ****         #else
+ 618:Generated_Source\PSoC5/interrupter1.c ****             /* Otherwise the data has to be masked and offset */
+ 619:Generated_Source\PSoC5/interrupter1.c ****             /* Clear existing data */
+ 620:Generated_Source\PSoC5/interrupter1.c ****             interrupter1_DEADBAND_COUNT &= ((uint8)(~interrupter1_DEADBAND_COUNT_MASK));
+ 621:Generated_Source\PSoC5/interrupter1.c **** 
+ 622:Generated_Source\PSoC5/interrupter1.c ****             /* Set new dead time */
+ 623:Generated_Source\PSoC5/interrupter1.c ****             #if(interrupter1_DEADBAND_COUNT_SHIFT)
+ 624:Generated_Source\PSoC5/interrupter1.c ****                 interrupter1_DEADBAND_COUNT |= ((uint8)((uint8)deadtime << interrupter1_DEADBAND_CO
+ 625:Generated_Source\PSoC5/interrupter1.c ****                                                     interrupter1_DEADBAND_COUNT_MASK;
+ 626:Generated_Source\PSoC5/interrupter1.c ****             #else
+ 627:Generated_Source\PSoC5/interrupter1.c ****                 interrupter1_DEADBAND_COUNT |= deadtime & interrupter1_DEADBAND_COUNT_MASK;
+ 628:Generated_Source\PSoC5/interrupter1.c ****             #endif /* (interrupter1_DEADBAND_COUNT_SHIFT) */
+ 629:Generated_Source\PSoC5/interrupter1.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 18
+
+
+ 630:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (!interrupter1_DeadBand2_4) */
+ 631:Generated_Source\PSoC5/interrupter1.c ****     }
+ 632:Generated_Source\PSoC5/interrupter1.c **** 
+ 633:Generated_Source\PSoC5/interrupter1.c **** 
+ 634:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 635:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_ReadDeadTime
+ 636:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 637:Generated_Source\PSoC5/interrupter1.c ****     *
+ 638:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 639:Generated_Source\PSoC5/interrupter1.c ****     *  This function reads the dead-band counts from the corresponding register
+ 640:Generated_Source\PSoC5/interrupter1.c ****     *
+ 641:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 642:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 643:Generated_Source\PSoC5/interrupter1.c ****     *
+ 644:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 645:Generated_Source\PSoC5/interrupter1.c ****     *  Dead Band Counts
+ 646:Generated_Source\PSoC5/interrupter1.c ****     *
+ 647:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 648:Generated_Source\PSoC5/interrupter1.c ****     uint8 interrupter1_ReadDeadTime(void) 
+ 649:Generated_Source\PSoC5/interrupter1.c ****     {
+ 650:Generated_Source\PSoC5/interrupter1.c ****         /* If using the Dead Band 1-255 mode then just read the register */
+ 651:Generated_Source\PSoC5/interrupter1.c ****         #if(!interrupter1_DeadBand2_4)
+ 652:Generated_Source\PSoC5/interrupter1.c ****             return (CY_GET_REG8(interrupter1_DEADBAND_COUNT_PTR));
+ 653:Generated_Source\PSoC5/interrupter1.c ****         #else
+ 654:Generated_Source\PSoC5/interrupter1.c **** 
+ 655:Generated_Source\PSoC5/interrupter1.c ****             /* Otherwise the data has to be masked and offset */
+ 656:Generated_Source\PSoC5/interrupter1.c ****             #if(interrupter1_DEADBAND_COUNT_SHIFT)
+ 657:Generated_Source\PSoC5/interrupter1.c ****                 return ((uint8)(((uint8)(interrupter1_DEADBAND_COUNT & interrupter1_DEADBAND_COUNT_
+ 658:Generated_Source\PSoC5/interrupter1.c ****                                                                            interrupter1_DEADBAND_CO
+ 659:Generated_Source\PSoC5/interrupter1.c ****             #else
+ 660:Generated_Source\PSoC5/interrupter1.c ****                 return (interrupter1_DEADBAND_COUNT & interrupter1_DEADBAND_COUNT_MASK);
+ 661:Generated_Source\PSoC5/interrupter1.c ****             #endif /* (interrupter1_DEADBAND_COUNT_SHIFT) */
+ 662:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (!interrupter1_DeadBand2_4) */
+ 663:Generated_Source\PSoC5/interrupter1.c ****     }
+ 664:Generated_Source\PSoC5/interrupter1.c **** #endif /* DeadBandUsed */
+ 665:Generated_Source\PSoC5/interrupter1.c **** 
+ 666:Generated_Source\PSoC5/interrupter1.c **** #if (interrupter1_UseStatus || interrupter1_UsingFixedFunction)
+ 667:Generated_Source\PSoC5/interrupter1.c **** 
+ 668:Generated_Source\PSoC5/interrupter1.c **** 
+ 669:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 670:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_SetInterruptMode
+ 671:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 672:Generated_Source\PSoC5/interrupter1.c ****     *
+ 673:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 674:Generated_Source\PSoC5/interrupter1.c ****     *  This function configures the interrupts mask control of theinterrupt
+ 675:Generated_Source\PSoC5/interrupter1.c ****     *  source status register.
+ 676:Generated_Source\PSoC5/interrupter1.c ****     *
+ 677:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 678:Generated_Source\PSoC5/interrupter1.c ****     *  uint8 interruptMode: Bit field containing the interrupt sources enabled
+ 679:Generated_Source\PSoC5/interrupter1.c ****     *
+ 680:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 681:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 682:Generated_Source\PSoC5/interrupter1.c ****     *
+ 683:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 684:Generated_Source\PSoC5/interrupter1.c ****     void interrupter1_SetInterruptMode(uint8 interruptMode) 
+ 685:Generated_Source\PSoC5/interrupter1.c ****     {
+ 686:Generated_Source\PSoC5/interrupter1.c ****         CY_SET_REG8(interrupter1_STATUS_MASK_PTR, interruptMode);
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 19
+
+
+ 687:Generated_Source\PSoC5/interrupter1.c ****     }
+ 688:Generated_Source\PSoC5/interrupter1.c **** 
+ 689:Generated_Source\PSoC5/interrupter1.c **** 
+ 690:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 691:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_ReadStatusRegister
+ 692:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 693:Generated_Source\PSoC5/interrupter1.c ****     *
+ 694:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 695:Generated_Source\PSoC5/interrupter1.c ****     *  This function returns the current state of the status register.
+ 696:Generated_Source\PSoC5/interrupter1.c ****     *
+ 697:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 698:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 699:Generated_Source\PSoC5/interrupter1.c ****     *
+ 700:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 701:Generated_Source\PSoC5/interrupter1.c ****     *  uint8 : Current status register value. The status register bits are:
+ 702:Generated_Source\PSoC5/interrupter1.c ****     *  [7:6] : Unused(0)
+ 703:Generated_Source\PSoC5/interrupter1.c ****     *  [5]   : Kill event output
+ 704:Generated_Source\PSoC5/interrupter1.c ****     *  [4]   : FIFO not empty
+ 705:Generated_Source\PSoC5/interrupter1.c ****     *  [3]   : FIFO full
+ 706:Generated_Source\PSoC5/interrupter1.c ****     *  [2]   : Terminal count
+ 707:Generated_Source\PSoC5/interrupter1.c ****     *  [1]   : Compare output 2
+ 708:Generated_Source\PSoC5/interrupter1.c ****     *  [0]   : Compare output 1
+ 709:Generated_Source\PSoC5/interrupter1.c ****     *
+ 710:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 711:Generated_Source\PSoC5/interrupter1.c ****     uint8 interrupter1_ReadStatusRegister(void) 
+ 712:Generated_Source\PSoC5/interrupter1.c ****     {
+ 713:Generated_Source\PSoC5/interrupter1.c ****         return (CY_GET_REG8(interrupter1_STATUS_PTR));
+ 714:Generated_Source\PSoC5/interrupter1.c ****     }
+ 715:Generated_Source\PSoC5/interrupter1.c **** 
+ 716:Generated_Source\PSoC5/interrupter1.c **** #endif /* (interrupter1_UseStatus || interrupter1_UsingFixedFunction) */
+ 717:Generated_Source\PSoC5/interrupter1.c **** 
+ 718:Generated_Source\PSoC5/interrupter1.c **** 
+ 719:Generated_Source\PSoC5/interrupter1.c **** #if (interrupter1_UseControl)
+ 720:Generated_Source\PSoC5/interrupter1.c **** 
+ 721:Generated_Source\PSoC5/interrupter1.c **** 
+ 722:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 723:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_ReadControlRegister
+ 724:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 725:Generated_Source\PSoC5/interrupter1.c ****     *
+ 726:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 727:Generated_Source\PSoC5/interrupter1.c ****     *  Returns the current state of the control register. This API is available
+ 728:Generated_Source\PSoC5/interrupter1.c ****     *  only if the control register is not removed.
+ 729:Generated_Source\PSoC5/interrupter1.c ****     *
+ 730:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 731:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 732:Generated_Source\PSoC5/interrupter1.c ****     *
+ 733:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 734:Generated_Source\PSoC5/interrupter1.c ****     *  uint8 : Current control register value
+ 735:Generated_Source\PSoC5/interrupter1.c ****     *
+ 736:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 737:Generated_Source\PSoC5/interrupter1.c ****     uint8 interrupter1_ReadControlRegister(void) 
+ 738:Generated_Source\PSoC5/interrupter1.c ****     {
+ 320              		.loc 1 738 0
+ 321              		.cfi_startproc
+ 322              		@ args = 0, pretend = 0, frame = 0
+ 323              		@ frame_needed = 0, uses_anonymous_args = 0
+ 324              		@ link register save eliminated.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 20
+
+
+ 739:Generated_Source\PSoC5/interrupter1.c ****         uint8 result;
+ 740:Generated_Source\PSoC5/interrupter1.c **** 
+ 741:Generated_Source\PSoC5/interrupter1.c ****         result = CY_GET_REG8(interrupter1_CONTROL_PTR);
+ 325              		.loc 1 741 0
+ 326 0000 014B     		ldr	r3, .L31
+ 327 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 328              	.LVL13:
+ 742:Generated_Source\PSoC5/interrupter1.c ****         return (result);
+ 743:Generated_Source\PSoC5/interrupter1.c ****     }
+ 329              		.loc 1 743 0
+ 330 0004 7047     		bx	lr
+ 331              	.L32:
+ 332 0006 00BF     		.align	2
+ 333              	.L31:
+ 334 0008 70640040 		.word	1073767536
+ 335              		.cfi_endproc
+ 336              	.LFE9:
+ 337              		.size	interrupter1_ReadControlRegister, .-interrupter1_ReadControlRegister
+ 338              		.section	.text.interrupter1_WriteControlRegister,"ax",%progbits
+ 339              		.align	1
+ 340              		.global	interrupter1_WriteControlRegister
+ 341              		.thumb
+ 342              		.thumb_func
+ 343              		.type	interrupter1_WriteControlRegister, %function
+ 344              	interrupter1_WriteControlRegister:
+ 345              	.LFB10:
+ 744:Generated_Source\PSoC5/interrupter1.c **** 
+ 745:Generated_Source\PSoC5/interrupter1.c **** 
+ 746:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 747:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_WriteControlRegister
+ 748:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 749:Generated_Source\PSoC5/interrupter1.c ****     *
+ 750:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 751:Generated_Source\PSoC5/interrupter1.c ****     *  Sets the bit field of the control register. This API is available only if
+ 752:Generated_Source\PSoC5/interrupter1.c ****     *  the control register is not removed.
+ 753:Generated_Source\PSoC5/interrupter1.c ****     *
+ 754:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 755:Generated_Source\PSoC5/interrupter1.c ****     *  uint8 control: Control register bit field, The status register bits are:
+ 756:Generated_Source\PSoC5/interrupter1.c ****     *  [7]   : PWM Enable
+ 757:Generated_Source\PSoC5/interrupter1.c ****     *  [6]   : Reset
+ 758:Generated_Source\PSoC5/interrupter1.c ****     *  [5:3] : Compare Mode2
+ 759:Generated_Source\PSoC5/interrupter1.c ****     *  [2:0] : Compare Mode2
+ 760:Generated_Source\PSoC5/interrupter1.c ****     *
+ 761:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 762:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 763:Generated_Source\PSoC5/interrupter1.c ****     *
+ 764:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 765:Generated_Source\PSoC5/interrupter1.c ****     void interrupter1_WriteControlRegister(uint8 control) 
+ 766:Generated_Source\PSoC5/interrupter1.c ****     {
+ 346              		.loc 1 766 0
+ 347              		.cfi_startproc
+ 348              		@ args = 0, pretend = 0, frame = 0
+ 349              		@ frame_needed = 0, uses_anonymous_args = 0
+ 350              		@ link register save eliminated.
+ 351              	.LVL14:
+ 767:Generated_Source\PSoC5/interrupter1.c ****         CY_SET_REG8(interrupter1_CONTROL_PTR, control);
+ 352              		.loc 1 767 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 21
+
+
+ 353 0000 014B     		ldr	r3, .L34
+ 354 0002 1870     		strb	r0, [r3]
+ 355 0004 7047     		bx	lr
+ 356              	.L35:
+ 357 0006 00BF     		.align	2
+ 358              	.L34:
+ 359 0008 70640040 		.word	1073767536
+ 360              		.cfi_endproc
+ 361              	.LFE10:
+ 362              		.size	interrupter1_WriteControlRegister, .-interrupter1_WriteControlRegister
+ 363              		.section	.text.interrupter1_ReadCapture,"ax",%progbits
+ 364              		.align	1
+ 365              		.global	interrupter1_ReadCapture
+ 366              		.thumb
+ 367              		.thumb_func
+ 368              		.type	interrupter1_ReadCapture, %function
+ 369              	interrupter1_ReadCapture:
+ 370              	.LFB11:
+ 768:Generated_Source\PSoC5/interrupter1.c ****     }
+ 769:Generated_Source\PSoC5/interrupter1.c **** 
+ 770:Generated_Source\PSoC5/interrupter1.c **** #endif /* (interrupter1_UseControl) */
+ 771:Generated_Source\PSoC5/interrupter1.c **** 
+ 772:Generated_Source\PSoC5/interrupter1.c **** 
+ 773:Generated_Source\PSoC5/interrupter1.c **** #if (!interrupter1_UsingFixedFunction)
+ 774:Generated_Source\PSoC5/interrupter1.c **** 
+ 775:Generated_Source\PSoC5/interrupter1.c **** 
+ 776:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 777:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_ReadCapture
+ 778:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 779:Generated_Source\PSoC5/interrupter1.c ****     *
+ 780:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 781:Generated_Source\PSoC5/interrupter1.c ****     *  Reads the capture value from the capture FIFO.
+ 782:Generated_Source\PSoC5/interrupter1.c ****     *
+ 783:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 784:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 785:Generated_Source\PSoC5/interrupter1.c ****     *
+ 786:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 787:Generated_Source\PSoC5/interrupter1.c ****     *  uint8/uint16: The current capture value
+ 788:Generated_Source\PSoC5/interrupter1.c ****     *
+ 789:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 790:Generated_Source\PSoC5/interrupter1.c ****     uint16 interrupter1_ReadCapture(void) 
+ 791:Generated_Source\PSoC5/interrupter1.c ****     {
+ 371              		.loc 1 791 0
+ 372              		.cfi_startproc
+ 373              		@ args = 0, pretend = 0, frame = 0
+ 374              		@ frame_needed = 0, uses_anonymous_args = 0
+ 375              		@ link register save eliminated.
+ 792:Generated_Source\PSoC5/interrupter1.c ****         return (CY_GET_REG16(interrupter1_CAPTURE_LSB_PTR));
+ 376              		.loc 1 792 0
+ 377 0000 014B     		ldr	r3, .L37
+ 378 0002 1888     		ldrh	r0, [r3]
+ 793:Generated_Source\PSoC5/interrupter1.c ****     }
+ 379              		.loc 1 793 0
+ 380 0004 80B2     		uxth	r0, r0
+ 381 0006 7047     		bx	lr
+ 382              	.L38:
+ 383              		.align	2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 22
+
+
+ 384              	.L37:
+ 385 0008 B8680040 		.word	1073768632
+ 386              		.cfi_endproc
+ 387              	.LFE11:
+ 388              		.size	interrupter1_ReadCapture, .-interrupter1_ReadCapture
+ 389              		.section	.text.interrupter1_ReadCompare1,"ax",%progbits
+ 390              		.align	1
+ 391              		.global	interrupter1_ReadCompare1
+ 392              		.thumb
+ 393              		.thumb_func
+ 394              		.type	interrupter1_ReadCompare1, %function
+ 395              	interrupter1_ReadCompare1:
+ 396              	.LFB12:
+ 794:Generated_Source\PSoC5/interrupter1.c **** 
+ 795:Generated_Source\PSoC5/interrupter1.c **** #endif /* (!interrupter1_UsingFixedFunction) */
+ 796:Generated_Source\PSoC5/interrupter1.c **** 
+ 797:Generated_Source\PSoC5/interrupter1.c **** 
+ 798:Generated_Source\PSoC5/interrupter1.c **** #if (interrupter1_UseOneCompareMode)
+ 799:Generated_Source\PSoC5/interrupter1.c **** 
+ 800:Generated_Source\PSoC5/interrupter1.c **** 
+ 801:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 802:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_ReadCompare
+ 803:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 804:Generated_Source\PSoC5/interrupter1.c ****     *
+ 805:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 806:Generated_Source\PSoC5/interrupter1.c ****     *  Reads the compare value for the compare output when the PWM Mode parameter is
+ 807:Generated_Source\PSoC5/interrupter1.c ****     *  set to Dither mode, Center Aligned mode, or One Output mode.
+ 808:Generated_Source\PSoC5/interrupter1.c ****     *
+ 809:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 810:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 811:Generated_Source\PSoC5/interrupter1.c ****     *
+ 812:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 813:Generated_Source\PSoC5/interrupter1.c ****     *  uint8/uint16: Current compare value
+ 814:Generated_Source\PSoC5/interrupter1.c ****     *
+ 815:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 816:Generated_Source\PSoC5/interrupter1.c ****     uint16 interrupter1_ReadCompare(void) 
+ 817:Generated_Source\PSoC5/interrupter1.c ****     {
+ 818:Generated_Source\PSoC5/interrupter1.c ****         #if(interrupter1_UsingFixedFunction)
+ 819:Generated_Source\PSoC5/interrupter1.c ****             return ((uint16)CY_GET_REG16(interrupter1_COMPARE1_LSB_PTR));
+ 820:Generated_Source\PSoC5/interrupter1.c ****         #else
+ 821:Generated_Source\PSoC5/interrupter1.c ****             return (CY_GET_REG16(interrupter1_COMPARE1_LSB_PTR));
+ 822:Generated_Source\PSoC5/interrupter1.c ****         #endif /* (interrupter1_UsingFixedFunction) */
+ 823:Generated_Source\PSoC5/interrupter1.c ****     }
+ 824:Generated_Source\PSoC5/interrupter1.c **** 
+ 825:Generated_Source\PSoC5/interrupter1.c **** #else
+ 826:Generated_Source\PSoC5/interrupter1.c **** 
+ 827:Generated_Source\PSoC5/interrupter1.c **** 
+ 828:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 829:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_ReadCompare1
+ 830:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 831:Generated_Source\PSoC5/interrupter1.c ****     *
+ 832:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 833:Generated_Source\PSoC5/interrupter1.c ****     *  Reads the compare value for the compare1 output.
+ 834:Generated_Source\PSoC5/interrupter1.c ****     *
+ 835:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 836:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 837:Generated_Source\PSoC5/interrupter1.c ****     *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 23
+
+
+ 838:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 839:Generated_Source\PSoC5/interrupter1.c ****     *  uint8/uint16: Current compare value.
+ 840:Generated_Source\PSoC5/interrupter1.c ****     *
+ 841:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 842:Generated_Source\PSoC5/interrupter1.c ****     uint16 interrupter1_ReadCompare1(void) 
+ 843:Generated_Source\PSoC5/interrupter1.c ****     {
+ 397              		.loc 1 843 0
+ 398              		.cfi_startproc
+ 399              		@ args = 0, pretend = 0, frame = 0
+ 400              		@ frame_needed = 0, uses_anonymous_args = 0
+ 401              		@ link register save eliminated.
+ 844:Generated_Source\PSoC5/interrupter1.c ****         return (CY_GET_REG16(interrupter1_COMPARE1_LSB_PTR));
+ 402              		.loc 1 844 0
+ 403 0000 014B     		ldr	r3, .L40
+ 404 0002 1888     		ldrh	r0, [r3]
+ 845:Generated_Source\PSoC5/interrupter1.c ****     }
+ 405              		.loc 1 845 0
+ 406 0004 80B2     		uxth	r0, r0
+ 407 0006 7047     		bx	lr
+ 408              	.L41:
+ 409              		.align	2
+ 410              	.L40:
+ 411 0008 58680040 		.word	1073768536
+ 412              		.cfi_endproc
+ 413              	.LFE12:
+ 414              		.size	interrupter1_ReadCompare1, .-interrupter1_ReadCompare1
+ 415              		.section	.text.interrupter1_ReadCompare2,"ax",%progbits
+ 416              		.align	1
+ 417              		.global	interrupter1_ReadCompare2
+ 418              		.thumb
+ 419              		.thumb_func
+ 420              		.type	interrupter1_ReadCompare2, %function
+ 421              	interrupter1_ReadCompare2:
+ 422              	.LFB13:
+ 846:Generated_Source\PSoC5/interrupter1.c **** 
+ 847:Generated_Source\PSoC5/interrupter1.c **** 
+ 848:Generated_Source\PSoC5/interrupter1.c ****     /*******************************************************************************
+ 849:Generated_Source\PSoC5/interrupter1.c ****     * Function Name: interrupter1_ReadCompare2
+ 850:Generated_Source\PSoC5/interrupter1.c ****     ********************************************************************************
+ 851:Generated_Source\PSoC5/interrupter1.c ****     *
+ 852:Generated_Source\PSoC5/interrupter1.c ****     * Summary:
+ 853:Generated_Source\PSoC5/interrupter1.c ****     *  Reads the compare value for the compare2 output.
+ 854:Generated_Source\PSoC5/interrupter1.c ****     *
+ 855:Generated_Source\PSoC5/interrupter1.c ****     * Parameters:
+ 856:Generated_Source\PSoC5/interrupter1.c ****     *  None
+ 857:Generated_Source\PSoC5/interrupter1.c ****     *
+ 858:Generated_Source\PSoC5/interrupter1.c ****     * Return:
+ 859:Generated_Source\PSoC5/interrupter1.c ****     *  uint8/uint16: Current compare value.
+ 860:Generated_Source\PSoC5/interrupter1.c ****     *
+ 861:Generated_Source\PSoC5/interrupter1.c ****     *******************************************************************************/
+ 862:Generated_Source\PSoC5/interrupter1.c ****     uint16 interrupter1_ReadCompare2(void) 
+ 863:Generated_Source\PSoC5/interrupter1.c ****     {
+ 423              		.loc 1 863 0
+ 424              		.cfi_startproc
+ 425              		@ args = 0, pretend = 0, frame = 0
+ 426              		@ frame_needed = 0, uses_anonymous_args = 0
+ 427              		@ link register save eliminated.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 24
+
+
+ 864:Generated_Source\PSoC5/interrupter1.c ****         return (CY_GET_REG16(interrupter1_COMPARE2_LSB_PTR));
+ 428              		.loc 1 864 0
+ 429 0000 014B     		ldr	r3, .L43
+ 430 0002 1888     		ldrh	r0, [r3]
+ 865:Generated_Source\PSoC5/interrupter1.c ****     }
+ 431              		.loc 1 865 0
+ 432 0004 80B2     		uxth	r0, r0
+ 433 0006 7047     		bx	lr
+ 434              	.L44:
+ 435              		.align	2
+ 436              	.L43:
+ 437 0008 78680040 		.word	1073768568
+ 438              		.cfi_endproc
+ 439              	.LFE13:
+ 440              		.size	interrupter1_ReadCompare2, .-interrupter1_ReadCompare2
+ 441              		.section	.text.interrupter1_ReadPeriod,"ax",%progbits
+ 442              		.align	1
+ 443              		.global	interrupter1_ReadPeriod
+ 444              		.thumb
+ 445              		.thumb_func
+ 446              		.type	interrupter1_ReadPeriod, %function
+ 447              	interrupter1_ReadPeriod:
+ 448              	.LFB14:
+ 866:Generated_Source\PSoC5/interrupter1.c **** 
+ 867:Generated_Source\PSoC5/interrupter1.c **** #endif /* (interrupter1_UseOneCompareMode) */
+ 868:Generated_Source\PSoC5/interrupter1.c **** 
+ 869:Generated_Source\PSoC5/interrupter1.c **** 
+ 870:Generated_Source\PSoC5/interrupter1.c **** /*******************************************************************************
+ 871:Generated_Source\PSoC5/interrupter1.c **** * Function Name: interrupter1_ReadPeriod
+ 872:Generated_Source\PSoC5/interrupter1.c **** ********************************************************************************
+ 873:Generated_Source\PSoC5/interrupter1.c **** *
+ 874:Generated_Source\PSoC5/interrupter1.c **** * Summary:
+ 875:Generated_Source\PSoC5/interrupter1.c **** *  Reads the period value used by the PWM hardware.
+ 876:Generated_Source\PSoC5/interrupter1.c **** *
+ 877:Generated_Source\PSoC5/interrupter1.c **** * Parameters:
+ 878:Generated_Source\PSoC5/interrupter1.c **** *  None
+ 879:Generated_Source\PSoC5/interrupter1.c **** *
+ 880:Generated_Source\PSoC5/interrupter1.c **** * Return:
+ 881:Generated_Source\PSoC5/interrupter1.c **** *  uint8/16: Period value
+ 882:Generated_Source\PSoC5/interrupter1.c **** *
+ 883:Generated_Source\PSoC5/interrupter1.c **** *******************************************************************************/
+ 884:Generated_Source\PSoC5/interrupter1.c **** uint16 interrupter1_ReadPeriod(void) 
+ 885:Generated_Source\PSoC5/interrupter1.c **** {
+ 449              		.loc 1 885 0
+ 450              		.cfi_startproc
+ 451              		@ args = 0, pretend = 0, frame = 0
+ 452              		@ frame_needed = 0, uses_anonymous_args = 0
+ 453              		@ link register save eliminated.
+ 886:Generated_Source\PSoC5/interrupter1.c ****     #if(interrupter1_UsingFixedFunction)
+ 887:Generated_Source\PSoC5/interrupter1.c ****         return ((uint16)CY_GET_REG16(interrupter1_PERIOD_LSB_PTR));
+ 888:Generated_Source\PSoC5/interrupter1.c ****     #else
+ 889:Generated_Source\PSoC5/interrupter1.c ****         return (CY_GET_REG16(interrupter1_PERIOD_LSB_PTR));
+ 454              		.loc 1 889 0
+ 455 0000 014B     		ldr	r3, .L46
+ 456 0002 1888     		ldrh	r0, [r3]
+ 890:Generated_Source\PSoC5/interrupter1.c ****     #endif /* (interrupter1_UsingFixedFunction) */
+ 891:Generated_Source\PSoC5/interrupter1.c **** }
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 25
+
+
+ 457              		.loc 1 891 0
+ 458 0004 80B2     		uxth	r0, r0
+ 459 0006 7047     		bx	lr
+ 460              	.L47:
+ 461              		.align	2
+ 462              	.L46:
+ 463 0008 98680040 		.word	1073768600
+ 464              		.cfi_endproc
+ 465              	.LFE14:
+ 466              		.size	interrupter1_ReadPeriod, .-interrupter1_ReadPeriod
+ 467              		.global	interrupter1_initVar
+ 468              		.bss
+ 469              		.set	.LANCHOR0,. + 0
+ 470              		.type	interrupter1_initVar, %object
+ 471              		.size	interrupter1_initVar, 1
+ 472              	interrupter1_initVar:
+ 473 0000 00       		.space	1
+ 474              		.text
+ 475              	.Letext0:
+ 476              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+ 477              		.section	.debug_info,"",%progbits
+ 478              	.Ldebug_info0:
+ 479 0000 3E030000 		.4byte	0x33e
+ 480 0004 0400     		.2byte	0x4
+ 481 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 482 000a 04       		.byte	0x4
+ 483 000b 01       		.uleb128 0x1
+ 484 000c 4D000000 		.4byte	.LASF36
+ 485 0010 0C       		.byte	0xc
+ 486 0011 EB010000 		.4byte	.LASF37
+ 487 0015 AC020000 		.4byte	.LASF38
+ 488 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 489 001d 00000000 		.4byte	0
+ 490 0021 00000000 		.4byte	.Ldebug_line0
+ 491 0025 02       		.uleb128 0x2
+ 492 0026 01       		.byte	0x1
+ 493 0027 06       		.byte	0x6
+ 494 0028 0E030000 		.4byte	.LASF0
+ 495 002c 02       		.uleb128 0x2
+ 496 002d 01       		.byte	0x1
+ 497 002e 08       		.byte	0x8
+ 498 002f 4E010000 		.4byte	.LASF1
+ 499 0033 02       		.uleb128 0x2
+ 500 0034 02       		.byte	0x2
+ 501 0035 05       		.byte	0x5
+ 502 0036 9D020000 		.4byte	.LASF2
+ 503 003a 02       		.uleb128 0x2
+ 504 003b 02       		.byte	0x2
+ 505 003c 07       		.byte	0x7
+ 506 003d ED000000 		.4byte	.LASF3
+ 507 0041 02       		.uleb128 0x2
+ 508 0042 04       		.byte	0x4
+ 509 0043 05       		.byte	0x5
+ 510 0044 E3020000 		.4byte	.LASF4
+ 511 0048 02       		.uleb128 0x2
+ 512 0049 04       		.byte	0x4
+ 513 004a 07       		.byte	0x7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 26
+
+
+ 514 004b 61010000 		.4byte	.LASF5
+ 515 004f 02       		.uleb128 0x2
+ 516 0050 08       		.byte	0x8
+ 517 0051 05       		.byte	0x5
+ 518 0052 50020000 		.4byte	.LASF6
+ 519 0056 02       		.uleb128 0x2
+ 520 0057 08       		.byte	0x8
+ 521 0058 07       		.byte	0x7
+ 522 0059 11020000 		.4byte	.LASF7
+ 523 005d 03       		.uleb128 0x3
+ 524 005e 04       		.byte	0x4
+ 525 005f 05       		.byte	0x5
+ 526 0060 696E7400 		.ascii	"int\000"
+ 527 0064 02       		.uleb128 0x2
+ 528 0065 04       		.byte	0x4
+ 529 0066 07       		.byte	0x7
+ 530 0067 DE010000 		.4byte	.LASF8
+ 531 006b 04       		.uleb128 0x4
+ 532 006c 8C010000 		.4byte	.LASF9
+ 533 0070 02       		.byte	0x2
+ 534 0071 9201     		.2byte	0x192
+ 535 0073 2C000000 		.4byte	0x2c
+ 536 0077 04       		.uleb128 0x4
+ 537 0078 A1010000 		.4byte	.LASF10
+ 538 007c 02       		.byte	0x2
+ 539 007d 9301     		.2byte	0x193
+ 540 007f 3A000000 		.4byte	0x3a
+ 541 0083 02       		.uleb128 0x2
+ 542 0084 04       		.byte	0x4
+ 543 0085 04       		.byte	0x4
+ 544 0086 2B010000 		.4byte	.LASF11
+ 545 008a 02       		.uleb128 0x2
+ 546 008b 08       		.byte	0x8
+ 547 008c 04       		.byte	0x4
+ 548 008d 9A010000 		.4byte	.LASF12
+ 549 0091 02       		.uleb128 0x2
+ 550 0092 01       		.byte	0x1
+ 551 0093 08       		.byte	0x8
+ 552 0094 77020000 		.4byte	.LASF13
+ 553 0098 04       		.uleb128 0x4
+ 554 0099 5C010000 		.4byte	.LASF14
+ 555 009d 02       		.byte	0x2
+ 556 009e 3C02     		.2byte	0x23c
+ 557 00a0 A4000000 		.4byte	0xa4
+ 558 00a4 05       		.uleb128 0x5
+ 559 00a5 6B000000 		.4byte	0x6b
+ 560 00a9 04       		.uleb128 0x4
+ 561 00aa 00000000 		.4byte	.LASF15
+ 562 00ae 02       		.byte	0x2
+ 563 00af 3D02     		.2byte	0x23d
+ 564 00b1 B5000000 		.4byte	0xb5
+ 565 00b5 05       		.uleb128 0x5
+ 566 00b6 77000000 		.4byte	0x77
+ 567 00ba 02       		.uleb128 0x2
+ 568 00bb 04       		.byte	0x4
+ 569 00bc 07       		.byte	0x7
+ 570 00bd 47020000 		.4byte	.LASF16
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 27
+
+
+ 571 00c1 06       		.uleb128 0x6
+ 572 00c2 C3010000 		.4byte	.LASF17
+ 573 00c6 01       		.byte	0x1
+ 574 00c7 4802     		.2byte	0x248
+ 575 00c9 01       		.byte	0x1
+ 576 00ca DB000000 		.4byte	0xdb
+ 577 00ce 07       		.uleb128 0x7
+ 578 00cf 1A030000 		.4byte	.LASF19
+ 579 00d3 01       		.byte	0x1
+ 580 00d4 4802     		.2byte	0x248
+ 581 00d6 77000000 		.4byte	0x77
+ 582 00da 00       		.byte	0
+ 583 00db 06       		.uleb128 0x6
+ 584 00dc A8010000 		.4byte	.LASF18
+ 585 00e0 01       		.byte	0x1
+ 586 00e1 2B02     		.2byte	0x22b
+ 587 00e3 01       		.byte	0x1
+ 588 00e4 F5000000 		.4byte	0xf5
+ 589 00e8 07       		.uleb128 0x7
+ 590 00e9 1A030000 		.4byte	.LASF19
+ 591 00ed 01       		.byte	0x1
+ 592 00ee 2B02     		.2byte	0x22b
+ 593 00f0 77000000 		.4byte	0x77
+ 594 00f4 00       		.byte	0
+ 595 00f5 06       		.uleb128 0x6
+ 596 00f6 5E020000 		.4byte	.LASF20
+ 597 00fa 01       		.byte	0x1
+ 598 00fb E201     		.2byte	0x1e2
+ 599 00fd 01       		.byte	0x1
+ 600 00fe 0F010000 		.4byte	0x10f
+ 601 0102 07       		.uleb128 0x7
+ 602 0103 E6000000 		.4byte	.LASF21
+ 603 0107 01       		.byte	0x1
+ 604 0108 E201     		.2byte	0x1e2
+ 605 010a 77000000 		.4byte	0x77
+ 606 010e 00       		.byte	0
+ 607 010f 06       		.uleb128 0x6
+ 608 0110 36030000 		.4byte	.LASF22
+ 609 0114 01       		.byte	0x1
+ 610 0115 9301     		.2byte	0x193
+ 611 0117 01       		.byte	0x1
+ 612 0118 29010000 		.4byte	0x129
+ 613 011c 07       		.uleb128 0x7
+ 614 011d 31010000 		.4byte	.LASF23
+ 615 0121 01       		.byte	0x1
+ 616 0122 9301     		.2byte	0x193
+ 617 0124 77000000 		.4byte	0x77
+ 618 0128 00       		.byte	0
+ 619 0129 08       		.uleb128 0x8
+ 620 012a D1020000 		.4byte	.LASF24
+ 621 012e 01       		.byte	0x1
+ 622 012f 54       		.byte	0x54
+ 623 0130 00000000 		.4byte	.LFB1
+ 624 0134 40000000 		.4byte	.LFE1-.LFB1
+ 625 0138 01       		.uleb128 0x1
+ 626 0139 9C       		.byte	0x9c
+ 627 013a BE010000 		.4byte	0x1be
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 28
+
+
+ 628 013e 09       		.uleb128 0x9
+ 629 013f A7020000 		.4byte	.LASF28
+ 630 0143 01       		.byte	0x1
+ 631 0144 57       		.byte	0x57
+ 632 0145 6B000000 		.4byte	0x6b
+ 633 0149 00000000 		.4byte	.LLST0
+ 634 014d 0A       		.uleb128 0xa
+ 635 014e 0F010000 		.4byte	0x10f
+ 636 0152 26000000 		.4byte	.LBB10
+ 637 0156 08000000 		.4byte	.LBE10-.LBB10
+ 638 015a 01       		.byte	0x1
+ 639 015b 85       		.byte	0x85
+ 640 015c 6A010000 		.4byte	0x16a
+ 641 0160 0B       		.uleb128 0xb
+ 642 0161 1C010000 		.4byte	0x11c
+ 643 0165 18000000 		.4byte	.LLST1
+ 644 0169 00       		.byte	0
+ 645 016a 0A       		.uleb128 0xa
+ 646 016b F5000000 		.4byte	0xf5
+ 647 016f 2E000000 		.4byte	.LBB12
+ 648 0173 04000000 		.4byte	.LBE12-.LBB12
+ 649 0177 01       		.byte	0x1
+ 650 0178 88       		.byte	0x88
+ 651 0179 87010000 		.4byte	0x187
+ 652 017d 0B       		.uleb128 0xb
+ 653 017e 02010000 		.4byte	0x102
+ 654 0182 2E000000 		.4byte	.LLST2
+ 655 0186 00       		.byte	0
+ 656 0187 0A       		.uleb128 0xa
+ 657 0188 DB000000 		.4byte	0xdb
+ 658 018c 32000000 		.4byte	.LBB14
+ 659 0190 04000000 		.4byte	.LBE14-.LBB14
+ 660 0194 01       		.byte	0x1
+ 661 0195 8D       		.byte	0x8d
+ 662 0196 A4010000 		.4byte	0x1a4
+ 663 019a 0B       		.uleb128 0xb
+ 664 019b E8000000 		.4byte	0xe8
+ 665 019f 44000000 		.4byte	.LLST3
+ 666 01a3 00       		.byte	0
+ 667 01a4 0C       		.uleb128 0xc
+ 668 01a5 C1000000 		.4byte	0xc1
+ 669 01a9 36000000 		.4byte	.LBB16
+ 670 01ad 0A000000 		.4byte	.LBE16-.LBB16
+ 671 01b1 01       		.byte	0x1
+ 672 01b2 8E       		.byte	0x8e
+ 673 01b3 0B       		.uleb128 0xb
+ 674 01b4 CE000000 		.4byte	0xce
+ 675 01b8 5A000000 		.4byte	.LLST4
+ 676 01bc 00       		.byte	0
+ 677 01bd 00       		.byte	0
+ 678 01be 0D       		.uleb128 0xd
+ 679 01bf 22030000 		.4byte	.LASF26
+ 680 01c3 01       		.byte	0x1
+ 681 01c4 C7       		.byte	0xc7
+ 682 01c5 00000000 		.4byte	.LFB2
+ 683 01c9 10000000 		.4byte	.LFE2-.LFB2
+ 684 01cd 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 29
+
+
+ 685 01ce 9C       		.byte	0x9c
+ 686 01cf 08       		.uleb128 0x8
+ 687 01d0 3A000000 		.4byte	.LASF25
+ 688 01d4 01       		.byte	0x1
+ 689 01d5 37       		.byte	0x37
+ 690 01d6 00000000 		.4byte	.LFB0
+ 691 01da 1C000000 		.4byte	.LFE0-.LFB0
+ 692 01de 01       		.uleb128 0x1
+ 693 01df 9C       		.byte	0x9c
+ 694 01e0 F7010000 		.4byte	0x1f7
+ 695 01e4 0E       		.uleb128 0xe
+ 696 01e5 0C000000 		.4byte	.LVL7
+ 697 01e9 29010000 		.4byte	0x129
+ 698 01ed 0F       		.uleb128 0xf
+ 699 01ee 18000000 		.4byte	.LVL8
+ 700 01f2 BE010000 		.4byte	0x1be
+ 701 01f6 00       		.byte	0
+ 702 01f7 0D       		.uleb128 0xd
+ 703 01f8 19010000 		.4byte	.LASF27
+ 704 01fc 01       		.byte	0x1
+ 705 01fd E9       		.byte	0xe9
+ 706 01fe 00000000 		.4byte	.LFB3
+ 707 0202 10000000 		.4byte	.LFE3-.LFB3
+ 708 0206 01       		.uleb128 0x1
+ 709 0207 9C       		.byte	0x9c
+ 710 0208 10       		.uleb128 0x10
+ 711 0209 0F010000 		.4byte	0x10f
+ 712 020d 00000000 		.4byte	.LFB4
+ 713 0211 0C000000 		.4byte	.LFE4-.LFB4
+ 714 0215 01       		.uleb128 0x1
+ 715 0216 9C       		.byte	0x9c
+ 716 0217 23020000 		.4byte	0x223
+ 717 021b 11       		.uleb128 0x11
+ 718 021c 1C010000 		.4byte	0x11c
+ 719 0220 01       		.uleb128 0x1
+ 720 0221 50       		.byte	0x50
+ 721 0222 00       		.byte	0
+ 722 0223 12       		.uleb128 0x12
+ 723 0224 73010000 		.4byte	.LASF31
+ 724 0228 01       		.byte	0x1
+ 725 0229 A901     		.2byte	0x1a9
+ 726 022b 77000000 		.4byte	0x77
+ 727 022f 00000000 		.4byte	.LFB5
+ 728 0233 14000000 		.4byte	.LFE5-.LFB5
+ 729 0237 01       		.uleb128 0x1
+ 730 0238 9C       		.byte	0x9c
+ 731 0239 10       		.uleb128 0x10
+ 732 023a F5000000 		.4byte	0xf5
+ 733 023e 00000000 		.4byte	.LFB6
+ 734 0242 0C000000 		.4byte	.LFE6-.LFB6
+ 735 0246 01       		.uleb128 0x1
+ 736 0247 9C       		.byte	0x9c
+ 737 0248 54020000 		.4byte	0x254
+ 738 024c 11       		.uleb128 0x11
+ 739 024d 02010000 		.4byte	0x102
+ 740 0251 01       		.uleb128 0x1
+ 741 0252 50       		.byte	0x50
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 30
+
+
+ 742 0253 00       		.byte	0
+ 743 0254 10       		.uleb128 0x10
+ 744 0255 DB000000 		.4byte	0xdb
+ 745 0259 00000000 		.4byte	.LFB7
+ 746 025d 0C000000 		.4byte	.LFE7-.LFB7
+ 747 0261 01       		.uleb128 0x1
+ 748 0262 9C       		.byte	0x9c
+ 749 0263 6F020000 		.4byte	0x26f
+ 750 0267 11       		.uleb128 0x11
+ 751 0268 E8000000 		.4byte	0xe8
+ 752 026c 01       		.uleb128 0x1
+ 753 026d 50       		.byte	0x50
+ 754 026e 00       		.byte	0
+ 755 026f 10       		.uleb128 0x10
+ 756 0270 C1000000 		.4byte	0xc1
+ 757 0274 00000000 		.4byte	.LFB8
+ 758 0278 0C000000 		.4byte	.LFE8-.LFB8
+ 759 027c 01       		.uleb128 0x1
+ 760 027d 9C       		.byte	0x9c
+ 761 027e 8A020000 		.4byte	0x28a
+ 762 0282 11       		.uleb128 0x11
+ 763 0283 CE000000 		.4byte	0xce
+ 764 0287 01       		.uleb128 0x1
+ 765 0288 50       		.byte	0x50
+ 766 0289 00       		.byte	0
+ 767 028a 13       		.uleb128 0x13
+ 768 028b 7C020000 		.4byte	.LASF39
+ 769 028f 01       		.byte	0x1
+ 770 0290 E102     		.2byte	0x2e1
+ 771 0292 6B000000 		.4byte	0x6b
+ 772 0296 00000000 		.4byte	.LFB9
+ 773 029a 0C000000 		.4byte	.LFE9-.LFB9
+ 774 029e 01       		.uleb128 0x1
+ 775 029f 9C       		.byte	0x9c
+ 776 02a0 B3020000 		.4byte	0x2b3
+ 777 02a4 14       		.uleb128 0x14
+ 778 02a5 28020000 		.4byte	.LASF29
+ 779 02a9 01       		.byte	0x1
+ 780 02aa E302     		.2byte	0x2e3
+ 781 02ac 6B000000 		.4byte	0x6b
+ 782 02b0 01       		.uleb128 0x1
+ 783 02b1 50       		.byte	0x50
+ 784 02b2 00       		.byte	0
+ 785 02b3 15       		.uleb128 0x15
+ 786 02b4 EC020000 		.4byte	.LASF30
+ 787 02b8 01       		.byte	0x1
+ 788 02b9 FD02     		.2byte	0x2fd
+ 789 02bb 00000000 		.4byte	.LFB10
+ 790 02bf 0C000000 		.4byte	.LFE10-.LFB10
+ 791 02c3 01       		.uleb128 0x1
+ 792 02c4 9C       		.byte	0x9c
+ 793 02c5 D8020000 		.4byte	0x2d8
+ 794 02c9 16       		.uleb128 0x16
+ 795 02ca 92010000 		.4byte	.LASF40
+ 796 02ce 01       		.byte	0x1
+ 797 02cf FD02     		.2byte	0x2fd
+ 798 02d1 6B000000 		.4byte	0x6b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 31
+
+
+ 799 02d5 01       		.uleb128 0x1
+ 800 02d6 50       		.byte	0x50
+ 801 02d7 00       		.byte	0
+ 802 02d8 12       		.uleb128 0x12
+ 803 02d9 00010000 		.4byte	.LASF32
+ 804 02dd 01       		.byte	0x1
+ 805 02de 1603     		.2byte	0x316
+ 806 02e0 77000000 		.4byte	0x77
+ 807 02e4 00000000 		.4byte	.LFB11
+ 808 02e8 0C000000 		.4byte	.LFE11-.LFB11
+ 809 02ec 01       		.uleb128 0x1
+ 810 02ed 9C       		.byte	0x9c
+ 811 02ee 12       		.uleb128 0x12
+ 812 02ef 06000000 		.4byte	.LASF33
+ 813 02f3 01       		.byte	0x1
+ 814 02f4 4A03     		.2byte	0x34a
+ 815 02f6 77000000 		.4byte	0x77
+ 816 02fa 00000000 		.4byte	.LFB12
+ 817 02fe 0C000000 		.4byte	.LFE12-.LFB12
+ 818 0302 01       		.uleb128 0x1
+ 819 0303 9C       		.byte	0x9c
+ 820 0304 12       		.uleb128 0x12
+ 821 0305 20000000 		.4byte	.LASF34
+ 822 0309 01       		.byte	0x1
+ 823 030a 5E03     		.2byte	0x35e
+ 824 030c 77000000 		.4byte	0x77
+ 825 0310 00000000 		.4byte	.LFB13
+ 826 0314 0C000000 		.4byte	.LFE13-.LFB13
+ 827 0318 01       		.uleb128 0x1
+ 828 0319 9C       		.byte	0x9c
+ 829 031a 12       		.uleb128 0x12
+ 830 031b 2F020000 		.4byte	.LASF35
+ 831 031f 01       		.byte	0x1
+ 832 0320 7403     		.2byte	0x374
+ 833 0322 77000000 		.4byte	0x77
+ 834 0326 00000000 		.4byte	.LFB14
+ 835 032a 0C000000 		.4byte	.LFE14-.LFB14
+ 836 032e 01       		.uleb128 0x1
+ 837 032f 9C       		.byte	0x9c
+ 838 0330 17       		.uleb128 0x17
+ 839 0331 39010000 		.4byte	.LASF41
+ 840 0335 01       		.byte	0x1
+ 841 0336 20       		.byte	0x20
+ 842 0337 6B000000 		.4byte	0x6b
+ 843 033b 05       		.uleb128 0x5
+ 844 033c 03       		.byte	0x3
+ 845 033d 00000000 		.4byte	interrupter1_initVar
+ 846 0341 00       		.byte	0
+ 847              		.section	.debug_abbrev,"",%progbits
+ 848              	.Ldebug_abbrev0:
+ 849 0000 01       		.uleb128 0x1
+ 850 0001 11       		.uleb128 0x11
+ 851 0002 01       		.byte	0x1
+ 852 0003 25       		.uleb128 0x25
+ 853 0004 0E       		.uleb128 0xe
+ 854 0005 13       		.uleb128 0x13
+ 855 0006 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 32
+
+
+ 856 0007 03       		.uleb128 0x3
+ 857 0008 0E       		.uleb128 0xe
+ 858 0009 1B       		.uleb128 0x1b
+ 859 000a 0E       		.uleb128 0xe
+ 860 000b 55       		.uleb128 0x55
+ 861 000c 17       		.uleb128 0x17
+ 862 000d 11       		.uleb128 0x11
+ 863 000e 01       		.uleb128 0x1
+ 864 000f 10       		.uleb128 0x10
+ 865 0010 17       		.uleb128 0x17
+ 866 0011 00       		.byte	0
+ 867 0012 00       		.byte	0
+ 868 0013 02       		.uleb128 0x2
+ 869 0014 24       		.uleb128 0x24
+ 870 0015 00       		.byte	0
+ 871 0016 0B       		.uleb128 0xb
+ 872 0017 0B       		.uleb128 0xb
+ 873 0018 3E       		.uleb128 0x3e
+ 874 0019 0B       		.uleb128 0xb
+ 875 001a 03       		.uleb128 0x3
+ 876 001b 0E       		.uleb128 0xe
+ 877 001c 00       		.byte	0
+ 878 001d 00       		.byte	0
+ 879 001e 03       		.uleb128 0x3
+ 880 001f 24       		.uleb128 0x24
+ 881 0020 00       		.byte	0
+ 882 0021 0B       		.uleb128 0xb
+ 883 0022 0B       		.uleb128 0xb
+ 884 0023 3E       		.uleb128 0x3e
+ 885 0024 0B       		.uleb128 0xb
+ 886 0025 03       		.uleb128 0x3
+ 887 0026 08       		.uleb128 0x8
+ 888 0027 00       		.byte	0
+ 889 0028 00       		.byte	0
+ 890 0029 04       		.uleb128 0x4
+ 891 002a 16       		.uleb128 0x16
+ 892 002b 00       		.byte	0
+ 893 002c 03       		.uleb128 0x3
+ 894 002d 0E       		.uleb128 0xe
+ 895 002e 3A       		.uleb128 0x3a
+ 896 002f 0B       		.uleb128 0xb
+ 897 0030 3B       		.uleb128 0x3b
+ 898 0031 05       		.uleb128 0x5
+ 899 0032 49       		.uleb128 0x49
+ 900 0033 13       		.uleb128 0x13
+ 901 0034 00       		.byte	0
+ 902 0035 00       		.byte	0
+ 903 0036 05       		.uleb128 0x5
+ 904 0037 35       		.uleb128 0x35
+ 905 0038 00       		.byte	0
+ 906 0039 49       		.uleb128 0x49
+ 907 003a 13       		.uleb128 0x13
+ 908 003b 00       		.byte	0
+ 909 003c 00       		.byte	0
+ 910 003d 06       		.uleb128 0x6
+ 911 003e 2E       		.uleb128 0x2e
+ 912 003f 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 33
+
+
+ 913 0040 3F       		.uleb128 0x3f
+ 914 0041 19       		.uleb128 0x19
+ 915 0042 03       		.uleb128 0x3
+ 916 0043 0E       		.uleb128 0xe
+ 917 0044 3A       		.uleb128 0x3a
+ 918 0045 0B       		.uleb128 0xb
+ 919 0046 3B       		.uleb128 0x3b
+ 920 0047 05       		.uleb128 0x5
+ 921 0048 27       		.uleb128 0x27
+ 922 0049 19       		.uleb128 0x19
+ 923 004a 20       		.uleb128 0x20
+ 924 004b 0B       		.uleb128 0xb
+ 925 004c 01       		.uleb128 0x1
+ 926 004d 13       		.uleb128 0x13
+ 927 004e 00       		.byte	0
+ 928 004f 00       		.byte	0
+ 929 0050 07       		.uleb128 0x7
+ 930 0051 05       		.uleb128 0x5
+ 931 0052 00       		.byte	0
+ 932 0053 03       		.uleb128 0x3
+ 933 0054 0E       		.uleb128 0xe
+ 934 0055 3A       		.uleb128 0x3a
+ 935 0056 0B       		.uleb128 0xb
+ 936 0057 3B       		.uleb128 0x3b
+ 937 0058 05       		.uleb128 0x5
+ 938 0059 49       		.uleb128 0x49
+ 939 005a 13       		.uleb128 0x13
+ 940 005b 00       		.byte	0
+ 941 005c 00       		.byte	0
+ 942 005d 08       		.uleb128 0x8
+ 943 005e 2E       		.uleb128 0x2e
+ 944 005f 01       		.byte	0x1
+ 945 0060 3F       		.uleb128 0x3f
+ 946 0061 19       		.uleb128 0x19
+ 947 0062 03       		.uleb128 0x3
+ 948 0063 0E       		.uleb128 0xe
+ 949 0064 3A       		.uleb128 0x3a
+ 950 0065 0B       		.uleb128 0xb
+ 951 0066 3B       		.uleb128 0x3b
+ 952 0067 0B       		.uleb128 0xb
+ 953 0068 27       		.uleb128 0x27
+ 954 0069 19       		.uleb128 0x19
+ 955 006a 11       		.uleb128 0x11
+ 956 006b 01       		.uleb128 0x1
+ 957 006c 12       		.uleb128 0x12
+ 958 006d 06       		.uleb128 0x6
+ 959 006e 40       		.uleb128 0x40
+ 960 006f 18       		.uleb128 0x18
+ 961 0070 9742     		.uleb128 0x2117
+ 962 0072 19       		.uleb128 0x19
+ 963 0073 01       		.uleb128 0x1
+ 964 0074 13       		.uleb128 0x13
+ 965 0075 00       		.byte	0
+ 966 0076 00       		.byte	0
+ 967 0077 09       		.uleb128 0x9
+ 968 0078 34       		.uleb128 0x34
+ 969 0079 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 34
+
+
+ 970 007a 03       		.uleb128 0x3
+ 971 007b 0E       		.uleb128 0xe
+ 972 007c 3A       		.uleb128 0x3a
+ 973 007d 0B       		.uleb128 0xb
+ 974 007e 3B       		.uleb128 0x3b
+ 975 007f 0B       		.uleb128 0xb
+ 976 0080 49       		.uleb128 0x49
+ 977 0081 13       		.uleb128 0x13
+ 978 0082 02       		.uleb128 0x2
+ 979 0083 17       		.uleb128 0x17
+ 980 0084 00       		.byte	0
+ 981 0085 00       		.byte	0
+ 982 0086 0A       		.uleb128 0xa
+ 983 0087 1D       		.uleb128 0x1d
+ 984 0088 01       		.byte	0x1
+ 985 0089 31       		.uleb128 0x31
+ 986 008a 13       		.uleb128 0x13
+ 987 008b 11       		.uleb128 0x11
+ 988 008c 01       		.uleb128 0x1
+ 989 008d 12       		.uleb128 0x12
+ 990 008e 06       		.uleb128 0x6
+ 991 008f 58       		.uleb128 0x58
+ 992 0090 0B       		.uleb128 0xb
+ 993 0091 59       		.uleb128 0x59
+ 994 0092 0B       		.uleb128 0xb
+ 995 0093 01       		.uleb128 0x1
+ 996 0094 13       		.uleb128 0x13
+ 997 0095 00       		.byte	0
+ 998 0096 00       		.byte	0
+ 999 0097 0B       		.uleb128 0xb
+ 1000 0098 05       		.uleb128 0x5
+ 1001 0099 00       		.byte	0
+ 1002 009a 31       		.uleb128 0x31
+ 1003 009b 13       		.uleb128 0x13
+ 1004 009c 02       		.uleb128 0x2
+ 1005 009d 17       		.uleb128 0x17
+ 1006 009e 00       		.byte	0
+ 1007 009f 00       		.byte	0
+ 1008 00a0 0C       		.uleb128 0xc
+ 1009 00a1 1D       		.uleb128 0x1d
+ 1010 00a2 01       		.byte	0x1
+ 1011 00a3 31       		.uleb128 0x31
+ 1012 00a4 13       		.uleb128 0x13
+ 1013 00a5 11       		.uleb128 0x11
+ 1014 00a6 01       		.uleb128 0x1
+ 1015 00a7 12       		.uleb128 0x12
+ 1016 00a8 06       		.uleb128 0x6
+ 1017 00a9 58       		.uleb128 0x58
+ 1018 00aa 0B       		.uleb128 0xb
+ 1019 00ab 59       		.uleb128 0x59
+ 1020 00ac 0B       		.uleb128 0xb
+ 1021 00ad 00       		.byte	0
+ 1022 00ae 00       		.byte	0
+ 1023 00af 0D       		.uleb128 0xd
+ 1024 00b0 2E       		.uleb128 0x2e
+ 1025 00b1 00       		.byte	0
+ 1026 00b2 3F       		.uleb128 0x3f
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 35
+
+
+ 1027 00b3 19       		.uleb128 0x19
+ 1028 00b4 03       		.uleb128 0x3
+ 1029 00b5 0E       		.uleb128 0xe
+ 1030 00b6 3A       		.uleb128 0x3a
+ 1031 00b7 0B       		.uleb128 0xb
+ 1032 00b8 3B       		.uleb128 0x3b
+ 1033 00b9 0B       		.uleb128 0xb
+ 1034 00ba 27       		.uleb128 0x27
+ 1035 00bb 19       		.uleb128 0x19
+ 1036 00bc 11       		.uleb128 0x11
+ 1037 00bd 01       		.uleb128 0x1
+ 1038 00be 12       		.uleb128 0x12
+ 1039 00bf 06       		.uleb128 0x6
+ 1040 00c0 40       		.uleb128 0x40
+ 1041 00c1 18       		.uleb128 0x18
+ 1042 00c2 9742     		.uleb128 0x2117
+ 1043 00c4 19       		.uleb128 0x19
+ 1044 00c5 00       		.byte	0
+ 1045 00c6 00       		.byte	0
+ 1046 00c7 0E       		.uleb128 0xe
+ 1047 00c8 898201   		.uleb128 0x4109
+ 1048 00cb 00       		.byte	0
+ 1049 00cc 11       		.uleb128 0x11
+ 1050 00cd 01       		.uleb128 0x1
+ 1051 00ce 31       		.uleb128 0x31
+ 1052 00cf 13       		.uleb128 0x13
+ 1053 00d0 00       		.byte	0
+ 1054 00d1 00       		.byte	0
+ 1055 00d2 0F       		.uleb128 0xf
+ 1056 00d3 898201   		.uleb128 0x4109
+ 1057 00d6 00       		.byte	0
+ 1058 00d7 11       		.uleb128 0x11
+ 1059 00d8 01       		.uleb128 0x1
+ 1060 00d9 9542     		.uleb128 0x2115
+ 1061 00db 19       		.uleb128 0x19
+ 1062 00dc 31       		.uleb128 0x31
+ 1063 00dd 13       		.uleb128 0x13
+ 1064 00de 00       		.byte	0
+ 1065 00df 00       		.byte	0
+ 1066 00e0 10       		.uleb128 0x10
+ 1067 00e1 2E       		.uleb128 0x2e
+ 1068 00e2 01       		.byte	0x1
+ 1069 00e3 31       		.uleb128 0x31
+ 1070 00e4 13       		.uleb128 0x13
+ 1071 00e5 11       		.uleb128 0x11
+ 1072 00e6 01       		.uleb128 0x1
+ 1073 00e7 12       		.uleb128 0x12
+ 1074 00e8 06       		.uleb128 0x6
+ 1075 00e9 40       		.uleb128 0x40
+ 1076 00ea 18       		.uleb128 0x18
+ 1077 00eb 9742     		.uleb128 0x2117
+ 1078 00ed 19       		.uleb128 0x19
+ 1079 00ee 01       		.uleb128 0x1
+ 1080 00ef 13       		.uleb128 0x13
+ 1081 00f0 00       		.byte	0
+ 1082 00f1 00       		.byte	0
+ 1083 00f2 11       		.uleb128 0x11
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 36
+
+
+ 1084 00f3 05       		.uleb128 0x5
+ 1085 00f4 00       		.byte	0
+ 1086 00f5 31       		.uleb128 0x31
+ 1087 00f6 13       		.uleb128 0x13
+ 1088 00f7 02       		.uleb128 0x2
+ 1089 00f8 18       		.uleb128 0x18
+ 1090 00f9 00       		.byte	0
+ 1091 00fa 00       		.byte	0
+ 1092 00fb 12       		.uleb128 0x12
+ 1093 00fc 2E       		.uleb128 0x2e
+ 1094 00fd 00       		.byte	0
+ 1095 00fe 3F       		.uleb128 0x3f
+ 1096 00ff 19       		.uleb128 0x19
+ 1097 0100 03       		.uleb128 0x3
+ 1098 0101 0E       		.uleb128 0xe
+ 1099 0102 3A       		.uleb128 0x3a
+ 1100 0103 0B       		.uleb128 0xb
+ 1101 0104 3B       		.uleb128 0x3b
+ 1102 0105 05       		.uleb128 0x5
+ 1103 0106 27       		.uleb128 0x27
+ 1104 0107 19       		.uleb128 0x19
+ 1105 0108 49       		.uleb128 0x49
+ 1106 0109 13       		.uleb128 0x13
+ 1107 010a 11       		.uleb128 0x11
+ 1108 010b 01       		.uleb128 0x1
+ 1109 010c 12       		.uleb128 0x12
+ 1110 010d 06       		.uleb128 0x6
+ 1111 010e 40       		.uleb128 0x40
+ 1112 010f 18       		.uleb128 0x18
+ 1113 0110 9742     		.uleb128 0x2117
+ 1114 0112 19       		.uleb128 0x19
+ 1115 0113 00       		.byte	0
+ 1116 0114 00       		.byte	0
+ 1117 0115 13       		.uleb128 0x13
+ 1118 0116 2E       		.uleb128 0x2e
+ 1119 0117 01       		.byte	0x1
+ 1120 0118 3F       		.uleb128 0x3f
+ 1121 0119 19       		.uleb128 0x19
+ 1122 011a 03       		.uleb128 0x3
+ 1123 011b 0E       		.uleb128 0xe
+ 1124 011c 3A       		.uleb128 0x3a
+ 1125 011d 0B       		.uleb128 0xb
+ 1126 011e 3B       		.uleb128 0x3b
+ 1127 011f 05       		.uleb128 0x5
+ 1128 0120 27       		.uleb128 0x27
+ 1129 0121 19       		.uleb128 0x19
+ 1130 0122 49       		.uleb128 0x49
+ 1131 0123 13       		.uleb128 0x13
+ 1132 0124 11       		.uleb128 0x11
+ 1133 0125 01       		.uleb128 0x1
+ 1134 0126 12       		.uleb128 0x12
+ 1135 0127 06       		.uleb128 0x6
+ 1136 0128 40       		.uleb128 0x40
+ 1137 0129 18       		.uleb128 0x18
+ 1138 012a 9742     		.uleb128 0x2117
+ 1139 012c 19       		.uleb128 0x19
+ 1140 012d 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 37
+
+
+ 1141 012e 13       		.uleb128 0x13
+ 1142 012f 00       		.byte	0
+ 1143 0130 00       		.byte	0
+ 1144 0131 14       		.uleb128 0x14
+ 1145 0132 34       		.uleb128 0x34
+ 1146 0133 00       		.byte	0
+ 1147 0134 03       		.uleb128 0x3
+ 1148 0135 0E       		.uleb128 0xe
+ 1149 0136 3A       		.uleb128 0x3a
+ 1150 0137 0B       		.uleb128 0xb
+ 1151 0138 3B       		.uleb128 0x3b
+ 1152 0139 05       		.uleb128 0x5
+ 1153 013a 49       		.uleb128 0x49
+ 1154 013b 13       		.uleb128 0x13
+ 1155 013c 02       		.uleb128 0x2
+ 1156 013d 18       		.uleb128 0x18
+ 1157 013e 00       		.byte	0
+ 1158 013f 00       		.byte	0
+ 1159 0140 15       		.uleb128 0x15
+ 1160 0141 2E       		.uleb128 0x2e
+ 1161 0142 01       		.byte	0x1
+ 1162 0143 3F       		.uleb128 0x3f
+ 1163 0144 19       		.uleb128 0x19
+ 1164 0145 03       		.uleb128 0x3
+ 1165 0146 0E       		.uleb128 0xe
+ 1166 0147 3A       		.uleb128 0x3a
+ 1167 0148 0B       		.uleb128 0xb
+ 1168 0149 3B       		.uleb128 0x3b
+ 1169 014a 05       		.uleb128 0x5
+ 1170 014b 27       		.uleb128 0x27
+ 1171 014c 19       		.uleb128 0x19
+ 1172 014d 11       		.uleb128 0x11
+ 1173 014e 01       		.uleb128 0x1
+ 1174 014f 12       		.uleb128 0x12
+ 1175 0150 06       		.uleb128 0x6
+ 1176 0151 40       		.uleb128 0x40
+ 1177 0152 18       		.uleb128 0x18
+ 1178 0153 9742     		.uleb128 0x2117
+ 1179 0155 19       		.uleb128 0x19
+ 1180 0156 01       		.uleb128 0x1
+ 1181 0157 13       		.uleb128 0x13
+ 1182 0158 00       		.byte	0
+ 1183 0159 00       		.byte	0
+ 1184 015a 16       		.uleb128 0x16
+ 1185 015b 05       		.uleb128 0x5
+ 1186 015c 00       		.byte	0
+ 1187 015d 03       		.uleb128 0x3
+ 1188 015e 0E       		.uleb128 0xe
+ 1189 015f 3A       		.uleb128 0x3a
+ 1190 0160 0B       		.uleb128 0xb
+ 1191 0161 3B       		.uleb128 0x3b
+ 1192 0162 05       		.uleb128 0x5
+ 1193 0163 49       		.uleb128 0x49
+ 1194 0164 13       		.uleb128 0x13
+ 1195 0165 02       		.uleb128 0x2
+ 1196 0166 18       		.uleb128 0x18
+ 1197 0167 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 38
+
+
+ 1198 0168 00       		.byte	0
+ 1199 0169 17       		.uleb128 0x17
+ 1200 016a 34       		.uleb128 0x34
+ 1201 016b 00       		.byte	0
+ 1202 016c 03       		.uleb128 0x3
+ 1203 016d 0E       		.uleb128 0xe
+ 1204 016e 3A       		.uleb128 0x3a
+ 1205 016f 0B       		.uleb128 0xb
+ 1206 0170 3B       		.uleb128 0x3b
+ 1207 0171 0B       		.uleb128 0xb
+ 1208 0172 49       		.uleb128 0x49
+ 1209 0173 13       		.uleb128 0x13
+ 1210 0174 3F       		.uleb128 0x3f
+ 1211 0175 19       		.uleb128 0x19
+ 1212 0176 02       		.uleb128 0x2
+ 1213 0177 18       		.uleb128 0x18
+ 1214 0178 00       		.byte	0
+ 1215 0179 00       		.byte	0
+ 1216 017a 00       		.byte	0
+ 1217              		.section	.debug_loc,"",%progbits
+ 1218              	.Ldebug_loc0:
+ 1219              	.LLST0:
+ 1220 0000 04000000 		.4byte	.LVL0
+ 1221 0004 08000000 		.4byte	.LVL1
+ 1222 0008 0600     		.2byte	0x6
+ 1223 000a 73       		.byte	0x73
+ 1224 000b 00       		.sleb128 0
+ 1225 000c 09       		.byte	0x9
+ 1226 000d C0       		.byte	0xc0
+ 1227 000e 1A       		.byte	0x1a
+ 1228 000f 9F       		.byte	0x9f
+ 1229 0010 00000000 		.4byte	0
+ 1230 0014 00000000 		.4byte	0
+ 1231              	.LLST1:
+ 1232 0018 26000000 		.4byte	.LVL2
+ 1233 001c 2E000000 		.4byte	.LVL3
+ 1234 0020 0400     		.2byte	0x4
+ 1235 0022 0B       		.byte	0xb
+ 1236 0023 E8FD     		.2byte	0xfde8
+ 1237 0025 9F       		.byte	0x9f
+ 1238 0026 00000000 		.4byte	0
+ 1239 002a 00000000 		.4byte	0
+ 1240              	.LLST2:
+ 1241 002e 2E000000 		.4byte	.LVL3
+ 1242 0032 32000000 		.4byte	.LVL4
+ 1243 0036 0400     		.2byte	0x4
+ 1244 0038 0B       		.byte	0xb
+ 1245 0039 E8FD     		.2byte	0xfde8
+ 1246 003b 9F       		.byte	0x9f
+ 1247 003c 00000000 		.4byte	0
+ 1248 0040 00000000 		.4byte	0
+ 1249              	.LLST3:
+ 1250 0044 32000000 		.4byte	.LVL4
+ 1251 0048 36000000 		.4byte	.LVL5
+ 1252 004c 0400     		.2byte	0x4
+ 1253 004e 0B       		.byte	0xb
+ 1254 004f E8FD     		.2byte	0xfde8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 39
+
+
+ 1255 0051 9F       		.byte	0x9f
+ 1256 0052 00000000 		.4byte	0
+ 1257 0056 00000000 		.4byte	0
+ 1258              	.LLST4:
+ 1259 005a 36000000 		.4byte	.LVL5
+ 1260 005e 3A000000 		.4byte	.LVL6
+ 1261 0062 0400     		.2byte	0x4
+ 1262 0064 0B       		.byte	0xb
+ 1263 0065 E8FD     		.2byte	0xfde8
+ 1264 0067 9F       		.byte	0x9f
+ 1265 0068 00000000 		.4byte	0
+ 1266 006c 00000000 		.4byte	0
+ 1267              		.section	.debug_aranges,"",%progbits
+ 1268 0000 8C000000 		.4byte	0x8c
+ 1269 0004 0200     		.2byte	0x2
+ 1270 0006 00000000 		.4byte	.Ldebug_info0
+ 1271 000a 04       		.byte	0x4
+ 1272 000b 00       		.byte	0
+ 1273 000c 0000     		.2byte	0
+ 1274 000e 0000     		.2byte	0
+ 1275 0010 00000000 		.4byte	.LFB1
+ 1276 0014 40000000 		.4byte	.LFE1-.LFB1
+ 1277 0018 00000000 		.4byte	.LFB2
+ 1278 001c 10000000 		.4byte	.LFE2-.LFB2
+ 1279 0020 00000000 		.4byte	.LFB0
+ 1280 0024 1C000000 		.4byte	.LFE0-.LFB0
+ 1281 0028 00000000 		.4byte	.LFB3
+ 1282 002c 10000000 		.4byte	.LFE3-.LFB3
+ 1283 0030 00000000 		.4byte	.LFB4
+ 1284 0034 0C000000 		.4byte	.LFE4-.LFB4
+ 1285 0038 00000000 		.4byte	.LFB5
+ 1286 003c 14000000 		.4byte	.LFE5-.LFB5
+ 1287 0040 00000000 		.4byte	.LFB6
+ 1288 0044 0C000000 		.4byte	.LFE6-.LFB6
+ 1289 0048 00000000 		.4byte	.LFB7
+ 1290 004c 0C000000 		.4byte	.LFE7-.LFB7
+ 1291 0050 00000000 		.4byte	.LFB8
+ 1292 0054 0C000000 		.4byte	.LFE8-.LFB8
+ 1293 0058 00000000 		.4byte	.LFB9
+ 1294 005c 0C000000 		.4byte	.LFE9-.LFB9
+ 1295 0060 00000000 		.4byte	.LFB10
+ 1296 0064 0C000000 		.4byte	.LFE10-.LFB10
+ 1297 0068 00000000 		.4byte	.LFB11
+ 1298 006c 0C000000 		.4byte	.LFE11-.LFB11
+ 1299 0070 00000000 		.4byte	.LFB12
+ 1300 0074 0C000000 		.4byte	.LFE12-.LFB12
+ 1301 0078 00000000 		.4byte	.LFB13
+ 1302 007c 0C000000 		.4byte	.LFE13-.LFB13
+ 1303 0080 00000000 		.4byte	.LFB14
+ 1304 0084 0C000000 		.4byte	.LFE14-.LFB14
+ 1305 0088 00000000 		.4byte	0
+ 1306 008c 00000000 		.4byte	0
+ 1307              		.section	.debug_ranges,"",%progbits
+ 1308              	.Ldebug_ranges0:
+ 1309 0000 00000000 		.4byte	.LFB1
+ 1310 0004 40000000 		.4byte	.LFE1
+ 1311 0008 00000000 		.4byte	.LFB2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 40
+
+
+ 1312 000c 10000000 		.4byte	.LFE2
+ 1313 0010 00000000 		.4byte	.LFB0
+ 1314 0014 1C000000 		.4byte	.LFE0
+ 1315 0018 00000000 		.4byte	.LFB3
+ 1316 001c 10000000 		.4byte	.LFE3
+ 1317 0020 00000000 		.4byte	.LFB4
+ 1318 0024 0C000000 		.4byte	.LFE4
+ 1319 0028 00000000 		.4byte	.LFB5
+ 1320 002c 14000000 		.4byte	.LFE5
+ 1321 0030 00000000 		.4byte	.LFB6
+ 1322 0034 0C000000 		.4byte	.LFE6
+ 1323 0038 00000000 		.4byte	.LFB7
+ 1324 003c 0C000000 		.4byte	.LFE7
+ 1325 0040 00000000 		.4byte	.LFB8
+ 1326 0044 0C000000 		.4byte	.LFE8
+ 1327 0048 00000000 		.4byte	.LFB9
+ 1328 004c 0C000000 		.4byte	.LFE9
+ 1329 0050 00000000 		.4byte	.LFB10
+ 1330 0054 0C000000 		.4byte	.LFE10
+ 1331 0058 00000000 		.4byte	.LFB11
+ 1332 005c 0C000000 		.4byte	.LFE11
+ 1333 0060 00000000 		.4byte	.LFB12
+ 1334 0064 0C000000 		.4byte	.LFE12
+ 1335 0068 00000000 		.4byte	.LFB13
+ 1336 006c 0C000000 		.4byte	.LFE13
+ 1337 0070 00000000 		.4byte	.LFB14
+ 1338 0074 0C000000 		.4byte	.LFE14
+ 1339 0078 00000000 		.4byte	0
+ 1340 007c 00000000 		.4byte	0
+ 1341              		.section	.debug_line,"",%progbits
+ 1342              	.Ldebug_line0:
+ 1343 0000 70010000 		.section	.debug_str,"MS",%progbits,1
+ 1343      02004900 
+ 1343      00000201 
+ 1343      FB0E0D00 
+ 1343      01010101 
+ 1344              	.LASF15:
+ 1345 0000 72656731 		.ascii	"reg16\000"
+ 1345      3600
+ 1346              	.LASF33:
+ 1347 0006 696E7465 		.ascii	"interrupter1_ReadCompare1\000"
+ 1347      72727570 
+ 1347      74657231 
+ 1347      5F526561 
+ 1347      64436F6D 
+ 1348              	.LASF34:
+ 1349 0020 696E7465 		.ascii	"interrupter1_ReadCompare2\000"
+ 1349      72727570 
+ 1349      74657231 
+ 1349      5F526561 
+ 1349      64436F6D 
+ 1350              	.LASF25:
+ 1351 003a 696E7465 		.ascii	"interrupter1_Start\000"
+ 1351      72727570 
+ 1351      74657231 
+ 1351      5F537461 
+ 1351      727400
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 41
+
+
+ 1352              	.LASF36:
+ 1353 004d 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1353      43393920 
+ 1353      352E342E 
+ 1353      31203230 
+ 1353      31363036 
+ 1354 0080 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1354      20726576 
+ 1354      6973696F 
+ 1354      6E203233 
+ 1354      37373135 
+ 1355 00b3 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 1355      74643D67 
+ 1355      6E753939 
+ 1355      202D6666 
+ 1355      756E6374 
+ 1356              	.LASF21:
+ 1357 00e6 70657269 		.ascii	"period\000"
+ 1357      6F6400
+ 1358              	.LASF3:
+ 1359 00ed 73686F72 		.ascii	"short unsigned int\000"
+ 1359      7420756E 
+ 1359      7369676E 
+ 1359      65642069 
+ 1359      6E7400
+ 1360              	.LASF32:
+ 1361 0100 696E7465 		.ascii	"interrupter1_ReadCapture\000"
+ 1361      72727570 
+ 1361      74657231 
+ 1361      5F526561 
+ 1361      64436170 
+ 1362              	.LASF27:
+ 1363 0119 696E7465 		.ascii	"interrupter1_Stop\000"
+ 1363      72727570 
+ 1363      74657231 
+ 1363      5F53746F 
+ 1363      7000
+ 1364              	.LASF11:
+ 1365 012b 666C6F61 		.ascii	"float\000"
+ 1365      7400
+ 1366              	.LASF23:
+ 1367 0131 636F756E 		.ascii	"counter\000"
+ 1367      74657200 
+ 1368              	.LASF41:
+ 1369 0139 696E7465 		.ascii	"interrupter1_initVar\000"
+ 1369      72727570 
+ 1369      74657231 
+ 1369      5F696E69 
+ 1369      74566172 
+ 1370              	.LASF1:
+ 1371 014e 756E7369 		.ascii	"unsigned char\000"
+ 1371      676E6564 
+ 1371      20636861 
+ 1371      7200
+ 1372              	.LASF14:
+ 1373 015c 72656738 		.ascii	"reg8\000"
+ 1373      00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 42
+
+
+ 1374              	.LASF5:
+ 1375 0161 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1375      20756E73 
+ 1375      69676E65 
+ 1375      6420696E 
+ 1375      7400
+ 1376              	.LASF31:
+ 1377 0173 696E7465 		.ascii	"interrupter1_ReadCounter\000"
+ 1377      72727570 
+ 1377      74657231 
+ 1377      5F526561 
+ 1377      64436F75 
+ 1378              	.LASF9:
+ 1379 018c 75696E74 		.ascii	"uint8\000"
+ 1379      3800
+ 1380              	.LASF40:
+ 1381 0192 636F6E74 		.ascii	"control\000"
+ 1381      726F6C00 
+ 1382              	.LASF12:
+ 1383 019a 646F7562 		.ascii	"double\000"
+ 1383      6C6500
+ 1384              	.LASF10:
+ 1385 01a1 75696E74 		.ascii	"uint16\000"
+ 1385      313600
+ 1386              	.LASF18:
+ 1387 01a8 696E7465 		.ascii	"interrupter1_WriteCompare1\000"
+ 1387      72727570 
+ 1387      74657231 
+ 1387      5F577269 
+ 1387      7465436F 
+ 1388              	.LASF17:
+ 1389 01c3 696E7465 		.ascii	"interrupter1_WriteCompare2\000"
+ 1389      72727570 
+ 1389      74657231 
+ 1389      5F577269 
+ 1389      7465436F 
+ 1390              	.LASF8:
+ 1391 01de 756E7369 		.ascii	"unsigned int\000"
+ 1391      676E6564 
+ 1391      20696E74 
+ 1391      00
+ 1392              	.LASF37:
+ 1393 01eb 47656E65 		.ascii	"Generated_Source\\PSoC5\\interrupter1.c\000"
+ 1393      72617465 
+ 1393      645F536F 
+ 1393      75726365 
+ 1393      5C50536F 
+ 1394              	.LASF7:
+ 1395 0211 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1395      206C6F6E 
+ 1395      6720756E 
+ 1395      7369676E 
+ 1395      65642069 
+ 1396              	.LASF29:
+ 1397 0228 72657375 		.ascii	"result\000"
+ 1397      6C7400
+ 1398              	.LASF35:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 43
+
+
+ 1399 022f 696E7465 		.ascii	"interrupter1_ReadPeriod\000"
+ 1399      72727570 
+ 1399      74657231 
+ 1399      5F526561 
+ 1399      64506572 
+ 1400              	.LASF16:
+ 1401 0247 73697A65 		.ascii	"sizetype\000"
+ 1401      74797065 
+ 1401      00
+ 1402              	.LASF6:
+ 1403 0250 6C6F6E67 		.ascii	"long long int\000"
+ 1403      206C6F6E 
+ 1403      6720696E 
+ 1403      7400
+ 1404              	.LASF20:
+ 1405 025e 696E7465 		.ascii	"interrupter1_WritePeriod\000"
+ 1405      72727570 
+ 1405      74657231 
+ 1405      5F577269 
+ 1405      74655065 
+ 1406              	.LASF13:
+ 1407 0277 63686172 		.ascii	"char\000"
+ 1407      00
+ 1408              	.LASF39:
+ 1409 027c 696E7465 		.ascii	"interrupter1_ReadControlRegister\000"
+ 1409      72727570 
+ 1409      74657231 
+ 1409      5F526561 
+ 1409      64436F6E 
+ 1410              	.LASF2:
+ 1411 029d 73686F72 		.ascii	"short int\000"
+ 1411      7420696E 
+ 1411      7400
+ 1412              	.LASF28:
+ 1413 02a7 6374726C 		.ascii	"ctrl\000"
+ 1413      00
+ 1414              	.LASF38:
+ 1415 02ac 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 1415      73657273 
+ 1415      5C636865 
+ 1415      6D695C55 
+ 1415      44335F51 
+ 1416              	.LASF24:
+ 1417 02d1 696E7465 		.ascii	"interrupter1_Init\000"
+ 1417      72727570 
+ 1417      74657231 
+ 1417      5F496E69 
+ 1417      7400
+ 1418              	.LASF4:
+ 1419 02e3 6C6F6E67 		.ascii	"long int\000"
+ 1419      20696E74 
+ 1419      00
+ 1420              	.LASF30:
+ 1421 02ec 696E7465 		.ascii	"interrupter1_WriteControlRegister\000"
+ 1421      72727570 
+ 1421      74657231 
+ 1421      5F577269 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccezsgPw.s 			page 44
+
+
+ 1421      7465436F 
+ 1422              	.LASF0:
+ 1423 030e 7369676E 		.ascii	"signed char\000"
+ 1423      65642063 
+ 1423      68617200 
+ 1424              	.LASF19:
+ 1425 031a 636F6D70 		.ascii	"compare\000"
+ 1425      61726500 
+ 1426              	.LASF26:
+ 1427 0322 696E7465 		.ascii	"interrupter1_Enable\000"
+ 1427      72727570 
+ 1427      74657231 
+ 1427      5F456E61 
+ 1427      626C6500 
+ 1428              	.LASF22:
+ 1429 0336 696E7465 		.ascii	"interrupter1_WriteCounter\000"
+ 1429      72727570 
+ 1429      74657231 
+ 1429      5F577269 
+ 1429      7465436F 
+ 1430              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

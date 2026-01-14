@@ -1,0 +1,5265 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"tsk_fault.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.vWD_Timer_Callback,"ax",%progbits
+  20              		.align	1
+  21              		.global	vWD_Timer_Callback
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	vWD_Timer_Callback, %function
+  25              	vWD_Timer_Callback:
+  26              	.LFB79:
+  27              		.file 1 "..\\common\\ud3core\\tasks\\tsk_fault.c"
+   1:..\common\ud3core\tasks/tsk_fault.c **** /*
+   2:..\common\ud3core\tasks/tsk_fault.c ****  * UD3
+   3:..\common\ud3core\tasks/tsk_fault.c ****  *
+   4:..\common\ud3core\tasks/tsk_fault.c ****  * Copyright (c) 2018 Jens Kerrinnes
+   5:..\common\ud3core\tasks/tsk_fault.c ****  * Copyright (c) 2015 Steve Ward
+   6:..\common\ud3core\tasks/tsk_fault.c ****  *
+   7:..\common\ud3core\tasks/tsk_fault.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   8:..\common\ud3core\tasks/tsk_fault.c ****  * this software and associated documentation files (the "Software"), to deal in
+   9:..\common\ud3core\tasks/tsk_fault.c ****  * the Software without restriction, including without limitation the rights to
+  10:..\common\ud3core\tasks/tsk_fault.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+  11:..\common\ud3core\tasks/tsk_fault.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  12:..\common\ud3core\tasks/tsk_fault.c ****  * subject to the following conditions:
+  13:..\common\ud3core\tasks/tsk_fault.c ****  *
+  14:..\common\ud3core\tasks/tsk_fault.c ****  * The above copyright notice and this permission notice shall be included in all
+  15:..\common\ud3core\tasks/tsk_fault.c ****  * copies or substantial portions of the Software.
+  16:..\common\ud3core\tasks/tsk_fault.c ****  *
+  17:..\common\ud3core\tasks/tsk_fault.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  18:..\common\ud3core\tasks/tsk_fault.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  19:..\common\ud3core\tasks/tsk_fault.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  20:..\common\ud3core\tasks/tsk_fault.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  21:..\common\ud3core\tasks/tsk_fault.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  22:..\common\ud3core\tasks/tsk_fault.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  23:..\common\ud3core\tasks/tsk_fault.c **** */
+  24:..\common\ud3core\tasks/tsk_fault.c **** 
+  25:..\common\ud3core\tasks/tsk_fault.c **** #include "cyapicallbacks.h"
+  26:..\common\ud3core\tasks/tsk_fault.c **** #include <cytypes.h>
+  27:..\common\ud3core\tasks/tsk_fault.c **** 
+  28:..\common\ud3core\tasks/tsk_fault.c **** #include "tsk_fault.h"
+  29:..\common\ud3core\tasks/tsk_fault.c **** #include "tsk_midi.h"
+  30:..\common\ud3core\tasks/tsk_fault.c **** #include "alarmevent.h"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 2
+
+
+  31:..\common\ud3core\tasks/tsk_fault.c **** 
+  32:..\common\ud3core\tasks/tsk_fault.c **** 
+  33:..\common\ud3core\tasks/tsk_fault.c **** /* RTOS includes. */
+  34:..\common\ud3core\tasks/tsk_fault.c **** #include "FreeRTOS.h"
+  35:..\common\ud3core\tasks/tsk_fault.c **** #include "task.h"
+  36:..\common\ud3core\tasks/tsk_fault.c **** #include "queue.h"
+  37:..\common\ud3core\tasks/tsk_fault.c **** #include "semphr.h"
+  38:..\common\ud3core\tasks/tsk_fault.c **** #include "ZCDtoPWM.h"
+  39:..\common\ud3core\tasks/tsk_fault.c **** 
+  40:..\common\ud3core\tasks/tsk_fault.c **** xTaskHandle tsk_fault_TaskHandle;
+  41:..\common\ud3core\tasks/tsk_fault.c **** uint8 tsk_fault_initVar = 0u;
+  42:..\common\ud3core\tasks/tsk_fault.c **** 
+  43:..\common\ud3core\tasks/tsk_fault.c **** #define FAULT_LOOP_SPEED_MS 50
+  44:..\common\ud3core\tasks/tsk_fault.c **** #define FB_ERROR_TIME 1000 / FAULT_LOOP_SPEED_MS
+  45:..\common\ud3core\tasks/tsk_fault.c **** 
+  46:..\common\ud3core\tasks/tsk_fault.c **** 
+  47:..\common\ud3core\tasks/tsk_fault.c **** /* ------------------------------------------------------------------------ */
+  48:..\common\ud3core\tasks/tsk_fault.c **** /*
+  49:..\common\ud3core\tasks/tsk_fault.c ****  * Place user included headers, defines and task global data in the
+  50:..\common\ud3core\tasks/tsk_fault.c ****  * below merge region section.
+  51:..\common\ud3core\tasks/tsk_fault.c ****  */
+  52:..\common\ud3core\tasks/tsk_fault.c **** /* `#START USER_INCLUDE SECTION` */
+  53:..\common\ud3core\tasks/tsk_fault.c **** #include "cli_common.h"
+  54:..\common\ud3core\tasks/tsk_fault.c **** #include "telemetry.h"
+  55:..\common\ud3core\tasks/tsk_fault.c **** #include "tsk_priority.h"
+  56:..\common\ud3core\tasks/tsk_fault.c **** #include "tsk_analog.h"
+  57:..\common\ud3core\tasks/tsk_fault.c **** 
+  58:..\common\ud3core\tasks/tsk_fault.c **** /* `#END` */
+  59:..\common\ud3core\tasks/tsk_fault.c **** /* ------------------------------------------------------------------------ */
+  60:..\common\ud3core\tasks/tsk_fault.c **** /*
+  61:..\common\ud3core\tasks/tsk_fault.c ****  * User defined task-local code that is used to process commands, control
+  62:..\common\ud3core\tasks/tsk_fault.c ****  * operations, and/or generrally do stuff to make the taks do something
+  63:..\common\ud3core\tasks/tsk_fault.c ****  * meaningful.
+  64:..\common\ud3core\tasks/tsk_fault.c ****  */
+  65:..\common\ud3core\tasks/tsk_fault.c **** /* `#START USER_TASK_LOCAL_CODE` */
+  66:..\common\ud3core\tasks/tsk_fault.c **** 
+  67:..\common\ud3core\tasks/tsk_fault.c **** TimerHandle_t xWD_Timer;
+  68:..\common\ud3core\tasks/tsk_fault.c **** SYSFAULT sysfault;
+  69:..\common\ud3core\tasks/tsk_fault.c **** uint32_t switch_without_fb = 0;
+  70:..\common\ud3core\tasks/tsk_fault.c **** 
+  71:..\common\ud3core\tasks/tsk_fault.c **** 
+  72:..\common\ud3core\tasks/tsk_fault.c **** void WD_enable(uint8_t enable){
+  73:..\common\ud3core\tasks/tsk_fault.c ****     if(xWD_Timer!=NULL){
+  74:..\common\ud3core\tasks/tsk_fault.c ****         if(enable){
+  75:..\common\ud3core\tasks/tsk_fault.c ****             xTimerStart(xWD_Timer,10);
+  76:..\common\ud3core\tasks/tsk_fault.c ****         }else{  
+  77:..\common\ud3core\tasks/tsk_fault.c ****             xTimerStop(xWD_Timer,10);
+  78:..\common\ud3core\tasks/tsk_fault.c ****         }
+  79:..\common\ud3core\tasks/tsk_fault.c ****     } 
+  80:..\common\ud3core\tasks/tsk_fault.c **** }
+  81:..\common\ud3core\tasks/tsk_fault.c **** 
+  82:..\common\ud3core\tasks/tsk_fault.c **** void WD_reset(){
+  83:..\common\ud3core\tasks/tsk_fault.c ****     if(xWD_Timer!=NULL && configuration.watchdog){
+  84:..\common\ud3core\tasks/tsk_fault.c ****         xTimerStart(xWD_Timer,0);
+  85:..\common\ud3core\tasks/tsk_fault.c ****     }
+  86:..\common\ud3core\tasks/tsk_fault.c **** }
+  87:..\common\ud3core\tasks/tsk_fault.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 3
+
+
+  88:..\common\ud3core\tasks/tsk_fault.c **** void WD_reset_from_ISR(){
+  89:..\common\ud3core\tasks/tsk_fault.c ****     if(xWD_Timer!=NULL && configuration.watchdog){
+  90:..\common\ud3core\tasks/tsk_fault.c ****         xTimerStartFromISR(xWD_Timer, NULL);
+  91:..\common\ud3core\tasks/tsk_fault.c ****     }
+  92:..\common\ud3core\tasks/tsk_fault.c **** }
+  93:..\common\ud3core\tasks/tsk_fault.c **** 
+  94:..\common\ud3core\tasks/tsk_fault.c **** void set_switch_without_fb(uint32_t en){
+  95:..\common\ud3core\tasks/tsk_fault.c ****     switch_without_fb = en ? 0 : 0b10;
+  96:..\common\ud3core\tasks/tsk_fault.c **** }
+  97:..\common\ud3core\tasks/tsk_fault.c **** 
+  98:..\common\ud3core\tasks/tsk_fault.c **** void handle_UVLO(void) {
+  99:..\common\ud3core\tasks/tsk_fault.c ****     // read the driver voltage
+ 100:..\common\ud3core\tasks/tsk_fault.c ****     tt.n.driver_v.value = read_driver_mv();
+ 101:..\common\ud3core\tasks/tsk_fault.c ****     
+ 102:..\common\ud3core\tasks/tsk_fault.c ****     uint8_t undervoltage = pdFALSE;
+ 103:..\common\ud3core\tasks/tsk_fault.c ****     
+ 104:..\common\ud3core\tasks/tsk_fault.c ****     if(configuration.uvlo_analog){  //Analog UVLO
+ 105:..\common\ud3core\tasks/tsk_fault.c ****         if(tt.n.driver_v.value < configuration.uvlo_analog){
+ 106:..\common\ud3core\tasks/tsk_fault.c ****             undervoltage = pdTRUE;   
+ 107:..\common\ud3core\tasks/tsk_fault.c ****         }
+ 108:..\common\ud3core\tasks/tsk_fault.c ****     }else{  //Digital UVLO
+ 109:..\common\ud3core\tasks/tsk_fault.c ****         if(UVLO_Read() == 0){
+ 110:..\common\ud3core\tasks/tsk_fault.c ****             undervoltage = pdTRUE;
+ 111:..\common\ud3core\tasks/tsk_fault.c ****         }
+ 112:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 113:..\common\ud3core\tasks/tsk_fault.c ****     
+ 114:..\common\ud3core\tasks/tsk_fault.c **** 	//UVLO feedback via system_fault (LED2)
+ 115:..\common\ud3core\tasks/tsk_fault.c **** 	if(undervoltage){
+ 116:..\common\ud3core\tasks/tsk_fault.c ****         if(sysfault.uvlo==0){
+ 117:..\common\ud3core\tasks/tsk_fault.c ****             alarm_push(ALM_PRIO_CRITICAL, "DRIVER: Undervoltage", ALM_NO_VALUE);
+ 118:..\common\ud3core\tasks/tsk_fault.c ****         }
+ 119:..\common\ud3core\tasks/tsk_fault.c ****         sysfault.uvlo=1;
+ 120:..\common\ud3core\tasks/tsk_fault.c ****     }else{
+ 121:..\common\ud3core\tasks/tsk_fault.c ****         sysfault.uvlo=0;
+ 122:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 123:..\common\ud3core\tasks/tsk_fault.c **** }
+ 124:..\common\ud3core\tasks/tsk_fault.c **** 
+ 125:..\common\ud3core\tasks/tsk_fault.c **** uint32_t feedback_error_cnt=0;
+ 126:..\common\ud3core\tasks/tsk_fault.c **** 
+ 127:..\common\ud3core\tasks/tsk_fault.c **** void reset_fault(){
+ 128:..\common\ud3core\tasks/tsk_fault.c ****     feedback_error_cnt = 0;
+ 129:..\common\ud3core\tasks/tsk_fault.c ****     for(uint8_t i=0;i<sizeof(SYSFAULT);i++){
+ 130:..\common\ud3core\tasks/tsk_fault.c ****         ((uint8_t*)&sysfault)[i]=0;
+ 131:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 132:..\common\ud3core\tasks/tsk_fault.c **** }
+ 133:..\common\ud3core\tasks/tsk_fault.c **** 
+ 134:..\common\ud3core\tasks/tsk_fault.c **** uint8_t tsk_fault_is_fault(){
+ 135:..\common\ud3core\tasks/tsk_fault.c ****     return (system_fault_Control & 0b1) ? pdFALSE : pdTRUE;   
+ 136:..\common\ud3core\tasks/tsk_fault.c **** }
+ 137:..\common\ud3core\tasks/tsk_fault.c **** 
+ 138:..\common\ud3core\tasks/tsk_fault.c **** void sysflt_set(uint32_t wait){
+ 139:..\common\ud3core\tasks/tsk_fault.c ****     system_fault_Control = (switch_without_fb & 0b10);
+ 140:..\common\ud3core\tasks/tsk_fault.c ****     if(wait) CyDelayUs(500); //TODO evaluate delay time
+ 141:..\common\ud3core\tasks/tsk_fault.c **** }
+ 142:..\common\ud3core\tasks/tsk_fault.c **** 
+ 143:..\common\ud3core\tasks/tsk_fault.c **** void sysflt_clr(uint32_t wait){
+ 144:..\common\ud3core\tasks/tsk_fault.c ****     system_fault_Control = (switch_without_fb & 0b10) | 0b1;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 4
+
+
+ 145:..\common\ud3core\tasks/tsk_fault.c ****     if(wait) CyDelayUs(500); //TODO evaluate delay time
+ 146:..\common\ud3core\tasks/tsk_fault.c **** }
+ 147:..\common\ud3core\tasks/tsk_fault.c **** 
+ 148:..\common\ud3core\tasks/tsk_fault.c **** void handle_FAULT(void) {
+ 149:..\common\ud3core\tasks/tsk_fault.c **** 	//UVLO feedback via system_fault (LED2)
+ 150:..\common\ud3core\tasks/tsk_fault.c **** 	uint8_t flag = 1;
+ 151:..\common\ud3core\tasks/tsk_fault.c ****     
+ 152:..\common\ud3core\tasks/tsk_fault.c ****     for(uint8_t i=0;i<sizeof(SYSFAULT);i++){
+ 153:..\common\ud3core\tasks/tsk_fault.c ****         if(((uint8_t*)&sysfault)[i]) flag = 0; //Sysfault is active low
+ 154:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 155:..\common\ud3core\tasks/tsk_fault.c ****     system_fault_Control = (switch_without_fb & 0b10) | (flag & 0b1);
+ 156:..\common\ud3core\tasks/tsk_fault.c ****     
+ 157:..\common\ud3core\tasks/tsk_fault.c ****     if(tsk_fault_is_fault()){
+ 158:..\common\ud3core\tasks/tsk_fault.c ****         LED_sysfault_Write(LED_ON);
+ 159:..\common\ud3core\tasks/tsk_fault.c ****     }else{
+ 160:..\common\ud3core\tasks/tsk_fault.c ****         LED_sysfault_Write(LED_OFF);
+ 161:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 162:..\common\ud3core\tasks/tsk_fault.c **** }
+ 163:..\common\ud3core\tasks/tsk_fault.c **** 
+ 164:..\common\ud3core\tasks/tsk_fault.c **** 
+ 165:..\common\ud3core\tasks/tsk_fault.c **** 
+ 166:..\common\ud3core\tasks/tsk_fault.c **** void handle_no_fb(void){
+ 167:..\common\ud3core\tasks/tsk_fault.c ****     uint32_t time = ((uint32_t)fb_filter_out * 15625ul)/1000; //ns
+ 168:..\common\ud3core\tasks/tsk_fault.c ****     tt.n.fres.value = (5000000ul / time);
+ 169:..\common\ud3core\tasks/tsk_fault.c ****     static uint8_t fb_error_timer=FB_ERROR_TIME;
+ 170:..\common\ud3core\tasks/tsk_fault.c ****     
+ 171:..\common\ud3core\tasks/tsk_fault.c ****     if(no_fb_reg_Read()){
+ 172:..\common\ud3core\tasks/tsk_fault.c ****         feedback_error_cnt++;
+ 173:..\common\ud3core\tasks/tsk_fault.c ****         fb_error_timer=FB_ERROR_TIME;
+ 174:..\common\ud3core\tasks/tsk_fault.c ****     }else{
+ 175:..\common\ud3core\tasks/tsk_fault.c ****         fb_error_timer--;
+ 176:..\common\ud3core\tasks/tsk_fault.c ****         if(fb_error_timer==0){
+ 177:..\common\ud3core\tasks/tsk_fault.c ****             fb_error_timer = 20;
+ 178:..\common\ud3core\tasks/tsk_fault.c ****             feedback_error_cnt = 0;
+ 179:..\common\ud3core\tasks/tsk_fault.c ****         }
+ 180:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 181:..\common\ud3core\tasks/tsk_fault.c ****     
+ 182:..\common\ud3core\tasks/tsk_fault.c ****     if(configuration.max_fb_errors){
+ 183:..\common\ud3core\tasks/tsk_fault.c ****         if(feedback_error_cnt > configuration.max_fb_errors){
+ 184:..\common\ud3core\tasks/tsk_fault.c ****             if(sysfault.feedback==0){
+ 185:..\common\ud3core\tasks/tsk_fault.c ****                 alarm_push(ALM_PRIO_CRITICAL, "FAULT: No Feedback", feedback_error_cnt);
+ 186:..\common\ud3core\tasks/tsk_fault.c ****             }
+ 187:..\common\ud3core\tasks/tsk_fault.c ****             sysfault.feedback = pdTRUE;          
+ 188:..\common\ud3core\tasks/tsk_fault.c ****         }
+ 189:..\common\ud3core\tasks/tsk_fault.c ****     }else{
+ 190:..\common\ud3core\tasks/tsk_fault.c ****         sysfault.feedback = pdFALSE;   
+ 191:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 192:..\common\ud3core\tasks/tsk_fault.c ****     
+ 193:..\common\ud3core\tasks/tsk_fault.c ****     
+ 194:..\common\ud3core\tasks/tsk_fault.c ****     
+ 195:..\common\ud3core\tasks/tsk_fault.c **** }
+ 196:..\common\ud3core\tasks/tsk_fault.c **** 
+ 197:..\common\ud3core\tasks/tsk_fault.c **** void vWD_Timer_Callback(TimerHandle_t xTimer){
+  28              		.loc 1 197 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 5
+
+
+  32              	.LVL0:
+  33 0000 37B5     		push	{r0, r1, r2, r4, r5, lr}
+  34              		.cfi_def_cfa_offset 24
+  35              		.cfi_offset 4, -12
+  36              		.cfi_offset 5, -8
+  37              		.cfi_offset 14, -4
+ 198:..\common\ud3core\tasks/tsk_fault.c ****     if(sysfault.watchdog==0){
+  38              		.loc 1 198 0
+  39 0002 104B     		ldr	r3, .L4
+ 197:..\common\ud3core\tasks/tsk_fault.c ****     if(sysfault.watchdog==0){
+  40              		.loc 1 197 0
+  41 0004 0546     		mov	r5, r0
+  42              		.loc 1 198 0
+  43 0006 5A79     		ldrb	r2, [r3, #5]	@ zero_extendqisi2
+  44 0008 1C46     		mov	r4, r3
+  45 000a 2AB9     		cbnz	r2, .L2
+ 199:..\common\ud3core\tasks/tsk_fault.c ****         alarm_push(ALM_PRIO_CRITICAL, "WD: Watchdog triggered", ALM_NO_VALUE);
+  46              		.loc 1 199 0
+  47 000c 4FF00042 		mov	r2, #-2147483648
+  48 0010 0D49     		ldr	r1, .L4+4
+  49 0012 0320     		movs	r0, #3
+  50              	.LVL1:
+  51 0014 FFF7FEFF 		bl	alarm_push
+  52              	.LVL2:
+  53              	.L2:
+ 200:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 201:..\common\ud3core\tasks/tsk_fault.c ****     sysfault.watchdog = 1;
+  54              		.loc 1 201 0
+  55 0018 0123     		movs	r3, #1
+  56 001a 6371     		strb	r3, [r4, #5]
+ 202:..\common\ud3core\tasks/tsk_fault.c ****     interrupter1_control_Control = 0;
+  57              		.loc 1 202 0
+  58 001c 0B4B     		ldr	r3, .L4+8
+  59 001e 0024     		movs	r4, #0
+  60 0020 1C70     		strb	r4, [r3]
+ 203:..\common\ud3core\tasks/tsk_fault.c **** 	QCW_enable_Control = 0;
+  61              		.loc 1 203 0
+  62 0022 03F8044C 		strb	r4, [r3, #-4]
+ 204:..\common\ud3core\tasks/tsk_fault.c ****     interrupter_kill();
+  63              		.loc 1 204 0
+  64 0026 FFF7FEFF 		bl	interrupter_kill
+  65              	.LVL3:
+ 205:..\common\ud3core\tasks/tsk_fault.c ****     tsk_midi_kill();
+  66              		.loc 1 205 0
+  67 002a FFF7FEFF 		bl	tsk_midi_kill
+  68              	.LVL4:
+ 206:..\common\ud3core\tasks/tsk_fault.c ****     xTimerReset(xTimer,0);
+  69              		.loc 1 206 0
+  70 002e FFF7FEFF 		bl	xTaskGetTickCount
+  71              	.LVL5:
+  72 0032 0094     		str	r4, [sp]
+  73 0034 0246     		mov	r2, r0
+  74 0036 2346     		mov	r3, r4
+  75 0038 0221     		movs	r1, #2
+  76 003a 2846     		mov	r0, r5
+  77 003c FFF7FEFF 		bl	xTimerGenericCommand
+  78              	.LVL6:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 6
+
+
+ 207:..\common\ud3core\tasks/tsk_fault.c **** }
+  79              		.loc 1 207 0
+  80 0040 03B0     		add	sp, sp, #12
+  81              		.cfi_def_cfa_offset 12
+  82              		@ sp needed
+  83 0042 30BD     		pop	{r4, r5, pc}
+  84              	.LVL7:
+  85              	.L5:
+  86              		.align	2
+  87              	.L4:
+  88 0044 00000000 		.word	sysfault
+  89 0048 00000000 		.word	.LC0
+  90 004c 7D640040 		.word	1073767549
+  91              		.cfi_endproc
+  92              	.LFE79:
+  93              		.size	vWD_Timer_Callback, .-vWD_Timer_Callback
+  94              		.section	.text.WD_enable,"ax",%progbits
+  95              		.align	1
+  96              		.global	WD_enable
+  97              		.thumb
+  98              		.thumb_func
+  99              		.type	WD_enable, %function
+ 100              	WD_enable:
+ 101              	.LFB68:
+  72:..\common\ud3core\tasks/tsk_fault.c ****     if(xWD_Timer!=NULL){
+ 102              		.loc 1 72 0
+ 103              		.cfi_startproc
+ 104              		@ args = 0, pretend = 0, frame = 0
+ 105              		@ frame_needed = 0, uses_anonymous_args = 0
+ 106              	.LVL8:
+ 107 0000 37B5     		push	{r0, r1, r2, r4, r5, lr}
+ 108              		.cfi_def_cfa_offset 24
+ 109              		.cfi_offset 4, -12
+ 110              		.cfi_offset 5, -8
+ 111              		.cfi_offset 14, -4
+  73:..\common\ud3core\tasks/tsk_fault.c ****         if(enable){
+ 112              		.loc 1 73 0
+ 113 0002 0A4A     		ldr	r2, .L13
+  72:..\common\ud3core\tasks/tsk_fault.c ****     if(xWD_Timer!=NULL){
+ 114              		.loc 1 72 0
+ 115 0004 0346     		mov	r3, r0
+  73:..\common\ud3core\tasks/tsk_fault.c ****         if(enable){
+ 116              		.loc 1 73 0
+ 117 0006 1468     		ldr	r4, [r2]
+ 118 0008 74B1     		cbz	r4, .L6
+ 119 000a 0A25     		movs	r5, #10
+  74:..\common\ud3core\tasks/tsk_fault.c ****             xTimerStart(xWD_Timer,10);
+ 120              		.loc 1 74 0
+ 121 000c 30B1     		cbz	r0, .L8
+  75:..\common\ud3core\tasks/tsk_fault.c ****         }else{  
+ 122              		.loc 1 75 0
+ 123 000e FFF7FEFF 		bl	xTaskGetTickCount
+ 124              	.LVL9:
+ 125 0012 0095     		str	r5, [sp]
+ 126 0014 0023     		movs	r3, #0
+ 127 0016 0246     		mov	r2, r0
+ 128 0018 0121     		movs	r1, #1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 7
+
+
+ 129 001a 02E0     		b	.L12
+ 130              	.LVL10:
+ 131              	.L8:
+  77:..\common\ud3core\tasks/tsk_fault.c ****         }
+ 132              		.loc 1 77 0
+ 133 001c 0246     		mov	r2, r0
+ 134 001e 0095     		str	r5, [sp]
+ 135 0020 0321     		movs	r1, #3
+ 136              	.LVL11:
+ 137              	.L12:
+ 138 0022 2046     		mov	r0, r4
+ 139 0024 FFF7FEFF 		bl	xTimerGenericCommand
+ 140              	.LVL12:
+ 141              	.L6:
+  80:..\common\ud3core\tasks/tsk_fault.c **** 
+ 142              		.loc 1 80 0
+ 143 0028 03B0     		add	sp, sp, #12
+ 144              		.cfi_def_cfa_offset 12
+ 145              		@ sp needed
+ 146 002a 30BD     		pop	{r4, r5, pc}
+ 147              	.L14:
+ 148              		.align	2
+ 149              	.L13:
+ 150 002c 00000000 		.word	xWD_Timer
+ 151              		.cfi_endproc
+ 152              	.LFE68:
+ 153              		.size	WD_enable, .-WD_enable
+ 154              		.section	.text.WD_reset,"ax",%progbits
+ 155              		.align	1
+ 156              		.global	WD_reset
+ 157              		.thumb
+ 158              		.thumb_func
+ 159              		.type	WD_reset, %function
+ 160              	WD_reset:
+ 161              	.LFB69:
+  82:..\common\ud3core\tasks/tsk_fault.c ****     if(xWD_Timer!=NULL && configuration.watchdog){
+ 162              		.loc 1 82 0
+ 163              		.cfi_startproc
+ 164              		@ args = 0, pretend = 0, frame = 0
+ 165              		@ frame_needed = 0, uses_anonymous_args = 0
+  83:..\common\ud3core\tasks/tsk_fault.c ****         xTimerStart(xWD_Timer,0);
+ 166              		.loc 1 83 0
+ 167 0000 084B     		ldr	r3, .L23
+  82:..\common\ud3core\tasks/tsk_fault.c ****     if(xWD_Timer!=NULL && configuration.watchdog){
+ 168              		.loc 1 82 0
+ 169 0002 13B5     		push	{r0, r1, r4, lr}
+ 170              		.cfi_def_cfa_offset 16
+ 171              		.cfi_offset 4, -8
+ 172              		.cfi_offset 14, -4
+  83:..\common\ud3core\tasks/tsk_fault.c ****         xTimerStart(xWD_Timer,0);
+ 173              		.loc 1 83 0
+ 174 0004 1C68     		ldr	r4, [r3]
+ 175 0006 5CB1     		cbz	r4, .L15
+  83:..\common\ud3core\tasks/tsk_fault.c ****         xTimerStart(xWD_Timer,0);
+ 176              		.loc 1 83 0 is_stmt 0 discriminator 1
+ 177 0008 074B     		ldr	r3, .L23+4
+ 178 000a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 8
+
+
+ 179 000c 43B1     		cbz	r3, .L15
+  84:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 180              		.loc 1 84 0 is_stmt 1
+ 181 000e FFF7FEFF 		bl	xTaskGetTickCount
+ 182              	.LVL13:
+ 183 0012 0023     		movs	r3, #0
+ 184 0014 0246     		mov	r2, r0
+ 185 0016 0093     		str	r3, [sp]
+ 186 0018 0121     		movs	r1, #1
+ 187 001a 2046     		mov	r0, r4
+ 188 001c FFF7FEFF 		bl	xTimerGenericCommand
+ 189              	.LVL14:
+ 190              	.L15:
+  86:..\common\ud3core\tasks/tsk_fault.c **** 
+ 191              		.loc 1 86 0
+ 192 0020 02B0     		add	sp, sp, #8
+ 193              		.cfi_def_cfa_offset 8
+ 194              		@ sp needed
+ 195 0022 10BD     		pop	{r4, pc}
+ 196              	.L24:
+ 197              		.align	2
+ 198              	.L23:
+ 199 0024 00000000 		.word	xWD_Timer
+ 200 0028 00000000 		.word	configuration
+ 201              		.cfi_endproc
+ 202              	.LFE69:
+ 203              		.size	WD_reset, .-WD_reset
+ 204              		.section	.text.WD_reset_from_ISR,"ax",%progbits
+ 205              		.align	1
+ 206              		.global	WD_reset_from_ISR
+ 207              		.thumb
+ 208              		.thumb_func
+ 209              		.type	WD_reset_from_ISR, %function
+ 210              	WD_reset_from_ISR:
+ 211              	.LFB70:
+  88:..\common\ud3core\tasks/tsk_fault.c ****     if(xWD_Timer!=NULL && configuration.watchdog){
+ 212              		.loc 1 88 0
+ 213              		.cfi_startproc
+ 214              		@ args = 0, pretend = 0, frame = 0
+ 215              		@ frame_needed = 0, uses_anonymous_args = 0
+  89:..\common\ud3core\tasks/tsk_fault.c ****         xTimerStartFromISR(xWD_Timer, NULL);
+ 216              		.loc 1 89 0
+ 217 0000 084B     		ldr	r3, .L33
+  88:..\common\ud3core\tasks/tsk_fault.c ****     if(xWD_Timer!=NULL && configuration.watchdog){
+ 218              		.loc 1 88 0
+ 219 0002 13B5     		push	{r0, r1, r4, lr}
+ 220              		.cfi_def_cfa_offset 16
+ 221              		.cfi_offset 4, -8
+ 222              		.cfi_offset 14, -4
+  89:..\common\ud3core\tasks/tsk_fault.c ****         xTimerStartFromISR(xWD_Timer, NULL);
+ 223              		.loc 1 89 0
+ 224 0004 1C68     		ldr	r4, [r3]
+ 225 0006 5CB1     		cbz	r4, .L25
+  89:..\common\ud3core\tasks/tsk_fault.c ****         xTimerStartFromISR(xWD_Timer, NULL);
+ 226              		.loc 1 89 0 is_stmt 0 discriminator 1
+ 227 0008 074B     		ldr	r3, .L33+4
+ 228 000a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 9
+
+
+ 229 000c 43B1     		cbz	r3, .L25
+  90:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 230              		.loc 1 90 0 is_stmt 1
+ 231 000e FFF7FEFF 		bl	xTaskGetTickCountFromISR
+ 232              	.LVL15:
+ 233 0012 0023     		movs	r3, #0
+ 234 0014 0246     		mov	r2, r0
+ 235 0016 0093     		str	r3, [sp]
+ 236 0018 0621     		movs	r1, #6
+ 237 001a 2046     		mov	r0, r4
+ 238 001c FFF7FEFF 		bl	xTimerGenericCommand
+ 239              	.LVL16:
+ 240              	.L25:
+  92:..\common\ud3core\tasks/tsk_fault.c **** 
+ 241              		.loc 1 92 0
+ 242 0020 02B0     		add	sp, sp, #8
+ 243              		.cfi_def_cfa_offset 8
+ 244              		@ sp needed
+ 245 0022 10BD     		pop	{r4, pc}
+ 246              	.L34:
+ 247              		.align	2
+ 248              	.L33:
+ 249 0024 00000000 		.word	xWD_Timer
+ 250 0028 00000000 		.word	configuration
+ 251              		.cfi_endproc
+ 252              	.LFE70:
+ 253              		.size	WD_reset_from_ISR, .-WD_reset_from_ISR
+ 254              		.section	.text.set_switch_without_fb,"ax",%progbits
+ 255              		.align	1
+ 256              		.global	set_switch_without_fb
+ 257              		.thumb
+ 258              		.thumb_func
+ 259              		.type	set_switch_without_fb, %function
+ 260              	set_switch_without_fb:
+ 261              	.LFB71:
+  94:..\common\ud3core\tasks/tsk_fault.c ****     switch_without_fb = en ? 0 : 0b10;
+ 262              		.loc 1 94 0
+ 263              		.cfi_startproc
+ 264              		@ args = 0, pretend = 0, frame = 0
+ 265              		@ frame_needed = 0, uses_anonymous_args = 0
+ 266              		@ link register save eliminated.
+ 267              	.LVL17:
+  95:..\common\ud3core\tasks/tsk_fault.c **** }
+ 268              		.loc 1 95 0
+ 269 0000 0028     		cmp	r0, #0
+ 270 0002 034B     		ldr	r3, .L38
+ 271 0004 14BF     		ite	ne
+ 272 0006 0022     		movne	r2, #0
+ 273 0008 0222     		moveq	r2, #2
+ 274 000a 1A60     		str	r2, [r3]
+ 275 000c 7047     		bx	lr
+ 276              	.L39:
+ 277 000e 00BF     		.align	2
+ 278              	.L38:
+ 279 0010 00000000 		.word	.LANCHOR0
+ 280              		.cfi_endproc
+ 281              	.LFE71:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 10
+
+
+ 282              		.size	set_switch_without_fb, .-set_switch_without_fb
+ 283              		.section	.text.handle_UVLO,"ax",%progbits
+ 284              		.align	1
+ 285              		.global	handle_UVLO
+ 286              		.thumb
+ 287              		.thumb_func
+ 288              		.type	handle_UVLO, %function
+ 289              	handle_UVLO:
+ 290              	.LFB72:
+  98:..\common\ud3core\tasks/tsk_fault.c ****     // read the driver voltage
+ 291              		.loc 1 98 0
+ 292              		.cfi_startproc
+ 293              		@ args = 0, pretend = 0, frame = 0
+ 294              		@ frame_needed = 0, uses_anonymous_args = 0
+ 295 0000 10B5     		push	{r4, lr}
+ 296              		.cfi_def_cfa_offset 8
+ 297              		.cfi_offset 4, -8
+ 298              		.cfi_offset 14, -4
+ 100:..\common\ud3core\tasks/tsk_fault.c ****     
+ 299              		.loc 1 100 0
+ 300 0002 FFF7FEFF 		bl	read_driver_mv
+ 301              	.LVL18:
+ 302 0006 0D4B     		ldr	r3, .L51
+ 303 0008 0D4C     		ldr	r4, .L51+4
+ 304 000a 1864     		str	r0, [r3, #64]
+ 305              	.LVL19:
+ 104:..\common\ud3core\tasks/tsk_fault.c ****         if(tt.n.driver_v.value < configuration.uvlo_analog){
+ 306              		.loc 1 104 0
+ 307 000c 0D4B     		ldr	r3, .L51+8
+ 308 000e B3F86830 		ldrh	r3, [r3, #104]
+ 309 0012 13B1     		cbz	r3, .L41
+ 105:..\common\ud3core\tasks/tsk_fault.c ****             undervoltage = pdTRUE;   
+ 310              		.loc 1 105 0
+ 311 0014 9842     		cmp	r0, r3
+ 312 0016 03DB     		blt	.L42
+ 313 0018 0CE0     		b	.L43
+ 314              	.L41:
+ 109:..\common\ud3core\tasks/tsk_fault.c ****             undervoltage = pdTRUE;
+ 315              		.loc 1 109 0
+ 316 001a FFF7FEFF 		bl	UVLO_Read
+ 317              	.LVL20:
+ 318 001e 48B9     		cbnz	r0, .L43
+ 319              	.L42:
+ 320              	.LVL21:
+ 321              	.LBB5:
+ 322              	.LBB6:
+ 116:..\common\ud3core\tasks/tsk_fault.c ****             alarm_push(ALM_PRIO_CRITICAL, "DRIVER: Undervoltage", ALM_NO_VALUE);
+ 323              		.loc 1 116 0
+ 324 0020 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 325 0022 2BB9     		cbnz	r3, .L45
+ 117:..\common\ud3core\tasks/tsk_fault.c ****         }
+ 326              		.loc 1 117 0
+ 327 0024 4FF00042 		mov	r2, #-2147483648
+ 328 0028 0749     		ldr	r1, .L51+12
+ 329 002a 0320     		movs	r0, #3
+ 330 002c FFF7FEFF 		bl	alarm_push
+ 331              	.LVL22:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 11
+
+
+ 332              	.L45:
+ 119:..\common\ud3core\tasks/tsk_fault.c ****     }else{
+ 333              		.loc 1 119 0
+ 334 0030 0123     		movs	r3, #1
+ 335 0032 00E0     		b	.L50
+ 336              	.LVL23:
+ 337              	.L43:
+ 338              	.LBE6:
+ 339              	.LBE5:
+ 121:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 340              		.loc 1 121 0
+ 341 0034 0023     		movs	r3, #0
+ 342              	.LVL24:
+ 343              	.L50:
+ 344 0036 2370     		strb	r3, [r4]
+ 345 0038 10BD     		pop	{r4, pc}
+ 346              	.L52:
+ 347 003a 00BF     		.align	2
+ 348              	.L51:
+ 349 003c 00000000 		.word	tt
+ 350 0040 00000000 		.word	sysfault
+ 351 0044 00000000 		.word	configuration
+ 352 0048 17000000 		.word	.LC1
+ 353              		.cfi_endproc
+ 354              	.LFE72:
+ 355              		.size	handle_UVLO, .-handle_UVLO
+ 356              		.section	.text.reset_fault,"ax",%progbits
+ 357              		.align	1
+ 358              		.global	reset_fault
+ 359              		.thumb
+ 360              		.thumb_func
+ 361              		.type	reset_fault, %function
+ 362              	reset_fault:
+ 363              	.LFB73:
+ 127:..\common\ud3core\tasks/tsk_fault.c ****     feedback_error_cnt = 0;
+ 364              		.loc 1 127 0
+ 365              		.cfi_startproc
+ 366              		@ args = 0, pretend = 0, frame = 0
+ 367              		@ frame_needed = 0, uses_anonymous_args = 0
+ 368              		@ link register save eliminated.
+ 128:..\common\ud3core\tasks/tsk_fault.c ****     for(uint8_t i=0;i<sizeof(SYSFAULT);i++){
+ 369              		.loc 1 128 0
+ 370 0000 0023     		movs	r3, #0
+ 371              	.LBB7:
+ 130:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 372              		.loc 1 130 0
+ 373 0002 1946     		mov	r1, r3
+ 374              	.LBE7:
+ 128:..\common\ud3core\tasks/tsk_fault.c ****     for(uint8_t i=0;i<sizeof(SYSFAULT);i++){
+ 375              		.loc 1 128 0
+ 376 0004 034A     		ldr	r2, .L56
+ 377 0006 5360     		str	r3, [r2, #4]
+ 378              	.LVL25:
+ 379              	.LBB8:
+ 130:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 380              		.loc 1 130 0
+ 381 0008 034A     		ldr	r2, .L56+4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 12
+
+
+ 382              	.LVL26:
+ 383              	.L54:
+ 130:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 384              		.loc 1 130 0 is_stmt 0 discriminator 3
+ 385 000a 9954     		strb	r1, [r3, r2]
+ 386              	.LVL27:
+ 387 000c 0133     		adds	r3, r3, #1
+ 388              	.LVL28:
+ 129:..\common\ud3core\tasks/tsk_fault.c ****         ((uint8_t*)&sysfault)[i]=0;
+ 389              		.loc 1 129 0 is_stmt 1 discriminator 3
+ 390 000e 0B2B     		cmp	r3, #11
+ 391 0010 FBD1     		bne	.L54
+ 392              	.LBE8:
+ 132:..\common\ud3core\tasks/tsk_fault.c **** 
+ 393              		.loc 1 132 0
+ 394 0012 7047     		bx	lr
+ 395              	.L57:
+ 396              		.align	2
+ 397              	.L56:
+ 398 0014 00000000 		.word	.LANCHOR0
+ 399 0018 00000000 		.word	sysfault
+ 400              		.cfi_endproc
+ 401              	.LFE73:
+ 402              		.size	reset_fault, .-reset_fault
+ 403              		.section	.text.tsk_fault_is_fault,"ax",%progbits
+ 404              		.align	1
+ 405              		.global	tsk_fault_is_fault
+ 406              		.thumb
+ 407              		.thumb_func
+ 408              		.type	tsk_fault_is_fault, %function
+ 409              	tsk_fault_is_fault:
+ 410              	.LFB74:
+ 134:..\common\ud3core\tasks/tsk_fault.c ****     return (system_fault_Control & 0b1) ? pdFALSE : pdTRUE;   
+ 411              		.loc 1 134 0
+ 412              		.cfi_startproc
+ 413              		@ args = 0, pretend = 0, frame = 0
+ 414              		@ frame_needed = 0, uses_anonymous_args = 0
+ 415              		@ link register save eliminated.
+ 135:..\common\ud3core\tasks/tsk_fault.c **** }
+ 416              		.loc 1 135 0
+ 417 0000 034B     		ldr	r3, .L59
+ 418 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 419 0004 00F00100 		and	r0, r0, #1
+ 136:..\common\ud3core\tasks/tsk_fault.c **** 
+ 420              		.loc 1 136 0
+ 421 0008 80F00100 		eor	r0, r0, #1
+ 422 000c 7047     		bx	lr
+ 423              	.L60:
+ 424 000e 00BF     		.align	2
+ 425              	.L59:
+ 426 0010 7E640040 		.word	1073767550
+ 427              		.cfi_endproc
+ 428              	.LFE74:
+ 429              		.size	tsk_fault_is_fault, .-tsk_fault_is_fault
+ 430              		.section	.text.sysflt_set,"ax",%progbits
+ 431              		.align	1
+ 432              		.global	sysflt_set
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 13
+
+
+ 433              		.thumb
+ 434              		.thumb_func
+ 435              		.type	sysflt_set, %function
+ 436              	sysflt_set:
+ 437              	.LFB75:
+ 138:..\common\ud3core\tasks/tsk_fault.c ****     system_fault_Control = (switch_without_fb & 0b10);
+ 438              		.loc 1 138 0
+ 439              		.cfi_startproc
+ 440              		@ args = 0, pretend = 0, frame = 0
+ 441              		@ frame_needed = 0, uses_anonymous_args = 0
+ 442              		@ link register save eliminated.
+ 443              	.LVL29:
+ 139:..\common\ud3core\tasks/tsk_fault.c ****     if(wait) CyDelayUs(500); //TODO evaluate delay time
+ 444              		.loc 1 139 0
+ 445 0000 064B     		ldr	r3, .L63
+ 446 0002 074A     		ldr	r2, .L63+4
+ 447 0004 1B68     		ldr	r3, [r3]
+ 448 0006 03F00203 		and	r3, r3, #2
+ 449 000a DBB2     		uxtb	r3, r3
+ 450 000c 1370     		strb	r3, [r2]
+ 140:..\common\ud3core\tasks/tsk_fault.c **** }
+ 451              		.loc 1 140 0
+ 452 000e 18B1     		cbz	r0, .L61
+ 140:..\common\ud3core\tasks/tsk_fault.c **** }
+ 453              		.loc 1 140 0 is_stmt 0 discriminator 1
+ 454 0010 4FF4FA70 		mov	r0, #500
+ 455              	.LVL30:
+ 456 0014 FFF7FEBF 		b	CyDelayUs
+ 457              	.LVL31:
+ 458              	.L61:
+ 459 0018 7047     		bx	lr
+ 460              	.L64:
+ 461 001a 00BF     		.align	2
+ 462              	.L63:
+ 463 001c 00000000 		.word	.LANCHOR0
+ 464 0020 7E640040 		.word	1073767550
+ 465              		.cfi_endproc
+ 466              	.LFE75:
+ 467              		.size	sysflt_set, .-sysflt_set
+ 468              		.section	.text.sysflt_clr,"ax",%progbits
+ 469              		.align	1
+ 470              		.global	sysflt_clr
+ 471              		.thumb
+ 472              		.thumb_func
+ 473              		.type	sysflt_clr, %function
+ 474              	sysflt_clr:
+ 475              	.LFB76:
+ 143:..\common\ud3core\tasks/tsk_fault.c ****     system_fault_Control = (switch_without_fb & 0b10) | 0b1;
+ 476              		.loc 1 143 0 is_stmt 1
+ 477              		.cfi_startproc
+ 478              		@ args = 0, pretend = 0, frame = 0
+ 479              		@ frame_needed = 0, uses_anonymous_args = 0
+ 480              		@ link register save eliminated.
+ 481              	.LVL32:
+ 144:..\common\ud3core\tasks/tsk_fault.c ****     if(wait) CyDelayUs(500); //TODO evaluate delay time
+ 482              		.loc 1 144 0
+ 483 0000 074B     		ldr	r3, .L67
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 14
+
+
+ 484 0002 084A     		ldr	r2, .L67+4
+ 485 0004 1B68     		ldr	r3, [r3]
+ 486 0006 03F00203 		and	r3, r3, #2
+ 487 000a 43F00103 		orr	r3, r3, #1
+ 488 000e DBB2     		uxtb	r3, r3
+ 489 0010 1370     		strb	r3, [r2]
+ 145:..\common\ud3core\tasks/tsk_fault.c **** }
+ 490              		.loc 1 145 0
+ 491 0012 18B1     		cbz	r0, .L65
+ 145:..\common\ud3core\tasks/tsk_fault.c **** }
+ 492              		.loc 1 145 0 is_stmt 0 discriminator 1
+ 493 0014 4FF4FA70 		mov	r0, #500
+ 494              	.LVL33:
+ 495 0018 FFF7FEBF 		b	CyDelayUs
+ 496              	.LVL34:
+ 497              	.L65:
+ 498 001c 7047     		bx	lr
+ 499              	.L68:
+ 500 001e 00BF     		.align	2
+ 501              	.L67:
+ 502 0020 00000000 		.word	.LANCHOR0
+ 503 0024 7E640040 		.word	1073767550
+ 504              		.cfi_endproc
+ 505              	.LFE76:
+ 506              		.size	sysflt_clr, .-sysflt_clr
+ 507              		.section	.text.handle_FAULT,"ax",%progbits
+ 508              		.align	1
+ 509              		.global	handle_FAULT
+ 510              		.thumb
+ 511              		.thumb_func
+ 512              		.type	handle_FAULT, %function
+ 513              	handle_FAULT:
+ 514              	.LFB77:
+ 148:..\common\ud3core\tasks/tsk_fault.c **** 	//UVLO feedback via system_fault (LED2)
+ 515              		.loc 1 148 0 is_stmt 1
+ 516              		.cfi_startproc
+ 517              		@ args = 0, pretend = 0, frame = 0
+ 518              		@ frame_needed = 0, uses_anonymous_args = 0
+ 519              	.LVL35:
+ 520 0000 08B5     		push	{r3, lr}
+ 521              		.cfi_def_cfa_offset 8
+ 522              		.cfi_offset 3, -8
+ 523              		.cfi_offset 14, -4
+ 524              	.LBB13:
+ 153:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 525              		.loc 1 153 0
+ 526 0002 1248     		ldr	r0, .L77
+ 527              	.LBE13:
+ 148:..\common\ud3core\tasks/tsk_fault.c **** 	//UVLO feedback via system_fault (LED2)
+ 528              		.loc 1 148 0
+ 529 0004 0022     		movs	r2, #0
+ 150:..\common\ud3core\tasks/tsk_fault.c ****     
+ 530              		.loc 1 150 0
+ 531 0006 0121     		movs	r1, #1
+ 532              	.LVL36:
+ 533              	.L71:
+ 534              	.LBB14:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 15
+
+
+ 153:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 535              		.loc 1 153 0
+ 536 0008 135C     		ldrb	r3, [r2, r0]	@ zero_extendqisi2
+ 537 000a 0132     		adds	r2, r2, #1
+ 538              	.LVL37:
+ 539 000c 002B     		cmp	r3, #0
+ 540 000e 18BF     		it	ne
+ 541 0010 0021     		movne	r1, #0
+ 542              	.LVL38:
+ 152:..\common\ud3core\tasks/tsk_fault.c ****         if(((uint8_t*)&sysfault)[i]) flag = 0; //Sysfault is active low
+ 543              		.loc 1 152 0
+ 544 0012 0B2A     		cmp	r2, #11
+ 545 0014 F8D1     		bne	.L71
+ 546              	.LBE14:
+ 155:..\common\ud3core\tasks/tsk_fault.c ****     
+ 547              		.loc 1 155 0
+ 548 0016 0E4B     		ldr	r3, .L77+4
+ 549 0018 0E4A     		ldr	r2, .L77+8
+ 550 001a 1B68     		ldr	r3, [r3]
+ 551 001c 03F00203 		and	r3, r3, #2
+ 552 0020 0B43     		orrs	r3, r3, r1
+ 553 0022 DBB2     		uxtb	r3, r3
+ 554 0024 1370     		strb	r3, [r2]
+ 157:..\common\ud3core\tasks/tsk_fault.c ****         LED_sysfault_Write(LED_ON);
+ 555              		.loc 1 157 0
+ 556 0026 FFF7FEFF 		bl	tsk_fault_is_fault
+ 557              	.LVL39:
+ 558 002a 0B4B     		ldr	r3, .L77+12
+ 559 002c 28B1     		cbz	r0, .L72
+ 560              	.LBB15:
+ 561              	.LBB16:
+ 158:..\common\ud3core\tasks/tsk_fault.c ****     }else{
+ 562              		.loc 1 158 0
+ 563 002e 93F86600 		ldrb	r0, [r3, #102]	@ zero_extendqisi2
+ 564 0032 B0FA80F0 		clz	r0, r0
+ 565 0036 4009     		lsrs	r0, r0, #5
+ 566 0038 04E0     		b	.L76
+ 567              	.L72:
+ 568              	.LBE16:
+ 569              	.LBE15:
+ 160:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 570              		.loc 1 160 0
+ 571 003a 93F86600 		ldrb	r0, [r3, #102]	@ zero_extendqisi2
+ 572 003e 0030     		adds	r0, r0, #0
+ 573 0040 18BF     		it	ne
+ 574 0042 0120     		movne	r0, #1
+ 575              	.L76:
+ 162:..\common\ud3core\tasks/tsk_fault.c **** 
+ 576              		.loc 1 162 0
+ 577 0044 BDE80840 		pop	{r3, lr}
+ 578              		.cfi_restore 14
+ 579              		.cfi_restore 3
+ 580              		.cfi_def_cfa_offset 0
+ 160:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 581              		.loc 1 160 0
+ 582 0048 FFF7FEBF 		b	LED_sysfault_Write
+ 583              	.LVL40:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 16
+
+
+ 584              	.L78:
+ 585              		.align	2
+ 586              	.L77:
+ 587 004c 00000000 		.word	sysfault
+ 588 0050 00000000 		.word	.LANCHOR0
+ 589 0054 7E640040 		.word	1073767550
+ 590 0058 00000000 		.word	configuration
+ 591              		.cfi_endproc
+ 592              	.LFE77:
+ 593              		.size	handle_FAULT, .-handle_FAULT
+ 594              		.section	.text.handle_no_fb,"ax",%progbits
+ 595              		.align	1
+ 596              		.global	handle_no_fb
+ 597              		.thumb
+ 598              		.thumb_func
+ 599              		.type	handle_no_fb, %function
+ 600              	handle_no_fb:
+ 601              	.LFB78:
+ 166:..\common\ud3core\tasks/tsk_fault.c ****     uint32_t time = ((uint32_t)fb_filter_out * 15625ul)/1000; //ns
+ 602              		.loc 1 166 0
+ 603              		.cfi_startproc
+ 604              		@ args = 0, pretend = 0, frame = 0
+ 605              		@ frame_needed = 0, uses_anonymous_args = 0
+ 606              	.LVL41:
+ 167:..\common\ud3core\tasks/tsk_fault.c ****     tt.n.fres.value = (5000000ul / time);
+ 607              		.loc 1 167 0
+ 608 0000 1D4B     		ldr	r3, .L87
+ 609              	.LVL42:
+ 166:..\common\ud3core\tasks/tsk_fault.c ****     uint32_t time = ((uint32_t)fb_filter_out * 15625ul)/1000; //ns
+ 610              		.loc 1 166 0
+ 611 0002 10B5     		push	{r4, lr}
+ 612              		.cfi_def_cfa_offset 8
+ 613              		.cfi_offset 4, -8
+ 614              		.cfi_offset 14, -4
+ 168:..\common\ud3core\tasks/tsk_fault.c ****     static uint8_t fb_error_timer=FB_ERROR_TIME;
+ 615              		.loc 1 168 0
+ 616 0004 1A88     		ldrh	r2, [r3]
+ 617 0006 43F60953 		movw	r3, #15625
+ 618              	.LVL43:
+ 619 000a 5343     		muls	r3, r2, r3
+ 620 000c 4FF47A72 		mov	r2, #1000
+ 621 0010 B3FBF2F3 		udiv	r3, r3, r2
+ 622              	.LVL44:
+ 623 0014 194A     		ldr	r2, .L87+4
+ 624 0016 B2FBF3F3 		udiv	r3, r2, r3
+ 625              	.LVL45:
+ 626 001a 194A     		ldr	r2, .L87+8
+ 627 001c C2F86031 		str	r3, [r2, #352]
+ 171:..\common\ud3core\tasks/tsk_fault.c ****         feedback_error_cnt++;
+ 628              		.loc 1 171 0
+ 629 0020 FFF7FEFF 		bl	no_fb_reg_Read
+ 630              	.LVL46:
+ 631 0024 174A     		ldr	r2, .L87+12
+ 632 0026 28B1     		cbz	r0, .L80
+ 172:..\common\ud3core\tasks/tsk_fault.c ****         fb_error_timer=FB_ERROR_TIME;
+ 633              		.loc 1 172 0
+ 634 0028 1749     		ldr	r1, .L87+16
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 17
+
+
+ 635 002a 4B68     		ldr	r3, [r1, #4]
+ 636 002c 0133     		adds	r3, r3, #1
+ 637 002e 4B60     		str	r3, [r1, #4]
+ 173:..\common\ud3core\tasks/tsk_fault.c ****     }else{
+ 638              		.loc 1 173 0
+ 639 0030 1423     		movs	r3, #20
+ 640 0032 04E0     		b	.L86
+ 641              	.L80:
+ 175:..\common\ud3core\tasks/tsk_fault.c ****         if(fb_error_timer==0){
+ 642              		.loc 1 175 0
+ 643 0034 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 644 0036 013B     		subs	r3, r3, #1
+ 176:..\common\ud3core\tasks/tsk_fault.c ****             fb_error_timer = 20;
+ 645              		.loc 1 176 0
+ 646 0038 13F0FF03 		ands	r3, r3, #255
+ 647 003c 01D0     		beq	.L82
+ 648              	.L86:
+ 175:..\common\ud3core\tasks/tsk_fault.c ****         if(fb_error_timer==0){
+ 649              		.loc 1 175 0
+ 650 003e 1370     		strb	r3, [r2]
+ 651 0040 03E0     		b	.L81
+ 652              	.L82:
+ 177:..\common\ud3core\tasks/tsk_fault.c ****             feedback_error_cnt = 0;
+ 653              		.loc 1 177 0
+ 654 0042 1421     		movs	r1, #20
+ 655 0044 1170     		strb	r1, [r2]
+ 178:..\common\ud3core\tasks/tsk_fault.c ****         }
+ 656              		.loc 1 178 0
+ 657 0046 104A     		ldr	r2, .L87+16
+ 658 0048 5360     		str	r3, [r2, #4]
+ 659              	.L81:
+ 182:..\common\ud3core\tasks/tsk_fault.c ****         if(feedback_error_cnt > configuration.max_fb_errors){
+ 660              		.loc 1 182 0
+ 661 004a 104B     		ldr	r3, .L87+20
+ 662 004c B3F85E30 		ldrh	r3, [r3, #94]
+ 663 0050 73B1     		cbz	r3, .L83
+ 183:..\common\ud3core\tasks/tsk_fault.c ****             if(sysfault.feedback==0){
+ 664              		.loc 1 183 0
+ 665 0052 0D4A     		ldr	r2, .L87+16
+ 666 0054 5268     		ldr	r2, [r2, #4]
+ 667 0056 9342     		cmp	r3, r2
+ 668 0058 0CD2     		bcs	.L79
+ 184:..\common\ud3core\tasks/tsk_fault.c ****                 alarm_push(ALM_PRIO_CRITICAL, "FAULT: No Feedback", feedback_error_cnt);
+ 669              		.loc 1 184 0
+ 670 005a 0D4B     		ldr	r3, .L87+24
+ 671 005c 997A     		ldrb	r1, [r3, #10]	@ zero_extendqisi2
+ 672 005e 1C46     		mov	r4, r3
+ 673 0060 19B9     		cbnz	r1, .L85
+ 185:..\common\ud3core\tasks/tsk_fault.c ****             }
+ 674              		.loc 1 185 0
+ 675 0062 0C49     		ldr	r1, .L87+28
+ 676 0064 0320     		movs	r0, #3
+ 677 0066 FFF7FEFF 		bl	alarm_push
+ 678              	.LVL47:
+ 679              	.L85:
+ 187:..\common\ud3core\tasks/tsk_fault.c ****         }
+ 680              		.loc 1 187 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 18
+
+
+ 681 006a 0123     		movs	r3, #1
+ 682 006c A372     		strb	r3, [r4, #10]
+ 683 006e 10BD     		pop	{r4, pc}
+ 684              	.L83:
+ 190:..\common\ud3core\tasks/tsk_fault.c ****     }
+ 685              		.loc 1 190 0
+ 686 0070 074A     		ldr	r2, .L87+24
+ 687 0072 9372     		strb	r3, [r2, #10]
+ 688              	.L79:
+ 689 0074 10BD     		pop	{r4, pc}
+ 690              	.L88:
+ 691 0076 00BF     		.align	2
+ 692              	.L87:
+ 693 0078 00000000 		.word	fb_filter_out
+ 694 007c 404B4C00 		.word	5000000
+ 695 0080 00000000 		.word	tt
+ 696 0084 00000000 		.word	.LANCHOR1
+ 697 0088 00000000 		.word	.LANCHOR0
+ 698 008c 00000000 		.word	configuration
+ 699 0090 00000000 		.word	sysfault
+ 700 0094 2C000000 		.word	.LC2
+ 701              		.cfi_endproc
+ 702              	.LFE78:
+ 703              		.size	handle_no_fb, .-handle_no_fb
+ 704              		.section	.text.tsk_fault_TaskProc,"ax",%progbits
+ 705              		.align	1
+ 706              		.global	tsk_fault_TaskProc
+ 707              		.thumb
+ 708              		.thumb_func
+ 709              		.type	tsk_fault_TaskProc, %function
+ 710              	tsk_fault_TaskProc:
+ 711              	.LFB80:
+ 208:..\common\ud3core\tasks/tsk_fault.c **** 
+ 209:..\common\ud3core\tasks/tsk_fault.c **** /* `#END` */
+ 210:..\common\ud3core\tasks/tsk_fault.c **** /* ------------------------------------------------------------------------ */
+ 211:..\common\ud3core\tasks/tsk_fault.c **** /*
+ 212:..\common\ud3core\tasks/tsk_fault.c ****  * This is the main procedure that comprises the task.  Place the code required
+ 213:..\common\ud3core\tasks/tsk_fault.c ****  * to preform the desired function within the merge regions of the task procedure
+ 214:..\common\ud3core\tasks/tsk_fault.c ****  * to add functionality to the task.
+ 215:..\common\ud3core\tasks/tsk_fault.c ****  */
+ 216:..\common\ud3core\tasks/tsk_fault.c **** void tsk_fault_TaskProc(void *pvParameters) {
+ 712              		.loc 1 216 0
+ 713              		.cfi_startproc
+ 714              		@ Volatile: function does not return.
+ 715              		@ args = 0, pretend = 0, frame = 0
+ 716              		@ frame_needed = 0, uses_anonymous_args = 0
+ 717              	.LVL48:
+ 718 0000 07B5     		push	{r0, r1, r2, lr}
+ 719              		.cfi_def_cfa_offset 16
+ 720              		.cfi_offset 14, -4
+ 217:..\common\ud3core\tasks/tsk_fault.c **** 	/*
+ 218:..\common\ud3core\tasks/tsk_fault.c **** 	 * Add and initialize local variables that are allocated on the Task stack
+ 219:..\common\ud3core\tasks/tsk_fault.c **** 	 * the the section below.
+ 220:..\common\ud3core\tasks/tsk_fault.c **** 	 */
+ 221:..\common\ud3core\tasks/tsk_fault.c **** 	/* `#START TASK_VARIABLES` */
+ 222:..\common\ud3core\tasks/tsk_fault.c **** 
+ 223:..\common\ud3core\tasks/tsk_fault.c **** 	/* `#END` */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 19
+
+
+ 224:..\common\ud3core\tasks/tsk_fault.c **** 
+ 225:..\common\ud3core\tasks/tsk_fault.c **** 	/*
+ 226:..\common\ud3core\tasks/tsk_fault.c **** 	 * Add the task initialzation code in the below merge region to be included
+ 227:..\common\ud3core\tasks/tsk_fault.c **** 	 * in the task.
+ 228:..\common\ud3core\tasks/tsk_fault.c **** 	 */
+ 229:..\common\ud3core\tasks/tsk_fault.c **** 	/* `#START TASK_INIT_CODE` */
+ 230:..\common\ud3core\tasks/tsk_fault.c ****     
+ 231:..\common\ud3core\tasks/tsk_fault.c ****     xWD_Timer = xTimerCreate("WD-Tmr", configuration.watchdog_timeout / portTICK_PERIOD_MS, pdFALSE
+ 721              		.loc 1 231 0
+ 722 0002 134B     		ldr	r3, .L91
+ 723 0004 134C     		ldr	r4, .L91+4
+ 724 0006 0093     		str	r3, [sp]
+ 725 0008 0023     		movs	r3, #0
+ 726 000a 1A46     		mov	r2, r3
+ 727 000c 6188     		ldrh	r1, [r4, #2]
+ 728 000e 1248     		ldr	r0, .L91+8
+ 729              	.LVL49:
+ 730 0010 FFF7FEFF 		bl	xTimerCreate
+ 731              	.LVL50:
+ 732 0014 114B     		ldr	r3, .L91+12
+ 733 0016 1860     		str	r0, [r3]
+ 232:..\common\ud3core\tasks/tsk_fault.c ****     
+ 233:..\common\ud3core\tasks/tsk_fault.c ****     WD_enable(configuration.watchdog);
+ 734              		.loc 1 233 0
+ 735 0018 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+ 736 001a FFF7FEFF 		bl	WD_enable
+ 737              	.LVL51:
+ 234:..\common\ud3core\tasks/tsk_fault.c ****     reset_fault();
+ 738              		.loc 1 234 0
+ 739 001e FFF7FEFF 		bl	reset_fault
+ 740              	.LVL52:
+ 235:..\common\ud3core\tasks/tsk_fault.c ****     alarm_push(ALM_PRIO_INFO, "TASK: Fault started", ALM_NO_VALUE);
+ 741              		.loc 1 235 0
+ 742 0022 4FF00042 		mov	r2, #-2147483648
+ 743 0026 0E49     		ldr	r1, .L91+16
+ 744 0028 0020     		movs	r0, #0
+ 745 002a FFF7FEFF 		bl	alarm_push
+ 746              	.LVL53:
+ 747              	.L90:
+ 236:..\common\ud3core\tasks/tsk_fault.c **** 	/* `#END` */
+ 237:..\common\ud3core\tasks/tsk_fault.c **** 	for (;;) {
+ 238:..\common\ud3core\tasks/tsk_fault.c **** 		/* `#START TASK_LOOP_CODE` */
+ 239:..\common\ud3core\tasks/tsk_fault.c **** 		handle_UVLO();
+ 748              		.loc 1 239 0 discriminator 1
+ 749 002e FFF7FEFF 		bl	handle_UVLO
+ 750              	.LVL54:
+ 240:..\common\ud3core\tasks/tsk_fault.c ****         handle_FAULT();
+ 751              		.loc 1 240 0 discriminator 1
+ 752 0032 FFF7FEFF 		bl	handle_FAULT
+ 753              	.LVL55:
+ 241:..\common\ud3core\tasks/tsk_fault.c ****         LED_com_Write(LED_OFF);
+ 754              		.loc 1 241 0 discriminator 1
+ 755 0036 94F86600 		ldrb	r0, [r4, #102]	@ zero_extendqisi2
+ 756 003a 0030     		adds	r0, r0, #0
+ 757 003c 18BF     		it	ne
+ 758 003e 0120     		movne	r0, #1
+ 759 0040 FFF7FEFF 		bl	LED_com_Write
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 20
+
+
+ 760              	.LVL56:
+ 242:..\common\ud3core\tasks/tsk_fault.c ****         handle_no_fb();
+ 761              		.loc 1 242 0 discriminator 1
+ 762 0044 FFF7FEFF 		bl	handle_no_fb
+ 763              	.LVL57:
+ 243:..\common\ud3core\tasks/tsk_fault.c **** 		/* `#END` */
+ 244:..\common\ud3core\tasks/tsk_fault.c **** 		vTaskDelay(FAULT_LOOP_SPEED_MS / portTICK_PERIOD_MS);
+ 764              		.loc 1 244 0 discriminator 1
+ 765 0048 3220     		movs	r0, #50
+ 766 004a FFF7FEFF 		bl	vTaskDelay
+ 767              	.LVL58:
+ 768 004e EEE7     		b	.L90
+ 769              	.L92:
+ 770              		.align	2
+ 771              	.L91:
+ 772 0050 00000000 		.word	vWD_Timer_Callback
+ 773 0054 00000000 		.word	configuration
+ 774 0058 3F000000 		.word	.LC3
+ 775 005c 00000000 		.word	xWD_Timer
+ 776 0060 46000000 		.word	.LC4
+ 777              		.cfi_endproc
+ 778              	.LFE80:
+ 779              		.size	tsk_fault_TaskProc, .-tsk_fault_TaskProc
+ 780              		.section	.text.tsk_fault_Start,"ax",%progbits
+ 781              		.align	1
+ 782              		.global	tsk_fault_Start
+ 783              		.thumb
+ 784              		.thumb_func
+ 785              		.type	tsk_fault_Start, %function
+ 786              	tsk_fault_Start:
+ 787              	.LFB81:
+ 245:..\common\ud3core\tasks/tsk_fault.c **** 	}
+ 246:..\common\ud3core\tasks/tsk_fault.c **** }
+ 247:..\common\ud3core\tasks/tsk_fault.c **** /* ------------------------------------------------------------------------ */
+ 248:..\common\ud3core\tasks/tsk_fault.c **** void tsk_fault_Start(void) {
+ 788              		.loc 1 248 0
+ 789              		.cfi_startproc
+ 790              		@ args = 0, pretend = 0, frame = 0
+ 791              		@ frame_needed = 0, uses_anonymous_args = 0
+ 792 0000 13B5     		push	{r0, r1, r4, lr}
+ 793              		.cfi_def_cfa_offset 16
+ 794              		.cfi_offset 4, -8
+ 795              		.cfi_offset 14, -4
+ 249:..\common\ud3core\tasks/tsk_fault.c **** 	/*
+ 250:..\common\ud3core\tasks/tsk_fault.c **** 	 * Insert task global memeory initialization here. Since the OS does not
+ 251:..\common\ud3core\tasks/tsk_fault.c **** 	 * initialize ANY global memory, execute the initialization here to make
+ 252:..\common\ud3core\tasks/tsk_fault.c **** 	 * sure that your task data is properly 
+ 253:..\common\ud3core\tasks/tsk_fault.c **** 	 */
+ 254:..\common\ud3core\tasks/tsk_fault.c **** 	/* `#START TASK_GLOBAL_INIT` */
+ 255:..\common\ud3core\tasks/tsk_fault.c ****     
+ 256:..\common\ud3core\tasks/tsk_fault.c ****     
+ 257:..\common\ud3core\tasks/tsk_fault.c **** 
+ 258:..\common\ud3core\tasks/tsk_fault.c **** 	/* `#END` */
+ 259:..\common\ud3core\tasks/tsk_fault.c **** 
+ 260:..\common\ud3core\tasks/tsk_fault.c **** 	if (tsk_fault_initVar != 1) {
+ 796              		.loc 1 260 0
+ 797 0002 094C     		ldr	r4, .L98
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 21
+
+
+ 798 0004 237A     		ldrb	r3, [r4, #8]	@ zero_extendqisi2
+ 799 0006 012B     		cmp	r3, #1
+ 800 0008 0BD0     		beq	.L93
+ 261:..\common\ud3core\tasks/tsk_fault.c **** 
+ 262:..\common\ud3core\tasks/tsk_fault.c **** 		/*
+ 263:..\common\ud3core\tasks/tsk_fault.c **** 	 	* Create the task and then leave. When FreeRTOS starts up the scheduler
+ 264:..\common\ud3core\tasks/tsk_fault.c **** 	 	* will call the task procedure and start execution of the task.
+ 265:..\common\ud3core\tasks/tsk_fault.c **** 	 	*/
+ 266:..\common\ud3core\tasks/tsk_fault.c **** 		xTaskCreate(tsk_fault_TaskProc, "Fault-Svc", STACK_FAULT, NULL, PRIO_FAULT, &tsk_fault_TaskHandle
+ 801              		.loc 1 266 0
+ 802 000a 084B     		ldr	r3, .L98+4
+ 803 000c 6422     		movs	r2, #100
+ 804 000e 0193     		str	r3, [sp, #4]
+ 805 0010 0423     		movs	r3, #4
+ 806 0012 0093     		str	r3, [sp]
+ 807 0014 0649     		ldr	r1, .L98+8
+ 808 0016 0023     		movs	r3, #0
+ 809 0018 0648     		ldr	r0, .L98+12
+ 810 001a FFF7FEFF 		bl	xTaskCreate
+ 811              	.LVL59:
+ 267:..\common\ud3core\tasks/tsk_fault.c **** 		tsk_fault_initVar = 1;
+ 812              		.loc 1 267 0
+ 813 001e 0123     		movs	r3, #1
+ 814 0020 2372     		strb	r3, [r4, #8]
+ 815              	.L93:
+ 268:..\common\ud3core\tasks/tsk_fault.c **** 	}
+ 269:..\common\ud3core\tasks/tsk_fault.c **** }
+ 816              		.loc 1 269 0
+ 817 0022 02B0     		add	sp, sp, #8
+ 818              		.cfi_def_cfa_offset 8
+ 819              		@ sp needed
+ 820 0024 10BD     		pop	{r4, pc}
+ 821              	.L99:
+ 822 0026 00BF     		.align	2
+ 823              	.L98:
+ 824 0028 00000000 		.word	.LANCHOR0
+ 825 002c 00000000 		.word	tsk_fault_TaskHandle
+ 826 0030 5A000000 		.word	.LC5
+ 827 0034 00000000 		.word	tsk_fault_TaskProc
+ 828              		.cfi_endproc
+ 829              	.LFE81:
+ 830              		.size	tsk_fault_Start, .-tsk_fault_Start
+ 831              		.global	feedback_error_cnt
+ 832              		.global	switch_without_fb
+ 833              		.comm	sysfault,11,1
+ 834              		.comm	xWD_Timer,4,4
+ 835              		.comm	bus_command,1,1
+ 836              		.comm	interrupter,12,4
+ 837              		.global	tsk_fault_initVar
+ 838              		.comm	tsk_fault_TaskHandle,4,4
+ 839              		.comm	ct1_dac_val,3,1
+ 840              		.comm	params,26,2
+ 841              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 842              	.LC0:
+ 843 0000 57443A20 		.ascii	"WD: Watchdog triggered\000"
+ 843      57617463 
+ 843      68646F67 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 22
+
+
+ 843      20747269 
+ 843      67676572 
+ 844              	.LC1:
+ 845 0017 44524956 		.ascii	"DRIVER: Undervoltage\000"
+ 845      45523A20 
+ 845      556E6465 
+ 845      72766F6C 
+ 845      74616765 
+ 846              	.LC2:
+ 847 002c 4641554C 		.ascii	"FAULT: No Feedback\000"
+ 847      543A204E 
+ 847      6F204665 
+ 847      65646261 
+ 847      636B00
+ 848              	.LC3:
+ 849 003f 57442D54 		.ascii	"WD-Tmr\000"
+ 849      6D7200
+ 850              	.LC4:
+ 851 0046 5441534B 		.ascii	"TASK: Fault started\000"
+ 851      3A204661 
+ 851      756C7420 
+ 851      73746172 
+ 851      74656400 
+ 852              	.LC5:
+ 853 005a 4661756C 		.ascii	"Fault-Svc\000"
+ 853      742D5376 
+ 853      6300
+ 854              		.data
+ 855              		.set	.LANCHOR1,. + 0
+ 856              		.type	fb_error_timer.9853, %object
+ 857              		.size	fb_error_timer.9853, 1
+ 858              	fb_error_timer.9853:
+ 859 0000 14       		.byte	20
+ 860              		.bss
+ 861              		.align	2
+ 862              		.set	.LANCHOR0,. + 0
+ 863              		.type	switch_without_fb, %object
+ 864              		.size	switch_without_fb, 4
+ 865              	switch_without_fb:
+ 866 0000 00000000 		.space	4
+ 867              		.type	feedback_error_cnt, %object
+ 868              		.size	feedback_error_cnt, 4
+ 869              	feedback_error_cnt:
+ 870 0004 00000000 		.space	4
+ 871              		.type	tsk_fault_initVar, %object
+ 872              		.size	tsk_fault_initVar, 1
+ 873              	tsk_fault_initVar:
+ 874 0008 00       		.space	1
+ 875              		.text
+ 876              	.Letext0:
+ 877              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 878              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 879              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 880              		.file 5 "..\\common\\ud3core\\tasks\\tsk_fault.h"
+ 881              		.file 6 "..\\common\\rtos\\portable\\GCC\\ARM_CM3/portmacro.h"
+ 882              		.file 7 "..\\common\\rtos\\include/task.h"
+ 883              		.file 8 "..\\common\\ud3core/ZCDtoPWM.h"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 23
+
+
+ 884              		.file 9 "..\\common\\rtos\\include/timers.h"
+ 885              		.file 10 "..\\common\\ud3core/cli_common.h"
+ 886              		.file 11 "..\\common\\ud3core/interrupter.h"
+ 887              		.file 12 "..\\common\\ud3core/telemetry.h"
+ 888              		.file 13 "Generated_Source\\PSoC5/core_cm3.h"
+ 889              		.file 14 "..\\common\\ud3core\\tasks\\tsk_analog.h"
+ 890              		.file 15 "..\\common\\ud3core/alarmevent.h"
+ 891              		.file 16 "..\\common\\ud3core\\tasks\\tsk_midi.h"
+ 892              		.file 17 "Generated_Source\\PSoC5/UVLO.h"
+ 893              		.file 18 "Generated_Source\\PSoC5/CyLib.h"
+ 894              		.file 19 "Generated_Source\\PSoC5/LED_sysfault.h"
+ 895              		.file 20 "Generated_Source\\PSoC5/no_fb_reg.h"
+ 896              		.file 21 "Generated_Source\\PSoC5/LED_com.h"
+ 897              		.section	.debug_info,"",%progbits
+ 898              	.Ldebug_info0:
+ 899 0000 1F0E0000 		.4byte	0xe1f
+ 900 0004 0400     		.2byte	0x4
+ 901 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 902 000a 04       		.byte	0x4
+ 903 000b 01       		.uleb128 0x1
+ 904 000c 41030000 		.4byte	.LASF212
+ 905 0010 0C       		.byte	0xc
+ 906 0011 5A040000 		.4byte	.LASF213
+ 907 0015 AA000000 		.4byte	.LASF214
+ 908 0019 30000000 		.4byte	.Ldebug_ranges0+0x30
+ 909 001d 00000000 		.4byte	0
+ 910 0021 00000000 		.4byte	.Ldebug_line0
+ 911 0025 02       		.uleb128 0x2
+ 912 0026 04       		.byte	0x4
+ 913 0027 07       		.byte	0x7
+ 914 0028 19010000 		.4byte	.LASF0
+ 915 002c 03       		.uleb128 0x3
+ 916 002d 3D010000 		.4byte	.LASF2
+ 917 0031 02       		.byte	0x2
+ 918 0032 1B       		.byte	0x1b
+ 919 0033 37000000 		.4byte	0x37
+ 920 0037 02       		.uleb128 0x2
+ 921 0038 01       		.byte	0x1
+ 922 0039 06       		.byte	0x6
+ 923 003a 75010000 		.4byte	.LASF1
+ 924 003e 03       		.uleb128 0x3
+ 925 003f 31000000 		.4byte	.LASF3
+ 926 0043 02       		.byte	0x2
+ 927 0044 1D       		.byte	0x1d
+ 928 0045 49000000 		.4byte	0x49
+ 929 0049 02       		.uleb128 0x2
+ 930 004a 01       		.byte	0x1
+ 931 004b 08       		.byte	0x8
+ 932 004c 33070000 		.4byte	.LASF4
+ 933 0050 03       		.uleb128 0x3
+ 934 0051 DA030000 		.4byte	.LASF5
+ 935 0055 02       		.byte	0x2
+ 936 0056 29       		.byte	0x29
+ 937 0057 5B000000 		.4byte	0x5b
+ 938 005b 02       		.uleb128 0x2
+ 939 005c 02       		.byte	0x2
+ 940 005d 05       		.byte	0x5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 24
+
+
+ 941 005e 7A020000 		.4byte	.LASF6
+ 942 0062 03       		.uleb128 0x3
+ 943 0063 62080000 		.4byte	.LASF7
+ 944 0067 02       		.byte	0x2
+ 945 0068 2B       		.byte	0x2b
+ 946 0069 6D000000 		.4byte	0x6d
+ 947 006d 02       		.uleb128 0x2
+ 948 006e 02       		.byte	0x2
+ 949 006f 07       		.byte	0x7
+ 950 0070 2D090000 		.4byte	.LASF8
+ 951 0074 03       		.uleb128 0x3
+ 952 0075 09050000 		.4byte	.LASF9
+ 953 0079 02       		.byte	0x2
+ 954 007a 3F       		.byte	0x3f
+ 955 007b 7F000000 		.4byte	0x7f
+ 956 007f 02       		.uleb128 0x2
+ 957 0080 04       		.byte	0x4
+ 958 0081 05       		.byte	0x5
+ 959 0082 F1010000 		.4byte	.LASF10
+ 960 0086 03       		.uleb128 0x3
+ 961 0087 2C030000 		.4byte	.LASF11
+ 962 008b 02       		.byte	0x2
+ 963 008c 41       		.byte	0x41
+ 964 008d 91000000 		.4byte	0x91
+ 965 0091 02       		.uleb128 0x2
+ 966 0092 04       		.byte	0x4
+ 967 0093 07       		.byte	0x7
+ 968 0094 3A040000 		.4byte	.LASF12
+ 969 0098 02       		.uleb128 0x2
+ 970 0099 08       		.byte	0x8
+ 971 009a 05       		.byte	0x5
+ 972 009b 67010000 		.4byte	.LASF13
+ 973 009f 02       		.uleb128 0x2
+ 974 00a0 08       		.byte	0x8
+ 975 00a1 07       		.byte	0x7
+ 976 00a2 CF000000 		.4byte	.LASF14
+ 977 00a6 04       		.uleb128 0x4
+ 978 00a7 04       		.byte	0x4
+ 979 00a8 05       		.byte	0x5
+ 980 00a9 696E7400 		.ascii	"int\000"
+ 981 00ad 03       		.uleb128 0x3
+ 982 00ae 6B090000 		.4byte	.LASF15
+ 983 00b2 03       		.byte	0x3
+ 984 00b3 14       		.byte	0x14
+ 985 00b4 2C000000 		.4byte	0x2c
+ 986 00b8 03       		.uleb128 0x3
+ 987 00b9 190A0000 		.4byte	.LASF16
+ 988 00bd 03       		.byte	0x3
+ 989 00be 18       		.byte	0x18
+ 990 00bf 3E000000 		.4byte	0x3e
+ 991 00c3 03       		.uleb128 0x3
+ 992 00c4 5F010000 		.4byte	.LASF17
+ 993 00c8 03       		.byte	0x3
+ 994 00c9 20       		.byte	0x20
+ 995 00ca 50000000 		.4byte	0x50
+ 996 00ce 03       		.uleb128 0x3
+ 997 00cf FD030000 		.4byte	.LASF18
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 25
+
+
+ 998 00d3 03       		.byte	0x3
+ 999 00d4 24       		.byte	0x24
+ 1000 00d5 62000000 		.4byte	0x62
+ 1001 00d9 03       		.uleb128 0x3
+ 1002 00da 2B070000 		.4byte	.LASF19
+ 1003 00de 03       		.byte	0x3
+ 1004 00df 2C       		.byte	0x2c
+ 1005 00e0 74000000 		.4byte	0x74
+ 1006 00e4 03       		.uleb128 0x3
+ 1007 00e5 FC070000 		.4byte	.LASF20
+ 1008 00e9 03       		.byte	0x3
+ 1009 00ea 30       		.byte	0x30
+ 1010 00eb 86000000 		.4byte	0x86
+ 1011 00ef 05       		.uleb128 0x5
+ 1012 00f0 69020000 		.4byte	.LASF21
+ 1013 00f4 04       		.byte	0x4
+ 1014 00f5 9201     		.2byte	0x192
+ 1015 00f7 49000000 		.4byte	0x49
+ 1016 00fb 05       		.uleb128 0x5
+ 1017 00fc 00000000 		.4byte	.LASF22
+ 1018 0100 04       		.byte	0x4
+ 1019 0101 9301     		.2byte	0x193
+ 1020 0103 6D000000 		.4byte	0x6d
+ 1021 0107 02       		.uleb128 0x2
+ 1022 0108 04       		.byte	0x4
+ 1023 0109 04       		.byte	0x4
+ 1024 010a B5060000 		.4byte	.LASF23
+ 1025 010e 02       		.uleb128 0x2
+ 1026 010f 08       		.byte	0x8
+ 1027 0110 04       		.byte	0x4
+ 1028 0111 A9020000 		.4byte	.LASF24
+ 1029 0115 02       		.uleb128 0x2
+ 1030 0116 01       		.byte	0x1
+ 1031 0117 08       		.byte	0x8
+ 1032 0118 1F080000 		.4byte	.LASF25
+ 1033 011c 05       		.uleb128 0x5
+ 1034 011d A7010000 		.4byte	.LASF26
+ 1035 0121 04       		.byte	0x4
+ 1036 0122 3C02     		.2byte	0x23c
+ 1037 0124 28010000 		.4byte	0x128
+ 1038 0128 06       		.uleb128 0x6
+ 1039 0129 EF000000 		.4byte	0xef
+ 1040 012d 02       		.uleb128 0x2
+ 1041 012e 04       		.byte	0x4
+ 1042 012f 07       		.byte	0x7
+ 1043 0130 C8050000 		.4byte	.LASF27
+ 1044 0134 07       		.uleb128 0x7
+ 1045 0135 04       		.byte	0x4
+ 1046 0136 08       		.uleb128 0x8
+ 1047 0137 04       		.byte	0x4
+ 1048 0138 15010000 		.4byte	0x115
+ 1049 013c 09       		.uleb128 0x9
+ 1050 013d 24000000 		.4byte	.LASF61
+ 1051 0141 0B       		.byte	0xb
+ 1052 0142 05       		.byte	0x5
+ 1053 0143 25       		.byte	0x25
+ 1054 0144 CD010000 		.4byte	0x1cd
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 26
+
+
+ 1055 0148 0A       		.uleb128 0xa
+ 1056 0149 85050000 		.4byte	.LASF28
+ 1057 014d 05       		.byte	0x5
+ 1058 014e 26       		.byte	0x26
+ 1059 014f B8000000 		.4byte	0xb8
+ 1060 0153 00       		.byte	0
+ 1061 0154 0A       		.uleb128 0xa
+ 1062 0155 19080000 		.4byte	.LASF29
+ 1063 0159 05       		.byte	0x5
+ 1064 015a 27       		.byte	0x27
+ 1065 015b B8000000 		.4byte	0xb8
+ 1066 015f 01       		.byte	0x1
+ 1067 0160 0A       		.uleb128 0xa
+ 1068 0161 7D070000 		.4byte	.LASF30
+ 1069 0165 05       		.byte	0x5
+ 1070 0166 28       		.byte	0x28
+ 1071 0167 B8000000 		.4byte	0xb8
+ 1072 016b 02       		.byte	0x2
+ 1073 016c 0A       		.uleb128 0xa
+ 1074 016d 13050000 		.4byte	.LASF31
+ 1075 0171 05       		.byte	0x5
+ 1076 0172 29       		.byte	0x29
+ 1077 0173 B8000000 		.4byte	0xb8
+ 1078 0177 03       		.byte	0x3
+ 1079 0178 0A       		.uleb128 0xa
+ 1080 0179 7E040000 		.4byte	.LASF32
+ 1081 017d 05       		.byte	0x5
+ 1082 017e 2A       		.byte	0x2a
+ 1083 017f B8000000 		.4byte	0xb8
+ 1084 0183 04       		.byte	0x4
+ 1085 0184 0A       		.uleb128 0xa
+ 1086 0185 6B060000 		.4byte	.LASF33
+ 1087 0189 05       		.byte	0x5
+ 1088 018a 2B       		.byte	0x2b
+ 1089 018b B8000000 		.4byte	0xb8
+ 1090 018f 05       		.byte	0x5
+ 1091 0190 0A       		.uleb128 0xa
+ 1092 0191 8A090000 		.4byte	.LASF34
+ 1093 0195 05       		.byte	0x5
+ 1094 0196 2C       		.byte	0x2c
+ 1095 0197 B8000000 		.4byte	0xb8
+ 1096 019b 06       		.byte	0x6
+ 1097 019c 0A       		.uleb128 0xa
+ 1098 019d 12080000 		.4byte	.LASF35
+ 1099 01a1 05       		.byte	0x5
+ 1100 01a2 2D       		.byte	0x2d
+ 1101 01a3 B8000000 		.4byte	0xb8
+ 1102 01a7 07       		.byte	0x7
+ 1103 01a8 0A       		.uleb128 0xa
+ 1104 01a9 12030000 		.4byte	.LASF36
+ 1105 01ad 05       		.byte	0x5
+ 1106 01ae 2E       		.byte	0x2e
+ 1107 01af B8000000 		.4byte	0xb8
+ 1108 01b3 08       		.byte	0x8
+ 1109 01b4 0A       		.uleb128 0xa
+ 1110 01b5 0E0A0000 		.4byte	.LASF37
+ 1111 01b9 05       		.byte	0x5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 27
+
+
+ 1112 01ba 2F       		.byte	0x2f
+ 1113 01bb B8000000 		.4byte	0xb8
+ 1114 01bf 09       		.byte	0x9
+ 1115 01c0 0A       		.uleb128 0xa
+ 1116 01c1 A5040000 		.4byte	.LASF38
+ 1117 01c5 05       		.byte	0x5
+ 1118 01c6 30       		.byte	0x30
+ 1119 01c7 B8000000 		.4byte	0xb8
+ 1120 01cb 0A       		.byte	0xa
+ 1121 01cc 00       		.byte	0
+ 1122 01cd 03       		.uleb128 0x3
+ 1123 01ce AF090000 		.4byte	.LASF39
+ 1124 01d2 05       		.byte	0x5
+ 1125 01d3 31       		.byte	0x31
+ 1126 01d4 3C010000 		.4byte	0x13c
+ 1127 01d8 03       		.uleb128 0x3
+ 1128 01d9 BF020000 		.4byte	.LASF40
+ 1129 01dd 06       		.byte	0x6
+ 1130 01de 38       		.byte	0x38
+ 1131 01df 7F000000 		.4byte	0x7f
+ 1132 01e3 03       		.uleb128 0x3
+ 1133 01e4 6F020000 		.4byte	.LASF41
+ 1134 01e8 06       		.byte	0x6
+ 1135 01e9 3F       		.byte	0x3f
+ 1136 01ea E4000000 		.4byte	0xe4
+ 1137 01ee 03       		.uleb128 0x3
+ 1138 01ef 5C020000 		.4byte	.LASF42
+ 1139 01f3 07       		.byte	0x7
+ 1140 01f4 4E       		.byte	0x4e
+ 1141 01f5 F9010000 		.4byte	0x1f9
+ 1142 01f9 08       		.uleb128 0x8
+ 1143 01fa 04       		.byte	0x4
+ 1144 01fb FF010000 		.4byte	0x1ff
+ 1145 01ff 0B       		.uleb128 0xb
+ 1146 0200 FA010000 		.4byte	.LASF59
+ 1147 0204 06       		.uleb128 0x6
+ 1148 0205 D9000000 		.4byte	0xd9
+ 1149 0209 0C       		.uleb128 0xc
+ 1150 020a 1A       		.byte	0x1a
+ 1151 020b 08       		.byte	0x8
+ 1152 020c 21       		.byte	0x21
+ 1153 020d BA020000 		.4byte	0x2ba
+ 1154 0211 0A       		.uleb128 0xa
+ 1155 0212 9C070000 		.4byte	.LASF43
+ 1156 0216 08       		.byte	0x8
+ 1157 0217 23       		.byte	0x23
+ 1158 0218 EF000000 		.4byte	0xef
+ 1159 021c 00       		.byte	0
+ 1160 021d 0A       		.uleb128 0xa
+ 1161 021e AA0A0000 		.4byte	.LASF44
+ 1162 0222 08       		.byte	0x8
+ 1163 0223 24       		.byte	0x24
+ 1164 0224 FB000000 		.4byte	0xfb
+ 1165 0228 02       		.byte	0x2
+ 1166 0229 0A       		.uleb128 0xa
+ 1167 022a 78080000 		.4byte	.LASF45
+ 1168 022e 08       		.byte	0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 28
+
+
+ 1169 022f 25       		.byte	0x25
+ 1170 0230 FB000000 		.4byte	0xfb
+ 1171 0234 04       		.byte	0x4
+ 1172 0235 0A       		.uleb128 0xa
+ 1173 0236 D1050000 		.4byte	.LASF46
+ 1174 023a 08       		.byte	0x8
+ 1175 023b 26       		.byte	0x26
+ 1176 023c FB000000 		.4byte	0xfb
+ 1177 0240 06       		.byte	0x6
+ 1178 0241 0A       		.uleb128 0xa
+ 1179 0242 84020000 		.4byte	.LASF47
+ 1180 0246 08       		.byte	0x8
+ 1181 0247 27       		.byte	0x27
+ 1182 0248 FB000000 		.4byte	0xfb
+ 1183 024c 08       		.byte	0x8
+ 1184 024d 0A       		.uleb128 0xa
+ 1185 024e BB010000 		.4byte	.LASF48
+ 1186 0252 08       		.byte	0x8
+ 1187 0253 28       		.byte	0x28
+ 1188 0254 FB000000 		.4byte	0xfb
+ 1189 0258 0A       		.byte	0xa
+ 1190 0259 0A       		.uleb128 0xa
+ 1191 025a 0C010000 		.4byte	.LASF49
+ 1192 025e 08       		.byte	0x8
+ 1193 025f 29       		.byte	0x29
+ 1194 0260 FB000000 		.4byte	0xfb
+ 1195 0264 0C       		.byte	0xc
+ 1196 0265 0A       		.uleb128 0xa
+ 1197 0266 55080000 		.4byte	.LASF50
+ 1198 026a 08       		.byte	0x8
+ 1199 026b 2A       		.byte	0x2a
+ 1200 026c FB000000 		.4byte	0xfb
+ 1201 0270 0E       		.byte	0xe
+ 1202 0271 0A       		.uleb128 0xa
+ 1203 0272 18050000 		.4byte	.LASF51
+ 1204 0276 08       		.byte	0x8
+ 1205 0277 2B       		.byte	0x2b
+ 1206 0278 FB000000 		.4byte	0xfb
+ 1207 027c 10       		.byte	0x10
+ 1208 027d 0A       		.uleb128 0xa
+ 1209 027e AE040000 		.4byte	.LASF52
+ 1210 0282 08       		.byte	0x8
+ 1211 0283 2C       		.byte	0x2c
+ 1212 0284 FB000000 		.4byte	0xfb
+ 1213 0288 12       		.byte	0x12
+ 1214 0289 0A       		.uleb128 0xa
+ 1215 028a D1010000 		.4byte	.LASF53
+ 1216 028e 08       		.byte	0x8
+ 1217 028f 2D       		.byte	0x2d
+ 1218 0290 EF000000 		.4byte	0xef
+ 1219 0294 14       		.byte	0x14
+ 1220 0295 0A       		.uleb128 0xa
+ 1221 0296 1A090000 		.4byte	.LASF54
+ 1222 029a 08       		.byte	0x8
+ 1223 029b 2E       		.byte	0x2e
+ 1224 029c EF000000 		.4byte	0xef
+ 1225 02a0 15       		.byte	0x15
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 29
+
+
+ 1226 02a1 0A       		.uleb128 0xa
+ 1227 02a2 C2090000 		.4byte	.LASF55
+ 1228 02a6 08       		.byte	0x8
+ 1229 02a7 2F       		.byte	0x2f
+ 1230 02a8 CE000000 		.4byte	0xce
+ 1231 02ac 16       		.byte	0x16
+ 1232 02ad 0A       		.uleb128 0xa
+ 1233 02ae 41070000 		.4byte	.LASF56
+ 1234 02b2 08       		.byte	0x8
+ 1235 02b3 30       		.byte	0x30
+ 1236 02b4 CE000000 		.4byte	0xce
+ 1237 02b8 18       		.byte	0x18
+ 1238 02b9 00       		.byte	0
+ 1239 02ba 03       		.uleb128 0x3
+ 1240 02bb 26010000 		.4byte	.LASF57
+ 1241 02bf 08       		.byte	0x8
+ 1242 02c0 31       		.byte	0x31
+ 1243 02c1 09020000 		.4byte	0x209
+ 1244 02c5 03       		.uleb128 0x3
+ 1245 02c6 4C040000 		.4byte	.LASF58
+ 1246 02ca 09       		.byte	0x9
+ 1247 02cb 4E       		.byte	0x4e
+ 1248 02cc D0020000 		.4byte	0x2d0
+ 1249 02d0 08       		.uleb128 0x8
+ 1250 02d1 04       		.byte	0x4
+ 1251 02d2 D6020000 		.4byte	0x2d6
+ 1252 02d6 0B       		.uleb128 0xb
+ 1253 02d7 78000000 		.4byte	.LASF60
+ 1254 02db 09       		.uleb128 0x9
+ 1255 02dc EA030000 		.4byte	.LASF62
+ 1256 02e0 7C       		.byte	0x7c
+ 1257 02e1 0A       		.byte	0xa
+ 1258 02e2 4B       		.byte	0x4b
+ 1259 02e3 88050000 		.4byte	0x588
+ 1260 02e7 0A       		.uleb128 0xa
+ 1261 02e8 6B060000 		.4byte	.LASF33
+ 1262 02ec 0A       		.byte	0xa
+ 1263 02ed 4C       		.byte	0x4c
+ 1264 02ee B8000000 		.4byte	0xb8
+ 1265 02f2 00       		.byte	0
+ 1266 02f3 0A       		.uleb128 0xa
+ 1267 02f4 32020000 		.4byte	.LASF63
+ 1268 02f8 0A       		.byte	0xa
+ 1269 02f9 4D       		.byte	0x4d
+ 1270 02fa CE000000 		.4byte	0xce
+ 1271 02fe 02       		.byte	0x2
+ 1272 02ff 0A       		.uleb128 0xa
+ 1273 0300 D6060000 		.4byte	.LASF64
+ 1274 0304 0A       		.byte	0xa
+ 1275 0305 4E       		.byte	0x4e
+ 1276 0306 CE000000 		.4byte	0xce
+ 1277 030a 04       		.byte	0x4
+ 1278 030b 0A       		.uleb128 0xa
+ 1279 030c 6D080000 		.4byte	.LASF65
+ 1280 0310 0A       		.byte	0xa
+ 1281 0311 4F       		.byte	0x4f
+ 1282 0312 CE000000 		.4byte	0xce
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 30
+
+
+ 1283 0316 06       		.byte	0x6
+ 1284 0317 0A       		.uleb128 0xa
+ 1285 0318 E8090000 		.4byte	.LASF66
+ 1286 031c 0A       		.byte	0xa
+ 1287 031d 50       		.byte	0x50
+ 1288 031e CE000000 		.4byte	0xce
+ 1289 0322 08       		.byte	0x8
+ 1290 0323 0A       		.uleb128 0xa
+ 1291 0324 9A020000 		.4byte	.LASF67
+ 1292 0328 0A       		.byte	0xa
+ 1293 0329 51       		.byte	0x51
+ 1294 032a CE000000 		.4byte	0xce
+ 1295 032e 0A       		.byte	0xa
+ 1296 032f 0A       		.uleb128 0xa
+ 1297 0330 11070000 		.4byte	.LASF68
+ 1298 0334 0A       		.byte	0xa
+ 1299 0335 52       		.byte	0x52
+ 1300 0336 CE000000 		.4byte	0xce
+ 1301 033a 0C       		.byte	0xc
+ 1302 033b 0A       		.uleb128 0xa
+ 1303 033c C6060000 		.4byte	.LASF69
+ 1304 0340 0A       		.byte	0xa
+ 1305 0341 53       		.byte	0x53
+ 1306 0342 CE000000 		.4byte	0xce
+ 1307 0346 0E       		.byte	0xe
+ 1308 0347 0A       		.uleb128 0xa
+ 1309 0348 85040000 		.4byte	.LASF70
+ 1310 034c 0A       		.byte	0xa
+ 1311 034d 54       		.byte	0x54
+ 1312 034e B8000000 		.4byte	0xb8
+ 1313 0352 10       		.byte	0x10
+ 1314 0353 0A       		.uleb128 0xa
+ 1315 0354 B90A0000 		.4byte	.LASF71
+ 1316 0358 0A       		.byte	0xa
+ 1317 0359 55       		.byte	0x55
+ 1318 035a B8000000 		.4byte	0xb8
+ 1319 035e 11       		.byte	0x11
+ 1320 035f 0A       		.uleb128 0xa
+ 1321 0360 07070000 		.4byte	.LASF72
+ 1322 0364 0A       		.byte	0xa
+ 1323 0365 56       		.byte	0x56
+ 1324 0366 CE000000 		.4byte	0xce
+ 1325 036a 12       		.byte	0x12
+ 1326 036b 0A       		.uleb128 0xa
+ 1327 036c 96040000 		.4byte	.LASF73
+ 1328 0370 0A       		.byte	0xa
+ 1329 0371 57       		.byte	0x57
+ 1330 0372 CE000000 		.4byte	0xce
+ 1331 0376 14       		.byte	0x14
+ 1332 0377 0A       		.uleb128 0xa
+ 1333 0378 E7070000 		.4byte	.LASF74
+ 1334 037c 0A       		.byte	0xa
+ 1335 037d 58       		.byte	0x58
+ 1336 037e CE000000 		.4byte	0xce
+ 1337 0382 16       		.byte	0x16
+ 1338 0383 0A       		.uleb128 0xa
+ 1339 0384 BB060000 		.4byte	.LASF75
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 31
+
+
+ 1340 0388 0A       		.byte	0xa
+ 1341 0389 59       		.byte	0x59
+ 1342 038a CE000000 		.4byte	0xce
+ 1343 038e 18       		.byte	0x18
+ 1344 038f 0A       		.uleb128 0xa
+ 1345 0390 37030000 		.4byte	.LASF76
+ 1346 0394 0A       		.byte	0xa
+ 1347 0395 5A       		.byte	0x5a
+ 1348 0396 CE000000 		.4byte	0xce
+ 1349 039a 1A       		.byte	0x1a
+ 1350 039b 0A       		.uleb128 0xa
+ 1351 039c CB070000 		.4byte	.LASF77
+ 1352 03a0 0A       		.byte	0xa
+ 1353 03a1 5B       		.byte	0x5b
+ 1354 03a2 CE000000 		.4byte	0xce
+ 1355 03a6 1C       		.byte	0x1c
+ 1356 03a7 0A       		.uleb128 0xa
+ 1357 03a8 820A0000 		.4byte	.LASF78
+ 1358 03ac 0A       		.byte	0xa
+ 1359 03ad 5C       		.byte	0x5c
+ 1360 03ae B8000000 		.4byte	0xb8
+ 1361 03b2 1E       		.byte	0x1e
+ 1362 03b3 0A       		.uleb128 0xa
+ 1363 03b4 A5050000 		.4byte	.LASF79
+ 1364 03b8 0A       		.byte	0xa
+ 1365 03b9 5D       		.byte	0x5d
+ 1366 03ba CE000000 		.4byte	0xce
+ 1367 03be 20       		.byte	0x20
+ 1368 03bf 0A       		.uleb128 0xa
+ 1369 03c0 40090000 		.4byte	.LASF80
+ 1370 03c4 0A       		.byte	0xa
+ 1371 03c5 5E       		.byte	0x5e
+ 1372 03c6 CE000000 		.4byte	0xce
+ 1373 03ca 22       		.byte	0x22
+ 1374 03cb 0A       		.uleb128 0xa
+ 1375 03cc E8020000 		.4byte	.LASF81
+ 1376 03d0 0A       		.byte	0xa
+ 1377 03d1 5F       		.byte	0x5f
+ 1378 03d2 CE000000 		.4byte	0xce
+ 1379 03d6 24       		.byte	0x24
+ 1380 03d7 0A       		.uleb128 0xa
+ 1381 03d8 F7020000 		.4byte	.LASF82
+ 1382 03dc 0A       		.byte	0xa
+ 1383 03dd 60       		.byte	0x60
+ 1384 03de CE000000 		.4byte	0xce
+ 1385 03e2 26       		.byte	0x26
+ 1386 03e3 0A       		.uleb128 0xa
+ 1387 03e4 D4020000 		.4byte	.LASF83
+ 1388 03e8 0A       		.byte	0xa
+ 1389 03e9 61       		.byte	0x61
+ 1390 03ea CE000000 		.4byte	0xce
+ 1391 03ee 28       		.byte	0x28
+ 1392 03ef 0A       		.uleb128 0xa
+ 1393 03f0 4D000000 		.4byte	.LASF84
+ 1394 03f4 0A       		.byte	0xa
+ 1395 03f5 62       		.byte	0x62
+ 1396 03f6 B8000000 		.4byte	0xb8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 32
+
+
+ 1397 03fa 2A       		.byte	0x2a
+ 1398 03fb 0A       		.uleb128 0xa
+ 1399 03fc 5F0A0000 		.4byte	.LASF85
+ 1400 0400 0A       		.byte	0xa
+ 1401 0401 63       		.byte	0x63
+ 1402 0402 07010000 		.4byte	0x107
+ 1403 0406 2C       		.byte	0x2c
+ 1404 0407 0A       		.uleb128 0xa
+ 1405 0408 3B0A0000 		.4byte	.LASF86
+ 1406 040c 0A       		.byte	0xa
+ 1407 040d 64       		.byte	0x64
+ 1408 040e 07010000 		.4byte	0x107
+ 1409 0412 30       		.byte	0x30
+ 1410 0413 0A       		.uleb128 0xa
+ 1411 0414 20070000 		.4byte	.LASF87
+ 1412 0418 0A       		.byte	0xa
+ 1413 0419 65       		.byte	0x65
+ 1414 041a B8000000 		.4byte	0xb8
+ 1415 041e 34       		.byte	0x34
+ 1416 041f 0A       		.uleb128 0xa
+ 1417 0420 F2070000 		.4byte	.LASF88
+ 1418 0424 0A       		.byte	0xa
+ 1419 0425 66       		.byte	0x66
+ 1420 0426 B8000000 		.4byte	0xb8
+ 1421 042a 35       		.byte	0x35
+ 1422 042b 0A       		.uleb128 0xa
+ 1423 042c 50070000 		.4byte	.LASF89
+ 1424 0430 0A       		.byte	0xa
+ 1425 0431 67       		.byte	0x67
+ 1426 0432 B8000000 		.4byte	0xb8
+ 1427 0436 36       		.byte	0x36
+ 1428 0437 0A       		.uleb128 0xa
+ 1429 0438 F6060000 		.4byte	.LASF90
+ 1430 043c 0A       		.byte	0xa
+ 1431 043d 68       		.byte	0x68
+ 1432 043e 88050000 		.4byte	0x588
+ 1433 0442 37       		.byte	0x37
+ 1434 0443 0A       		.uleb128 0xa
+ 1435 0444 9E010000 		.4byte	.LASF91
+ 1436 0448 0A       		.byte	0xa
+ 1437 0449 69       		.byte	0x69
+ 1438 044a E4000000 		.4byte	0xe4
+ 1439 044e 48       		.byte	0x48
+ 1440 044f 0A       		.uleb128 0xa
+ 1441 0450 1C020000 		.4byte	.LASF92
+ 1442 0454 0A       		.byte	0xa
+ 1443 0455 6A       		.byte	0x6a
+ 1444 0456 B8000000 		.4byte	0xb8
+ 1445 045a 4C       		.byte	0x4c
+ 1446 045b 0A       		.uleb128 0xa
+ 1447 045c DC090000 		.4byte	.LASF93
+ 1448 0460 0A       		.byte	0xa
+ 1449 0461 6B       		.byte	0x6b
+ 1450 0462 CE000000 		.4byte	0xce
+ 1451 0466 4E       		.byte	0x4e
+ 1452 0467 0A       		.uleb128 0xa
+ 1453 0468 3E080000 		.4byte	.LASF94
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 33
+
+
+ 1454 046c 0A       		.byte	0xa
+ 1455 046d 6C       		.byte	0x6c
+ 1456 046e CE000000 		.4byte	0xce
+ 1457 0472 50       		.byte	0x50
+ 1458 0473 0A       		.uleb128 0xa
+ 1459 0474 AA060000 		.4byte	.LASF95
+ 1460 0478 0A       		.byte	0xa
+ 1461 0479 6D       		.byte	0x6d
+ 1462 047a CE000000 		.4byte	0xce
+ 1463 047e 52       		.byte	0x52
+ 1464 047f 0A       		.uleb128 0xa
+ 1465 0480 C3080000 		.4byte	.LASF96
+ 1466 0484 0A       		.byte	0xa
+ 1467 0485 6E       		.byte	0x6e
+ 1468 0486 E4000000 		.4byte	0xe4
+ 1469 048a 54       		.byte	0x54
+ 1470 048b 0A       		.uleb128 0xa
+ 1471 048c 530A0000 		.4byte	.LASF97
+ 1472 0490 0A       		.byte	0xa
+ 1473 0491 6F       		.byte	0x6f
+ 1474 0492 CE000000 		.4byte	0xce
+ 1475 0496 58       		.byte	0x58
+ 1476 0497 0A       		.uleb128 0xa
+ 1477 0498 62090000 		.4byte	.LASF98
+ 1478 049c 0A       		.byte	0xa
+ 1479 049d 70       		.byte	0x70
+ 1480 049e B8000000 		.4byte	0xb8
+ 1481 04a2 5A       		.byte	0x5a
+ 1482 04a3 0A       		.uleb128 0xa
+ 1483 04a4 87060000 		.4byte	.LASF99
+ 1484 04a8 0A       		.byte	0xa
+ 1485 04a9 71       		.byte	0x71
+ 1486 04aa B8000000 		.4byte	0xb8
+ 1487 04ae 5B       		.byte	0x5b
+ 1488 04af 0A       		.uleb128 0xa
+ 1489 04b0 05060000 		.4byte	.LASF100
+ 1490 04b4 0A       		.byte	0xa
+ 1491 04b5 72       		.byte	0x72
+ 1492 04b6 B8000000 		.4byte	0xb8
+ 1493 04ba 5C       		.byte	0x5c
+ 1494 04bb 0A       		.uleb128 0xa
+ 1495 04bc E9040000 		.4byte	.LASF101
+ 1496 04c0 0A       		.byte	0xa
+ 1497 04c1 73       		.byte	0x73
+ 1498 04c2 B8000000 		.4byte	0xb8
+ 1499 04c6 5D       		.byte	0x5d
+ 1500 04c7 0A       		.uleb128 0xa
+ 1501 04c8 C9080000 		.4byte	.LASF102
+ 1502 04cc 0A       		.byte	0xa
+ 1503 04cd 74       		.byte	0x74
+ 1504 04ce CE000000 		.4byte	0xce
+ 1505 04d2 5E       		.byte	0x5e
+ 1506 04d3 0A       		.uleb128 0xa
+ 1507 04d4 E0060000 		.4byte	.LASF103
+ 1508 04d8 0A       		.byte	0xa
+ 1509 04d9 75       		.byte	0x75
+ 1510 04da CE000000 		.4byte	0xce
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 34
+
+
+ 1511 04de 60       		.byte	0x60
+ 1512 04df 0A       		.uleb128 0xa
+ 1513 04e0 CC040000 		.4byte	.LASF104
+ 1514 04e4 0A       		.byte	0xa
+ 1515 04e5 76       		.byte	0x76
+ 1516 04e6 CE000000 		.4byte	0xce
+ 1517 04ea 62       		.byte	0x62
+ 1518 04eb 0A       		.uleb128 0xa
+ 1519 04ec AF080000 		.4byte	.LASF105
+ 1520 04f0 0A       		.byte	0xa
+ 1521 04f1 77       		.byte	0x77
+ 1522 04f2 CE000000 		.4byte	0xce
+ 1523 04f6 64       		.byte	0x64
+ 1524 04f7 0A       		.uleb128 0xa
+ 1525 04f8 E3080000 		.4byte	.LASF106
+ 1526 04fc 0A       		.byte	0xa
+ 1527 04fd 78       		.byte	0x78
+ 1528 04fe B8000000 		.4byte	0xb8
+ 1529 0502 66       		.byte	0x66
+ 1530 0503 0A       		.uleb128 0xa
+ 1531 0504 53010000 		.4byte	.LASF107
+ 1532 0508 0A       		.byte	0xa
+ 1533 0509 79       		.byte	0x79
+ 1534 050a CE000000 		.4byte	0xce
+ 1535 050e 68       		.byte	0x68
+ 1536 050f 0A       		.uleb128 0xa
+ 1537 0510 D6070000 		.4byte	.LASF108
+ 1538 0514 0A       		.byte	0xa
+ 1539 0515 7A       		.byte	0x7a
+ 1540 0516 07010000 		.4byte	0x107
+ 1541 051a 6C       		.byte	0x6c
+ 1542 051b 0A       		.uleb128 0xa
+ 1543 051c C30A0000 		.4byte	.LASF109
+ 1544 0520 0A       		.byte	0xa
+ 1545 0521 7B       		.byte	0x7b
+ 1546 0522 B8000000 		.4byte	0xb8
+ 1547 0526 70       		.byte	0x70
+ 1548 0527 0A       		.uleb128 0xa
+ 1549 0528 5B070000 		.4byte	.LASF110
+ 1550 052c 0A       		.byte	0xa
+ 1551 052d 7C       		.byte	0x7c
+ 1552 052e B8000000 		.4byte	0xb8
+ 1553 0532 71       		.byte	0x71
+ 1554 0533 0A       		.uleb128 0xa
+ 1555 0534 B4080000 		.4byte	.LASF111
+ 1556 0538 0A       		.byte	0xa
+ 1557 0539 7D       		.byte	0x7d
+ 1558 053a B8000000 		.4byte	0xb8
+ 1559 053e 72       		.byte	0x72
+ 1560 053f 0A       		.uleb128 0xa
+ 1561 0540 23060000 		.4byte	.LASF112
+ 1562 0544 0A       		.byte	0xa
+ 1563 0545 7F       		.byte	0x7f
+ 1564 0546 B8000000 		.4byte	0xb8
+ 1565 054a 73       		.byte	0x73
+ 1566 054b 0A       		.uleb128 0xa
+ 1567 054c 87080000 		.4byte	.LASF113
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 35
+
+
+ 1568 0550 0A       		.byte	0xa
+ 1569 0551 81       		.byte	0x81
+ 1570 0552 B8000000 		.4byte	0xb8
+ 1571 0556 74       		.byte	0x74
+ 1572 0557 0A       		.uleb128 0xa
+ 1573 0558 97060000 		.4byte	.LASF114
+ 1574 055c 0A       		.byte	0xa
+ 1575 055d 82       		.byte	0x82
+ 1576 055e B8000000 		.4byte	0xb8
+ 1577 0562 75       		.byte	0x75
+ 1578 0563 0A       		.uleb128 0xa
+ 1579 0564 E6000000 		.4byte	.LASF115
+ 1580 0568 0A       		.byte	0xa
+ 1581 0569 83       		.byte	0x83
+ 1582 056a B8000000 		.4byte	0xb8
+ 1583 056e 76       		.byte	0x76
+ 1584 056f 0A       		.uleb128 0xa
+ 1585 0570 E0050000 		.4byte	.LASF116
+ 1586 0574 0A       		.byte	0xa
+ 1587 0575 84       		.byte	0x84
+ 1588 0576 B8000000 		.4byte	0xb8
+ 1589 057a 77       		.byte	0x77
+ 1590 057b 0A       		.uleb128 0xa
+ 1591 057c 25020000 		.4byte	.LASF117
+ 1592 0580 0A       		.byte	0xa
+ 1593 0581 86       		.byte	0x86
+ 1594 0582 07010000 		.4byte	0x107
+ 1595 0586 78       		.byte	0x78
+ 1596 0587 00       		.byte	0
+ 1597 0588 0D       		.uleb128 0xd
+ 1598 0589 15010000 		.4byte	0x115
+ 1599 058d 98050000 		.4byte	0x598
+ 1600 0591 0E       		.uleb128 0xe
+ 1601 0592 2D010000 		.4byte	0x12d
+ 1602 0596 0F       		.byte	0xf
+ 1603 0597 00       		.byte	0
+ 1604 0598 03       		.uleb128 0x3
+ 1605 0599 0F090000 		.4byte	.LASF118
+ 1606 059d 0A       		.byte	0xa
+ 1607 059e 88       		.byte	0x88
+ 1608 059f DB020000 		.4byte	0x2db
+ 1609 05a3 0F       		.uleb128 0xf
+ 1610 05a4 1C030000 		.4byte	.LASF121
+ 1611 05a8 01       		.byte	0x1
+ 1612 05a9 49000000 		.4byte	0x49
+ 1613 05ad 0B       		.byte	0xb
+ 1614 05ae 38       		.byte	0x38
+ 1615 05af C0050000 		.4byte	0x5c0
+ 1616 05b3 10       		.uleb128 0x10
+ 1617 05b4 99050000 		.4byte	.LASF119
+ 1618 05b8 00       		.byte	0
+ 1619 05b9 10       		.uleb128 0x10
+ 1620 05ba 460A0000 		.4byte	.LASF120
+ 1621 05be 01       		.byte	0x1
+ 1622 05bf 00       		.byte	0
+ 1623 05c0 0F       		.uleb128 0xf
+ 1624 05c1 46050000 		.4byte	.LASF122
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 36
+
+
+ 1625 05c5 01       		.byte	0x1
+ 1626 05c6 49000000 		.4byte	0x49
+ 1627 05ca 0B       		.byte	0xb
+ 1628 05cb 3D       		.byte	0x3d
+ 1629 05cc E3050000 		.4byte	0x5e3
+ 1630 05d0 10       		.uleb128 0x10
+ 1631 05d1 15060000 		.4byte	.LASF123
+ 1632 05d5 00       		.byte	0
+ 1633 05d6 10       		.uleb128 0x10
+ 1634 05d7 CF090000 		.4byte	.LASF124
+ 1635 05db 01       		.byte	0x1
+ 1636 05dc 10       		.uleb128 0x10
+ 1637 05dd 66000000 		.4byte	.LASF125
+ 1638 05e1 02       		.byte	0x2
+ 1639 05e2 00       		.byte	0
+ 1640 05e3 0F       		.uleb128 0xf
+ 1641 05e4 9D090000 		.4byte	.LASF126
+ 1642 05e8 01       		.byte	0x1
+ 1643 05e9 49000000 		.4byte	0x49
+ 1644 05ed 0B       		.byte	0xb
+ 1645 05ee 43       		.byte	0x43
+ 1646 05ef 00060000 		.4byte	0x600
+ 1647 05f3 10       		.uleb128 0x10
+ 1648 05f4 FE060000 		.4byte	.LASF127
+ 1649 05f8 00       		.byte	0
+ 1650 05f9 10       		.uleb128 0x10
+ 1651 05fa 6D050000 		.4byte	.LASF128
+ 1652 05fe 01       		.byte	0x1
+ 1653 05ff 00       		.byte	0
+ 1654 0600 0F       		.uleb128 0xf
+ 1655 0601 B1050000 		.4byte	.LASF129
+ 1656 0605 01       		.byte	0x1
+ 1657 0606 49000000 		.4byte	0x49
+ 1658 060a 0B       		.byte	0xb
+ 1659 060b 49       		.byte	0x49
+ 1660 060c 1D060000 		.4byte	0x61d
+ 1661 0610 10       		.uleb128 0x10
+ 1662 0611 210A0000 		.4byte	.LASF130
+ 1663 0615 00       		.byte	0
+ 1664 0616 10       		.uleb128 0x10
+ 1665 0617 86010000 		.4byte	.LASF131
+ 1666 061b 01       		.byte	0x1
+ 1667 061c 00       		.byte	0
+ 1668 061d 0C       		.uleb128 0xc
+ 1669 061e 0C       		.byte	0xc
+ 1670 061f 0B       		.byte	0xb
+ 1671 0620 4E       		.byte	0x4e
+ 1672 0621 79060000 		.4byte	0x679
+ 1673 0625 11       		.uleb128 0x11
+ 1674 0626 707700   		.ascii	"pw\000"
+ 1675 0629 0B       		.byte	0xb
+ 1676 062a 50       		.byte	0x50
+ 1677 062b CE000000 		.4byte	0xce
+ 1678 062f 00       		.byte	0
+ 1679 0630 11       		.uleb128 0x11
+ 1680 0631 70726400 		.ascii	"prd\000"
+ 1681 0635 0B       		.byte	0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 37
+
+
+ 1682 0636 51       		.byte	0x51
+ 1683 0637 CE000000 		.4byte	0xce
+ 1684 063b 02       		.byte	0x2
+ 1685 063c 0A       		.uleb128 0xa
+ 1686 063d 2E080000 		.4byte	.LASF132
+ 1687 0641 0B       		.byte	0xb
+ 1688 0642 52       		.byte	0x52
+ 1689 0643 C0050000 		.4byte	0x5c0
+ 1690 0647 04       		.byte	0x4
+ 1691 0648 0A       		.uleb128 0xa
+ 1692 0649 91090000 		.4byte	.LASF133
+ 1693 064d 0B       		.byte	0xb
+ 1694 064e 53       		.byte	0x53
+ 1695 064f E3050000 		.4byte	0x5e3
+ 1696 0653 05       		.byte	0x5
+ 1697 0654 11       		.uleb128 0x11
+ 1698 0655 6D6F6400 		.ascii	"mod\000"
+ 1699 0659 0B       		.byte	0xb
+ 1700 065a 54       		.byte	0x54
+ 1701 065b 00060000 		.4byte	0x600
+ 1702 065f 06       		.byte	0x6
+ 1703 0660 0A       		.uleb128 0xa
+ 1704 0661 43060000 		.4byte	.LASF134
+ 1705 0665 0B       		.byte	0xb
+ 1706 0666 55       		.byte	0x55
+ 1707 0667 A3050000 		.4byte	0x5a3
+ 1708 066b 07       		.byte	0x7
+ 1709 066c 0A       		.uleb128 0xa
+ 1710 066d 36060000 		.4byte	.LASF135
+ 1711 0671 0B       		.byte	0xb
+ 1712 0672 56       		.byte	0x56
+ 1713 0673 C5020000 		.4byte	0x2c5
+ 1714 0677 08       		.byte	0x8
+ 1715 0678 00       		.byte	0
+ 1716 0679 03       		.uleb128 0x3
+ 1717 067a F9000000 		.4byte	.LASF136
+ 1718 067e 0B       		.byte	0xb
+ 1719 067f 57       		.byte	0x57
+ 1720 0680 1D060000 		.4byte	0x61d
+ 1721 0684 09       		.uleb128 0x9
+ 1722 0685 E0040000 		.4byte	.LASF137
+ 1723 0689 20       		.byte	0x20
+ 1724 068a 0C       		.byte	0xc
+ 1725 068b 31       		.byte	0x31
+ 1726 068c 15070000 		.4byte	0x715
+ 1727 0690 0A       		.uleb128 0xa
+ 1728 0691 E4030000 		.4byte	.LASF138
+ 1729 0695 0C       		.byte	0xc
+ 1730 0696 32       		.byte	0x32
+ 1731 0697 D9000000 		.4byte	0xd9
+ 1732 069b 00       		.byte	0
+ 1733 069c 0A       		.uleb128 0xa
+ 1734 069d F8030000 		.4byte	.LASF139
+ 1735 06a1 0C       		.byte	0xc
+ 1736 06a2 33       		.byte	0x33
+ 1737 06a3 B8000000 		.4byte	0xb8
+ 1738 06a7 04       		.byte	0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 38
+
+
+ 1739 06a8 0A       		.uleb128 0xa
+ 1740 06a9 A0040000 		.4byte	.LASF140
+ 1741 06ad 0C       		.byte	0xc
+ 1742 06ae 34       		.byte	0x34
+ 1743 06af 36010000 		.4byte	0x136
+ 1744 06b3 08       		.byte	0x8
+ 1745 06b4 11       		.uleb128 0x11
+ 1746 06b5 6D696E00 		.ascii	"min\000"
+ 1747 06b9 0C       		.byte	0xc
+ 1748 06ba 35       		.byte	0x35
+ 1749 06bb E4000000 		.4byte	0xe4
+ 1750 06bf 0C       		.byte	0xc
+ 1751 06c0 11       		.uleb128 0x11
+ 1752 06c1 6D617800 		.ascii	"max\000"
+ 1753 06c5 0C       		.byte	0xc
+ 1754 06c6 36       		.byte	0x36
+ 1755 06c7 E4000000 		.4byte	0xe4
+ 1756 06cb 10       		.byte	0x10
+ 1757 06cc 0A       		.uleb128 0xa
+ 1758 06cd DC080000 		.4byte	.LASF141
+ 1759 06d1 0C       		.byte	0xc
+ 1760 06d2 37       		.byte	0x37
+ 1761 06d3 D9000000 		.4byte	0xd9
+ 1762 06d7 14       		.byte	0x14
+ 1763 06d8 0A       		.uleb128 0xa
+ 1764 06d9 330A0000 		.4byte	.LASF142
+ 1765 06dd 0C       		.byte	0xc
+ 1766 06de 38       		.byte	0x38
+ 1767 06df C3000000 		.4byte	0xc3
+ 1768 06e3 18       		.byte	0x18
+ 1769 06e4 0A       		.uleb128 0xa
+ 1770 06e5 6A0A0000 		.4byte	.LASF143
+ 1771 06e9 0C       		.byte	0xc
+ 1772 06ea 39       		.byte	0x39
+ 1773 06eb CE000000 		.4byte	0xce
+ 1774 06ef 1A       		.byte	0x1a
+ 1775 06f0 0A       		.uleb128 0xa
+ 1776 06f1 2B050000 		.4byte	.LASF144
+ 1777 06f5 0C       		.byte	0xc
+ 1778 06f6 3A       		.byte	0x3a
+ 1779 06f7 B8000000 		.4byte	0xb8
+ 1780 06fb 1C       		.byte	0x1c
+ 1781 06fc 0A       		.uleb128 0xa
+ 1782 06fd 37010000 		.4byte	.LASF145
+ 1783 0701 0C       		.byte	0xc
+ 1784 0702 3B       		.byte	0x3b
+ 1785 0703 AD000000 		.4byte	0xad
+ 1786 0707 1D       		.byte	0x1d
+ 1787 0708 0A       		.uleb128 0xa
+ 1788 0709 2D0A0000 		.4byte	.LASF146
+ 1789 070d 0C       		.byte	0xc
+ 1790 070e 3C       		.byte	0x3c
+ 1791 070f AD000000 		.4byte	0xad
+ 1792 0713 1E       		.byte	0x1e
+ 1793 0714 00       		.byte	0
+ 1794 0715 03       		.uleb128 0x3
+ 1795 0716 D7080000 		.4byte	.LASF147
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 39
+
+
+ 1796 071a 0C       		.byte	0xc
+ 1797 071b 3D       		.byte	0x3d
+ 1798 071c 84060000 		.4byte	0x684
+ 1799 0720 12       		.uleb128 0x12
+ 1800 0721 AC010000 		.4byte	.LASF148
+ 1801 0725 E001     		.2byte	0x1e0
+ 1802 0727 0C       		.byte	0xc
+ 1803 0728 40       		.byte	0x40
+ 1804 0729 E9070000 		.4byte	0x7e9
+ 1805 072d 0A       		.uleb128 0xa
+ 1806 072e 31010000 		.4byte	.LASF149
+ 1807 0732 0C       		.byte	0xc
+ 1808 0733 41       		.byte	0x41
+ 1809 0734 15070000 		.4byte	0x715
+ 1810 0738 00       		.byte	0
+ 1811 0739 0A       		.uleb128 0xa
+ 1812 073a 8F040000 		.4byte	.LASF150
+ 1813 073e 0C       		.byte	0xc
+ 1814 073f 42       		.byte	0x42
+ 1815 0740 15070000 		.4byte	0x715
+ 1816 0744 20       		.byte	0x20
+ 1817 0745 0A       		.uleb128 0xa
+ 1818 0746 C8010000 		.4byte	.LASF151
+ 1819 074a 0C       		.byte	0xc
+ 1820 074b 43       		.byte	0x43
+ 1821 074c 15070000 		.4byte	0x715
+ 1822 0750 40       		.byte	0x40
+ 1823 0751 0A       		.uleb128 0xa
+ 1824 0752 19080000 		.4byte	.LASF29
+ 1825 0756 0C       		.byte	0xc
+ 1826 0757 44       		.byte	0x44
+ 1827 0758 15070000 		.4byte	0x715
+ 1828 075c 60       		.byte	0x60
+ 1829 075d 0A       		.uleb128 0xa
+ 1830 075e 7D070000 		.4byte	.LASF30
+ 1831 0762 0C       		.byte	0xc
+ 1832 0763 45       		.byte	0x45
+ 1833 0764 15070000 		.4byte	0x715
+ 1834 0768 80       		.byte	0x80
+ 1835 0769 0A       		.uleb128 0xa
+ 1836 076a 72090000 		.4byte	.LASF152
+ 1837 076e 0C       		.byte	0xc
+ 1838 076f 46       		.byte	0x46
+ 1839 0770 15070000 		.4byte	0x715
+ 1840 0774 A0       		.byte	0xa0
+ 1841 0775 0A       		.uleb128 0xa
+ 1842 0776 B8090000 		.4byte	.LASF153
+ 1843 077a 0C       		.byte	0xc
+ 1844 077b 47       		.byte	0x47
+ 1845 077c 15070000 		.4byte	0x715
+ 1846 0780 C0       		.byte	0xc0
+ 1847 0781 0A       		.uleb128 0xa
+ 1848 0782 28040000 		.4byte	.LASF154
+ 1849 0786 0C       		.byte	0xc
+ 1850 0787 48       		.byte	0x48
+ 1851 0788 15070000 		.4byte	0x715
+ 1852 078c E0       		.byte	0xe0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 40
+
+
+ 1853 078d 13       		.uleb128 0x13
+ 1854 078e 77070000 		.4byte	.LASF155
+ 1855 0792 0C       		.byte	0xc
+ 1856 0793 49       		.byte	0x49
+ 1857 0794 15070000 		.4byte	0x715
+ 1858 0798 0001     		.2byte	0x100
+ 1859 079a 13       		.uleb128 0x13
+ 1860 079b 12040000 		.4byte	.LASF156
+ 1861 079f 0C       		.byte	0xc
+ 1862 07a0 4A       		.byte	0x4a
+ 1863 07a1 15070000 		.4byte	0x715
+ 1864 07a5 2001     		.2byte	0x120
+ 1865 07a7 13       		.uleb128 0x13
+ 1866 07a8 8F0A0000 		.4byte	.LASF157
+ 1867 07ac 0C       		.byte	0xc
+ 1868 07ad 4B       		.byte	0x4b
+ 1869 07ae 15070000 		.4byte	0x715
+ 1870 07b2 4001     		.2byte	0x140
+ 1871 07b4 13       		.uleb128 0x13
+ 1872 07b5 81010000 		.4byte	.LASF158
+ 1873 07b9 0C       		.byte	0xc
+ 1874 07ba 4C       		.byte	0x4c
+ 1875 07bb 15070000 		.4byte	0x715
+ 1876 07bf 6001     		.2byte	0x160
+ 1877 07c1 13       		.uleb128 0x13
+ 1878 07c2 760A0000 		.4byte	.LASF159
+ 1879 07c6 0C       		.byte	0xc
+ 1880 07c7 4D       		.byte	0x4d
+ 1881 07c8 15070000 		.4byte	0x715
+ 1882 07cc 8001     		.2byte	0x180
+ 1883 07ce 13       		.uleb128 0x13
+ 1884 07cf 1C040000 		.4byte	.LASF160
+ 1885 07d3 0C       		.byte	0xc
+ 1886 07d4 4E       		.byte	0x4e
+ 1887 07d5 15070000 		.4byte	0x715
+ 1888 07d9 A001     		.2byte	0x1a0
+ 1889 07db 13       		.uleb128 0x13
+ 1890 07dc 24080000 		.4byte	.LASF161
+ 1891 07e0 0C       		.byte	0xc
+ 1892 07e1 4F       		.byte	0x4f
+ 1893 07e2 15070000 		.4byte	0x715
+ 1894 07e6 C001     		.2byte	0x1c0
+ 1895 07e8 00       		.byte	0
+ 1896 07e9 03       		.uleb128 0x3
+ 1897 07ea 33080000 		.4byte	.LASF162
+ 1898 07ee 0C       		.byte	0xc
+ 1899 07ef 50       		.byte	0x50
+ 1900 07f0 20070000 		.4byte	0x720
+ 1901 07f4 14       		.uleb128 0x14
+ 1902 07f5 FD040000 		.4byte	.LASF215
+ 1903 07f9 E001     		.2byte	0x1e0
+ 1904 07fb 0C       		.byte	0xc
+ 1905 07fc 54       		.byte	0x54
+ 1906 07fd 14080000 		.4byte	0x814
+ 1907 0801 15       		.uleb128 0x15
+ 1908 0802 6E00     		.ascii	"n\000"
+ 1909 0804 0C       		.byte	0xc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 41
+
+
+ 1910 0805 56       		.byte	0x56
+ 1911 0806 E9070000 		.4byte	0x7e9
+ 1912 080a 15       		.uleb128 0x15
+ 1913 080b 6100     		.ascii	"a\000"
+ 1914 080d 0C       		.byte	0xc
+ 1915 080e 57       		.byte	0x57
+ 1916 080f 14080000 		.4byte	0x814
+ 1917 0813 00       		.byte	0
+ 1918 0814 0D       		.uleb128 0xd
+ 1919 0815 15070000 		.4byte	0x715
+ 1920 0819 24080000 		.4byte	0x824
+ 1921 081d 0E       		.uleb128 0xe
+ 1922 081e 2D010000 		.4byte	0x12d
+ 1923 0822 0E       		.byte	0xe
+ 1924 0823 00       		.byte	0
+ 1925 0824 03       		.uleb128 0x3
+ 1926 0825 CA020000 		.4byte	.LASF163
+ 1927 0829 0C       		.byte	0xc
+ 1928 082a 58       		.byte	0x58
+ 1929 082b F4070000 		.4byte	0x7f4
+ 1930 082f 16       		.uleb128 0x16
+ 1931 0830 4C060000 		.4byte	.LASF164
+ 1932 0834 01       		.byte	0x1
+ 1933 0835 62       		.byte	0x62
+ 1934 0836 01       		.byte	0x1
+ 1935 0837 47080000 		.4byte	0x847
+ 1936 083b 17       		.uleb128 0x17
+ 1937 083c 88000000 		.4byte	.LASF166
+ 1938 0840 01       		.byte	0x1
+ 1939 0841 66       		.byte	0x66
+ 1940 0842 B8000000 		.4byte	0xb8
+ 1941 0846 00       		.byte	0
+ 1942 0847 16       		.uleb128 0x16
+ 1943 0848 98080000 		.4byte	.LASF165
+ 1944 084c 01       		.byte	0x1
+ 1945 084d 94       		.byte	0x94
+ 1946 084e 01       		.byte	0x1
+ 1947 084f 6A080000 		.4byte	0x86a
+ 1948 0853 17       		.uleb128 0x17
+ 1949 0854 90070000 		.4byte	.LASF167
+ 1950 0858 01       		.byte	0x1
+ 1951 0859 96       		.byte	0x96
+ 1952 085a B8000000 		.4byte	0xb8
+ 1953 085e 18       		.uleb128 0x18
+ 1954 085f 19       		.uleb128 0x19
+ 1955 0860 6900     		.ascii	"i\000"
+ 1956 0862 01       		.byte	0x1
+ 1957 0863 98       		.byte	0x98
+ 1958 0864 B8000000 		.4byte	0xb8
+ 1959 0868 00       		.byte	0
+ 1960 0869 00       		.byte	0
+ 1961 086a 1A       		.uleb128 0x1a
+ 1962 086b AE070000 		.4byte	.LASF168
+ 1963 086f 01       		.byte	0x1
+ 1964 0870 C5       		.byte	0xc5
+ 1965 0871 00000000 		.4byte	.LFB79
+ 1966 0875 50000000 		.4byte	.LFE79-.LFB79
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 42
+
+
+ 1967 0879 01       		.uleb128 0x1
+ 1968 087a 9C       		.byte	0x9c
+ 1969 087b F0080000 		.4byte	0x8f0
+ 1970 087f 1B       		.uleb128 0x1b
+ 1971 0880 E1020000 		.4byte	.LASF170
+ 1972 0884 01       		.byte	0x1
+ 1973 0885 C5       		.byte	0xc5
+ 1974 0886 C5020000 		.4byte	0x2c5
+ 1975 088a 00000000 		.4byte	.LLST0
+ 1976 088e 1C       		.uleb128 0x1c
+ 1977 088f 18000000 		.4byte	.LVL2
+ 1978 0893 780D0000 		.4byte	0xd78
+ 1979 0897 B2080000 		.4byte	0x8b2
+ 1980 089b 1D       		.uleb128 0x1d
+ 1981 089c 01       		.uleb128 0x1
+ 1982 089d 50       		.byte	0x50
+ 1983 089e 01       		.uleb128 0x1
+ 1984 089f 33       		.byte	0x33
+ 1985 08a0 1D       		.uleb128 0x1d
+ 1986 08a1 01       		.uleb128 0x1
+ 1987 08a2 51       		.byte	0x51
+ 1988 08a3 05       		.uleb128 0x5
+ 1989 08a4 03       		.byte	0x3
+ 1990 08a5 00000000 		.4byte	.LC0
+ 1991 08a9 1D       		.uleb128 0x1d
+ 1992 08aa 01       		.uleb128 0x1
+ 1993 08ab 52       		.byte	0x52
+ 1994 08ac 04       		.uleb128 0x4
+ 1995 08ad 40       		.byte	0x40
+ 1996 08ae 4B       		.byte	0x4b
+ 1997 08af 24       		.byte	0x24
+ 1998 08b0 1F       		.byte	0x1f
+ 1999 08b1 00       		.byte	0
+ 2000 08b2 1E       		.uleb128 0x1e
+ 2001 08b3 2A000000 		.4byte	.LVL3
+ 2002 08b7 830D0000 		.4byte	0xd83
+ 2003 08bb 1E       		.uleb128 0x1e
+ 2004 08bc 2E000000 		.4byte	.LVL4
+ 2005 08c0 8E0D0000 		.4byte	0xd8e
+ 2006 08c4 1E       		.uleb128 0x1e
+ 2007 08c5 32000000 		.4byte	.LVL5
+ 2008 08c9 990D0000 		.4byte	0xd99
+ 2009 08cd 1F       		.uleb128 0x1f
+ 2010 08ce 40000000 		.4byte	.LVL6
+ 2011 08d2 A50D0000 		.4byte	0xda5
+ 2012 08d6 1D       		.uleb128 0x1d
+ 2013 08d7 01       		.uleb128 0x1
+ 2014 08d8 50       		.byte	0x50
+ 2015 08d9 02       		.uleb128 0x2
+ 2016 08da 75       		.byte	0x75
+ 2017 08db 00       		.sleb128 0
+ 2018 08dc 1D       		.uleb128 0x1d
+ 2019 08dd 01       		.uleb128 0x1
+ 2020 08de 51       		.byte	0x51
+ 2021 08df 01       		.uleb128 0x1
+ 2022 08e0 32       		.byte	0x32
+ 2023 08e1 1D       		.uleb128 0x1d
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 43
+
+
+ 2024 08e2 01       		.uleb128 0x1
+ 2025 08e3 53       		.byte	0x53
+ 2026 08e4 02       		.uleb128 0x2
+ 2027 08e5 74       		.byte	0x74
+ 2028 08e6 00       		.sleb128 0
+ 2029 08e7 1D       		.uleb128 0x1d
+ 2030 08e8 02       		.uleb128 0x2
+ 2031 08e9 7D       		.byte	0x7d
+ 2032 08ea 00       		.sleb128 0
+ 2033 08eb 02       		.uleb128 0x2
+ 2034 08ec 74       		.byte	0x74
+ 2035 08ed 00       		.sleb128 0
+ 2036 08ee 00       		.byte	0
+ 2037 08ef 00       		.byte	0
+ 2038 08f0 1A       		.uleb128 0x1a
+ 2039 08f1 07000000 		.4byte	.LASF169
+ 2040 08f5 01       		.byte	0x1
+ 2041 08f6 48       		.byte	0x48
+ 2042 08f7 00000000 		.4byte	.LFB68
+ 2043 08fb 30000000 		.4byte	.LFE68-.LFB68
+ 2044 08ff 01       		.uleb128 0x1
+ 2045 0900 9C       		.byte	0x9c
+ 2046 0901 2E090000 		.4byte	0x92e
+ 2047 0905 1B       		.uleb128 0x1b
+ 2048 0906 93020000 		.4byte	.LASF171
+ 2049 090a 01       		.byte	0x1
+ 2050 090b 48       		.byte	0x48
+ 2051 090c B8000000 		.4byte	0xb8
+ 2052 0910 2C000000 		.4byte	.LLST1
+ 2053 0914 1E       		.uleb128 0x1e
+ 2054 0915 12000000 		.4byte	.LVL9
+ 2055 0919 990D0000 		.4byte	0xd99
+ 2056 091d 1F       		.uleb128 0x1f
+ 2057 091e 28000000 		.4byte	.LVL12
+ 2058 0922 A50D0000 		.4byte	0xda5
+ 2059 0926 1D       		.uleb128 0x1d
+ 2060 0927 01       		.uleb128 0x1
+ 2061 0928 50       		.byte	0x50
+ 2062 0929 02       		.uleb128 0x2
+ 2063 092a 74       		.byte	0x74
+ 2064 092b 00       		.sleb128 0
+ 2065 092c 00       		.byte	0
+ 2066 092d 00       		.byte	0
+ 2067 092e 20       		.uleb128 0x20
+ 2068 092f 050A0000 		.4byte	.LASF172
+ 2069 0933 01       		.byte	0x1
+ 2070 0934 52       		.byte	0x52
+ 2071 0935 00000000 		.4byte	.LFB69
+ 2072 0939 2C000000 		.4byte	.LFE69-.LFB69
+ 2073 093d 01       		.uleb128 0x1
+ 2074 093e 9C       		.byte	0x9c
+ 2075 093f 6D090000 		.4byte	0x96d
+ 2076 0943 1E       		.uleb128 0x1e
+ 2077 0944 12000000 		.4byte	.LVL13
+ 2078 0948 990D0000 		.4byte	0xd99
+ 2079 094c 1F       		.uleb128 0x1f
+ 2080 094d 20000000 		.4byte	.LVL14
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 44
+
+
+ 2081 0951 A50D0000 		.4byte	0xda5
+ 2082 0955 1D       		.uleb128 0x1d
+ 2083 0956 01       		.uleb128 0x1
+ 2084 0957 50       		.byte	0x50
+ 2085 0958 02       		.uleb128 0x2
+ 2086 0959 74       		.byte	0x74
+ 2087 095a 00       		.sleb128 0
+ 2088 095b 1D       		.uleb128 0x1d
+ 2089 095c 01       		.uleb128 0x1
+ 2090 095d 51       		.byte	0x51
+ 2091 095e 01       		.uleb128 0x1
+ 2092 095f 31       		.byte	0x31
+ 2093 0960 1D       		.uleb128 0x1d
+ 2094 0961 01       		.uleb128 0x1
+ 2095 0962 53       		.byte	0x53
+ 2096 0963 01       		.uleb128 0x1
+ 2097 0964 30       		.byte	0x30
+ 2098 0965 1D       		.uleb128 0x1d
+ 2099 0966 02       		.uleb128 0x2
+ 2100 0967 7D       		.byte	0x7d
+ 2101 0968 00       		.sleb128 0
+ 2102 0969 01       		.uleb128 0x1
+ 2103 096a 30       		.byte	0x30
+ 2104 096b 00       		.byte	0
+ 2105 096c 00       		.byte	0
+ 2106 096d 20       		.uleb128 0x20
+ 2107 096e 65070000 		.4byte	.LASF173
+ 2108 0972 01       		.byte	0x1
+ 2109 0973 58       		.byte	0x58
+ 2110 0974 00000000 		.4byte	.LFB70
+ 2111 0978 2C000000 		.4byte	.LFE70-.LFB70
+ 2112 097c 01       		.uleb128 0x1
+ 2113 097d 9C       		.byte	0x9c
+ 2114 097e AC090000 		.4byte	0x9ac
+ 2115 0982 1E       		.uleb128 0x1e
+ 2116 0983 12000000 		.4byte	.LVL15
+ 2117 0987 B10D0000 		.4byte	0xdb1
+ 2118 098b 1F       		.uleb128 0x1f
+ 2119 098c 20000000 		.4byte	.LVL16
+ 2120 0990 A50D0000 		.4byte	0xda5
+ 2121 0994 1D       		.uleb128 0x1d
+ 2122 0995 01       		.uleb128 0x1
+ 2123 0996 50       		.byte	0x50
+ 2124 0997 02       		.uleb128 0x2
+ 2125 0998 74       		.byte	0x74
+ 2126 0999 00       		.sleb128 0
+ 2127 099a 1D       		.uleb128 0x1d
+ 2128 099b 01       		.uleb128 0x1
+ 2129 099c 51       		.byte	0x51
+ 2130 099d 01       		.uleb128 0x1
+ 2131 099e 36       		.byte	0x36
+ 2132 099f 1D       		.uleb128 0x1d
+ 2133 09a0 01       		.uleb128 0x1
+ 2134 09a1 53       		.byte	0x53
+ 2135 09a2 01       		.uleb128 0x1
+ 2136 09a3 30       		.byte	0x30
+ 2137 09a4 1D       		.uleb128 0x1d
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 45
+
+
+ 2138 09a5 02       		.uleb128 0x2
+ 2139 09a6 7D       		.byte	0x7d
+ 2140 09a7 00       		.sleb128 0
+ 2141 09a8 01       		.uleb128 0x1
+ 2142 09a9 30       		.byte	0x30
+ 2143 09aa 00       		.byte	0
+ 2144 09ab 00       		.byte	0
+ 2145 09ac 1A       		.uleb128 0x1a
+ 2146 09ad 57050000 		.4byte	.LASF174
+ 2147 09b1 01       		.byte	0x1
+ 2148 09b2 5E       		.byte	0x5e
+ 2149 09b3 00000000 		.4byte	.LFB71
+ 2150 09b7 14000000 		.4byte	.LFE71-.LFB71
+ 2151 09bb 01       		.uleb128 0x1
+ 2152 09bc 9C       		.byte	0x9c
+ 2153 09bd CE090000 		.4byte	0x9ce
+ 2154 09c1 21       		.uleb128 0x21
+ 2155 09c2 656E00   		.ascii	"en\000"
+ 2156 09c5 01       		.byte	0x1
+ 2157 09c6 5E       		.byte	0x5e
+ 2158 09c7 E4000000 		.4byte	0xe4
+ 2159 09cb 01       		.uleb128 0x1
+ 2160 09cc 50       		.byte	0x50
+ 2161 09cd 00       		.byte	0
+ 2162 09ce 22       		.uleb128 0x22
+ 2163 09cf 2F080000 		.4byte	0x82f
+ 2164 09d3 00000000 		.4byte	.LFB72
+ 2165 09d7 4C000000 		.4byte	.LFE72-.LFB72
+ 2166 09db 01       		.uleb128 0x1
+ 2167 09dc 9C       		.byte	0x9c
+ 2168 09dd 300A0000 		.4byte	0xa30
+ 2169 09e1 23       		.uleb128 0x23
+ 2170 09e2 3B080000 		.4byte	0x83b
+ 2171 09e6 66000000 		.4byte	.LLST2
+ 2172 09ea 24       		.uleb128 0x24
+ 2173 09eb 20000000 		.4byte	.LBB6
+ 2174 09ef 14000000 		.4byte	.LBE6-.LBB6
+ 2175 09f3 1D0A0000 		.4byte	0xa1d
+ 2176 09f7 25       		.uleb128 0x25
+ 2177 09f8 3B080000 		.4byte	0x83b
+ 2178 09fc 1F       		.uleb128 0x1f
+ 2179 09fd 30000000 		.4byte	.LVL22
+ 2180 0a01 780D0000 		.4byte	0xd78
+ 2181 0a05 1D       		.uleb128 0x1d
+ 2182 0a06 01       		.uleb128 0x1
+ 2183 0a07 50       		.byte	0x50
+ 2184 0a08 01       		.uleb128 0x1
+ 2185 0a09 33       		.byte	0x33
+ 2186 0a0a 1D       		.uleb128 0x1d
+ 2187 0a0b 01       		.uleb128 0x1
+ 2188 0a0c 51       		.byte	0x51
+ 2189 0a0d 05       		.uleb128 0x5
+ 2190 0a0e 03       		.byte	0x3
+ 2191 0a0f 17000000 		.4byte	.LC1
+ 2192 0a13 1D       		.uleb128 0x1d
+ 2193 0a14 01       		.uleb128 0x1
+ 2194 0a15 52       		.byte	0x52
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 46
+
+
+ 2195 0a16 04       		.uleb128 0x4
+ 2196 0a17 40       		.byte	0x40
+ 2197 0a18 4B       		.byte	0x4b
+ 2198 0a19 24       		.byte	0x24
+ 2199 0a1a 1F       		.byte	0x1f
+ 2200 0a1b 00       		.byte	0
+ 2201 0a1c 00       		.byte	0
+ 2202 0a1d 1E       		.uleb128 0x1e
+ 2203 0a1e 06000000 		.4byte	.LVL18
+ 2204 0a22 BD0D0000 		.4byte	0xdbd
+ 2205 0a26 1E       		.uleb128 0x1e
+ 2206 0a27 1E000000 		.4byte	.LVL20
+ 2207 0a2b C80D0000 		.4byte	0xdc8
+ 2208 0a2f 00       		.byte	0
+ 2209 0a30 20       		.uleb128 0x20
+ 2210 0a31 06040000 		.4byte	.LASF175
+ 2211 0a35 01       		.byte	0x1
+ 2212 0a36 7F       		.byte	0x7f
+ 2213 0a37 00000000 		.4byte	.LFB73
+ 2214 0a3b 1C000000 		.4byte	.LFE73-.LFB73
+ 2215 0a3f 01       		.uleb128 0x1
+ 2216 0a40 9C       		.byte	0x9c
+ 2217 0a41 590A0000 		.4byte	0xa59
+ 2218 0a45 26       		.uleb128 0x26
+ 2219 0a46 00000000 		.4byte	.Ldebug_ranges0+0
+ 2220 0a4a 27       		.uleb128 0x27
+ 2221 0a4b 6900     		.ascii	"i\000"
+ 2222 0a4d 01       		.byte	0x1
+ 2223 0a4e 81       		.byte	0x81
+ 2224 0a4f B8000000 		.4byte	0xb8
+ 2225 0a53 92000000 		.4byte	.LLST3
+ 2226 0a57 00       		.byte	0
+ 2227 0a58 00       		.byte	0
+ 2228 0a59 28       		.uleb128 0x28
+ 2229 0a5a B9040000 		.4byte	.LASF216
+ 2230 0a5e 01       		.byte	0x1
+ 2231 0a5f 86       		.byte	0x86
+ 2232 0a60 B8000000 		.4byte	0xb8
+ 2233 0a64 00000000 		.4byte	.LFB74
+ 2234 0a68 14000000 		.4byte	.LFE74-.LFB74
+ 2235 0a6c 01       		.uleb128 0x1
+ 2236 0a6d 9C       		.byte	0x9c
+ 2237 0a6e 1A       		.uleb128 0x1a
+ 2238 0a6f 2F040000 		.4byte	.LASF176
+ 2239 0a73 01       		.byte	0x1
+ 2240 0a74 8A       		.byte	0x8a
+ 2241 0a75 00000000 		.4byte	.LFB75
+ 2242 0a79 24000000 		.4byte	.LFE75-.LFB75
+ 2243 0a7d 01       		.uleb128 0x1
+ 2244 0a7e 9C       		.byte	0x9c
+ 2245 0a7f A40A0000 		.4byte	0xaa4
+ 2246 0a83 1B       		.uleb128 0x1b
+ 2247 0a84 C3010000 		.4byte	.LASF177
+ 2248 0a88 01       		.byte	0x1
+ 2249 0a89 8A       		.byte	0x8a
+ 2250 0a8a E4000000 		.4byte	0xe4
+ 2251 0a8e BE000000 		.4byte	.LLST4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 47
+
+
+ 2252 0a92 29       		.uleb128 0x29
+ 2253 0a93 18000000 		.4byte	.LVL31
+ 2254 0a97 D30D0000 		.4byte	0xdd3
+ 2255 0a9b 1D       		.uleb128 0x1d
+ 2256 0a9c 01       		.uleb128 0x1
+ 2257 0a9d 50       		.byte	0x50
+ 2258 0a9e 03       		.uleb128 0x3
+ 2259 0a9f 0A       		.byte	0xa
+ 2260 0aa0 F401     		.2byte	0x1f4
+ 2261 0aa2 00       		.byte	0
+ 2262 0aa3 00       		.byte	0
+ 2263 0aa4 1A       		.uleb128 0x1a
+ 2264 0aa5 93010000 		.4byte	.LASF178
+ 2265 0aa9 01       		.byte	0x1
+ 2266 0aaa 8F       		.byte	0x8f
+ 2267 0aab 00000000 		.4byte	.LFB76
+ 2268 0aaf 28000000 		.4byte	.LFE76-.LFB76
+ 2269 0ab3 01       		.uleb128 0x1
+ 2270 0ab4 9C       		.byte	0x9c
+ 2271 0ab5 DA0A0000 		.4byte	0xada
+ 2272 0ab9 1B       		.uleb128 0x1b
+ 2273 0aba C3010000 		.4byte	.LASF177
+ 2274 0abe 01       		.byte	0x1
+ 2275 0abf 8F       		.byte	0x8f
+ 2276 0ac0 E4000000 		.4byte	0xe4
+ 2277 0ac4 EA000000 		.4byte	.LLST5
+ 2278 0ac8 29       		.uleb128 0x29
+ 2279 0ac9 1C000000 		.4byte	.LVL34
+ 2280 0acd D30D0000 		.4byte	0xdd3
+ 2281 0ad1 1D       		.uleb128 0x1d
+ 2282 0ad2 01       		.uleb128 0x1
+ 2283 0ad3 50       		.byte	0x50
+ 2284 0ad4 03       		.uleb128 0x3
+ 2285 0ad5 0A       		.byte	0xa
+ 2286 0ad6 F401     		.2byte	0x1f4
+ 2287 0ad8 00       		.byte	0
+ 2288 0ad9 00       		.byte	0
+ 2289 0ada 22       		.uleb128 0x22
+ 2290 0adb 47080000 		.4byte	0x847
+ 2291 0adf 00000000 		.4byte	.LFB77
+ 2292 0ae3 5C000000 		.4byte	.LFE77-.LFB77
+ 2293 0ae7 01       		.uleb128 0x1
+ 2294 0ae8 9C       		.byte	0x9c
+ 2295 0ae9 2F0B0000 		.4byte	0xb2f
+ 2296 0aed 23       		.uleb128 0x23
+ 2297 0aee 53080000 		.4byte	0x853
+ 2298 0af2 16010000 		.4byte	.LLST6
+ 2299 0af6 2A       		.uleb128 0x2a
+ 2300 0af7 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 2301 0afb 090B0000 		.4byte	0xb09
+ 2302 0aff 23       		.uleb128 0x23
+ 2303 0b00 5F080000 		.4byte	0x85f
+ 2304 0b04 35010000 		.4byte	.LLST7
+ 2305 0b08 00       		.byte	0
+ 2306 0b09 24       		.uleb128 0x24
+ 2307 0b0a 2E000000 		.4byte	.LBB16
+ 2308 0b0e 0C000000 		.4byte	.LBE16-.LBB16
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 48
+
+
+ 2309 0b12 1C0B0000 		.4byte	0xb1c
+ 2310 0b16 25       		.uleb128 0x25
+ 2311 0b17 53080000 		.4byte	0x853
+ 2312 0b1b 00       		.byte	0
+ 2313 0b1c 1E       		.uleb128 0x1e
+ 2314 0b1d 2A000000 		.4byte	.LVL39
+ 2315 0b21 590A0000 		.4byte	0xa59
+ 2316 0b25 2B       		.uleb128 0x2b
+ 2317 0b26 4C000000 		.4byte	.LVL40
+ 2318 0b2a DE0D0000 		.4byte	0xdde
+ 2319 0b2e 00       		.byte	0
+ 2320 0b2f 1A       		.uleb128 0x1a
+ 2321 0b30 83070000 		.4byte	.LASF179
+ 2322 0b34 01       		.byte	0x1
+ 2323 0b35 A6       		.byte	0xa6
+ 2324 0b36 00000000 		.4byte	.LFB78
+ 2325 0b3a 98000000 		.4byte	.LFE78-.LFB78
+ 2326 0b3e 01       		.uleb128 0x1
+ 2327 0b3f 9C       		.byte	0x9c
+ 2328 0b40 860B0000 		.4byte	0xb86
+ 2329 0b44 2C       		.uleb128 0x2c
+ 2330 0b45 58060000 		.4byte	.LASF180
+ 2331 0b49 01       		.byte	0x1
+ 2332 0b4a A7       		.byte	0xa7
+ 2333 0b4b E4000000 		.4byte	0xe4
+ 2334 0b4f 54010000 		.4byte	.LLST8
+ 2335 0b53 2D       		.uleb128 0x2d
+ 2336 0b54 9B0A0000 		.4byte	.LASF181
+ 2337 0b58 01       		.byte	0x1
+ 2338 0b59 A9       		.byte	0xa9
+ 2339 0b5a B8000000 		.4byte	0xb8
+ 2340 0b5e 05       		.uleb128 0x5
+ 2341 0b5f 03       		.byte	0x3
+ 2342 0b60 00000000 		.4byte	fb_error_timer.9853
+ 2343 0b64 1E       		.uleb128 0x1e
+ 2344 0b65 24000000 		.4byte	.LVL46
+ 2345 0b69 E90D0000 		.4byte	0xde9
+ 2346 0b6d 1F       		.uleb128 0x1f
+ 2347 0b6e 6A000000 		.4byte	.LVL47
+ 2348 0b72 780D0000 		.4byte	0xd78
+ 2349 0b76 1D       		.uleb128 0x1d
+ 2350 0b77 01       		.uleb128 0x1
+ 2351 0b78 50       		.byte	0x50
+ 2352 0b79 01       		.uleb128 0x1
+ 2353 0b7a 33       		.byte	0x33
+ 2354 0b7b 1D       		.uleb128 0x1d
+ 2355 0b7c 01       		.uleb128 0x1
+ 2356 0b7d 51       		.byte	0x51
+ 2357 0b7e 05       		.uleb128 0x5
+ 2358 0b7f 03       		.byte	0x3
+ 2359 0b80 2C000000 		.4byte	.LC2
+ 2360 0b84 00       		.byte	0
+ 2361 0b85 00       		.byte	0
+ 2362 0b86 2E       		.uleb128 0x2e
+ 2363 0b87 11000000 		.4byte	.LASF217
+ 2364 0b8b 01       		.byte	0x1
+ 2365 0b8c D8       		.byte	0xd8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 49
+
+
+ 2366 0b8d 00000000 		.4byte	.LFB80
+ 2367 0b91 64000000 		.4byte	.LFE80-.LFB80
+ 2368 0b95 01       		.uleb128 0x1
+ 2369 0b96 9C       		.byte	0x9c
+ 2370 0b97 400C0000 		.4byte	0xc40
+ 2371 0b9b 1B       		.uleb128 0x1b
+ 2372 0b9c 7D090000 		.4byte	.LASF182
+ 2373 0ba0 01       		.byte	0x1
+ 2374 0ba1 D8       		.byte	0xd8
+ 2375 0ba2 34010000 		.4byte	0x134
+ 2376 0ba6 88010000 		.4byte	.LLST9
+ 2377 0baa 1C       		.uleb128 0x1c
+ 2378 0bab 14000000 		.4byte	.LVL50
+ 2379 0baf F40D0000 		.4byte	0xdf4
+ 2380 0bb3 D50B0000 		.4byte	0xbd5
+ 2381 0bb7 1D       		.uleb128 0x1d
+ 2382 0bb8 01       		.uleb128 0x1
+ 2383 0bb9 50       		.byte	0x50
+ 2384 0bba 05       		.uleb128 0x5
+ 2385 0bbb 03       		.byte	0x3
+ 2386 0bbc 3F000000 		.4byte	.LC3
+ 2387 0bc0 1D       		.uleb128 0x1d
+ 2388 0bc1 01       		.uleb128 0x1
+ 2389 0bc2 52       		.byte	0x52
+ 2390 0bc3 01       		.uleb128 0x1
+ 2391 0bc4 30       		.byte	0x30
+ 2392 0bc5 1D       		.uleb128 0x1d
+ 2393 0bc6 01       		.uleb128 0x1
+ 2394 0bc7 53       		.byte	0x53
+ 2395 0bc8 01       		.uleb128 0x1
+ 2396 0bc9 30       		.byte	0x30
+ 2397 0bca 1D       		.uleb128 0x1d
+ 2398 0bcb 02       		.uleb128 0x2
+ 2399 0bcc 7D       		.byte	0x7d
+ 2400 0bcd 00       		.sleb128 0
+ 2401 0bce 05       		.uleb128 0x5
+ 2402 0bcf 03       		.byte	0x3
+ 2403 0bd0 00000000 		.4byte	vWD_Timer_Callback
+ 2404 0bd4 00       		.byte	0
+ 2405 0bd5 1E       		.uleb128 0x1e
+ 2406 0bd6 1E000000 		.4byte	.LVL51
+ 2407 0bda F0080000 		.4byte	0x8f0
+ 2408 0bde 1E       		.uleb128 0x1e
+ 2409 0bdf 22000000 		.4byte	.LVL52
+ 2410 0be3 300A0000 		.4byte	0xa30
+ 2411 0be7 1C       		.uleb128 0x1c
+ 2412 0be8 2E000000 		.4byte	.LVL53
+ 2413 0bec 780D0000 		.4byte	0xd78
+ 2414 0bf0 0B0C0000 		.4byte	0xc0b
+ 2415 0bf4 1D       		.uleb128 0x1d
+ 2416 0bf5 01       		.uleb128 0x1
+ 2417 0bf6 50       		.byte	0x50
+ 2418 0bf7 01       		.uleb128 0x1
+ 2419 0bf8 30       		.byte	0x30
+ 2420 0bf9 1D       		.uleb128 0x1d
+ 2421 0bfa 01       		.uleb128 0x1
+ 2422 0bfb 51       		.byte	0x51
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 50
+
+
+ 2423 0bfc 05       		.uleb128 0x5
+ 2424 0bfd 03       		.byte	0x3
+ 2425 0bfe 46000000 		.4byte	.LC4
+ 2426 0c02 1D       		.uleb128 0x1d
+ 2427 0c03 01       		.uleb128 0x1
+ 2428 0c04 52       		.byte	0x52
+ 2429 0c05 04       		.uleb128 0x4
+ 2430 0c06 40       		.byte	0x40
+ 2431 0c07 4B       		.byte	0x4b
+ 2432 0c08 24       		.byte	0x24
+ 2433 0c09 1F       		.byte	0x1f
+ 2434 0c0a 00       		.byte	0
+ 2435 0c0b 1E       		.uleb128 0x1e
+ 2436 0c0c 32000000 		.4byte	.LVL54
+ 2437 0c10 2F080000 		.4byte	0x82f
+ 2438 0c14 1E       		.uleb128 0x1e
+ 2439 0c15 36000000 		.4byte	.LVL55
+ 2440 0c19 47080000 		.4byte	0x847
+ 2441 0c1d 1E       		.uleb128 0x1e
+ 2442 0c1e 44000000 		.4byte	.LVL56
+ 2443 0c22 FF0D0000 		.4byte	0xdff
+ 2444 0c26 1E       		.uleb128 0x1e
+ 2445 0c27 48000000 		.4byte	.LVL57
+ 2446 0c2b 2F0B0000 		.4byte	0xb2f
+ 2447 0c2f 1F       		.uleb128 0x1f
+ 2448 0c30 4E000000 		.4byte	.LVL58
+ 2449 0c34 0A0E0000 		.4byte	0xe0a
+ 2450 0c38 1D       		.uleb128 0x1d
+ 2451 0c39 01       		.uleb128 0x1
+ 2452 0c3a 50       		.byte	0x50
+ 2453 0c3b 02       		.uleb128 0x2
+ 2454 0c3c 08       		.byte	0x8
+ 2455 0c3d 32       		.byte	0x32
+ 2456 0c3e 00       		.byte	0
+ 2457 0c3f 00       		.byte	0
+ 2458 0c40 1A       		.uleb128 0x1a
+ 2459 0c41 E6060000 		.4byte	.LASF183
+ 2460 0c45 01       		.byte	0x1
+ 2461 0c46 F8       		.byte	0xf8
+ 2462 0c47 00000000 		.4byte	.LFB81
+ 2463 0c4b 38000000 		.4byte	.LFE81-.LFB81
+ 2464 0c4f 01       		.uleb128 0x1
+ 2465 0c50 9C       		.byte	0x9c
+ 2466 0c51 8D0C0000 		.4byte	0xc8d
+ 2467 0c55 1F       		.uleb128 0x1f
+ 2468 0c56 1E000000 		.4byte	.LVL59
+ 2469 0c5a 160E0000 		.4byte	0xe16
+ 2470 0c5e 1D       		.uleb128 0x1d
+ 2471 0c5f 01       		.uleb128 0x1
+ 2472 0c60 50       		.byte	0x50
+ 2473 0c61 05       		.uleb128 0x5
+ 2474 0c62 03       		.byte	0x3
+ 2475 0c63 00000000 		.4byte	tsk_fault_TaskProc
+ 2476 0c67 1D       		.uleb128 0x1d
+ 2477 0c68 01       		.uleb128 0x1
+ 2478 0c69 51       		.byte	0x51
+ 2479 0c6a 05       		.uleb128 0x5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 51
+
+
+ 2480 0c6b 03       		.byte	0x3
+ 2481 0c6c 5A000000 		.4byte	.LC5
+ 2482 0c70 1D       		.uleb128 0x1d
+ 2483 0c71 01       		.uleb128 0x1
+ 2484 0c72 52       		.byte	0x52
+ 2485 0c73 02       		.uleb128 0x2
+ 2486 0c74 08       		.byte	0x8
+ 2487 0c75 64       		.byte	0x64
+ 2488 0c76 1D       		.uleb128 0x1d
+ 2489 0c77 01       		.uleb128 0x1
+ 2490 0c78 53       		.byte	0x53
+ 2491 0c79 01       		.uleb128 0x1
+ 2492 0c7a 30       		.byte	0x30
+ 2493 0c7b 1D       		.uleb128 0x1d
+ 2494 0c7c 02       		.uleb128 0x2
+ 2495 0c7d 7D       		.byte	0x7d
+ 2496 0c7e 00       		.sleb128 0
+ 2497 0c7f 01       		.uleb128 0x1
+ 2498 0c80 34       		.byte	0x34
+ 2499 0c81 1D       		.uleb128 0x1d
+ 2500 0c82 02       		.uleb128 0x2
+ 2501 0c83 7D       		.byte	0x7d
+ 2502 0c84 04       		.sleb128 4
+ 2503 0c85 05       		.uleb128 0x5
+ 2504 0c86 03       		.byte	0x3
+ 2505 0c87 00000000 		.4byte	tsk_fault_TaskHandle
+ 2506 0c8b 00       		.byte	0
+ 2507 0c8c 00       		.byte	0
+ 2508 0c8d 2F       		.uleb128 0x2f
+ 2509 0c8e 46010000 		.4byte	.LASF184
+ 2510 0c92 0D       		.byte	0xd
+ 2511 0c93 1207     		.2byte	0x712
+ 2512 0c95 04020000 		.4byte	0x204
+ 2513 0c99 30       		.uleb128 0x30
+ 2514 0c9a 0C060000 		.4byte	.LASF185
+ 2515 0c9e 01       		.byte	0x1
+ 2516 0c9f 44       		.byte	0x44
+ 2517 0ca0 CD010000 		.4byte	0x1cd
+ 2518 0ca4 05       		.uleb128 0x5
+ 2519 0ca5 03       		.byte	0x3
+ 2520 0ca6 00000000 		.4byte	sysfault
+ 2521 0caa 30       		.uleb128 0x30
+ 2522 0cab 74060000 		.4byte	.LASF186
+ 2523 0caf 01       		.byte	0x1
+ 2524 0cb0 7D       		.byte	0x7d
+ 2525 0cb1 E4000000 		.4byte	0xe4
+ 2526 0cb5 05       		.uleb128 0x5
+ 2527 0cb6 03       		.byte	0x3
+ 2528 0cb7 00000000 		.4byte	feedback_error_cnt
+ 2529 0cbb 30       		.uleb128 0x30
+ 2530 0cbc 95070000 		.4byte	.LASF187
+ 2531 0cc0 08       		.byte	0x8
+ 2532 0cc1 32       		.byte	0x32
+ 2533 0cc2 CC0C0000 		.4byte	0xccc
+ 2534 0cc6 05       		.uleb128 0x5
+ 2535 0cc7 03       		.byte	0x3
+ 2536 0cc8 00000000 		.4byte	params
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 52
+
+
+ 2537 0ccc 06       		.uleb128 0x6
+ 2538 0ccd BA020000 		.4byte	0x2ba
+ 2539 0cd1 31       		.uleb128 0x31
+ 2540 0cd2 5D060000 		.4byte	.LASF188
+ 2541 0cd6 08       		.byte	0x8
+ 2542 0cd7 36       		.byte	0x36
+ 2543 0cd8 CE000000 		.4byte	0xce
+ 2544 0cdc 0D       		.uleb128 0xd
+ 2545 0cdd B8000000 		.4byte	0xb8
+ 2546 0ce1 EC0C0000 		.4byte	0xcec
+ 2547 0ce5 0E       		.uleb128 0xe
+ 2548 0ce6 2D010000 		.4byte	0x12d
+ 2549 0cea 02       		.byte	0x2
+ 2550 0ceb 00       		.byte	0
+ 2551 0cec 30       		.uleb128 0x30
+ 2552 0ced D4040000 		.4byte	.LASF189
+ 2553 0cf1 08       		.byte	0x8
+ 2554 0cf2 37       		.byte	0x37
+ 2555 0cf3 DC0C0000 		.4byte	0xcdc
+ 2556 0cf7 05       		.uleb128 0x5
+ 2557 0cf8 03       		.byte	0x3
+ 2558 0cf9 00000000 		.4byte	ct1_dac_val
+ 2559 0cfd 30       		.uleb128 0x30
+ 2560 0cfe 95000000 		.4byte	.LASF190
+ 2561 0d02 01       		.byte	0x1
+ 2562 0d03 28       		.byte	0x28
+ 2563 0d04 EE010000 		.4byte	0x1ee
+ 2564 0d08 05       		.uleb128 0x5
+ 2565 0d09 03       		.byte	0x3
+ 2566 0d0a 00000000 		.4byte	tsk_fault_TaskHandle
+ 2567 0d0e 30       		.uleb128 0x30
+ 2568 0d0f 3B000000 		.4byte	.LASF191
+ 2569 0d13 01       		.byte	0x1
+ 2570 0d14 29       		.byte	0x29
+ 2571 0d15 EF000000 		.4byte	0xef
+ 2572 0d19 05       		.uleb128 0x5
+ 2573 0d1a 03       		.byte	0x3
+ 2574 0d1b 00000000 		.4byte	tsk_fault_initVar
+ 2575 0d1f 31       		.uleb128 0x31
+ 2576 0d20 E3010000 		.4byte	.LASF192
+ 2577 0d24 0A       		.byte	0xa
+ 2578 0d25 A1       		.byte	0xa1
+ 2579 0d26 98050000 		.4byte	0x598
+ 2580 0d2a 30       		.uleb128 0x30
+ 2581 0d2b F1040000 		.4byte	.LASF193
+ 2582 0d2f 0B       		.byte	0xb
+ 2583 0d30 59       		.byte	0x59
+ 2584 0d31 79060000 		.4byte	0x679
+ 2585 0d35 05       		.uleb128 0x5
+ 2586 0d36 03       		.byte	0x3
+ 2587 0d37 00000000 		.4byte	interrupter
+ 2588 0d3b 32       		.uleb128 0x32
+ 2589 0d3c 747400   		.ascii	"tt\000"
+ 2590 0d3f 0C       		.byte	0xc
+ 2591 0d40 5B       		.byte	0x5b
+ 2592 0d41 24080000 		.4byte	0x824
+ 2593 0d45 30       		.uleb128 0x30
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 53
+
+
+ 2594 0d46 06030000 		.4byte	.LASF194
+ 2595 0d4a 0E       		.byte	0xe
+ 2596 0d4b 4B       		.byte	0x4b
+ 2597 0d4c 28010000 		.4byte	0x128
+ 2598 0d50 05       		.uleb128 0x5
+ 2599 0d51 03       		.byte	0x3
+ 2600 0d52 00000000 		.4byte	bus_command
+ 2601 0d56 30       		.uleb128 0x30
+ 2602 0d57 DD070000 		.4byte	.LASF195
+ 2603 0d5b 01       		.byte	0x1
+ 2604 0d5c 43       		.byte	0x43
+ 2605 0d5d C5020000 		.4byte	0x2c5
+ 2606 0d61 05       		.uleb128 0x5
+ 2607 0d62 03       		.byte	0x3
+ 2608 0d63 00000000 		.4byte	xWD_Timer
+ 2609 0d67 30       		.uleb128 0x30
+ 2610 0d68 F3090000 		.4byte	.LASF196
+ 2611 0d6c 01       		.byte	0x1
+ 2612 0d6d 45       		.byte	0x45
+ 2613 0d6e E4000000 		.4byte	0xe4
+ 2614 0d72 05       		.uleb128 0x5
+ 2615 0d73 03       		.byte	0x3
+ 2616 0d74 00000000 		.4byte	switch_without_fb
+ 2617 0d78 33       		.uleb128 0x33
+ 2618 0d79 4A080000 		.4byte	.LASF197
+ 2619 0d7d 4A080000 		.4byte	.LASF197
+ 2620 0d81 0F       		.byte	0xf
+ 2621 0d82 2C       		.byte	0x2c
+ 2622 0d83 33       		.uleb128 0x33
+ 2623 0d84 EB080000 		.4byte	.LASF198
+ 2624 0d88 EB080000 		.4byte	.LASF198
+ 2625 0d8c 0B       		.byte	0xb
+ 2626 0d8d 73       		.byte	0x73
+ 2627 0d8e 33       		.uleb128 0x33
+ 2628 0d8f 77050000 		.4byte	.LASF199
+ 2629 0d93 77050000 		.4byte	.LASF199
+ 2630 0d97 10       		.byte	0x10
+ 2631 0d98 48       		.byte	0x48
+ 2632 0d99 34       		.uleb128 0x34
+ 2633 0d9a 34050000 		.4byte	.LASF200
+ 2634 0d9e 34050000 		.4byte	.LASF200
+ 2635 0da2 07       		.byte	0x7
+ 2636 0da3 9305     		.2byte	0x593
+ 2637 0da5 34       		.uleb128 0x34
+ 2638 0da6 4D090000 		.4byte	.LASF201
+ 2639 0daa 4D090000 		.4byte	.LASF201
+ 2640 0dae 09       		.byte	0x9
+ 2641 0daf 2305     		.2byte	0x523
+ 2642 0db1 34       		.uleb128 0x34
+ 2643 0db2 43020000 		.4byte	.LASF202
+ 2644 0db6 43020000 		.4byte	.LASF202
+ 2645 0dba 07       		.byte	0x7
+ 2646 0dbb A305     		.2byte	0x5a3
+ 2647 0dbd 33       		.uleb128 0x33
+ 2648 0dbe 8A050000 		.4byte	.LASF203
+ 2649 0dc2 8A050000 		.4byte	.LASF203
+ 2650 0dc6 0E       		.byte	0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 54
+
+
+ 2651 0dc7 64       		.byte	0x64
+ 2652 0dc8 33       		.uleb128 0x33
+ 2653 0dc9 A5080000 		.4byte	.LASF204
+ 2654 0dcd A5080000 		.4byte	.LASF204
+ 2655 0dd1 11       		.byte	0x11
+ 2656 0dd2 29       		.byte	0x29
+ 2657 0dd3 33       		.uleb128 0x33
+ 2658 0dd4 C1070000 		.4byte	.LASF205
+ 2659 0dd8 C1070000 		.4byte	.LASF205
+ 2660 0ddc 12       		.byte	0x12
+ 2661 0ddd 77       		.byte	0x77
+ 2662 0dde 33       		.uleb128 0x33
+ 2663 0ddf FC080000 		.4byte	.LASF206
+ 2664 0de3 FC080000 		.4byte	.LASF206
+ 2665 0de7 13       		.byte	0x13
+ 2666 0de8 26       		.byte	0x26
+ 2667 0de9 33       		.uleb128 0x33
+ 2668 0dea B0020000 		.4byte	.LASF207
+ 2669 0dee B0020000 		.4byte	.LASF207
+ 2670 0df2 14       		.byte	0x14
+ 2671 0df3 30       		.byte	0x30
+ 2672 0df4 33       		.uleb128 0x33
+ 2673 0df5 05080000 		.4byte	.LASF208
+ 2674 0df9 05080000 		.4byte	.LASF208
+ 2675 0dfd 09       		.byte	0x9
+ 2676 0dfe E6       		.byte	0xe6
+ 2677 0dff 33       		.uleb128 0x33
+ 2678 0e00 0E020000 		.4byte	.LASF209
+ 2679 0e04 0E020000 		.4byte	.LASF209
+ 2680 0e08 15       		.byte	0x15
+ 2681 0e09 26       		.byte	0x26
+ 2682 0e0a 34       		.uleb128 0x34
+ 2683 0e0b 5B000000 		.4byte	.LASF210
+ 2684 0e0f 5B000000 		.4byte	.LASF210
+ 2685 0e13 07       		.byte	0x7
+ 2686 0e14 0C03     		.2byte	0x30c
+ 2687 0e16 34       		.uleb128 0x34
+ 2688 0e17 F9050000 		.4byte	.LASF211
+ 2689 0e1b F9050000 		.4byte	.LASF211
+ 2690 0e1f 07       		.byte	0x7
+ 2691 0e20 5501     		.2byte	0x155
+ 2692 0e22 00       		.byte	0
+ 2693              		.section	.debug_abbrev,"",%progbits
+ 2694              	.Ldebug_abbrev0:
+ 2695 0000 01       		.uleb128 0x1
+ 2696 0001 11       		.uleb128 0x11
+ 2697 0002 01       		.byte	0x1
+ 2698 0003 25       		.uleb128 0x25
+ 2699 0004 0E       		.uleb128 0xe
+ 2700 0005 13       		.uleb128 0x13
+ 2701 0006 0B       		.uleb128 0xb
+ 2702 0007 03       		.uleb128 0x3
+ 2703 0008 0E       		.uleb128 0xe
+ 2704 0009 1B       		.uleb128 0x1b
+ 2705 000a 0E       		.uleb128 0xe
+ 2706 000b 55       		.uleb128 0x55
+ 2707 000c 17       		.uleb128 0x17
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 55
+
+
+ 2708 000d 11       		.uleb128 0x11
+ 2709 000e 01       		.uleb128 0x1
+ 2710 000f 10       		.uleb128 0x10
+ 2711 0010 17       		.uleb128 0x17
+ 2712 0011 00       		.byte	0
+ 2713 0012 00       		.byte	0
+ 2714 0013 02       		.uleb128 0x2
+ 2715 0014 24       		.uleb128 0x24
+ 2716 0015 00       		.byte	0
+ 2717 0016 0B       		.uleb128 0xb
+ 2718 0017 0B       		.uleb128 0xb
+ 2719 0018 3E       		.uleb128 0x3e
+ 2720 0019 0B       		.uleb128 0xb
+ 2721 001a 03       		.uleb128 0x3
+ 2722 001b 0E       		.uleb128 0xe
+ 2723 001c 00       		.byte	0
+ 2724 001d 00       		.byte	0
+ 2725 001e 03       		.uleb128 0x3
+ 2726 001f 16       		.uleb128 0x16
+ 2727 0020 00       		.byte	0
+ 2728 0021 03       		.uleb128 0x3
+ 2729 0022 0E       		.uleb128 0xe
+ 2730 0023 3A       		.uleb128 0x3a
+ 2731 0024 0B       		.uleb128 0xb
+ 2732 0025 3B       		.uleb128 0x3b
+ 2733 0026 0B       		.uleb128 0xb
+ 2734 0027 49       		.uleb128 0x49
+ 2735 0028 13       		.uleb128 0x13
+ 2736 0029 00       		.byte	0
+ 2737 002a 00       		.byte	0
+ 2738 002b 04       		.uleb128 0x4
+ 2739 002c 24       		.uleb128 0x24
+ 2740 002d 00       		.byte	0
+ 2741 002e 0B       		.uleb128 0xb
+ 2742 002f 0B       		.uleb128 0xb
+ 2743 0030 3E       		.uleb128 0x3e
+ 2744 0031 0B       		.uleb128 0xb
+ 2745 0032 03       		.uleb128 0x3
+ 2746 0033 08       		.uleb128 0x8
+ 2747 0034 00       		.byte	0
+ 2748 0035 00       		.byte	0
+ 2749 0036 05       		.uleb128 0x5
+ 2750 0037 16       		.uleb128 0x16
+ 2751 0038 00       		.byte	0
+ 2752 0039 03       		.uleb128 0x3
+ 2753 003a 0E       		.uleb128 0xe
+ 2754 003b 3A       		.uleb128 0x3a
+ 2755 003c 0B       		.uleb128 0xb
+ 2756 003d 3B       		.uleb128 0x3b
+ 2757 003e 05       		.uleb128 0x5
+ 2758 003f 49       		.uleb128 0x49
+ 2759 0040 13       		.uleb128 0x13
+ 2760 0041 00       		.byte	0
+ 2761 0042 00       		.byte	0
+ 2762 0043 06       		.uleb128 0x6
+ 2763 0044 35       		.uleb128 0x35
+ 2764 0045 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 56
+
+
+ 2765 0046 49       		.uleb128 0x49
+ 2766 0047 13       		.uleb128 0x13
+ 2767 0048 00       		.byte	0
+ 2768 0049 00       		.byte	0
+ 2769 004a 07       		.uleb128 0x7
+ 2770 004b 0F       		.uleb128 0xf
+ 2771 004c 00       		.byte	0
+ 2772 004d 0B       		.uleb128 0xb
+ 2773 004e 0B       		.uleb128 0xb
+ 2774 004f 00       		.byte	0
+ 2775 0050 00       		.byte	0
+ 2776 0051 08       		.uleb128 0x8
+ 2777 0052 0F       		.uleb128 0xf
+ 2778 0053 00       		.byte	0
+ 2779 0054 0B       		.uleb128 0xb
+ 2780 0055 0B       		.uleb128 0xb
+ 2781 0056 49       		.uleb128 0x49
+ 2782 0057 13       		.uleb128 0x13
+ 2783 0058 00       		.byte	0
+ 2784 0059 00       		.byte	0
+ 2785 005a 09       		.uleb128 0x9
+ 2786 005b 13       		.uleb128 0x13
+ 2787 005c 01       		.byte	0x1
+ 2788 005d 03       		.uleb128 0x3
+ 2789 005e 0E       		.uleb128 0xe
+ 2790 005f 0B       		.uleb128 0xb
+ 2791 0060 0B       		.uleb128 0xb
+ 2792 0061 3A       		.uleb128 0x3a
+ 2793 0062 0B       		.uleb128 0xb
+ 2794 0063 3B       		.uleb128 0x3b
+ 2795 0064 0B       		.uleb128 0xb
+ 2796 0065 01       		.uleb128 0x1
+ 2797 0066 13       		.uleb128 0x13
+ 2798 0067 00       		.byte	0
+ 2799 0068 00       		.byte	0
+ 2800 0069 0A       		.uleb128 0xa
+ 2801 006a 0D       		.uleb128 0xd
+ 2802 006b 00       		.byte	0
+ 2803 006c 03       		.uleb128 0x3
+ 2804 006d 0E       		.uleb128 0xe
+ 2805 006e 3A       		.uleb128 0x3a
+ 2806 006f 0B       		.uleb128 0xb
+ 2807 0070 3B       		.uleb128 0x3b
+ 2808 0071 0B       		.uleb128 0xb
+ 2809 0072 49       		.uleb128 0x49
+ 2810 0073 13       		.uleb128 0x13
+ 2811 0074 38       		.uleb128 0x38
+ 2812 0075 0B       		.uleb128 0xb
+ 2813 0076 00       		.byte	0
+ 2814 0077 00       		.byte	0
+ 2815 0078 0B       		.uleb128 0xb
+ 2816 0079 13       		.uleb128 0x13
+ 2817 007a 00       		.byte	0
+ 2818 007b 03       		.uleb128 0x3
+ 2819 007c 0E       		.uleb128 0xe
+ 2820 007d 3C       		.uleb128 0x3c
+ 2821 007e 19       		.uleb128 0x19
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 57
+
+
+ 2822 007f 00       		.byte	0
+ 2823 0080 00       		.byte	0
+ 2824 0081 0C       		.uleb128 0xc
+ 2825 0082 13       		.uleb128 0x13
+ 2826 0083 01       		.byte	0x1
+ 2827 0084 0B       		.uleb128 0xb
+ 2828 0085 0B       		.uleb128 0xb
+ 2829 0086 3A       		.uleb128 0x3a
+ 2830 0087 0B       		.uleb128 0xb
+ 2831 0088 3B       		.uleb128 0x3b
+ 2832 0089 0B       		.uleb128 0xb
+ 2833 008a 01       		.uleb128 0x1
+ 2834 008b 13       		.uleb128 0x13
+ 2835 008c 00       		.byte	0
+ 2836 008d 00       		.byte	0
+ 2837 008e 0D       		.uleb128 0xd
+ 2838 008f 01       		.uleb128 0x1
+ 2839 0090 01       		.byte	0x1
+ 2840 0091 49       		.uleb128 0x49
+ 2841 0092 13       		.uleb128 0x13
+ 2842 0093 01       		.uleb128 0x1
+ 2843 0094 13       		.uleb128 0x13
+ 2844 0095 00       		.byte	0
+ 2845 0096 00       		.byte	0
+ 2846 0097 0E       		.uleb128 0xe
+ 2847 0098 21       		.uleb128 0x21
+ 2848 0099 00       		.byte	0
+ 2849 009a 49       		.uleb128 0x49
+ 2850 009b 13       		.uleb128 0x13
+ 2851 009c 2F       		.uleb128 0x2f
+ 2852 009d 0B       		.uleb128 0xb
+ 2853 009e 00       		.byte	0
+ 2854 009f 00       		.byte	0
+ 2855 00a0 0F       		.uleb128 0xf
+ 2856 00a1 04       		.uleb128 0x4
+ 2857 00a2 01       		.byte	0x1
+ 2858 00a3 03       		.uleb128 0x3
+ 2859 00a4 0E       		.uleb128 0xe
+ 2860 00a5 0B       		.uleb128 0xb
+ 2861 00a6 0B       		.uleb128 0xb
+ 2862 00a7 49       		.uleb128 0x49
+ 2863 00a8 13       		.uleb128 0x13
+ 2864 00a9 3A       		.uleb128 0x3a
+ 2865 00aa 0B       		.uleb128 0xb
+ 2866 00ab 3B       		.uleb128 0x3b
+ 2867 00ac 0B       		.uleb128 0xb
+ 2868 00ad 01       		.uleb128 0x1
+ 2869 00ae 13       		.uleb128 0x13
+ 2870 00af 00       		.byte	0
+ 2871 00b0 00       		.byte	0
+ 2872 00b1 10       		.uleb128 0x10
+ 2873 00b2 28       		.uleb128 0x28
+ 2874 00b3 00       		.byte	0
+ 2875 00b4 03       		.uleb128 0x3
+ 2876 00b5 0E       		.uleb128 0xe
+ 2877 00b6 1C       		.uleb128 0x1c
+ 2878 00b7 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 58
+
+
+ 2879 00b8 00       		.byte	0
+ 2880 00b9 00       		.byte	0
+ 2881 00ba 11       		.uleb128 0x11
+ 2882 00bb 0D       		.uleb128 0xd
+ 2883 00bc 00       		.byte	0
+ 2884 00bd 03       		.uleb128 0x3
+ 2885 00be 08       		.uleb128 0x8
+ 2886 00bf 3A       		.uleb128 0x3a
+ 2887 00c0 0B       		.uleb128 0xb
+ 2888 00c1 3B       		.uleb128 0x3b
+ 2889 00c2 0B       		.uleb128 0xb
+ 2890 00c3 49       		.uleb128 0x49
+ 2891 00c4 13       		.uleb128 0x13
+ 2892 00c5 38       		.uleb128 0x38
+ 2893 00c6 0B       		.uleb128 0xb
+ 2894 00c7 00       		.byte	0
+ 2895 00c8 00       		.byte	0
+ 2896 00c9 12       		.uleb128 0x12
+ 2897 00ca 13       		.uleb128 0x13
+ 2898 00cb 01       		.byte	0x1
+ 2899 00cc 03       		.uleb128 0x3
+ 2900 00cd 0E       		.uleb128 0xe
+ 2901 00ce 0B       		.uleb128 0xb
+ 2902 00cf 05       		.uleb128 0x5
+ 2903 00d0 3A       		.uleb128 0x3a
+ 2904 00d1 0B       		.uleb128 0xb
+ 2905 00d2 3B       		.uleb128 0x3b
+ 2906 00d3 0B       		.uleb128 0xb
+ 2907 00d4 01       		.uleb128 0x1
+ 2908 00d5 13       		.uleb128 0x13
+ 2909 00d6 00       		.byte	0
+ 2910 00d7 00       		.byte	0
+ 2911 00d8 13       		.uleb128 0x13
+ 2912 00d9 0D       		.uleb128 0xd
+ 2913 00da 00       		.byte	0
+ 2914 00db 03       		.uleb128 0x3
+ 2915 00dc 0E       		.uleb128 0xe
+ 2916 00dd 3A       		.uleb128 0x3a
+ 2917 00de 0B       		.uleb128 0xb
+ 2918 00df 3B       		.uleb128 0x3b
+ 2919 00e0 0B       		.uleb128 0xb
+ 2920 00e1 49       		.uleb128 0x49
+ 2921 00e2 13       		.uleb128 0x13
+ 2922 00e3 38       		.uleb128 0x38
+ 2923 00e4 05       		.uleb128 0x5
+ 2924 00e5 00       		.byte	0
+ 2925 00e6 00       		.byte	0
+ 2926 00e7 14       		.uleb128 0x14
+ 2927 00e8 17       		.uleb128 0x17
+ 2928 00e9 01       		.byte	0x1
+ 2929 00ea 03       		.uleb128 0x3
+ 2930 00eb 0E       		.uleb128 0xe
+ 2931 00ec 0B       		.uleb128 0xb
+ 2932 00ed 05       		.uleb128 0x5
+ 2933 00ee 3A       		.uleb128 0x3a
+ 2934 00ef 0B       		.uleb128 0xb
+ 2935 00f0 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 59
+
+
+ 2936 00f1 0B       		.uleb128 0xb
+ 2937 00f2 01       		.uleb128 0x1
+ 2938 00f3 13       		.uleb128 0x13
+ 2939 00f4 00       		.byte	0
+ 2940 00f5 00       		.byte	0
+ 2941 00f6 15       		.uleb128 0x15
+ 2942 00f7 0D       		.uleb128 0xd
+ 2943 00f8 00       		.byte	0
+ 2944 00f9 03       		.uleb128 0x3
+ 2945 00fa 08       		.uleb128 0x8
+ 2946 00fb 3A       		.uleb128 0x3a
+ 2947 00fc 0B       		.uleb128 0xb
+ 2948 00fd 3B       		.uleb128 0x3b
+ 2949 00fe 0B       		.uleb128 0xb
+ 2950 00ff 49       		.uleb128 0x49
+ 2951 0100 13       		.uleb128 0x13
+ 2952 0101 00       		.byte	0
+ 2953 0102 00       		.byte	0
+ 2954 0103 16       		.uleb128 0x16
+ 2955 0104 2E       		.uleb128 0x2e
+ 2956 0105 01       		.byte	0x1
+ 2957 0106 3F       		.uleb128 0x3f
+ 2958 0107 19       		.uleb128 0x19
+ 2959 0108 03       		.uleb128 0x3
+ 2960 0109 0E       		.uleb128 0xe
+ 2961 010a 3A       		.uleb128 0x3a
+ 2962 010b 0B       		.uleb128 0xb
+ 2963 010c 3B       		.uleb128 0x3b
+ 2964 010d 0B       		.uleb128 0xb
+ 2965 010e 27       		.uleb128 0x27
+ 2966 010f 19       		.uleb128 0x19
+ 2967 0110 20       		.uleb128 0x20
+ 2968 0111 0B       		.uleb128 0xb
+ 2969 0112 01       		.uleb128 0x1
+ 2970 0113 13       		.uleb128 0x13
+ 2971 0114 00       		.byte	0
+ 2972 0115 00       		.byte	0
+ 2973 0116 17       		.uleb128 0x17
+ 2974 0117 34       		.uleb128 0x34
+ 2975 0118 00       		.byte	0
+ 2976 0119 03       		.uleb128 0x3
+ 2977 011a 0E       		.uleb128 0xe
+ 2978 011b 3A       		.uleb128 0x3a
+ 2979 011c 0B       		.uleb128 0xb
+ 2980 011d 3B       		.uleb128 0x3b
+ 2981 011e 0B       		.uleb128 0xb
+ 2982 011f 49       		.uleb128 0x49
+ 2983 0120 13       		.uleb128 0x13
+ 2984 0121 00       		.byte	0
+ 2985 0122 00       		.byte	0
+ 2986 0123 18       		.uleb128 0x18
+ 2987 0124 0B       		.uleb128 0xb
+ 2988 0125 01       		.byte	0x1
+ 2989 0126 00       		.byte	0
+ 2990 0127 00       		.byte	0
+ 2991 0128 19       		.uleb128 0x19
+ 2992 0129 34       		.uleb128 0x34
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 60
+
+
+ 2993 012a 00       		.byte	0
+ 2994 012b 03       		.uleb128 0x3
+ 2995 012c 08       		.uleb128 0x8
+ 2996 012d 3A       		.uleb128 0x3a
+ 2997 012e 0B       		.uleb128 0xb
+ 2998 012f 3B       		.uleb128 0x3b
+ 2999 0130 0B       		.uleb128 0xb
+ 3000 0131 49       		.uleb128 0x49
+ 3001 0132 13       		.uleb128 0x13
+ 3002 0133 00       		.byte	0
+ 3003 0134 00       		.byte	0
+ 3004 0135 1A       		.uleb128 0x1a
+ 3005 0136 2E       		.uleb128 0x2e
+ 3006 0137 01       		.byte	0x1
+ 3007 0138 3F       		.uleb128 0x3f
+ 3008 0139 19       		.uleb128 0x19
+ 3009 013a 03       		.uleb128 0x3
+ 3010 013b 0E       		.uleb128 0xe
+ 3011 013c 3A       		.uleb128 0x3a
+ 3012 013d 0B       		.uleb128 0xb
+ 3013 013e 3B       		.uleb128 0x3b
+ 3014 013f 0B       		.uleb128 0xb
+ 3015 0140 27       		.uleb128 0x27
+ 3016 0141 19       		.uleb128 0x19
+ 3017 0142 11       		.uleb128 0x11
+ 3018 0143 01       		.uleb128 0x1
+ 3019 0144 12       		.uleb128 0x12
+ 3020 0145 06       		.uleb128 0x6
+ 3021 0146 40       		.uleb128 0x40
+ 3022 0147 18       		.uleb128 0x18
+ 3023 0148 9742     		.uleb128 0x2117
+ 3024 014a 19       		.uleb128 0x19
+ 3025 014b 01       		.uleb128 0x1
+ 3026 014c 13       		.uleb128 0x13
+ 3027 014d 00       		.byte	0
+ 3028 014e 00       		.byte	0
+ 3029 014f 1B       		.uleb128 0x1b
+ 3030 0150 05       		.uleb128 0x5
+ 3031 0151 00       		.byte	0
+ 3032 0152 03       		.uleb128 0x3
+ 3033 0153 0E       		.uleb128 0xe
+ 3034 0154 3A       		.uleb128 0x3a
+ 3035 0155 0B       		.uleb128 0xb
+ 3036 0156 3B       		.uleb128 0x3b
+ 3037 0157 0B       		.uleb128 0xb
+ 3038 0158 49       		.uleb128 0x49
+ 3039 0159 13       		.uleb128 0x13
+ 3040 015a 02       		.uleb128 0x2
+ 3041 015b 17       		.uleb128 0x17
+ 3042 015c 00       		.byte	0
+ 3043 015d 00       		.byte	0
+ 3044 015e 1C       		.uleb128 0x1c
+ 3045 015f 898201   		.uleb128 0x4109
+ 3046 0162 01       		.byte	0x1
+ 3047 0163 11       		.uleb128 0x11
+ 3048 0164 01       		.uleb128 0x1
+ 3049 0165 31       		.uleb128 0x31
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 61
+
+
+ 3050 0166 13       		.uleb128 0x13
+ 3051 0167 01       		.uleb128 0x1
+ 3052 0168 13       		.uleb128 0x13
+ 3053 0169 00       		.byte	0
+ 3054 016a 00       		.byte	0
+ 3055 016b 1D       		.uleb128 0x1d
+ 3056 016c 8A8201   		.uleb128 0x410a
+ 3057 016f 00       		.byte	0
+ 3058 0170 02       		.uleb128 0x2
+ 3059 0171 18       		.uleb128 0x18
+ 3060 0172 9142     		.uleb128 0x2111
+ 3061 0174 18       		.uleb128 0x18
+ 3062 0175 00       		.byte	0
+ 3063 0176 00       		.byte	0
+ 3064 0177 1E       		.uleb128 0x1e
+ 3065 0178 898201   		.uleb128 0x4109
+ 3066 017b 00       		.byte	0
+ 3067 017c 11       		.uleb128 0x11
+ 3068 017d 01       		.uleb128 0x1
+ 3069 017e 31       		.uleb128 0x31
+ 3070 017f 13       		.uleb128 0x13
+ 3071 0180 00       		.byte	0
+ 3072 0181 00       		.byte	0
+ 3073 0182 1F       		.uleb128 0x1f
+ 3074 0183 898201   		.uleb128 0x4109
+ 3075 0186 01       		.byte	0x1
+ 3076 0187 11       		.uleb128 0x11
+ 3077 0188 01       		.uleb128 0x1
+ 3078 0189 31       		.uleb128 0x31
+ 3079 018a 13       		.uleb128 0x13
+ 3080 018b 00       		.byte	0
+ 3081 018c 00       		.byte	0
+ 3082 018d 20       		.uleb128 0x20
+ 3083 018e 2E       		.uleb128 0x2e
+ 3084 018f 01       		.byte	0x1
+ 3085 0190 3F       		.uleb128 0x3f
+ 3086 0191 19       		.uleb128 0x19
+ 3087 0192 03       		.uleb128 0x3
+ 3088 0193 0E       		.uleb128 0xe
+ 3089 0194 3A       		.uleb128 0x3a
+ 3090 0195 0B       		.uleb128 0xb
+ 3091 0196 3B       		.uleb128 0x3b
+ 3092 0197 0B       		.uleb128 0xb
+ 3093 0198 11       		.uleb128 0x11
+ 3094 0199 01       		.uleb128 0x1
+ 3095 019a 12       		.uleb128 0x12
+ 3096 019b 06       		.uleb128 0x6
+ 3097 019c 40       		.uleb128 0x40
+ 3098 019d 18       		.uleb128 0x18
+ 3099 019e 9742     		.uleb128 0x2117
+ 3100 01a0 19       		.uleb128 0x19
+ 3101 01a1 01       		.uleb128 0x1
+ 3102 01a2 13       		.uleb128 0x13
+ 3103 01a3 00       		.byte	0
+ 3104 01a4 00       		.byte	0
+ 3105 01a5 21       		.uleb128 0x21
+ 3106 01a6 05       		.uleb128 0x5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 62
+
+
+ 3107 01a7 00       		.byte	0
+ 3108 01a8 03       		.uleb128 0x3
+ 3109 01a9 08       		.uleb128 0x8
+ 3110 01aa 3A       		.uleb128 0x3a
+ 3111 01ab 0B       		.uleb128 0xb
+ 3112 01ac 3B       		.uleb128 0x3b
+ 3113 01ad 0B       		.uleb128 0xb
+ 3114 01ae 49       		.uleb128 0x49
+ 3115 01af 13       		.uleb128 0x13
+ 3116 01b0 02       		.uleb128 0x2
+ 3117 01b1 18       		.uleb128 0x18
+ 3118 01b2 00       		.byte	0
+ 3119 01b3 00       		.byte	0
+ 3120 01b4 22       		.uleb128 0x22
+ 3121 01b5 2E       		.uleb128 0x2e
+ 3122 01b6 01       		.byte	0x1
+ 3123 01b7 31       		.uleb128 0x31
+ 3124 01b8 13       		.uleb128 0x13
+ 3125 01b9 11       		.uleb128 0x11
+ 3126 01ba 01       		.uleb128 0x1
+ 3127 01bb 12       		.uleb128 0x12
+ 3128 01bc 06       		.uleb128 0x6
+ 3129 01bd 40       		.uleb128 0x40
+ 3130 01be 18       		.uleb128 0x18
+ 3131 01bf 9742     		.uleb128 0x2117
+ 3132 01c1 19       		.uleb128 0x19
+ 3133 01c2 01       		.uleb128 0x1
+ 3134 01c3 13       		.uleb128 0x13
+ 3135 01c4 00       		.byte	0
+ 3136 01c5 00       		.byte	0
+ 3137 01c6 23       		.uleb128 0x23
+ 3138 01c7 34       		.uleb128 0x34
+ 3139 01c8 00       		.byte	0
+ 3140 01c9 31       		.uleb128 0x31
+ 3141 01ca 13       		.uleb128 0x13
+ 3142 01cb 02       		.uleb128 0x2
+ 3143 01cc 17       		.uleb128 0x17
+ 3144 01cd 00       		.byte	0
+ 3145 01ce 00       		.byte	0
+ 3146 01cf 24       		.uleb128 0x24
+ 3147 01d0 0B       		.uleb128 0xb
+ 3148 01d1 01       		.byte	0x1
+ 3149 01d2 11       		.uleb128 0x11
+ 3150 01d3 01       		.uleb128 0x1
+ 3151 01d4 12       		.uleb128 0x12
+ 3152 01d5 06       		.uleb128 0x6
+ 3153 01d6 01       		.uleb128 0x1
+ 3154 01d7 13       		.uleb128 0x13
+ 3155 01d8 00       		.byte	0
+ 3156 01d9 00       		.byte	0
+ 3157 01da 25       		.uleb128 0x25
+ 3158 01db 34       		.uleb128 0x34
+ 3159 01dc 00       		.byte	0
+ 3160 01dd 31       		.uleb128 0x31
+ 3161 01de 13       		.uleb128 0x13
+ 3162 01df 00       		.byte	0
+ 3163 01e0 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 63
+
+
+ 3164 01e1 26       		.uleb128 0x26
+ 3165 01e2 0B       		.uleb128 0xb
+ 3166 01e3 01       		.byte	0x1
+ 3167 01e4 55       		.uleb128 0x55
+ 3168 01e5 17       		.uleb128 0x17
+ 3169 01e6 00       		.byte	0
+ 3170 01e7 00       		.byte	0
+ 3171 01e8 27       		.uleb128 0x27
+ 3172 01e9 34       		.uleb128 0x34
+ 3173 01ea 00       		.byte	0
+ 3174 01eb 03       		.uleb128 0x3
+ 3175 01ec 08       		.uleb128 0x8
+ 3176 01ed 3A       		.uleb128 0x3a
+ 3177 01ee 0B       		.uleb128 0xb
+ 3178 01ef 3B       		.uleb128 0x3b
+ 3179 01f0 0B       		.uleb128 0xb
+ 3180 01f1 49       		.uleb128 0x49
+ 3181 01f2 13       		.uleb128 0x13
+ 3182 01f3 02       		.uleb128 0x2
+ 3183 01f4 17       		.uleb128 0x17
+ 3184 01f5 00       		.byte	0
+ 3185 01f6 00       		.byte	0
+ 3186 01f7 28       		.uleb128 0x28
+ 3187 01f8 2E       		.uleb128 0x2e
+ 3188 01f9 00       		.byte	0
+ 3189 01fa 3F       		.uleb128 0x3f
+ 3190 01fb 19       		.uleb128 0x19
+ 3191 01fc 03       		.uleb128 0x3
+ 3192 01fd 0E       		.uleb128 0xe
+ 3193 01fe 3A       		.uleb128 0x3a
+ 3194 01ff 0B       		.uleb128 0xb
+ 3195 0200 3B       		.uleb128 0x3b
+ 3196 0201 0B       		.uleb128 0xb
+ 3197 0202 49       		.uleb128 0x49
+ 3198 0203 13       		.uleb128 0x13
+ 3199 0204 11       		.uleb128 0x11
+ 3200 0205 01       		.uleb128 0x1
+ 3201 0206 12       		.uleb128 0x12
+ 3202 0207 06       		.uleb128 0x6
+ 3203 0208 40       		.uleb128 0x40
+ 3204 0209 18       		.uleb128 0x18
+ 3205 020a 9742     		.uleb128 0x2117
+ 3206 020c 19       		.uleb128 0x19
+ 3207 020d 00       		.byte	0
+ 3208 020e 00       		.byte	0
+ 3209 020f 29       		.uleb128 0x29
+ 3210 0210 898201   		.uleb128 0x4109
+ 3211 0213 01       		.byte	0x1
+ 3212 0214 11       		.uleb128 0x11
+ 3213 0215 01       		.uleb128 0x1
+ 3214 0216 9542     		.uleb128 0x2115
+ 3215 0218 19       		.uleb128 0x19
+ 3216 0219 31       		.uleb128 0x31
+ 3217 021a 13       		.uleb128 0x13
+ 3218 021b 00       		.byte	0
+ 3219 021c 00       		.byte	0
+ 3220 021d 2A       		.uleb128 0x2a
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 64
+
+
+ 3221 021e 0B       		.uleb128 0xb
+ 3222 021f 01       		.byte	0x1
+ 3223 0220 55       		.uleb128 0x55
+ 3224 0221 17       		.uleb128 0x17
+ 3225 0222 01       		.uleb128 0x1
+ 3226 0223 13       		.uleb128 0x13
+ 3227 0224 00       		.byte	0
+ 3228 0225 00       		.byte	0
+ 3229 0226 2B       		.uleb128 0x2b
+ 3230 0227 898201   		.uleb128 0x4109
+ 3231 022a 00       		.byte	0
+ 3232 022b 11       		.uleb128 0x11
+ 3233 022c 01       		.uleb128 0x1
+ 3234 022d 9542     		.uleb128 0x2115
+ 3235 022f 19       		.uleb128 0x19
+ 3236 0230 31       		.uleb128 0x31
+ 3237 0231 13       		.uleb128 0x13
+ 3238 0232 00       		.byte	0
+ 3239 0233 00       		.byte	0
+ 3240 0234 2C       		.uleb128 0x2c
+ 3241 0235 34       		.uleb128 0x34
+ 3242 0236 00       		.byte	0
+ 3243 0237 03       		.uleb128 0x3
+ 3244 0238 0E       		.uleb128 0xe
+ 3245 0239 3A       		.uleb128 0x3a
+ 3246 023a 0B       		.uleb128 0xb
+ 3247 023b 3B       		.uleb128 0x3b
+ 3248 023c 0B       		.uleb128 0xb
+ 3249 023d 49       		.uleb128 0x49
+ 3250 023e 13       		.uleb128 0x13
+ 3251 023f 02       		.uleb128 0x2
+ 3252 0240 17       		.uleb128 0x17
+ 3253 0241 00       		.byte	0
+ 3254 0242 00       		.byte	0
+ 3255 0243 2D       		.uleb128 0x2d
+ 3256 0244 34       		.uleb128 0x34
+ 3257 0245 00       		.byte	0
+ 3258 0246 03       		.uleb128 0x3
+ 3259 0247 0E       		.uleb128 0xe
+ 3260 0248 3A       		.uleb128 0x3a
+ 3261 0249 0B       		.uleb128 0xb
+ 3262 024a 3B       		.uleb128 0x3b
+ 3263 024b 0B       		.uleb128 0xb
+ 3264 024c 49       		.uleb128 0x49
+ 3265 024d 13       		.uleb128 0x13
+ 3266 024e 02       		.uleb128 0x2
+ 3267 024f 18       		.uleb128 0x18
+ 3268 0250 00       		.byte	0
+ 3269 0251 00       		.byte	0
+ 3270 0252 2E       		.uleb128 0x2e
+ 3271 0253 2E       		.uleb128 0x2e
+ 3272 0254 01       		.byte	0x1
+ 3273 0255 3F       		.uleb128 0x3f
+ 3274 0256 19       		.uleb128 0x19
+ 3275 0257 03       		.uleb128 0x3
+ 3276 0258 0E       		.uleb128 0xe
+ 3277 0259 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 65
+
+
+ 3278 025a 0B       		.uleb128 0xb
+ 3279 025b 3B       		.uleb128 0x3b
+ 3280 025c 0B       		.uleb128 0xb
+ 3281 025d 27       		.uleb128 0x27
+ 3282 025e 19       		.uleb128 0x19
+ 3283 025f 8701     		.uleb128 0x87
+ 3284 0261 19       		.uleb128 0x19
+ 3285 0262 11       		.uleb128 0x11
+ 3286 0263 01       		.uleb128 0x1
+ 3287 0264 12       		.uleb128 0x12
+ 3288 0265 06       		.uleb128 0x6
+ 3289 0266 40       		.uleb128 0x40
+ 3290 0267 18       		.uleb128 0x18
+ 3291 0268 9742     		.uleb128 0x2117
+ 3292 026a 19       		.uleb128 0x19
+ 3293 026b 01       		.uleb128 0x1
+ 3294 026c 13       		.uleb128 0x13
+ 3295 026d 00       		.byte	0
+ 3296 026e 00       		.byte	0
+ 3297 026f 2F       		.uleb128 0x2f
+ 3298 0270 34       		.uleb128 0x34
+ 3299 0271 00       		.byte	0
+ 3300 0272 03       		.uleb128 0x3
+ 3301 0273 0E       		.uleb128 0xe
+ 3302 0274 3A       		.uleb128 0x3a
+ 3303 0275 0B       		.uleb128 0xb
+ 3304 0276 3B       		.uleb128 0x3b
+ 3305 0277 05       		.uleb128 0x5
+ 3306 0278 49       		.uleb128 0x49
+ 3307 0279 13       		.uleb128 0x13
+ 3308 027a 3F       		.uleb128 0x3f
+ 3309 027b 19       		.uleb128 0x19
+ 3310 027c 3C       		.uleb128 0x3c
+ 3311 027d 19       		.uleb128 0x19
+ 3312 027e 00       		.byte	0
+ 3313 027f 00       		.byte	0
+ 3314 0280 30       		.uleb128 0x30
+ 3315 0281 34       		.uleb128 0x34
+ 3316 0282 00       		.byte	0
+ 3317 0283 03       		.uleb128 0x3
+ 3318 0284 0E       		.uleb128 0xe
+ 3319 0285 3A       		.uleb128 0x3a
+ 3320 0286 0B       		.uleb128 0xb
+ 3321 0287 3B       		.uleb128 0x3b
+ 3322 0288 0B       		.uleb128 0xb
+ 3323 0289 49       		.uleb128 0x49
+ 3324 028a 13       		.uleb128 0x13
+ 3325 028b 3F       		.uleb128 0x3f
+ 3326 028c 19       		.uleb128 0x19
+ 3327 028d 02       		.uleb128 0x2
+ 3328 028e 18       		.uleb128 0x18
+ 3329 028f 00       		.byte	0
+ 3330 0290 00       		.byte	0
+ 3331 0291 31       		.uleb128 0x31
+ 3332 0292 34       		.uleb128 0x34
+ 3333 0293 00       		.byte	0
+ 3334 0294 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 66
+
+
+ 3335 0295 0E       		.uleb128 0xe
+ 3336 0296 3A       		.uleb128 0x3a
+ 3337 0297 0B       		.uleb128 0xb
+ 3338 0298 3B       		.uleb128 0x3b
+ 3339 0299 0B       		.uleb128 0xb
+ 3340 029a 49       		.uleb128 0x49
+ 3341 029b 13       		.uleb128 0x13
+ 3342 029c 3F       		.uleb128 0x3f
+ 3343 029d 19       		.uleb128 0x19
+ 3344 029e 3C       		.uleb128 0x3c
+ 3345 029f 19       		.uleb128 0x19
+ 3346 02a0 00       		.byte	0
+ 3347 02a1 00       		.byte	0
+ 3348 02a2 32       		.uleb128 0x32
+ 3349 02a3 34       		.uleb128 0x34
+ 3350 02a4 00       		.byte	0
+ 3351 02a5 03       		.uleb128 0x3
+ 3352 02a6 08       		.uleb128 0x8
+ 3353 02a7 3A       		.uleb128 0x3a
+ 3354 02a8 0B       		.uleb128 0xb
+ 3355 02a9 3B       		.uleb128 0x3b
+ 3356 02aa 0B       		.uleb128 0xb
+ 3357 02ab 49       		.uleb128 0x49
+ 3358 02ac 13       		.uleb128 0x13
+ 3359 02ad 3F       		.uleb128 0x3f
+ 3360 02ae 19       		.uleb128 0x19
+ 3361 02af 3C       		.uleb128 0x3c
+ 3362 02b0 19       		.uleb128 0x19
+ 3363 02b1 00       		.byte	0
+ 3364 02b2 00       		.byte	0
+ 3365 02b3 33       		.uleb128 0x33
+ 3366 02b4 2E       		.uleb128 0x2e
+ 3367 02b5 00       		.byte	0
+ 3368 02b6 3F       		.uleb128 0x3f
+ 3369 02b7 19       		.uleb128 0x19
+ 3370 02b8 3C       		.uleb128 0x3c
+ 3371 02b9 19       		.uleb128 0x19
+ 3372 02ba 6E       		.uleb128 0x6e
+ 3373 02bb 0E       		.uleb128 0xe
+ 3374 02bc 03       		.uleb128 0x3
+ 3375 02bd 0E       		.uleb128 0xe
+ 3376 02be 3A       		.uleb128 0x3a
+ 3377 02bf 0B       		.uleb128 0xb
+ 3378 02c0 3B       		.uleb128 0x3b
+ 3379 02c1 0B       		.uleb128 0xb
+ 3380 02c2 00       		.byte	0
+ 3381 02c3 00       		.byte	0
+ 3382 02c4 34       		.uleb128 0x34
+ 3383 02c5 2E       		.uleb128 0x2e
+ 3384 02c6 00       		.byte	0
+ 3385 02c7 3F       		.uleb128 0x3f
+ 3386 02c8 19       		.uleb128 0x19
+ 3387 02c9 3C       		.uleb128 0x3c
+ 3388 02ca 19       		.uleb128 0x19
+ 3389 02cb 6E       		.uleb128 0x6e
+ 3390 02cc 0E       		.uleb128 0xe
+ 3391 02cd 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 67
+
+
+ 3392 02ce 0E       		.uleb128 0xe
+ 3393 02cf 3A       		.uleb128 0x3a
+ 3394 02d0 0B       		.uleb128 0xb
+ 3395 02d1 3B       		.uleb128 0x3b
+ 3396 02d2 05       		.uleb128 0x5
+ 3397 02d3 00       		.byte	0
+ 3398 02d4 00       		.byte	0
+ 3399 02d5 00       		.byte	0
+ 3400              		.section	.debug_loc,"",%progbits
+ 3401              	.Ldebug_loc0:
+ 3402              	.LLST0:
+ 3403 0000 00000000 		.4byte	.LVL0
+ 3404 0004 14000000 		.4byte	.LVL1
+ 3405 0008 0100     		.2byte	0x1
+ 3406 000a 50       		.byte	0x50
+ 3407 000b 14000000 		.4byte	.LVL1
+ 3408 000f 44000000 		.4byte	.LVL7
+ 3409 0013 0100     		.2byte	0x1
+ 3410 0015 55       		.byte	0x55
+ 3411 0016 44000000 		.4byte	.LVL7
+ 3412 001a 50000000 		.4byte	.LFE79
+ 3413 001e 0400     		.2byte	0x4
+ 3414 0020 F3       		.byte	0xf3
+ 3415 0021 01       		.uleb128 0x1
+ 3416 0022 50       		.byte	0x50
+ 3417 0023 9F       		.byte	0x9f
+ 3418 0024 00000000 		.4byte	0
+ 3419 0028 00000000 		.4byte	0
+ 3420              	.LLST1:
+ 3421 002c 00000000 		.4byte	.LVL8
+ 3422 0030 11000000 		.4byte	.LVL9-1
+ 3423 0034 0100     		.2byte	0x1
+ 3424 0036 50       		.byte	0x50
+ 3425 0037 11000000 		.4byte	.LVL9-1
+ 3426 003b 1C000000 		.4byte	.LVL10
+ 3427 003f 0400     		.2byte	0x4
+ 3428 0041 F3       		.byte	0xf3
+ 3429 0042 01       		.uleb128 0x1
+ 3430 0043 50       		.byte	0x50
+ 3431 0044 9F       		.byte	0x9f
+ 3432 0045 1C000000 		.4byte	.LVL10
+ 3433 0049 22000000 		.4byte	.LVL11
+ 3434 004d 0100     		.2byte	0x1
+ 3435 004f 50       		.byte	0x50
+ 3436 0050 22000000 		.4byte	.LVL11
+ 3437 0054 30000000 		.4byte	.LFE68
+ 3438 0058 0400     		.2byte	0x4
+ 3439 005a F3       		.byte	0xf3
+ 3440 005b 01       		.uleb128 0x1
+ 3441 005c 50       		.byte	0x50
+ 3442 005d 9F       		.byte	0x9f
+ 3443 005e 00000000 		.4byte	0
+ 3444 0062 00000000 		.4byte	0
+ 3445              	.LLST2:
+ 3446 0066 0C000000 		.4byte	.LVL19
+ 3447 006a 20000000 		.4byte	.LVL21
+ 3448 006e 0200     		.2byte	0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 68
+
+
+ 3449 0070 30       		.byte	0x30
+ 3450 0071 9F       		.byte	0x9f
+ 3451 0072 20000000 		.4byte	.LVL21
+ 3452 0076 34000000 		.4byte	.LVL23
+ 3453 007a 0200     		.2byte	0x2
+ 3454 007c 31       		.byte	0x31
+ 3455 007d 9F       		.byte	0x9f
+ 3456 007e 34000000 		.4byte	.LVL23
+ 3457 0082 36000000 		.4byte	.LVL24
+ 3458 0086 0200     		.2byte	0x2
+ 3459 0088 30       		.byte	0x30
+ 3460 0089 9F       		.byte	0x9f
+ 3461 008a 00000000 		.4byte	0
+ 3462 008e 00000000 		.4byte	0
+ 3463              	.LLST3:
+ 3464 0092 08000000 		.4byte	.LVL25
+ 3465 0096 0A000000 		.4byte	.LVL26
+ 3466 009a 0200     		.2byte	0x2
+ 3467 009c 30       		.byte	0x30
+ 3468 009d 9F       		.byte	0x9f
+ 3469 009e 0A000000 		.4byte	.LVL26
+ 3470 00a2 0C000000 		.4byte	.LVL27
+ 3471 00a6 0100     		.2byte	0x1
+ 3472 00a8 53       		.byte	0x53
+ 3473 00a9 0C000000 		.4byte	.LVL27
+ 3474 00ad 0E000000 		.4byte	.LVL28
+ 3475 00b1 0300     		.2byte	0x3
+ 3476 00b3 73       		.byte	0x73
+ 3477 00b4 01       		.sleb128 1
+ 3478 00b5 9F       		.byte	0x9f
+ 3479 00b6 00000000 		.4byte	0
+ 3480 00ba 00000000 		.4byte	0
+ 3481              	.LLST4:
+ 3482 00be 00000000 		.4byte	.LVL29
+ 3483 00c2 14000000 		.4byte	.LVL30
+ 3484 00c6 0100     		.2byte	0x1
+ 3485 00c8 50       		.byte	0x50
+ 3486 00c9 14000000 		.4byte	.LVL30
+ 3487 00cd 18000000 		.4byte	.LVL31
+ 3488 00d1 0400     		.2byte	0x4
+ 3489 00d3 F3       		.byte	0xf3
+ 3490 00d4 01       		.uleb128 0x1
+ 3491 00d5 50       		.byte	0x50
+ 3492 00d6 9F       		.byte	0x9f
+ 3493 00d7 18000000 		.4byte	.LVL31
+ 3494 00db 24000000 		.4byte	.LFE75
+ 3495 00df 0100     		.2byte	0x1
+ 3496 00e1 50       		.byte	0x50
+ 3497 00e2 00000000 		.4byte	0
+ 3498 00e6 00000000 		.4byte	0
+ 3499              	.LLST5:
+ 3500 00ea 00000000 		.4byte	.LVL32
+ 3501 00ee 18000000 		.4byte	.LVL33
+ 3502 00f2 0100     		.2byte	0x1
+ 3503 00f4 50       		.byte	0x50
+ 3504 00f5 18000000 		.4byte	.LVL33
+ 3505 00f9 1C000000 		.4byte	.LVL34
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 69
+
+
+ 3506 00fd 0400     		.2byte	0x4
+ 3507 00ff F3       		.byte	0xf3
+ 3508 0100 01       		.uleb128 0x1
+ 3509 0101 50       		.byte	0x50
+ 3510 0102 9F       		.byte	0x9f
+ 3511 0103 1C000000 		.4byte	.LVL34
+ 3512 0107 28000000 		.4byte	.LFE76
+ 3513 010b 0100     		.2byte	0x1
+ 3514 010d 50       		.byte	0x50
+ 3515 010e 00000000 		.4byte	0
+ 3516 0112 00000000 		.4byte	0
+ 3517              	.LLST6:
+ 3518 0116 00000000 		.4byte	.LVL35
+ 3519 011a 08000000 		.4byte	.LVL36
+ 3520 011e 0200     		.2byte	0x2
+ 3521 0120 31       		.byte	0x31
+ 3522 0121 9F       		.byte	0x9f
+ 3523 0122 08000000 		.4byte	.LVL36
+ 3524 0126 29000000 		.4byte	.LVL39-1
+ 3525 012a 0100     		.2byte	0x1
+ 3526 012c 51       		.byte	0x51
+ 3527 012d 00000000 		.4byte	0
+ 3528 0131 00000000 		.4byte	0
+ 3529              	.LLST7:
+ 3530 0135 00000000 		.4byte	.LVL35
+ 3531 0139 08000000 		.4byte	.LVL36
+ 3532 013d 0200     		.2byte	0x2
+ 3533 013f 30       		.byte	0x30
+ 3534 0140 9F       		.byte	0x9f
+ 3535 0141 08000000 		.4byte	.LVL36
+ 3536 0145 0C000000 		.4byte	.LVL37
+ 3537 0149 0100     		.2byte	0x1
+ 3538 014b 52       		.byte	0x52
+ 3539 014c 00000000 		.4byte	0
+ 3540 0150 00000000 		.4byte	0
+ 3541              	.LLST8:
+ 3542 0154 02000000 		.4byte	.LVL42
+ 3543 0158 0A000000 		.4byte	.LVL43
+ 3544 015c 1700     		.2byte	0x17
+ 3545 015e 73       		.byte	0x73
+ 3546 015f 00       		.sleb128 0
+ 3547 0160 94       		.byte	0x94
+ 3548 0161 02       		.byte	0x2
+ 3549 0162 0A       		.byte	0xa
+ 3550 0163 FFFF     		.2byte	0xffff
+ 3551 0165 1A       		.byte	0x1a
+ 3552 0166 0A       		.byte	0xa
+ 3553 0167 093D     		.2byte	0x3d09
+ 3554 0169 1E       		.byte	0x1e
+ 3555 016a F7       		.byte	0xf7
+ 3556 016b 25       		.uleb128 0x25
+ 3557 016c 0A       		.byte	0xa
+ 3558 016d E803     		.2byte	0x3e8
+ 3559 016f F7       		.byte	0xf7
+ 3560 0170 25       		.uleb128 0x25
+ 3561 0171 1B       		.byte	0x1b
+ 3562 0172 F7       		.byte	0xf7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 70
+
+
+ 3563 0173 00       		.uleb128 0
+ 3564 0174 9F       		.byte	0x9f
+ 3565 0175 14000000 		.4byte	.LVL44
+ 3566 0179 1A000000 		.4byte	.LVL45
+ 3567 017d 0100     		.2byte	0x1
+ 3568 017f 53       		.byte	0x53
+ 3569 0180 00000000 		.4byte	0
+ 3570 0184 00000000 		.4byte	0
+ 3571              	.LLST9:
+ 3572 0188 00000000 		.4byte	.LVL48
+ 3573 018c 10000000 		.4byte	.LVL49
+ 3574 0190 0100     		.2byte	0x1
+ 3575 0192 50       		.byte	0x50
+ 3576 0193 10000000 		.4byte	.LVL49
+ 3577 0197 64000000 		.4byte	.LFE80
+ 3578 019b 0400     		.2byte	0x4
+ 3579 019d F3       		.byte	0xf3
+ 3580 019e 01       		.uleb128 0x1
+ 3581 019f 50       		.byte	0x50
+ 3582 01a0 9F       		.byte	0x9f
+ 3583 01a1 00000000 		.4byte	0
+ 3584 01a5 00000000 		.4byte	0
+ 3585              		.section	.debug_aranges,"",%progbits
+ 3586 0000 84000000 		.4byte	0x84
+ 3587 0004 0200     		.2byte	0x2
+ 3588 0006 00000000 		.4byte	.Ldebug_info0
+ 3589 000a 04       		.byte	0x4
+ 3590 000b 00       		.byte	0
+ 3591 000c 0000     		.2byte	0
+ 3592 000e 0000     		.2byte	0
+ 3593 0010 00000000 		.4byte	.LFB79
+ 3594 0014 50000000 		.4byte	.LFE79-.LFB79
+ 3595 0018 00000000 		.4byte	.LFB68
+ 3596 001c 30000000 		.4byte	.LFE68-.LFB68
+ 3597 0020 00000000 		.4byte	.LFB69
+ 3598 0024 2C000000 		.4byte	.LFE69-.LFB69
+ 3599 0028 00000000 		.4byte	.LFB70
+ 3600 002c 2C000000 		.4byte	.LFE70-.LFB70
+ 3601 0030 00000000 		.4byte	.LFB71
+ 3602 0034 14000000 		.4byte	.LFE71-.LFB71
+ 3603 0038 00000000 		.4byte	.LFB72
+ 3604 003c 4C000000 		.4byte	.LFE72-.LFB72
+ 3605 0040 00000000 		.4byte	.LFB73
+ 3606 0044 1C000000 		.4byte	.LFE73-.LFB73
+ 3607 0048 00000000 		.4byte	.LFB74
+ 3608 004c 14000000 		.4byte	.LFE74-.LFB74
+ 3609 0050 00000000 		.4byte	.LFB75
+ 3610 0054 24000000 		.4byte	.LFE75-.LFB75
+ 3611 0058 00000000 		.4byte	.LFB76
+ 3612 005c 28000000 		.4byte	.LFE76-.LFB76
+ 3613 0060 00000000 		.4byte	.LFB77
+ 3614 0064 5C000000 		.4byte	.LFE77-.LFB77
+ 3615 0068 00000000 		.4byte	.LFB78
+ 3616 006c 98000000 		.4byte	.LFE78-.LFB78
+ 3617 0070 00000000 		.4byte	.LFB80
+ 3618 0074 64000000 		.4byte	.LFE80-.LFB80
+ 3619 0078 00000000 		.4byte	.LFB81
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 71
+
+
+ 3620 007c 38000000 		.4byte	.LFE81-.LFB81
+ 3621 0080 00000000 		.4byte	0
+ 3622 0084 00000000 		.4byte	0
+ 3623              		.section	.debug_ranges,"",%progbits
+ 3624              	.Ldebug_ranges0:
+ 3625 0000 02000000 		.4byte	.LBB7
+ 3626 0004 04000000 		.4byte	.LBE7
+ 3627 0008 08000000 		.4byte	.LBB8
+ 3628 000c 12000000 		.4byte	.LBE8
+ 3629 0010 00000000 		.4byte	0
+ 3630 0014 00000000 		.4byte	0
+ 3631 0018 02000000 		.4byte	.LBB13
+ 3632 001c 04000000 		.4byte	.LBE13
+ 3633 0020 08000000 		.4byte	.LBB14
+ 3634 0024 16000000 		.4byte	.LBE14
+ 3635 0028 00000000 		.4byte	0
+ 3636 002c 00000000 		.4byte	0
+ 3637 0030 00000000 		.4byte	.LFB79
+ 3638 0034 50000000 		.4byte	.LFE79
+ 3639 0038 00000000 		.4byte	.LFB68
+ 3640 003c 30000000 		.4byte	.LFE68
+ 3641 0040 00000000 		.4byte	.LFB69
+ 3642 0044 2C000000 		.4byte	.LFE69
+ 3643 0048 00000000 		.4byte	.LFB70
+ 3644 004c 2C000000 		.4byte	.LFE70
+ 3645 0050 00000000 		.4byte	.LFB71
+ 3646 0054 14000000 		.4byte	.LFE71
+ 3647 0058 00000000 		.4byte	.LFB72
+ 3648 005c 4C000000 		.4byte	.LFE72
+ 3649 0060 00000000 		.4byte	.LFB73
+ 3650 0064 1C000000 		.4byte	.LFE73
+ 3651 0068 00000000 		.4byte	.LFB74
+ 3652 006c 14000000 		.4byte	.LFE74
+ 3653 0070 00000000 		.4byte	.LFB75
+ 3654 0074 24000000 		.4byte	.LFE75
+ 3655 0078 00000000 		.4byte	.LFB76
+ 3656 007c 28000000 		.4byte	.LFE76
+ 3657 0080 00000000 		.4byte	.LFB77
+ 3658 0084 5C000000 		.4byte	.LFE77
+ 3659 0088 00000000 		.4byte	.LFB78
+ 3660 008c 98000000 		.4byte	.LFE78
+ 3661 0090 00000000 		.4byte	.LFB80
+ 3662 0094 64000000 		.4byte	.LFE80
+ 3663 0098 00000000 		.4byte	.LFB81
+ 3664 009c 38000000 		.4byte	.LFE81
+ 3665 00a0 00000000 		.4byte	0
+ 3666 00a4 00000000 		.4byte	0
+ 3667              		.section	.debug_line,"",%progbits
+ 3668              	.Ldebug_line0:
+ 3669 0000 16040000 		.section	.debug_str,"MS",%progbits,1
+ 3669      02009902 
+ 3669      00000201 
+ 3669      FB0E0D00 
+ 3669      01010101 
+ 3670              	.LASF22:
+ 3671 0000 75696E74 		.ascii	"uint16\000"
+ 3671      313600
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 72
+
+
+ 3672              	.LASF169:
+ 3673 0007 57445F65 		.ascii	"WD_enable\000"
+ 3673      6E61626C 
+ 3673      6500
+ 3674              	.LASF217:
+ 3675 0011 74736B5F 		.ascii	"tsk_fault_TaskProc\000"
+ 3675      6661756C 
+ 3675      745F5461 
+ 3675      736B5072 
+ 3675      6F6300
+ 3676              	.LASF61:
+ 3677 0024 5F5F7379 		.ascii	"__sysfault__\000"
+ 3677      73666175 
+ 3677      6C745F5F 
+ 3677      00
+ 3678              	.LASF3:
+ 3679 0031 5F5F7569 		.ascii	"__uint8_t\000"
+ 3679      6E74385F 
+ 3679      7400
+ 3680              	.LASF191:
+ 3681 003b 74736B5F 		.ascii	"tsk_fault_initVar\000"
+ 3681      6661756C 
+ 3681      745F696E 
+ 3681      69745661 
+ 3681      7200
+ 3682              	.LASF84:
+ 3683 004d 7069645F 		.ascii	"pid_temp_mode\000"
+ 3683      74656D70 
+ 3683      5F6D6F64 
+ 3683      6500
+ 3684              	.LASF210:
+ 3685 005b 76546173 		.ascii	"vTaskDelay\000"
+ 3685      6B44656C 
+ 3685      617900
+ 3686              	.LASF125:
+ 3687 0066 494E5452 		.ascii	"INTR_MODE_BLOCKED\000"
+ 3687      5F4D4F44 
+ 3687      455F424C 
+ 3687      4F434B45 
+ 3687      4400
+ 3688              	.LASF60:
+ 3689 0078 746D7254 		.ascii	"tmrTimerControl\000"
+ 3689      696D6572 
+ 3689      436F6E74 
+ 3689      726F6C00 
+ 3690              	.LASF166:
+ 3691 0088 756E6465 		.ascii	"undervoltage\000"
+ 3691      72766F6C 
+ 3691      74616765 
+ 3691      00
+ 3692              	.LASF190:
+ 3693 0095 74736B5F 		.ascii	"tsk_fault_TaskHandle\000"
+ 3693      6661756C 
+ 3693      745F5461 
+ 3693      736B4861 
+ 3693      6E646C65 
+ 3694              	.LASF214:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 73
+
+
+ 3695 00aa 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 3695      73657273 
+ 3695      5C636865 
+ 3695      6D695C55 
+ 3695      44335F51 
+ 3696              	.LASF14:
+ 3697 00cf 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 3697      206C6F6E 
+ 3697      6720756E 
+ 3697      7369676E 
+ 3697      65642069 
+ 3698              	.LASF115:
+ 3699 00e6 636F6D70 		.ascii	"compressor_release\000"
+ 3699      72657373 
+ 3699      6F725F72 
+ 3699      656C6561 
+ 3699      736500
+ 3700              	.LASF136:
+ 3701 00f9 696E7465 		.ascii	"interrupter_params\000"
+ 3701      72727570 
+ 3701      7465725F 
+ 3701      70617261 
+ 3701      6D7300
+ 3702              	.LASF49:
+ 3703 010c 70776D62 		.ascii	"pwmb_psb_prd\000"
+ 3703      5F707362 
+ 3703      5F707264 
+ 3703      00
+ 3704              	.LASF0:
+ 3705 0119 756E7369 		.ascii	"unsigned int\000"
+ 3705      676E6564 
+ 3705      20696E74 
+ 3705      00
+ 3706              	.LASF57:
+ 3707 0126 70617261 		.ascii	"parameters\000"
+ 3707      6D657465 
+ 3707      727300
+ 3708              	.LASF149:
+ 3709 0131 6275735F 		.ascii	"bus_v\000"
+ 3709      7600
+ 3710              	.LASF145:
+ 3711 0137 67617567 		.ascii	"gauge\000"
+ 3711      6500
+ 3712              	.LASF2:
+ 3713 013d 5F5F696E 		.ascii	"__int8_t\000"
+ 3713      74385F74 
+ 3713      00
+ 3714              	.LASF184:
+ 3715 0146 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 3715      52784275 
+ 3715      66666572 
+ 3715      00
+ 3716              	.LASF107:
+ 3717 0153 75766C6F 		.ascii	"uvlo_analog\000"
+ 3717      5F616E61 
+ 3717      6C6F6700 
+ 3718              	.LASF17:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 74
+
+
+ 3719 015f 696E7431 		.ascii	"int16_t\000"
+ 3719      365F7400 
+ 3720              	.LASF13:
+ 3721 0167 6C6F6E67 		.ascii	"long long int\000"
+ 3721      206C6F6E 
+ 3721      6720696E 
+ 3721      7400
+ 3722              	.LASF1:
+ 3723 0175 7369676E 		.ascii	"signed char\000"
+ 3723      65642063 
+ 3723      68617200 
+ 3724              	.LASF158:
+ 3725 0181 66726573 		.ascii	"fres\000"
+ 3725      00
+ 3726              	.LASF131:
+ 3727 0186 494E5452 		.ascii	"INTR_MOD_CUR\000"
+ 3727      5F4D4F44 
+ 3727      5F435552 
+ 3727      00
+ 3728              	.LASF178:
+ 3729 0193 73797366 		.ascii	"sysflt_clr\000"
+ 3729      6C745F63 
+ 3729      6C7200
+ 3730              	.LASF91:
+ 3731 019e 62617564 		.ascii	"baudrate\000"
+ 3731      72617465 
+ 3731      00
+ 3732              	.LASF26:
+ 3733 01a7 72656738 		.ascii	"reg8\000"
+ 3733      00
+ 3734              	.LASF148:
+ 3735 01ac 5F5F7465 		.ascii	"__tele_human__\000"
+ 3735      6C655F68 
+ 3735      756D616E 
+ 3735      5F5F00
+ 3736              	.LASF48:
+ 3737 01bb 70776D5F 		.ascii	"pwm_top\000"
+ 3737      746F7000 
+ 3738              	.LASF177:
+ 3739 01c3 77616974 		.ascii	"wait\000"
+ 3739      00
+ 3740              	.LASF151:
+ 3741 01c8 64726976 		.ascii	"driver_v\000"
+ 3741      65725F76 
+ 3741      00
+ 3742              	.LASF53:
+ 3743 01d1 6D696E5F 		.ascii	"min_tr_cl_dac_val\000"
+ 3743      74725F63 
+ 3743      6C5F6461 
+ 3743      635F7661 
+ 3743      6C00
+ 3744              	.LASF192:
+ 3745 01e3 636F6E66 		.ascii	"configuration\000"
+ 3745      69677572 
+ 3745      6174696F 
+ 3745      6E00
+ 3746              	.LASF10:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 75
+
+
+ 3747 01f1 6C6F6E67 		.ascii	"long int\000"
+ 3747      20696E74 
+ 3747      00
+ 3748              	.LASF59:
+ 3749 01fa 74736B54 		.ascii	"tskTaskControlBlock\000"
+ 3749      61736B43 
+ 3749      6F6E7472 
+ 3749      6F6C426C 
+ 3749      6F636B00 
+ 3750              	.LASF209:
+ 3751 020e 4C45445F 		.ascii	"LED_com_Write\000"
+ 3751      636F6D5F 
+ 3751      57726974 
+ 3751      6500
+ 3752              	.LASF92:
+ 3753 021c 6374325F 		.ascii	"ct2_type\000"
+ 3753      74797065 
+ 3753      00
+ 3754              	.LASF117:
+ 3755 0225 64726976 		.ascii	"drive_factor\000"
+ 3755      655F6661 
+ 3755      63746F72 
+ 3755      00
+ 3756              	.LASF63:
+ 3757 0232 77617463 		.ascii	"watchdog_timeout\000"
+ 3757      68646F67 
+ 3757      5F74696D 
+ 3757      656F7574 
+ 3757      00
+ 3758              	.LASF202:
+ 3759 0243 78546173 		.ascii	"xTaskGetTickCountFromISR\000"
+ 3759      6B476574 
+ 3759      5469636B 
+ 3759      436F756E 
+ 3759      7446726F 
+ 3760              	.LASF42:
+ 3761 025c 5461736B 		.ascii	"TaskHandle_t\000"
+ 3761      48616E64 
+ 3761      6C655F74 
+ 3761      00
+ 3762              	.LASF21:
+ 3763 0269 75696E74 		.ascii	"uint8\000"
+ 3763      3800
+ 3764              	.LASF41:
+ 3765 026f 5469636B 		.ascii	"TickType_t\000"
+ 3765      54797065 
+ 3765      5F7400
+ 3766              	.LASF6:
+ 3767 027a 73686F72 		.ascii	"short int\000"
+ 3767      7420696E 
+ 3767      7400
+ 3768              	.LASF47:
+ 3769 0284 70776D62 		.ascii	"pwmb_start_cmp\000"
+ 3769      5F737461 
+ 3769      72745F63 
+ 3769      6D7000
+ 3770              	.LASF171:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 76
+
+
+ 3771 0293 656E6162 		.ascii	"enable\000"
+ 3771      6C6500
+ 3772              	.LASF67:
+ 3773 029a 6D61785F 		.ascii	"max_tr_current\000"
+ 3773      74725F63 
+ 3773      75727265 
+ 3773      6E7400
+ 3774              	.LASF24:
+ 3775 02a9 646F7562 		.ascii	"double\000"
+ 3775      6C6500
+ 3776              	.LASF207:
+ 3777 02b0 6E6F5F66 		.ascii	"no_fb_reg_Read\000"
+ 3777      625F7265 
+ 3777      675F5265 
+ 3777      616400
+ 3778              	.LASF40:
+ 3779 02bf 42617365 		.ascii	"BaseType_t\000"
+ 3779      54797065 
+ 3779      5F7400
+ 3780              	.LASF163:
+ 3781 02ca 54454C45 		.ascii	"TELEMETRY\000"
+ 3781      4D455452 
+ 3781      5900
+ 3782              	.LASF83:
+ 3783 02d4 7069645F 		.ascii	"pid_temp_set\000"
+ 3783      74656D70 
+ 3783      5F736574 
+ 3783      00
+ 3784              	.LASF170:
+ 3785 02e1 7854696D 		.ascii	"xTimer\000"
+ 3785      657200
+ 3786              	.LASF81:
+ 3787 02e8 74656D70 		.ascii	"temp1_setpoint\000"
+ 3787      315F7365 
+ 3787      74706F69 
+ 3787      6E7400
+ 3788              	.LASF82:
+ 3789 02f7 74656D70 		.ascii	"temp2_setpoint\000"
+ 3789      325F7365 
+ 3789      74706F69 
+ 3789      6E7400
+ 3790              	.LASF194:
+ 3791 0306 6275735F 		.ascii	"bus_command\000"
+ 3791      636F6D6D 
+ 3791      616E6400 
+ 3792              	.LASF36:
+ 3793 0312 696E7465 		.ascii	"interlock\000"
+ 3793      726C6F63 
+ 3793      6B00
+ 3794              	.LASF121:
+ 3795 031c 696E7465 		.ascii	"interrupter_DMA\000"
+ 3795      72727570 
+ 3795      7465725F 
+ 3795      444D4100 
+ 3796              	.LASF11:
+ 3797 032c 5F5F7569 		.ascii	"__uint32_t\000"
+ 3797      6E743332 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 77
+
+
+ 3797      5F7400
+ 3798              	.LASF76:
+ 3799 0337 6C656164 		.ascii	"lead_time\000"
+ 3799      5F74696D 
+ 3799      6500
+ 3800              	.LASF212:
+ 3801 0341 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 3801      43393920 
+ 3801      352E342E 
+ 3801      31203230 
+ 3801      31363036 
+ 3802 0374 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 3802      20726576 
+ 3802      6973696F 
+ 3802      6E203233 
+ 3802      37373135 
+ 3803 03a7 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 3803      74643D67 
+ 3803      6E753939 
+ 3803      202D6666 
+ 3803      756E6374 
+ 3804              	.LASF5:
+ 3805 03da 5F5F696E 		.ascii	"__int16_t\000"
+ 3805      7431365F 
+ 3805      7400
+ 3806              	.LASF138:
+ 3807 03e4 76616C75 		.ascii	"value\000"
+ 3807      6500
+ 3808              	.LASF62:
+ 3809 03ea 636F6E66 		.ascii	"config_struct\000"
+ 3809      69675F73 
+ 3809      74727563 
+ 3809      7400
+ 3810              	.LASF139:
+ 3811 03f8 756E6974 		.ascii	"unit\000"
+ 3811      00
+ 3812              	.LASF18:
+ 3813 03fd 75696E74 		.ascii	"uint16_t\000"
+ 3813      31365F74 
+ 3813      00
+ 3814              	.LASF175:
+ 3815 0406 72657365 		.ascii	"reset_fault\000"
+ 3815      745F6661 
+ 3815      756C7400 
+ 3816              	.LASF156:
+ 3817 0412 7072696D 		.ascii	"primary_i\000"
+ 3817      6172795F 
+ 3817      6900
+ 3818              	.LASF160:
+ 3819 041c 72785F64 		.ascii	"rx_datarate\000"
+ 3819      61746172 
+ 3819      61746500 
+ 3820              	.LASF154:
+ 3821 0428 62617474 		.ascii	"batt_i\000"
+ 3821      5F6900
+ 3822              	.LASF176:
+ 3823 042f 73797366 		.ascii	"sysflt_set\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 78
+
+
+ 3823      6C745F73 
+ 3823      657400
+ 3824              	.LASF12:
+ 3825 043a 6C6F6E67 		.ascii	"long unsigned int\000"
+ 3825      20756E73 
+ 3825      69676E65 
+ 3825      6420696E 
+ 3825      7400
+ 3826              	.LASF58:
+ 3827 044c 54696D65 		.ascii	"TimerHandle_t\000"
+ 3827      7248616E 
+ 3827      646C655F 
+ 3827      7400
+ 3828              	.LASF213:
+ 3829 045a 2E2E5C63 		.ascii	"..\\common\\ud3core\\tasks\\tsk_fault.c\000"
+ 3829      6F6D6D6F 
+ 3829      6E5C7564 
+ 3829      33636F72 
+ 3829      655C7461 
+ 3830              	.LASF32:
+ 3831 047e 63686172 		.ascii	"charge\000"
+ 3831      676500
+ 3832              	.LASF70:
+ 3833 0485 74656D70 		.ascii	"temp1_max\000"
+ 3833      315F6D61 
+ 3833      7800
+ 3834              	.LASF150:
+ 3835 048f 62617474 		.ascii	"batt_v\000"
+ 3835      5F7600
+ 3836              	.LASF73:
+ 3837 0496 6374325F 		.ascii	"ct2_ratio\000"
+ 3837      72617469 
+ 3837      6F00
+ 3838              	.LASF140:
+ 3839 04a0 6E616D65 		.ascii	"name\000"
+ 3839      00
+ 3840              	.LASF38:
+ 3841 04a5 66656564 		.ascii	"feedback\000"
+ 3841      6261636B 
+ 3841      00
+ 3842              	.LASF52:
+ 3843 04ae 6D696E5F 		.ascii	"min_tr_prd\000"
+ 3843      74725F70 
+ 3843      726400
+ 3844              	.LASF216:
+ 3845 04b9 74736B5F 		.ascii	"tsk_fault_is_fault\000"
+ 3845      6661756C 
+ 3845      745F6973 
+ 3845      5F666175 
+ 3845      6C7400
+ 3846              	.LASF104:
+ 3847 04cc 6E74635F 		.ascii	"ntc_r25\000"
+ 3847      72323500 
+ 3848              	.LASF189:
+ 3849 04d4 6374315F 		.ascii	"ct1_dac_val\000"
+ 3849      6461635F 
+ 3849      76616C00 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 79
+
+
+ 3850              	.LASF137:
+ 3851 04e0 5F5F7465 		.ascii	"__tele__\000"
+ 3851      6C655F5F 
+ 3851      00
+ 3852              	.LASF101:
+ 3853 04e9 70636139 		.ascii	"pca9685\000"
+ 3853      36383500 
+ 3854              	.LASF193:
+ 3855 04f1 696E7465 		.ascii	"interrupter\000"
+ 3855      72727570 
+ 3855      74657200 
+ 3856              	.LASF215:
+ 3857 04fd 74656C65 		.ascii	"telemetry_u\000"
+ 3857      6D657472 
+ 3857      795F7500 
+ 3858              	.LASF9:
+ 3859 0509 5F5F696E 		.ascii	"__int32_t\000"
+ 3859      7433325F 
+ 3859      7400
+ 3860              	.LASF31:
+ 3861 0513 66757365 		.ascii	"fuse\000"
+ 3861      00
+ 3862              	.LASF51:
+ 3863 0518 70776D62 		.ascii	"pwmb_start_psb_val\000"
+ 3863      5F737461 
+ 3863      72745F70 
+ 3863      73625F76 
+ 3863      616C00
+ 3864              	.LASF144:
+ 3865 052b 68696768 		.ascii	"high_res\000"
+ 3865      5F726573 
+ 3865      00
+ 3866              	.LASF200:
+ 3867 0534 78546173 		.ascii	"xTaskGetTickCount\000"
+ 3867      6B476574 
+ 3867      5469636B 
+ 3867      436F756E 
+ 3867      7400
+ 3868              	.LASF122:
+ 3869 0546 696E7465 		.ascii	"interrupter_mode\000"
+ 3869      72727570 
+ 3869      7465725F 
+ 3869      6D6F6465 
+ 3869      00
+ 3870              	.LASF174:
+ 3871 0557 7365745F 		.ascii	"set_switch_without_fb\000"
+ 3871      73776974 
+ 3871      63685F77 
+ 3871      6974686F 
+ 3871      75745F66 
+ 3872              	.LASF128:
+ 3873 056d 42555253 		.ascii	"BURST_OFF\000"
+ 3873      545F4F46 
+ 3873      4600
+ 3874              	.LASF199:
+ 3875 0577 74736B5F 		.ascii	"tsk_midi_kill\000"
+ 3875      6D696469 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 80
+
+
+ 3875      5F6B696C 
+ 3875      6C00
+ 3876              	.LASF28:
+ 3877 0585 75766C6F 		.ascii	"uvlo\000"
+ 3877      00
+ 3878              	.LASF203:
+ 3879 058a 72656164 		.ascii	"read_driver_mv\000"
+ 3879      5F647269 
+ 3879      7665725F 
+ 3879      6D7600
+ 3880              	.LASF119:
+ 3881 0599 494E5452 		.ascii	"INTR_DMA_TR\000"
+ 3881      5F444D41 
+ 3881      5F545200 
+ 3882              	.LASF79:
+ 3883 05a5 6D61785F 		.ascii	"max_tr_duty\000"
+ 3883      74725F64 
+ 3883      75747900 
+ 3884              	.LASF129:
+ 3885 05b1 696E7465 		.ascii	"interrupter_modulation\000"
+ 3885      72727570 
+ 3885      7465725F 
+ 3885      6D6F6475 
+ 3885      6C617469 
+ 3886              	.LASF27:
+ 3887 05c8 73697A65 		.ascii	"sizetype\000"
+ 3887      74797065 
+ 3887      00
+ 3888              	.LASF46:
+ 3889 05d1 70776D62 		.ascii	"pwmb_start_prd\000"
+ 3889      5F737461 
+ 3889      72745F70 
+ 3889      726400
+ 3890              	.LASF116:
+ 3891 05e0 636F6D70 		.ascii	"compressor_maxDutyOffset\000"
+ 3891      72657373 
+ 3891      6F725F6D 
+ 3891      61784475 
+ 3891      74794F66 
+ 3892              	.LASF211:
+ 3893 05f9 78546173 		.ascii	"xTaskCreate\000"
+ 3893      6B437265 
+ 3893      61746500 
+ 3894              	.LASF100:
+ 3895 0605 69735F71 		.ascii	"is_qcw\000"
+ 3895      637700
+ 3896              	.LASF185:
+ 3897 060c 73797366 		.ascii	"sysfault\000"
+ 3897      61756C74 
+ 3897      00
+ 3898              	.LASF123:
+ 3899 0615 494E5452 		.ascii	"INTR_MODE_OFF\000"
+ 3899      5F4D4F44 
+ 3899      455F4F46 
+ 3899      4600
+ 3900              	.LASF112:
+ 3901 0623 53696747 		.ascii	"SigGen_minOtOffset\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 81
+
+
+ 3901      656E5F6D 
+ 3901      696E4F74 
+ 3901      4F666673 
+ 3901      657400
+ 3902              	.LASF135:
+ 3903 0636 78427572 		.ascii	"xBurst_Timer\000"
+ 3903      73745F54 
+ 3903      696D6572 
+ 3903      00
+ 3904              	.LASF134:
+ 3905 0643 646D615F 		.ascii	"dma_mode\000"
+ 3905      6D6F6465 
+ 3905      00
+ 3906              	.LASF164:
+ 3907 064c 68616E64 		.ascii	"handle_UVLO\000"
+ 3907      6C655F55 
+ 3907      564C4F00 
+ 3908              	.LASF180:
+ 3909 0658 74696D65 		.ascii	"time\000"
+ 3909      00
+ 3910              	.LASF188:
+ 3911 065d 66625F66 		.ascii	"fb_filter_out\000"
+ 3911      696C7465 
+ 3911      725F6F75 
+ 3911      7400
+ 3912              	.LASF33:
+ 3913 066b 77617463 		.ascii	"watchdog\000"
+ 3913      68646F67 
+ 3913      00
+ 3914              	.LASF186:
+ 3915 0674 66656564 		.ascii	"feedback_error_cnt\000"
+ 3915      6261636B 
+ 3915      5F657272 
+ 3915      6F725F63 
+ 3915      6E7400
+ 3916              	.LASF99:
+ 3917 0687 6578745F 		.ascii	"ext_interrupter\000"
+ 3917      696E7465 
+ 3917      72727570 
+ 3917      74657200 
+ 3918              	.LASF114:
+ 3919 0697 636F6D70 		.ascii	"compressor_sustain\000"
+ 3919      72657373 
+ 3919      6F725F73 
+ 3919      75737461 
+ 3919      696E00
+ 3920              	.LASF95:
+ 3921 06aa 6374325F 		.ascii	"ct2_offset\000"
+ 3921      6F666673 
+ 3921      657400
+ 3922              	.LASF23:
+ 3923 06b5 666C6F61 		.ascii	"float\000"
+ 3923      7400
+ 3924              	.LASF75:
+ 3925 06bb 6374325F 		.ascii	"ct2_burden\000"
+ 3925      62757264 
+ 3925      656E00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 82
+
+
+ 3926              	.LASF69:
+ 3927 06c6 6D61785F 		.ascii	"max_qcw_current\000"
+ 3927      7163775F 
+ 3927      63757272 
+ 3927      656E7400 
+ 3928              	.LASF64:
+ 3929 06d6 6D61785F 		.ascii	"max_tr_pw\000"
+ 3929      74725F70 
+ 3929      7700
+ 3930              	.LASF103:
+ 3931 06e0 6E74635F 		.ascii	"ntc_b\000"
+ 3931      6200
+ 3932              	.LASF183:
+ 3933 06e6 74736B5F 		.ascii	"tsk_fault_Start\000"
+ 3933      6661756C 
+ 3933      745F5374 
+ 3933      61727400 
+ 3934              	.LASF90:
+ 3935 06f6 75645F6E 		.ascii	"ud_name\000"
+ 3935      616D6500 
+ 3936              	.LASF127:
+ 3937 06fe 42555253 		.ascii	"BURST_ON\000"
+ 3937      545F4F4E 
+ 3937      00
+ 3938              	.LASF72:
+ 3939 0707 6374315F 		.ascii	"ct1_ratio\000"
+ 3939      72617469 
+ 3939      6F00
+ 3940              	.LASF68:
+ 3941 0711 6D696E5F 		.ascii	"min_tr_current\000"
+ 3941      74725F63 
+ 3941      75727265 
+ 3941      6E7400
+ 3942              	.LASF87:
+ 3943 0720 74656D70 		.ascii	"temp2_mode\000"
+ 3943      325F6D6F 
+ 3943      646500
+ 3944              	.LASF19:
+ 3945 072b 696E7433 		.ascii	"int32_t\000"
+ 3945      325F7400 
+ 3946              	.LASF4:
+ 3947 0733 756E7369 		.ascii	"unsigned char\000"
+ 3947      676E6564 
+ 3947      20636861 
+ 3947      7200
+ 3948              	.LASF56:
+ 3949 0741 6374325F 		.ascii	"ct2_offset_cnt\000"
+ 3949      6F666673 
+ 3949      65745F63 
+ 3949      6E7400
+ 3950              	.LASF89:
+ 3951 0750 6175746F 		.ascii	"autotune_s\000"
+ 3951      74756E65 
+ 3951      5F7300
+ 3952              	.LASF110:
+ 3953 075b 6175746F 		.ascii	"autostart\000"
+ 3953      73746172 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 83
+
+
+ 3953      7400
+ 3954              	.LASF173:
+ 3955 0765 57445F72 		.ascii	"WD_reset_from_ISR\000"
+ 3955      65736574 
+ 3955      5F66726F 
+ 3955      6D5F4953 
+ 3955      5200
+ 3956              	.LASF155:
+ 3957 0777 6932745F 		.ascii	"i2t_i\000"
+ 3957      6900
+ 3958              	.LASF30:
+ 3959 077d 74656D70 		.ascii	"temp2\000"
+ 3959      3200
+ 3960              	.LASF179:
+ 3961 0783 68616E64 		.ascii	"handle_no_fb\000"
+ 3961      6C655F6E 
+ 3961      6F5F6662 
+ 3961      00
+ 3962              	.LASF167:
+ 3963 0790 666C6167 		.ascii	"flag\000"
+ 3963      00
+ 3964              	.LASF187:
+ 3965 0795 70617261 		.ascii	"params\000"
+ 3965      6D7300
+ 3966              	.LASF43:
+ 3967 079c 6D61785F 		.ascii	"max_tr_cl_dac_val\000"
+ 3967      74725F63 
+ 3967      6C5F6461 
+ 3967      635F7661 
+ 3967      6C00
+ 3968              	.LASF168:
+ 3969 07ae 7657445F 		.ascii	"vWD_Timer_Callback\000"
+ 3969      54696D65 
+ 3969      725F4361 
+ 3969      6C6C6261 
+ 3969      636B00
+ 3970              	.LASF205:
+ 3971 07c1 43794465 		.ascii	"CyDelayUs\000"
+ 3971      6C617955 
+ 3971      7300
+ 3972              	.LASF77:
+ 3973 07cb 73746172 		.ascii	"start_freq\000"
+ 3973      745F6672 
+ 3973      657100
+ 3974              	.LASF108:
+ 3975 07d6 76647269 		.ascii	"vdrive\000"
+ 3975      766500
+ 3976              	.LASF195:
+ 3977 07dd 7857445F 		.ascii	"xWD_Timer\000"
+ 3977      54696D65 
+ 3977      7200
+ 3978              	.LASF74:
+ 3979 07e7 6374315F 		.ascii	"ct1_burden\000"
+ 3979      62757264 
+ 3979      656E00
+ 3980              	.LASF88:
+ 3981 07f2 70735F73 		.ascii	"ps_scheme\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 84
+
+
+ 3981      6368656D 
+ 3981      6500
+ 3982              	.LASF20:
+ 3983 07fc 75696E74 		.ascii	"uint32_t\000"
+ 3983      33325F74 
+ 3983      00
+ 3984              	.LASF208:
+ 3985 0805 7854696D 		.ascii	"xTimerCreate\000"
+ 3985      65724372 
+ 3985      65617465 
+ 3985      00
+ 3986              	.LASF35:
+ 3987 0812 6275735F 		.ascii	"bus_uv\000"
+ 3987      757600
+ 3988              	.LASF29:
+ 3989 0819 74656D70 		.ascii	"temp1\000"
+ 3989      3100
+ 3990              	.LASF25:
+ 3991 081f 63686172 		.ascii	"char\000"
+ 3991      00
+ 3992              	.LASF161:
+ 3993 0824 64757479 		.ascii	"dutycycle\000"
+ 3993      6379636C 
+ 3993      6500
+ 3994              	.LASF132:
+ 3995 082e 6D6F6465 		.ascii	"mode\000"
+ 3995      00
+ 3996              	.LASF162:
+ 3997 0833 54454C45 		.ascii	"TELE_HUMAN\000"
+ 3997      5F48554D 
+ 3997      414E00
+ 3998              	.LASF94:
+ 3999 083e 6374325F 		.ascii	"ct2_voltage\000"
+ 3999      766F6C74 
+ 3999      61676500 
+ 4000              	.LASF197:
+ 4001 084a 616C6172 		.ascii	"alarm_push\000"
+ 4001      6D5F7075 
+ 4001      736800
+ 4002              	.LASF50:
+ 4003 0855 70776D62 		.ascii	"pwmb_psb_val\000"
+ 4003      5F707362 
+ 4003      5F76616C 
+ 4003      00
+ 4004              	.LASF7:
+ 4005 0862 5F5F7569 		.ascii	"__uint16_t\000"
+ 4005      6E743136 
+ 4005      5F7400
+ 4006              	.LASF65:
+ 4007 086d 6D61785F 		.ascii	"max_tr_prf\000"
+ 4007      74725F70 
+ 4007      726600
+ 4008              	.LASF45:
+ 4009 0878 70776D61 		.ascii	"pwma_start_cmp\000"
+ 4009      5F737461 
+ 4009      72745F63 
+ 4009      6D7000
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 85
+
+
+ 4010              	.LASF113:
+ 4011 0887 636F6D70 		.ascii	"compressor_attac\000"
+ 4011      72657373 
+ 4011      6F725F61 
+ 4011      74746163 
+ 4011      00
+ 4012              	.LASF165:
+ 4013 0898 68616E64 		.ascii	"handle_FAULT\000"
+ 4013      6C655F46 
+ 4013      41554C54 
+ 4013      00
+ 4014              	.LASF204:
+ 4015 08a5 55564C4F 		.ascii	"UVLO_Read\000"
+ 4015      5F526561 
+ 4015      6400
+ 4016              	.LASF105:
+ 4017 08af 69646163 		.ascii	"idac\000"
+ 4017      00
+ 4018              	.LASF111:
+ 4019 08b4 6D696E5F 		.ascii	"min_fb_current\000"
+ 4019      66625F63 
+ 4019      75727265 
+ 4019      6E7400
+ 4020              	.LASF96:
+ 4021 08c3 725F746F 		.ascii	"r_top\000"
+ 4021      7000
+ 4022              	.LASF102:
+ 4023 08c9 6D61785F 		.ascii	"max_fb_errors\000"
+ 4023      66625F65 
+ 4023      72726F72 
+ 4023      7300
+ 4024              	.LASF147:
+ 4025 08d7 54454C45 		.ascii	"TELE\000"
+ 4025      00
+ 4026              	.LASF141:
+ 4027 08dc 6F666673 		.ascii	"offset\000"
+ 4027      657400
+ 4028              	.LASF106:
+ 4029 08e3 69766F5F 		.ascii	"ivo_led\000"
+ 4029      6C656400 
+ 4030              	.LASF198:
+ 4031 08eb 696E7465 		.ascii	"interrupter_kill\000"
+ 4031      72727570 
+ 4031      7465725F 
+ 4031      6B696C6C 
+ 4031      00
+ 4032              	.LASF206:
+ 4033 08fc 4C45445F 		.ascii	"LED_sysfault_Write\000"
+ 4033      73797366 
+ 4033      61756C74 
+ 4033      5F577269 
+ 4033      746500
+ 4034              	.LASF118:
+ 4035 090f 636C695F 		.ascii	"cli_config\000"
+ 4035      636F6E66 
+ 4035      696700
+ 4036              	.LASF54:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 86
+
+
+ 4037 091a 64696666 		.ascii	"diff_tr_cl_dac_val\000"
+ 4037      5F74725F 
+ 4037      636C5F64 
+ 4037      61635F76 
+ 4037      616C00
+ 4038              	.LASF8:
+ 4039 092d 73686F72 		.ascii	"short unsigned int\000"
+ 4039      7420756E 
+ 4039      7369676E 
+ 4039      65642069 
+ 4039      6E7400
+ 4040              	.LASF80:
+ 4041 0940 6D61785F 		.ascii	"max_qcw_duty\000"
+ 4041      7163775F 
+ 4041      64757479 
+ 4041      00
+ 4042              	.LASF201:
+ 4043 094d 7854696D 		.ascii	"xTimerGenericCommand\000"
+ 4043      65724765 
+ 4043      6E657269 
+ 4043      63436F6D 
+ 4043      6D616E64 
+ 4044              	.LASF98:
+ 4045 0962 69766F5F 		.ascii	"ivo_uart\000"
+ 4045      75617274 
+ 4045      00
+ 4046              	.LASF15:
+ 4047 096b 696E7438 		.ascii	"int8_t\000"
+ 4047      5F7400
+ 4048              	.LASF152:
+ 4049 0972 6275735F 		.ascii	"bus_status\000"
+ 4049      73746174 
+ 4049      757300
+ 4050              	.LASF182:
+ 4051 097d 70765061 		.ascii	"pvParameters\000"
+ 4051      72616D65 
+ 4051      74657273 
+ 4051      00
+ 4052              	.LASF34:
+ 4053 098a 75706461 		.ascii	"update\000"
+ 4053      746500
+ 4054              	.LASF133:
+ 4055 0991 62757273 		.ascii	"burst_state\000"
+ 4055      745F7374 
+ 4055      61746500 
+ 4056              	.LASF126:
+ 4057 099d 696E7465 		.ascii	"interrupter_burst\000"
+ 4057      72727570 
+ 4057      7465725F 
+ 4057      62757273 
+ 4057      7400
+ 4058              	.LASF39:
+ 4059 09af 53595346 		.ascii	"SYSFAULT\000"
+ 4059      41554C54 
+ 4059      00
+ 4060              	.LASF153:
+ 4061 09b8 6176675F 		.ascii	"avg_power\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 87
+
+
+ 4061      706F7765 
+ 4061      7200
+ 4062              	.LASF55:
+ 4063 09c2 6964635F 		.ascii	"idc_ma_count\000"
+ 4063      6D615F63 
+ 4063      6F756E74 
+ 4063      00
+ 4064              	.LASF124:
+ 4065 09cf 494E5452 		.ascii	"INTR_MODE_TR\000"
+ 4065      5F4D4F44 
+ 4065      455F5452 
+ 4065      00
+ 4066              	.LASF93:
+ 4067 09dc 6374325F 		.ascii	"ct2_current\000"
+ 4067      63757272 
+ 4067      656E7400 
+ 4068              	.LASF66:
+ 4069 09e8 6D61785F 		.ascii	"max_qcw_pw\000"
+ 4069      7163775F 
+ 4069      707700
+ 4070              	.LASF196:
+ 4071 09f3 73776974 		.ascii	"switch_without_fb\000"
+ 4071      63685F77 
+ 4071      6974686F 
+ 4071      75745F66 
+ 4071      6200
+ 4072              	.LASF172:
+ 4073 0a05 57445F72 		.ascii	"WD_reset\000"
+ 4073      65736574 
+ 4073      00
+ 4074              	.LASF37:
+ 4075 0a0e 6C696E6B 		.ascii	"link_state\000"
+ 4075      5F737461 
+ 4075      746500
+ 4076              	.LASF16:
+ 4077 0a19 75696E74 		.ascii	"uint8_t\000"
+ 4077      385F7400 
+ 4078              	.LASF130:
+ 4079 0a21 494E5452 		.ascii	"INTR_MOD_PW\000"
+ 4079      5F4D4F44 
+ 4079      5F505700 
+ 4080              	.LASF146:
+ 4081 0a2d 63686172 		.ascii	"chart\000"
+ 4081      7400
+ 4082              	.LASF142:
+ 4083 0a33 64697669 		.ascii	"divider\000"
+ 4083      64657200 
+ 4084              	.LASF86:
+ 4085 0a3b 7069645F 		.ascii	"pid_temp_i\000"
+ 4085      74656D70 
+ 4085      5F6900
+ 4086              	.LASF120:
+ 4087 0a46 494E5452 		.ascii	"INTR_DMA_DDS\000"
+ 4087      5F444D41 
+ 4087      5F444453 
+ 4087      00
+ 4088              	.LASF97:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccSW0GM3.s 			page 88
+
+
+ 4089 0a53 63686172 		.ascii	"chargedelay\000"
+ 4089      67656465 
+ 4089      6C617900 
+ 4090              	.LASF85:
+ 4091 0a5f 7069645F 		.ascii	"pid_temp_p\000"
+ 4091      74656D70 
+ 4091      5F7000
+ 4092              	.LASF143:
+ 4093 0a6a 72657365 		.ascii	"resend_time\000"
+ 4093      6E645F74 
+ 4093      696D6500 
+ 4094              	.LASF159:
+ 4095 0a76 74785F64 		.ascii	"tx_datarate\000"
+ 4095      61746172 
+ 4095      61746500 
+ 4096              	.LASF78:
+ 4097 0a82 73746172 		.ascii	"start_cycles\000"
+ 4097      745F6379 
+ 4097      636C6573 
+ 4097      00
+ 4098              	.LASF157:
+ 4099 0a8f 6D696469 		.ascii	"midi_voices\000"
+ 4099      5F766F69 
+ 4099      63657300 
+ 4100              	.LASF181:
+ 4101 0a9b 66625F65 		.ascii	"fb_error_timer\000"
+ 4101      72726F72 
+ 4101      5F74696D 
+ 4101      657200
+ 4102              	.LASF44:
+ 4103 0aaa 70776D61 		.ascii	"pwma_start_prd\000"
+ 4103      5F737461 
+ 4103      72745F70 
+ 4103      726400
+ 4104              	.LASF71:
+ 4105 0ab9 74656D70 		.ascii	"temp2_max\000"
+ 4105      325F6D61 
+ 4105      7800
+ 4106              	.LASF109:
+ 4107 0ac3 68775F72 		.ascii	"hw_rev\000"
+ 4107      657600
+ 4108              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

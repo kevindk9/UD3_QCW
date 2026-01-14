@@ -1,0 +1,9 @@
+C:\Users\chemi\UD3\UD3_TQFP.cydsn\UD3_TQFP.cyprj|883f375c-2abe-47b9-ad55-af8df1f8b66c
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|2d43e018-0b93-43ed-89a1-e3647e5a6947
+C:\Users\chemi\Documents\PSoC Creator\4.4\Downloads ( 4.4).cylib\Downloads ( 4.4).cyprj|83ffae91-454e-40da-9d2e-c91ee7a89268
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|47d30be7-4d06-4162-b7c5-a866e5eea907
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|9623a8d0-87b3-4c9d-83cf-dfdd8306f4b6
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|4aced2af-3da6-4b82-9528-3aa9c56161d3
+C:\Users\chemi\UD3\UARTldr_TQFP.cydsn\UARTldr_TQFP.cyprj|58d2f0ae-ce16-457c-a363-6be501f597af
+C:\Users\chemi\UD3\UARTldr_QFN.cydsn\UARTldr_QFN.cyprj|3a8a9ee9-e72c-4bf4-9620-1c4fc82dc624
+C:\Users\chemi\UD3\UD3_QFN.cydsn\UD3_QFN.cyprj|e5c40163-592d-451c-967a-5030cb87622f

@@ -1,0 +1,10 @@
+C:/Users/chemi/UD3_QCW/UD3_QFN.cydsn/CortexM3/ARM_GCC_541/Release/CyBootAsmGnu.o : C:/Users/chemi/UD3_QCW/UD3_QFN.cydsn/Generated_Source/PSoC5/CyBootAsmGnu.s C:/Users/chemi/UD3_QCW/UD3_QFN.cydsn/Generated_Source/PSoC5/cydevicegnu.inc C:/Users/chemi/UD3_QCW/UD3_QFN.cydsn/Generated_Source/PSoC5/cydevicegnu_trm.inc C:/Users/chemi/UD3_QCW/UD3_QFN.cydsn/Generated_Source/PSoC5/cyfittergnu.inc 
+
+C:/Users/chemi/UD3_QCW/UD3_QFN.cydsn/Generated_Source/PSoC5/CyBootAsmGnu.s : 
+
+C:/Users/chemi/UD3_QCW/UD3_QFN.cydsn/Generated_Source/PSoC5/cydevicegnu.inc : 
+
+C:/Users/chemi/UD3_QCW/UD3_QFN.cydsn/Generated_Source/PSoC5/cydevicegnu_trm.inc : 
+
+C:/Users/chemi/UD3_QCW/UD3_QFN.cydsn/Generated_Source/PSoC5/cyfittergnu.inc : 
+

@@ -1,0 +1,4775 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"top.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.CMD_main,"ax",%progbits
+  20              		.align	1
+  21              		.global	CMD_main
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	CMD_main, %function
+  25              	CMD_main:
+  26              	.LFB69:
+  27              		.file 1 "..\\common\\tterm\\top.c"
+   1:..\common\tterm/top.c **** /*
+   2:..\common\tterm/top.c ****  * TTerm
+   3:..\common\tterm/top.c ****  *
+   4:..\common\tterm/top.c ****  * Copyright (c) 2020 Thorben Zethoff, Jens Kerrinnes
+   5:..\common\tterm/top.c ****  *
+   6:..\common\tterm/top.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   7:..\common\tterm/top.c ****  * this software and associated documentation files (the "Software"), to deal in
+   8:..\common\tterm/top.c ****  * the Software without restriction, including without limitation the rights to
+   9:..\common\tterm/top.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+  10:..\common\tterm/top.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  11:..\common\tterm/top.c ****  * subject to the following conditions:
+  12:..\common\tterm/top.c ****  *
+  13:..\common\tterm/top.c ****  * The above copyright notice and this permission notice shall be included in all
+  14:..\common\tterm/top.c ****  * copies or substantial portions of the Software.
+  15:..\common\tterm/top.c ****  *
+  16:..\common\tterm/top.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  17:..\common\tterm/top.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  18:..\common\tterm/top.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  19:..\common\tterm/top.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  20:..\common\tterm/top.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  21:..\common\tterm/top.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  22:..\common\tterm/top.c **** */
+  23:..\common\tterm/top.c **** 
+  24:..\common\tterm/top.c **** #include "top.h"
+  25:..\common\tterm/top.c **** #include "string.h"
+  26:..\common\tterm/top.c **** #include "system.h"
+  27:..\common\tterm/top.c **** 
+  28:..\common\tterm/top.c **** #define APP_NAME "top"
+  29:..\common\tterm/top.c **** #define APP_DESCRIPTION "shows performance stats"
+  30:..\common\tterm/top.c **** #define APP_STACK 250
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 2
+
+
+  31:..\common\tterm/top.c **** 
+  32:..\common\tterm/top.c **** uint8_t CMD_main(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args);
+  33:..\common\tterm/top.c **** void TASK_main(void *pvParameters);
+  34:..\common\tterm/top.c **** uint8_t INPUT_handler(TERMINAL_HANDLE * handle, uint16_t c);
+  35:..\common\tterm/top.c **** 
+  36:..\common\tterm/top.c **** uint8_t REGISTER_top(TermCommandDescriptor * desc){
+  37:..\common\tterm/top.c ****     TERM_addCommand(CMD_main, APP_NAME, APP_DESCRIPTION, 0, desc); 
+  38:..\common\tterm/top.c ****     return pdTRUE;
+  39:..\common\tterm/top.c **** }
+  40:..\common\tterm/top.c **** 
+  41:..\common\tterm/top.c **** uint8_t CMD_main(TERMINAL_HANDLE * handle, uint8_t argCount, char ** args){
+  28              		.loc 1 41 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 8
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+  34              		.cfi_def_cfa_offset 36
+  35              		.cfi_offset 4, -36
+  36              		.cfi_offset 5, -32
+  37              		.cfi_offset 6, -28
+  38              		.cfi_offset 7, -24
+  39              		.cfi_offset 8, -20
+  40              		.cfi_offset 9, -16
+  41              		.cfi_offset 10, -12
+  42              		.cfi_offset 11, -8
+  43              		.cfi_offset 14, -4
+  42:..\common\tterm/top.c ****     
+  43:..\common\tterm/top.c ****     uint8_t currArg = 0;
+  44:..\common\tterm/top.c ****     uint8_t returnCode = TERM_CMD_EXIT_SUCCESS;
+  45:..\common\tterm/top.c ****     char ** cpy_args=NULL;
+  46:..\common\tterm/top.c ****     argCount++;
+  44              		.loc 1 46 0
+  45 0004 0131     		adds	r1, r1, #1
+  46              	.LVL1:
+  47:..\common\tterm/top.c ****     if(argCount){
+  47              		.loc 1 47 0
+  48 0006 11F0FF05 		ands	r5, r1, #255
+  41:..\common\tterm/top.c ****     
+  49              		.loc 1 41 0
+  50 000a 85B0     		sub	sp, sp, #20
+  51              		.cfi_def_cfa_offset 56
+  41:..\common\tterm/top.c ****     
+  52              		.loc 1 41 0
+  53 000c 0646     		mov	r6, r0
+  54 000e 9146     		mov	r9, r2
+  55              		.loc 1 47 0
+  56 0010 2AD0     		beq	.L7
+  48:..\common\tterm/top.c ****         cpy_args = pvPortMalloc(sizeof(char*)*argCount);
+  57              		.loc 1 48 0
+  58 0012 A800     		lsls	r0, r5, #2
+  59              	.LVL2:
+  60 0014 FFF7FEFF 		bl	pvPortMalloc
+  61              	.LVL3:
+  62 0018 0746     		mov	r7, r0
+  63              	.LVL4:
+  49:..\common\tterm/top.c ****         cpy_args[0] = pvPortMalloc(sizeof(APP_NAME));
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 3
+
+
+  64              		.loc 1 49 0
+  65 001a 0420     		movs	r0, #4
+  66              	.LVL5:
+  67 001c FFF7FEFF 		bl	pvPortMalloc
+  68              	.LVL6:
+  50:..\common\tterm/top.c ****         cpy_args[0]=memcpy(cpy_args[0], APP_NAME, sizeof(APP_NAME));
+  69              		.loc 1 50 0
+  70 0020 244B     		ldr	r3, .L10
+  51:..\common\tterm/top.c ****         for(;currArg<argCount-1; currArg++){
+  71              		.loc 1 51 0
+  72 0022 0024     		movs	r4, #0
+  50:..\common\tterm/top.c ****         cpy_args[0]=memcpy(cpy_args[0], APP_NAME, sizeof(APP_NAME));
+  73              		.loc 1 50 0
+  74 0024 1B68     		ldr	r3, [r3]	@ unaligned
+  75              		.loc 1 51 0
+  76 0026 05F1FF3A 		add	r10, r5, #-1
+  50:..\common\tterm/top.c ****         cpy_args[0]=memcpy(cpy_args[0], APP_NAME, sizeof(APP_NAME));
+  77              		.loc 1 50 0
+  78 002a 0360     		str	r3, [r0]	@ unaligned
+  79 002c 3860     		str	r0, [r7]
+  80              	.LVL7:
+  81              	.L3:
+  82 002e 04F1010B 		add	fp, r4, #1
+  83              		.loc 1 51 0 discriminator 1
+  84 0032 E4B2     		uxtb	r4, r4
+  85 0034 5445     		cmp	r4, r10
+  86 0036 18DA     		bge	.L2
+  87              	.LBB2:
+  52:..\common\tterm/top.c ****             uint16_t len = strlen(args[currArg])+1;
+  88              		.loc 1 52 0 discriminator 2
+  89 0038 59F82400 		ldr	r0, [r9, r4, lsl #2]
+  90 003c FFF7FEFF 		bl	strlen
+  91              	.LVL8:
+  92 0040 4FEA8408 		lsl	r8, r4, #2
+  53:..\common\tterm/top.c ****             cpy_args[currArg+1] = pvPortMalloc(len);
+  93              		.loc 1 53 0 discriminator 2
+  94 0044 0130     		adds	r0, r0, #1
+  95              	.LVL9:
+  96 0046 08F10403 		add	r3, r8, #4
+  97 004a 1FFA80F8 		uxth	r8, r0
+  98 004e 4046     		mov	r0, r8
+  99 0050 0393     		str	r3, [sp, #12]
+ 100 0052 FFF7FEFF 		bl	pvPortMalloc
+ 101              	.LVL10:
+ 102 0056 039B     		ldr	r3, [sp, #12]
+  54:..\common\tterm/top.c ****             memcpy(cpy_args[currArg+1], args[currArg], len);
+ 103              		.loc 1 54 0 discriminator 2
+ 104 0058 4246     		mov	r2, r8
+  53:..\common\tterm/top.c ****             cpy_args[currArg+1] = pvPortMalloc(len);
+ 105              		.loc 1 53 0 discriminator 2
+ 106 005a F850     		str	r0, [r7, r3]
+ 107              		.loc 1 54 0 discriminator 2
+ 108 005c 59F82410 		ldr	r1, [r9, r4, lsl #2]
+ 109 0060 FFF7FEFF 		bl	memcpy
+ 110              	.LVL11:
+ 111 0064 5C46     		mov	r4, fp
+ 112 0066 E2E7     		b	.L3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 4
+
+
+ 113              	.LVL12:
+ 114              	.L7:
+ 115              	.LBE2:
+  45:..\common\tterm/top.c ****     argCount++;
+ 116              		.loc 1 45 0
+ 117 0068 2F46     		mov	r7, r5
+ 118              	.LVL13:
+ 119              	.L2:
+  55:..\common\tterm/top.c ****         }
+  56:..\common\tterm/top.c ****     }
+  57:..\common\tterm/top.c ****     TermProgram * prog = pvPortMalloc(sizeof(TermProgram));
+ 120              		.loc 1 57 0
+ 121 006a 1820     		movs	r0, #24
+ 122 006c FFF7FEFF 		bl	pvPortMalloc
+ 123              	.LVL14:
+ 124 0070 0446     		mov	r4, r0
+ 125              	.LVL15:
+  58:..\common\tterm/top.c ****     prog->inputHandler = INPUT_handler;
+ 126              		.loc 1 58 0
+ 127 0072 114B     		ldr	r3, .L10+4
+  59:..\common\tterm/top.c ****     prog->args = cpy_args;
+ 128              		.loc 1 59 0
+ 129 0074 0761     		str	r7, [r0, #16]
+  58:..\common\tterm/top.c ****     prog->inputHandler = INPUT_handler;
+ 130              		.loc 1 58 0
+ 131 0076 4360     		str	r3, [r0, #4]
+  60:..\common\tterm/top.c ****     prog->argCount = argCount;
+ 132              		.loc 1 60 0
+ 133 0078 0575     		strb	r5, [r0, #20]
+  61:..\common\tterm/top.c ****     TERM_sendVT100Code(handle, _VT100_RESET, 0); TERM_sendVT100Code(handle, _VT100_CURSOR_POS1, 0);
+ 134              		.loc 1 61 0
+ 135 007a 0022     		movs	r2, #0
+ 136 007c 4FF48051 		mov	r1, #4096
+ 137 0080 3046     		mov	r0, r6
+ 138              	.LVL16:
+ 139 0082 FFF7FEFF 		bl	TERM_sendVT100Code
+ 140              	.LVL17:
+ 141 0086 0022     		movs	r2, #0
+ 142 0088 1146     		mov	r1, r2
+ 143 008a 3046     		mov	r0, r6
+ 144 008c FFF7FEFF 		bl	TERM_sendVT100Code
+ 145              	.LVL18:
+  62:..\common\tterm/top.c ****     returnCode = xTaskCreate(TASK_main, APP_NAME, APP_STACK, handle, tskIDLE_PRIORITY + 1, &prog->t
+ 146              		.loc 1 62 0
+ 147 0090 0123     		movs	r3, #1
+ 148 0092 0093     		str	r3, [sp]
+ 149 0094 0194     		str	r4, [sp, #4]
+ 150 0096 3346     		mov	r3, r6
+ 151 0098 FA22     		movs	r2, #250
+ 152 009a 0649     		ldr	r1, .L10
+ 153 009c 0748     		ldr	r0, .L10+8
+ 154 009e FFF7FEFF 		bl	xTaskCreate
+ 155              	.LVL19:
+ 156 00a2 20B1     		cbz	r0, .L8
+ 157              	.LVL20:
+  63:..\common\tterm/top.c ****     if(returnCode == TERM_CMD_EXIT_PROC_STARTED) TERM_attachProgramm(handle, prog);
+ 158              		.loc 1 63 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 5
+
+
+ 159 00a4 3046     		mov	r0, r6
+ 160 00a6 2146     		mov	r1, r4
+ 161 00a8 FFF7FEFF 		bl	TERM_attachProgramm
+ 162              	.LVL21:
+  62:..\common\tterm/top.c ****     returnCode = xTaskCreate(TASK_main, APP_NAME, APP_STACK, handle, tskIDLE_PRIORITY + 1, &prog->t
+ 163              		.loc 1 62 0
+ 164 00ac FE20     		movs	r0, #254
+ 165              	.LVL22:
+ 166              	.L8:
+  64:..\common\tterm/top.c ****     return returnCode;
+  65:..\common\tterm/top.c **** }
+ 167              		.loc 1 65 0
+ 168 00ae 05B0     		add	sp, sp, #20
+ 169              		.cfi_def_cfa_offset 36
+ 170              		@ sp needed
+ 171 00b0 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 172              	.LVL23:
+ 173              	.L11:
+ 174              		.align	2
+ 175              	.L10:
+ 176 00b4 00000000 		.word	.LC0
+ 177 00b8 00000000 		.word	INPUT_handler
+ 178 00bc 00000000 		.word	TASK_main
+ 179              		.cfi_endproc
+ 180              	.LFE69:
+ 181              		.size	CMD_main, .-CMD_main
+ 182              		.section	.text.TASK_main,"ax",%progbits
+ 183              		.align	1
+ 184              		.global	TASK_main
+ 185              		.thumb
+ 186              		.thumb_func
+ 187              		.type	TASK_main, %function
+ 188              	TASK_main:
+ 189              	.LFB70:
+  66:..\common\tterm/top.c **** 
+  67:..\common\tterm/top.c **** void TASK_main(void *pvParameters){
+ 190              		.loc 1 67 0
+ 191              		.cfi_startproc
+ 192              		@ args = 0, pretend = 0, frame = 40
+ 193              		@ frame_needed = 0, uses_anonymous_args = 0
+ 194              	.LVL24:
+ 195 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 196              		.cfi_def_cfa_offset 36
+ 197              		.cfi_offset 4, -36
+ 198              		.cfi_offset 5, -32
+ 199              		.cfi_offset 6, -28
+ 200              		.cfi_offset 7, -24
+ 201              		.cfi_offset 8, -20
+ 202              		.cfi_offset 9, -16
+ 203              		.cfi_offset 10, -12
+ 204              		.cfi_offset 11, -8
+ 205              		.cfi_offset 14, -4
+ 206 0004 0446     		mov	r4, r0
+ 207              	.LVL25:
+ 208 0006 99B0     		sub	sp, sp, #100
+ 209              		.cfi_def_cfa_offset 136
+  68:..\common\tterm/top.c ****     TERMINAL_HANDLE * handle = (TERMINAL_HANDLE*)pvParameters;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 6
+
+
+  69:..\common\tterm/top.c ****     char c=0;
+ 210              		.loc 1 69 0
+ 211 0008 0023     		movs	r3, #0
+ 212 000a 8DF84B30 		strb	r3, [sp, #75]
+ 213              	.LVL26:
+ 214              	.L20:
+ 215              	.LBB3:
+  70:..\common\tterm/top.c ****     do{
+  71:..\common\tterm/top.c ****         
+  72:..\common\tterm/top.c ****         TaskStatus_t * taskStats;
+  73:..\common\tterm/top.c ****         uint32_t taskCount = uxTaskGetNumberOfTasks();
+ 216              		.loc 1 73 0
+ 217 000e FFF7FEFF 		bl	uxTaskGetNumberOfTasks
+ 218              	.LVL27:
+ 219 0012 0546     		mov	r5, r0
+ 220              	.LVL28:
+  74:..\common\tterm/top.c ****         uint32_t sysTime;
+  75:..\common\tterm/top.c ****                 
+  76:..\common\tterm/top.c ****         taskStats = pvPortMalloc( taskCount * sizeof( TaskStatus_t ) );
+ 221              		.loc 1 76 0
+ 222 0014 2820     		movs	r0, #40
+ 223              	.LVL29:
+ 224 0016 6843     		muls	r0, r5, r0
+ 225 0018 FFF7FEFF 		bl	pvPortMalloc
+ 226              	.LVL30:
+  77:..\common\tterm/top.c ****         if(taskStats){
+ 227              		.loc 1 77 0
+ 228 001c 0F90     		str	r0, [sp, #60]
+ 229 001e 0028     		cmp	r0, #0
+ 230 0020 00F0E180 		beq	.L13
+ 231              	.LBB4:
+  78:..\common\tterm/top.c ****             taskCount = uxTaskGetSystemState(taskStats, taskCount, &sysTime);
+ 232              		.loc 1 78 0
+ 233 0024 2946     		mov	r1, r5
+ 234 0026 13AA     		add	r2, sp, #76
+ 235 0028 FFF7FEFF 		bl	uxTaskGetSystemState
+ 236              	.LVL31:
+ 237 002c 0746     		mov	r7, r0
+ 238              	.LVL32:
+  79:..\common\tterm/top.c ****             
+  80:..\common\tterm/top.c ****             TERM_sendVT100Code(handle, _VT100_CURSOR_POS1, 0);
+ 239              		.loc 1 80 0
+ 240 002e 0022     		movs	r2, #0
+ 241 0030 1146     		mov	r1, r2
+ 242 0032 2046     		mov	r0, r4
+ 243              	.LVL33:
+ 244 0034 FFF7FEFF 		bl	TERM_sendVT100Code
+ 245              	.LVL34:
+  81:..\common\tterm/top.c ****         
+  82:..\common\tterm/top.c ****             uint32_t cpuLoad = SYS_getCPULoadFine(taskStats, taskCount, sysTime);
+ 246              		.loc 1 82 0
+ 247 0038 139A     		ldr	r2, [sp, #76]
+ 248 003a 3946     		mov	r1, r7
+ 249 003c 0F98     		ldr	r0, [sp, #60]
+ 250 003e FFF7FEFF 		bl	SYS_getCPULoadFine
+ 251              	.LVL35:
+  83:..\common\tterm/top.c ****             ttprintf("%sbottom - %d\r\n%sTasks: \t%d\r\n%sCPU: \t%d,%d%%\r\n", TERM_getVT100Code(_V
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 7
+
+
+ 252              		.loc 1 83 0
+ 253 0042 6368     		ldr	r3, [r4, #4]
+  82:..\common\tterm/top.c ****             ttprintf("%sbottom - %d\r\n%sTasks: \t%d\r\n%sCPU: \t%d,%d%%\r\n", TERM_getVT100Code(_V
+ 254              		.loc 1 82 0
+ 255 0044 8046     		mov	r8, r0
+ 256              	.LVL36:
+ 257              		.loc 1 83 0
+ 258 0046 0021     		movs	r1, #0
+ 259 0048 1120     		movs	r0, #17
+ 260              	.LVL37:
+ 261 004a 1E46     		mov	r6, r3
+ 262 004c 656A     		ldr	r5, [r4, #36]
+ 263 004e FFF7FEFF 		bl	TERM_getVT100Code
+ 264              	.LVL38:
+ 265 0052 8146     		mov	r9, r0
+ 266 0054 FFF7FEFF 		bl	xTaskGetTickCount
+ 267              	.LVL39:
+ 268 0058 0021     		movs	r1, #0
+ 269 005a 8246     		mov	r10, r0
+ 270 005c 1120     		movs	r0, #17
+ 271 005e FFF7FEFF 		bl	TERM_getVT100Code
+ 272              	.LVL40:
+ 273 0062 0021     		movs	r1, #0
+ 274 0064 8346     		mov	fp, r0
+ 275 0066 1120     		movs	r0, #17
+ 276 0068 FFF7FEFF 		bl	TERM_getVT100Code
+ 277              	.LVL41:
+ 278 006c 0A21     		movs	r1, #10
+ 279 006e B8FBF1F2 		udiv	r2, r8, r1
+ 280 0072 01FB1281 		mls	r1, r1, r2, r8
+ 281 0076 5346     		mov	r3, r10
+ 282 0078 0491     		str	r1, [sp, #16]
+ 283 007a 0392     		str	r2, [sp, #12]
+ 284 007c 6649     		ldr	r1, .L27
+ 285 007e 4A46     		mov	r2, r9
+ 286 0080 0290     		str	r0, [sp, #8]
+ 287 0082 0197     		str	r7, [sp, #4]
+ 288 0084 CDF800B0 		str	fp, [sp]
+ 289 0088 3046     		mov	r0, r6
+ 290 008a A847     		blx	r5
+ 291              	.LVL42:
+  84:..\common\tterm/top.c ****             
+  85:..\common\tterm/top.c ****             uint32_t heapRemaining = xPortGetFreeHeapSize();
+ 292              		.loc 1 85 0
+ 293 008c FFF7FEFF 		bl	xPortGetFreeHeapSize
+ 294              	.LVL43:
+ 295 0090 8146     		mov	r9, r0
+ 296              	.LVL44:
+  86:..\common\tterm/top.c ****             ttprintf("%sMem: \t%db total,\t %db free,\t %db used (%d%%)\r\n", TERM_getVT100Code(_VT
+ 297              		.loc 1 86 0
+ 298 0092 0021     		movs	r1, #0
+ 299 0094 1120     		movs	r0, #17
+ 300              	.LVL45:
+ 301 0096 656A     		ldr	r5, [r4, #36]
+ 302 0098 D4F80480 		ldr	r8, [r4, #4]
+ 303              	.LVL46:
+ 304 009c FFF7FEFF 		bl	TERM_getVT100Code
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 8
+
+
+ 305              	.LVL47:
+ 306 00a0 6FF06302 		mvn	r2, #99
+ 307 00a4 02FB09F2 		mul	r2, r2, r9
+ 308 00a8 4FF44043 		mov	r3, #49152
+ 309 00ac 02F59602 		add	r2, r2, #4915200
+ 310 00b0 B2FBF3F2 		udiv	r2, r2, r3
+ 311 00b4 0292     		str	r2, [sp, #8]
+ 312 00b6 C9EB0302 		rsb	r2, r9, r3
+ 313 00ba 0192     		str	r2, [sp, #4]
+ 314 00bc CDF80090 		str	r9, [sp]
+ 315 00c0 0246     		mov	r2, r0
+ 316 00c2 5649     		ldr	r1, .L27+4
+ 317 00c4 4046     		mov	r0, r8
+ 318 00c6 A847     		blx	r5
+ 319              	.LVL48:
+  87:..\common\tterm/top.c ****             //taskStats[0].
+  88:..\common\tterm/top.c ****             ttprintf("%s%s%s", TERM_getVT100Code(_VT100_BACKGROUND_COLOR, _VT100_WHITE), TERM_getVT
+ 320              		.loc 1 88 0
+ 321 00c8 0721     		movs	r1, #7
+ 322 00ca 0320     		movs	r0, #3
+ 323 00cc 656A     		ldr	r5, [r4, #36]
+ 324 00ce D4F80480 		ldr	r8, [r4, #4]
+ 325 00d2 FFF7FEFF 		bl	TERM_getVT100Code
+ 326              	.LVL49:
+ 327 00d6 0021     		movs	r1, #0
+ 328 00d8 8146     		mov	r9, r0
+ 329              	.LVL50:
+ 330 00da 1120     		movs	r0, #17
+ 331 00dc FFF7FEFF 		bl	TERM_getVT100Code
+ 332              	.LVL51:
+ 333 00e0 0021     		movs	r1, #0
+ 334 00e2 8246     		mov	r10, r0
+ 335 00e4 0220     		movs	r0, #2
+ 336 00e6 FFF7FEFF 		bl	TERM_getVT100Code
+ 337              	.LVL52:
+ 338 00ea 4A46     		mov	r2, r9
+ 339 00ec 0090     		str	r0, [sp]
+ 340 00ee 5346     		mov	r3, r10
+ 341 00f0 4B49     		ldr	r1, .L27+8
+ 342 00f2 4046     		mov	r0, r8
+ 343 00f4 A847     		blx	r5
+ 344              	.LVL53:
+  89:..\common\tterm/top.c ****             ttprintf("PID \r\x1b[%dCName \r\x1b[%dCstate \r\x1b[%dC%%Cpu \r\x1b[%dCtime  \r\x1b[%dC
+ 345              		.loc 1 89 0
+ 346 00f6 2020     		movs	r0, #32
+ 347 00f8 2721     		movs	r1, #39
+ 348 00fa 3222     		movs	r2, #50
+ 349 00fc 3923     		movs	r3, #57
+ 350 00fe 8DE80F00 		stmia	sp, {r0, r1, r2, r3}
+ 351 0102 656A     		ldr	r5, [r4, #36]
+ 352 0104 1323     		movs	r3, #19
+ 353 0106 0622     		movs	r2, #6
+ 354 0108 4649     		ldr	r1, .L27+12
+ 355 010a 6068     		ldr	r0, [r4, #4]
+ 356 010c A847     		blx	r5
+ 357              	.LVL54:
+  90:..\common\tterm/top.c ****             ttprintf("%s", TERM_getVT100Code(_VT100_RESET_ATTRIB, 0));
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 9
+
+
+ 358              		.loc 1 90 0
+ 359 010e 0021     		movs	r1, #0
+ 360 0110 0420     		movs	r0, #4
+ 361 0112 656A     		ldr	r5, [r4, #36]
+ 362 0114 D4F80480 		ldr	r8, [r4, #4]
+ 363 0118 FFF7FEFF 		bl	TERM_getVT100Code
+ 364              	.LVL55:
+ 365 011c 4249     		ldr	r1, .L27+16
+ 366 011e 0246     		mov	r2, r0
+ 367 0120 4046     		mov	r0, r8
+ 368 0122 A847     		blx	r5
+ 369              	.LVL56:
+ 370 0124 0F9D     		ldr	r5, [sp, #60]
+  91:..\common\tterm/top.c ****             
+  92:..\common\tterm/top.c ****             uint32_t currTask = 0;
+ 371              		.loc 1 92 0
+ 372 0126 4FF00008 		mov	r8, #0
+ 373              	.LBB5:
+  93:..\common\tterm/top.c ****             for(;currTask < taskCount; currTask++){
+  94:..\common\tterm/top.c ****                 if(strlen(taskStats[currTask].pcTaskName) != 4 || strcmp(taskStats[currTask].pcTask
+  95:..\common\tterm/top.c ****                     char name[configMAX_TASK_NAME_LEN+1];
+  96:..\common\tterm/top.c ****                     strncpy(name, taskStats[currTask].pcTaskName, configMAX_TASK_NAME_LEN);
+ 374              		.loc 1 96 0
+ 375 012a 0DF15009 		add	r9, sp, #80
+ 376              	.LVL57:
+ 377              	.L14:
+ 378              	.LBE5:
+  93:..\common\tterm/top.c ****             for(;currTask < taskCount; currTask++){
+ 379              		.loc 1 93 0 discriminator 1
+ 380 012e B845     		cmp	r8, r7
+ 381 0130 55D0     		beq	.L26
+  94:..\common\tterm/top.c ****                     char name[configMAX_TASK_NAME_LEN+1];
+ 382              		.loc 1 94 0
+ 383 0132 D5F804A0 		ldr	r10, [r5, #4]
+ 384 0136 5046     		mov	r0, r10
+ 385 0138 FFF7FEFF 		bl	strlen
+ 386              	.LVL58:
+ 387 013c 0428     		cmp	r0, #4
+ 388 013e 05D1     		bne	.L15
+  94:..\common\tterm/top.c ****                     char name[configMAX_TASK_NAME_LEN+1];
+ 389              		.loc 1 94 0 is_stmt 0 discriminator 1
+ 390 0140 3A49     		ldr	r1, .L27+20
+ 391 0142 5046     		mov	r0, r10
+ 392 0144 FFF7FEFF 		bl	strcmp
+ 393              	.LVL59:
+ 394 0148 0028     		cmp	r0, #0
+ 395 014a 44D0     		beq	.L16
+ 396              	.L15:
+ 397              	.LBB6:
+ 398              		.loc 1 96 0 is_stmt 1
+ 399 014c 0C22     		movs	r2, #12
+ 400 014e 5146     		mov	r1, r10
+ 401 0150 4846     		mov	r0, r9
+ 402 0152 FFF7FEFF 		bl	strncpy
+ 403              	.LVL60:
+  97:..\common\tterm/top.c ****                      uint32_t load=0;
+  98:..\common\tterm/top.c ****                     if(sysTime>1000){
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 10
+
+
+ 404              		.loc 1 98 0
+ 405 0156 139B     		ldr	r3, [sp, #76]
+  99:..\common\tterm/top.c ****                         load = (taskStats[currTask].ulRunTimeCounter) / (sysTime/configTICK_RATE_HZ
+ 100:..\common\tterm/top.c ****                     }
+ 101:..\common\tterm/top.c ****                     ttprintf("%s%d\r\x1b[%dC%s\r\x1b[%dC%s\r\x1b[%dC%d,%d\r\x1b[%dC%d\r\x1b[%dC%u\r
+ 406              		.loc 1 101 0
+ 407 0158 0021     		movs	r1, #0
+  98:..\common\tterm/top.c ****                         load = (taskStats[currTask].ulRunTimeCounter) / (sysTime/configTICK_RATE_HZ
+ 408              		.loc 1 98 0
+ 409 015a B3F57A7F 		cmp	r3, #1000
+  99:..\common\tterm/top.c ****                         load = (taskStats[currTask].ulRunTimeCounter) / (sysTime/configTICK_RATE_HZ
+ 410              		.loc 1 99 0
+ 411 015e 82BF     		ittt	hi
+ 412 0160 4FF47A72 		movhi	r2, #1000
+ 413 0164 B3FBF2F3 		udivhi	r3, r3, r2
+ 414 0168 AA69     		ldrhi	r2, [r5, #24]
+ 415              		.loc 1 101 0
+ 416 016a 4FF01100 		mov	r0, #17
+  99:..\common\tterm/top.c ****                         load = (taskStats[currTask].ulRunTimeCounter) / (sysTime/configTICK_RATE_HZ
+ 417              		.loc 1 99 0
+ 418 016e 88BF     		it	hi
+ 419 0170 B2FBF3FA 		udivhi	r10, r2, r3
+ 420              	.LVL61:
+ 421              		.loc 1 101 0
+ 422 0174 636A     		ldr	r3, [r4, #36]
+  97:..\common\tterm/top.c ****                      uint32_t load=0;
+ 423              		.loc 1 97 0
+ 424 0176 98BF     		it	ls
+ 425 0178 4FF0000A 		movls	r10, #0
+ 426              	.LVL62:
+ 427              		.loc 1 101 0
+ 428 017c 1E46     		mov	r6, r3
+ 429 017e D4F804B0 		ldr	fp, [r4, #4]
+ 430 0182 FFF7FEFF 		bl	TERM_getVT100Code
+ 431              	.LVL63:
+ 432 0186 AB68     		ldr	r3, [r5, #8]
+ 433 0188 1190     		str	r0, [sp, #68]
+ 434 018a 287B     		ldrb	r0, [r5, #12]	@ zero_extendqisi2
+ 435 018c 1093     		str	r3, [sp, #64]
+ 436 018e FFF7FEFF 		bl	SYS_getTaskStateString
+ 437              	.LVL64:
+ 438 0192 4FF00A0E 		mov	lr, #10
+ 439 0196 BAFBFEF1 		udiv	r1, r10, lr
+ 440 019a 6B6A     		ldr	r3, [r5, #36]
+ 441 019c 119A     		ldr	r2, [sp, #68]
+ 442 019e 0C93     		str	r3, [sp, #48]
+ 443 01a0 3923     		movs	r3, #57
+ 444 01a2 0B93     		str	r3, [sp, #44]
+ 445 01a4 2B8C     		ldrh	r3, [r5, #32]
+ 446 01a6 0A93     		str	r3, [sp, #40]
+ 447 01a8 3223     		movs	r3, #50
+ 448 01aa 0993     		str	r3, [sp, #36]
+ 449 01ac AB69     		ldr	r3, [r5, #24]
+ 450 01ae 0591     		str	r1, [sp, #20]
+ 451 01b0 0893     		str	r3, [sp, #32]
+ 452 01b2 2723     		movs	r3, #39
+ 453 01b4 0793     		str	r3, [sp, #28]
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 11
+
+
+ 454 01b6 0EFB11A3 		mls	r3, lr, r1, r10
+ 455 01ba 0693     		str	r3, [sp, #24]
+ 456 01bc 2023     		movs	r3, #32
+ 457 01be 0493     		str	r3, [sp, #16]
+ 458 01c0 1323     		movs	r3, #19
+ 459 01c2 0293     		str	r3, [sp, #8]
+ 460 01c4 0623     		movs	r3, #6
+ 461 01c6 0390     		str	r0, [sp, #12]
+ 462 01c8 0093     		str	r3, [sp]
+ 463 01ca CDF80490 		str	r9, [sp, #4]
+ 464 01ce 109B     		ldr	r3, [sp, #64]
+ 465 01d0 1749     		ldr	r1, .L27+24
+ 466 01d2 5846     		mov	r0, fp
+ 467 01d4 B047     		blx	r6
+ 468              	.LVL65:
+ 469              	.L16:
+ 470              	.LBE6:
+  93:..\common\tterm/top.c ****                 if(strlen(taskStats[currTask].pcTaskName) != 4 || strcmp(taskStats[currTask].pcTask
+ 471              		.loc 1 93 0
+ 472 01d6 08F10108 		add	r8, r8, #1
+ 473              	.LVL66:
+ 474 01da 2835     		adds	r5, r5, #40
+ 475 01dc A7E7     		b	.L14
+ 476              	.L26:
+ 102:..\common\tterm/top.c ****                             , SYS_getTaskStateString(taskStats[currTask].eCurrentState), 20 + confi
+ 103:..\common\tterm/top.c ****                             , 38 + configMAX_TASK_NAME_LEN, taskStats[currTask].usStackHighWaterMar
+ 104:..\common\tterm/top.c ****                 }
+ 105:..\common\tterm/top.c ****             }
+ 106:..\common\tterm/top.c ****             vPortFree(taskStats);
+ 477              		.loc 1 106 0
+ 478 01de 0F98     		ldr	r0, [sp, #60]
+ 479 01e0 FFF7FEFF 		bl	vPortFree
+ 480              	.LVL67:
+ 481              	.LBE4:
+ 482 01e4 03E0     		b	.L19
+ 483              	.LVL68:
+ 484              	.L13:
+ 107:..\common\tterm/top.c ****         }else{
+ 108:..\common\tterm/top.c ****             ttprintf("Malloc failed\r\n");
+ 485              		.loc 1 108 0
+ 486 01e6 636A     		ldr	r3, [r4, #36]
+ 487 01e8 1249     		ldr	r1, .L27+28
+ 488 01ea 6068     		ldr	r0, [r4, #4]
+ 489              	.LVL69:
+ 490 01ec 9847     		blx	r3
+ 491              	.LVL70:
+ 492              	.L19:
+ 109:..\common\tterm/top.c ****         }
+ 110:..\common\tterm/top.c ****         
+ 111:..\common\tterm/top.c ****         xStreamBufferReceive(handle->currProgram->inputStream,&c,sizeof(c),pdMS_TO_TICKS(1000));
+ 493              		.loc 1 111 0
+ 494 01ee 6069     		ldr	r0, [r4, #20]
+ 495 01f0 4FF47A73 		mov	r3, #1000
+ 496 01f4 0122     		movs	r2, #1
+ 497 01f6 0DF14B01 		add	r1, sp, #75
+ 498 01fa C068     		ldr	r0, [r0, #12]
+ 499 01fc FFF7FEFF 		bl	xStreamBufferReceive
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 12
+
+
+ 500              	.LVL71:
+ 501              	.LBE3:
+ 112:..\common\tterm/top.c ****     }while(c!=CTRL_C);
+ 502              		.loc 1 112 0
+ 503 0200 9DF84B30 		ldrb	r3, [sp, #75]	@ zero_extendqisi2
+ 504 0204 032B     		cmp	r3, #3
+ 505 0206 7FF402AF 		bne	.L20
+ 113:..\common\tterm/top.c ****     TERM_killProgramm(handle);
+ 506              		.loc 1 113 0
+ 507 020a 2046     		mov	r0, r4
+ 508 020c FFF7FEFF 		bl	TERM_killProgramm
+ 509              	.LVL72:
+ 114:..\common\tterm/top.c **** }
+ 510              		.loc 1 114 0
+ 511 0210 19B0     		add	sp, sp, #100
+ 512              		.cfi_def_cfa_offset 36
+ 513              		@ sp needed
+ 514 0212 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 515              	.LVL73:
+ 516              	.L28:
+ 517 0216 00BF     		.align	2
+ 518              	.L27:
+ 519 0218 04000000 		.word	.LC1
+ 520 021c 33000000 		.word	.LC2
+ 521 0220 64000000 		.word	.LC3
+ 522 0224 6B000000 		.word	.LC4
+ 523 0228 B7000000 		.word	.LC5
+ 524 022c BA000000 		.word	.LC6
+ 525 0230 BF000000 		.word	.LC7
+ 526 0234 F9000000 		.word	.LC8
+ 527              		.cfi_endproc
+ 528              	.LFE70:
+ 529              		.size	TASK_main, .-TASK_main
+ 530              		.section	.text.INPUT_handler,"ax",%progbits
+ 531              		.align	1
+ 532              		.global	INPUT_handler
+ 533              		.thumb
+ 534              		.thumb_func
+ 535              		.type	INPUT_handler, %function
+ 536              	INPUT_handler:
+ 537              	.LFB71:
+ 115:..\common\tterm/top.c **** 
+ 116:..\common\tterm/top.c **** uint8_t INPUT_handler(TERMINAL_HANDLE * handle, uint16_t c){
+ 538              		.loc 1 116 0
+ 539              		.cfi_startproc
+ 540              		@ args = 0, pretend = 0, frame = 8
+ 541              		@ frame_needed = 0, uses_anonymous_args = 0
+ 542              	.LVL74:
+ 543 0000 07B5     		push	{r0, r1, r2, lr}
+ 544              		.cfi_def_cfa_offset 16
+ 545              		.cfi_offset 14, -4
+ 117:..\common\tterm/top.c ****     if(handle->currProgram->inputStream==NULL) return TERM_CMD_EXIT_SUCCESS;
+ 546              		.loc 1 117 0
+ 547 0002 4369     		ldr	r3, [r0, #20]
+ 116:..\common\tterm/top.c ****     if(handle->currProgram->inputStream==NULL) return TERM_CMD_EXIT_SUCCESS;
+ 548              		.loc 1 116 0
+ 549 0004 ADF80610 		strh	r1, [sp, #6]	@ movhi
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 13
+
+
+ 550              		.loc 1 117 0
+ 551 0008 D868     		ldr	r0, [r3, #12]
+ 552              	.LVL75:
+ 553 000a 60B1     		cbz	r0, .L32
+ 118:..\common\tterm/top.c ****     switch(c){
+ 554              		.loc 1 118 0
+ 555 000c 8BB2     		uxth	r3, r1
+ 556 000e 032B     		cmp	r3, #3
+ 557 0010 01D0     		beq	.L31
+ 558 0012 712B     		cmp	r3, #113
+ 559 0014 09D1     		bne	.L40
+ 560              	.L31:
+ 119:..\common\tterm/top.c ****         case 'q':
+ 120:..\common\tterm/top.c ****         case CTRL_C:
+ 121:..\common\tterm/top.c ****             c=CTRL_C;
+ 561              		.loc 1 121 0
+ 562 0016 0323     		movs	r3, #3
+ 563 0018 02A9     		add	r1, sp, #8
+ 564              	.LVL76:
+ 565 001a 21F8023D 		strh	r3, [r1, #-2]!	@ movhi
+ 566              	.LVL77:
+ 122:..\common\tterm/top.c ****             xStreamBufferSend(handle->currProgram->inputStream,&c,1,20);
+ 567              		.loc 1 122 0
+ 568 001e 0122     		movs	r2, #1
+ 569 0020 1423     		movs	r3, #20
+ 570 0022 FFF7FEFF 		bl	xStreamBufferSend
+ 571              	.LVL78:
+ 572              	.L32:
+ 117:..\common\tterm/top.c ****     switch(c){
+ 573              		.loc 1 117 0
+ 574 0026 FF20     		movs	r0, #255
+ 575 0028 00E0     		b	.L30
+ 576              	.LVL79:
+ 577              	.L40:
+ 123:..\common\tterm/top.c ****             return TERM_CMD_EXIT_SUCCESS;
+ 124:..\common\tterm/top.c ****         default:
+ 125:..\common\tterm/top.c ****             return TERM_CMD_CONTINUE;
+ 578              		.loc 1 125 0
+ 579 002a 8020     		movs	r0, #128
+ 580              	.LVL80:
+ 581              	.L30:
+ 126:..\common\tterm/top.c ****     }
+ 127:..\common\tterm/top.c **** }...
+ 582              		.loc 1 127 0
+ 583 002c 03B0     		add	sp, sp, #12
+ 584              		.cfi_def_cfa_offset 4
+ 585              		@ sp needed
+ 586 002e 5DF804FB 		ldr	pc, [sp], #4
+ 587              		.cfi_endproc
+ 588              	.LFE71:
+ 589              		.size	INPUT_handler, .-INPUT_handler
+ 590              		.section	.text.REGISTER_top,"ax",%progbits
+ 591              		.align	1
+ 592              		.global	REGISTER_top
+ 593              		.thumb
+ 594              		.thumb_func
+ 595              		.type	REGISTER_top, %function
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 14
+
+
+ 596              	REGISTER_top:
+ 597              	.LFB68:
+  36:..\common\tterm/top.c **** uint8_t REGISTER_top(TermCommandDescriptor * desc){
+ 598              		.loc 1 36 0
+ 599              		.cfi_startproc
+ 600              		@ args = 0, pretend = 0, frame = 0
+ 601              		@ frame_needed = 0, uses_anonymous_args = 0
+ 602              	.LVL81:
+ 603 0000 07B5     		push	{r0, r1, r2, lr}
+ 604              		.cfi_def_cfa_offset 16
+ 605              		.cfi_offset 14, -4
+  37:..\common\tterm/top.c ****     TERM_addCommand(CMD_main, APP_NAME, APP_DESCRIPTION, 0, desc); 
+ 606              		.loc 1 37 0
+ 607 0002 0023     		movs	r3, #0
+ 608 0004 0090     		str	r0, [sp]
+ 609 0006 044A     		ldr	r2, .L42
+ 610 0008 0449     		ldr	r1, .L42+4
+ 611 000a 0548     		ldr	r0, .L42+8
+ 612              	.LVL82:
+ 613 000c FFF7FEFF 		bl	TERM_addCommand
+ 614              	.LVL83:
+  39:..\common\tterm/top.c **** }
+ 615              		.loc 1 39 0
+ 616 0010 0120     		movs	r0, #1
+ 617 0012 03B0     		add	sp, sp, #12
+ 618              		.cfi_def_cfa_offset 4
+ 619              		@ sp needed
+ 620 0014 5DF804FB 		ldr	pc, [sp], #4
+ 621              	.L43:
+ 622              		.align	2
+ 623              	.L42:
+ 624 0018 09010000 		.word	.LC9
+ 625 001c 00000000 		.word	.LC0
+ 626 0020 00000000 		.word	CMD_main
+ 627              		.cfi_endproc
+ 628              	.LFE68:
+ 629              		.size	REGISTER_top, .-REGISTER_top
+ 630              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 631              	.LC0:
+ 632 0000 746F7000 		.ascii	"top\000"
+ 633              	.LC1:
+ 634 0004 2573626F 		.ascii	"%sbottom - %d\015\012%sTasks: \011%d\015\012%sCPU: "
+ 634      74746F6D 
+ 634      202D2025 
+ 634      640D0A25 
+ 634      73546173 
+ 635 0028 0925642C 		.ascii	"\011%d,%d%%\015\012\000"
+ 635      25642525 
+ 635      0D0A00
+ 636              	.LC2:
+ 637 0033 25734D65 		.ascii	"%sMem: \011%db total,\011 %db free,\011 %db used (%"
+ 637      6D3A2009 
+ 637      25646220 
+ 637      746F7461 
+ 637      6C2C0920 
+ 638 005d 64252529 		.ascii	"d%%)\015\012\000"
+ 638      0D0A00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 15
+
+
+ 639              	.LC3:
+ 640 0064 25732573 		.ascii	"%s%s%s\000"
+ 640      257300
+ 641              	.LC4:
+ 642 006b 50494420 		.ascii	"PID \015\033[%dCName \015\033[%dCstate \015\033[%dC"
+ 642      0D1B5B25 
+ 642      64434E61 
+ 642      6D65200D 
+ 642      1B5B2564 
+ 643 008c 25254370 		.ascii	"%%Cpu \015\033[%dCtime  \015\033[%dCStack \015\033["
+ 643      75200D1B 
+ 643      5B256443 
+ 643      74696D65 
+ 643      20200D1B 
+ 644 00ad 25644348 		.ascii	"%dCHeap\015\012\000"
+ 644      6561700D 
+ 644      0A00
+ 645              	.LC5:
+ 646 00b7 257300   		.ascii	"%s\000"
+ 647              	.LC6:
+ 648 00ba 49444C45 		.ascii	"IDLE\000"
+ 648      00
+ 649              	.LC7:
+ 650 00bf 25732564 		.ascii	"%s%d\015\033[%dC%s\015\033[%dC%s\015\033[%dC%d,%d\015"
+ 650      0D1B5B25 
+ 650      64432573 
+ 650      0D1B5B25 
+ 650      64432573 
+ 651 00df 1B5B2564 		.ascii	"\033[%dC%d\015\033[%dC%u\015\033[%dC%d\015\012\000"
+ 651      4325640D 
+ 651      1B5B2564 
+ 651      4325750D 
+ 651      1B5B2564 
+ 652              	.LC8:
+ 653 00f9 4D616C6C 		.ascii	"Malloc failed\015\012\000"
+ 653      6F632066 
+ 653      61696C65 
+ 653      640D0A00 
+ 654              	.LC9:
+ 655 0109 73686F77 		.ascii	"shows performance stats\000"
+ 655      73207065 
+ 655      72666F72 
+ 655      6D616E63 
+ 655      65207374 
+ 656              		.text
+ 657              	.Letext0:
+ 658              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 659              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 660              		.file 4 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 661              		.file 5 "..\\common\\rtos\\portable\\GCC\\ARM_CM3/portmacro.h"
+ 662              		.file 6 "..\\common\\rtos\\include/task.h"
+ 663              		.file 7 "..\\common\\rtos\\include/stream_buffer.h"
+ 664              		.file 8 "..\\common\\tterm\\TTerm.h"
+ 665              		.file 9 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 666              		.file 10 "..\\common\\rtos\\include/portable.h"
+ 667              		.file 11 "..\\common\\ud3core/system.h"
+ 668              		.file 12 "Generated_Source\\PSoC5/core_cm3.h"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 16
+
+
+ 669              		.section	.debug_info,"",%progbits
+ 670              	.Ldebug_info0:
+ 671 0000 BC0D0000 		.4byte	0xdbc
+ 672 0004 0400     		.2byte	0x4
+ 673 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 674 000a 04       		.byte	0x4
+ 675 000b 01       		.uleb128 0x1
+ 676 000c 09030000 		.4byte	.LASF167
+ 677 0010 0C       		.byte	0xc
+ 678 0011 06080000 		.4byte	.LASF168
+ 679 0015 AF000000 		.4byte	.LASF169
+ 680 0019 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 681 001d 00000000 		.4byte	0
+ 682 0021 00000000 		.4byte	.Ldebug_line0
+ 683 0025 02       		.uleb128 0x2
+ 684 0026 04       		.byte	0x4
+ 685 0027 07       		.byte	0x7
+ 686 0028 F8030000 		.4byte	.LASF0
+ 687 002c 03       		.uleb128 0x3
+ 688 002d 04       		.byte	0x4
+ 689 002e 05       		.byte	0x5
+ 690 002f 696E7400 		.ascii	"int\000"
+ 691 0033 04       		.uleb128 0x4
+ 692 0034 40000000 		.4byte	.LASF2
+ 693 0038 02       		.byte	0x2
+ 694 0039 D8       		.byte	0xd8
+ 695 003a 25000000 		.4byte	0x25
+ 696 003e 02       		.uleb128 0x2
+ 697 003f 01       		.byte	0x1
+ 698 0040 06       		.byte	0x6
+ 699 0041 8B010000 		.4byte	.LASF1
+ 700 0045 04       		.uleb128 0x4
+ 701 0046 76000000 		.4byte	.LASF3
+ 702 004a 03       		.byte	0x3
+ 703 004b 1D       		.byte	0x1d
+ 704 004c 50000000 		.4byte	0x50
+ 705 0050 02       		.uleb128 0x2
+ 706 0051 01       		.byte	0x1
+ 707 0052 08       		.byte	0x8
+ 708 0053 E5060000 		.4byte	.LASF4
+ 709 0057 02       		.uleb128 0x2
+ 710 0058 02       		.byte	0x2
+ 711 0059 05       		.byte	0x5
+ 712 005a 24070000 		.4byte	.LASF5
+ 713 005e 04       		.uleb128 0x4
+ 714 005f 65080000 		.4byte	.LASF6
+ 715 0063 03       		.byte	0x3
+ 716 0064 2B       		.byte	0x2b
+ 717 0065 69000000 		.4byte	0x69
+ 718 0069 02       		.uleb128 0x2
+ 719 006a 02       		.byte	0x2
+ 720 006b 07       		.byte	0x7
+ 721 006c A8040000 		.4byte	.LASF7
+ 722 0070 04       		.uleb128 0x4
+ 723 0071 93080000 		.4byte	.LASF8
+ 724 0075 03       		.byte	0x3
+ 725 0076 3F       		.byte	0x3f
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 17
+
+
+ 726 0077 7B000000 		.4byte	0x7b
+ 727 007b 02       		.uleb128 0x2
+ 728 007c 04       		.byte	0x4
+ 729 007d 05       		.byte	0x5
+ 730 007e 11020000 		.4byte	.LASF9
+ 731 0082 04       		.uleb128 0x4
+ 732 0083 FE020000 		.4byte	.LASF10
+ 733 0087 03       		.byte	0x3
+ 734 0088 41       		.byte	0x41
+ 735 0089 8D000000 		.4byte	0x8d
+ 736 008d 02       		.uleb128 0x2
+ 737 008e 04       		.byte	0x4
+ 738 008f 07       		.byte	0x7
+ 739 0090 38040000 		.4byte	.LASF11
+ 740 0094 02       		.uleb128 0x2
+ 741 0095 08       		.byte	0x8
+ 742 0096 05       		.byte	0x5
+ 743 0097 96020000 		.4byte	.LASF12
+ 744 009b 02       		.uleb128 0x2
+ 745 009c 08       		.byte	0x8
+ 746 009d 07       		.byte	0x7
+ 747 009e D4000000 		.4byte	.LASF13
+ 748 00a2 04       		.uleb128 0x4
+ 749 00a3 7F090000 		.4byte	.LASF14
+ 750 00a7 04       		.byte	0x4
+ 751 00a8 18       		.byte	0x18
+ 752 00a9 45000000 		.4byte	0x45
+ 753 00ad 04       		.uleb128 0x4
+ 754 00ae A4020000 		.4byte	.LASF15
+ 755 00b2 04       		.byte	0x4
+ 756 00b3 24       		.byte	0x24
+ 757 00b4 5E000000 		.4byte	0x5e
+ 758 00b8 04       		.uleb128 0x4
+ 759 00b9 DD060000 		.4byte	.LASF16
+ 760 00bd 04       		.byte	0x4
+ 761 00be 2C       		.byte	0x2c
+ 762 00bf 70000000 		.4byte	0x70
+ 763 00c3 04       		.uleb128 0x4
+ 764 00c4 48080000 		.4byte	.LASF17
+ 765 00c8 04       		.byte	0x4
+ 766 00c9 30       		.byte	0x30
+ 767 00ca 82000000 		.4byte	0x82
+ 768 00ce 02       		.uleb128 0x2
+ 769 00cf 04       		.byte	0x4
+ 770 00d0 04       		.byte	0x4
+ 771 00d1 6F060000 		.4byte	.LASF18
+ 772 00d5 02       		.uleb128 0x2
+ 773 00d6 08       		.byte	0x8
+ 774 00d7 04       		.byte	0x4
+ 775 00d8 C1020000 		.4byte	.LASF19
+ 776 00dc 02       		.uleb128 0x2
+ 777 00dd 01       		.byte	0x1
+ 778 00de 08       		.byte	0x8
+ 779 00df 57080000 		.4byte	.LASF20
+ 780 00e3 02       		.uleb128 0x2
+ 781 00e4 04       		.byte	0x4
+ 782 00e5 07       		.byte	0x7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 18
+
+
+ 783 00e6 93050000 		.4byte	.LASF21
+ 784 00ea 05       		.uleb128 0x5
+ 785 00eb 04       		.byte	0x4
+ 786 00ec 06       		.uleb128 0x6
+ 787 00ed 04       		.byte	0x4
+ 788 00ee DC000000 		.4byte	0xdc
+ 789 00f2 06       		.uleb128 0x6
+ 790 00f3 04       		.byte	0x4
+ 791 00f4 F8000000 		.4byte	0xf8
+ 792 00f8 07       		.uleb128 0x7
+ 793 00f9 DC000000 		.4byte	0xdc
+ 794 00fd 04       		.uleb128 0x4
+ 795 00fe BB040000 		.4byte	.LASF22
+ 796 0102 05       		.byte	0x5
+ 797 0103 37       		.byte	0x37
+ 798 0104 C3000000 		.4byte	0xc3
+ 799 0108 04       		.uleb128 0x4
+ 800 0109 C8020000 		.4byte	.LASF23
+ 801 010d 05       		.byte	0x5
+ 802 010e 38       		.byte	0x38
+ 803 010f 7B000000 		.4byte	0x7b
+ 804 0113 04       		.uleb128 0x4
+ 805 0114 060A0000 		.4byte	.LASF24
+ 806 0118 05       		.byte	0x5
+ 807 0119 39       		.byte	0x39
+ 808 011a 8D000000 		.4byte	0x8d
+ 809 011e 04       		.uleb128 0x4
+ 810 011f EF050000 		.4byte	.LASF25
+ 811 0123 05       		.byte	0x5
+ 812 0124 3F       		.byte	0x3f
+ 813 0125 C3000000 		.4byte	0xc3
+ 814 0129 04       		.uleb128 0x4
+ 815 012a 76020000 		.4byte	.LASF26
+ 816 012e 06       		.byte	0x6
+ 817 012f 4E       		.byte	0x4e
+ 818 0130 34010000 		.4byte	0x134
+ 819 0134 06       		.uleb128 0x6
+ 820 0135 04       		.byte	0x4
+ 821 0136 3A010000 		.4byte	0x13a
+ 822 013a 08       		.uleb128 0x8
+ 823 013b 1A020000 		.4byte	.LASF46
+ 824 013f 09       		.uleb128 0x9
+ 825 0140 01       		.byte	0x1
+ 826 0141 50000000 		.4byte	0x50
+ 827 0145 06       		.byte	0x6
+ 828 0146 58       		.byte	0x58
+ 829 0147 70010000 		.4byte	0x170
+ 830 014b 0A       		.uleb128 0xa
+ 831 014c 22040000 		.4byte	.LASF27
+ 832 0150 00       		.byte	0
+ 833 0151 0A       		.uleb128 0xa
+ 834 0152 4A040000 		.4byte	.LASF28
+ 835 0156 01       		.byte	0x1
+ 836 0157 0A       		.uleb128 0xa
+ 837 0158 C7040000 		.4byte	.LASF29
+ 838 015c 02       		.byte	0x2
+ 839 015d 0A       		.uleb128 0xa
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 19
+
+
+ 840 015e 12000000 		.4byte	.LASF30
+ 841 0162 03       		.byte	0x3
+ 842 0163 0A       		.uleb128 0xa
+ 843 0164 98060000 		.4byte	.LASF31
+ 844 0168 04       		.byte	0x4
+ 845 0169 0A       		.uleb128 0xa
+ 846 016a 6B090000 		.4byte	.LASF32
+ 847 016e 05       		.byte	0x5
+ 848 016f 00       		.byte	0
+ 849 0170 04       		.uleb128 0x4
+ 850 0171 B5090000 		.4byte	.LASF33
+ 851 0175 06       		.byte	0x6
+ 852 0176 5F       		.byte	0x5f
+ 853 0177 3F010000 		.4byte	0x13f
+ 854 017b 06       		.uleb128 0x6
+ 855 017c 04       		.byte	0x4
+ 856 017d FD000000 		.4byte	0xfd
+ 857 0181 0B       		.uleb128 0xb
+ 858 0182 70040000 		.4byte	.LASF87
+ 859 0186 28       		.byte	0x28
+ 860 0187 06       		.byte	0x6
+ 861 0188 91       		.byte	0x91
+ 862 0189 06020000 		.4byte	0x206
+ 863 018d 0C       		.uleb128 0xc
+ 864 018e 41060000 		.4byte	.LASF34
+ 865 0192 06       		.byte	0x6
+ 866 0193 93       		.byte	0x93
+ 867 0194 29010000 		.4byte	0x129
+ 868 0198 00       		.byte	0
+ 869 0199 0C       		.uleb128 0xc
+ 870 019a 74090000 		.4byte	.LASF35
+ 871 019e 06       		.byte	0x6
+ 872 019f 94       		.byte	0x94
+ 873 01a0 F2000000 		.4byte	0xf2
+ 874 01a4 04       		.byte	0x4
+ 875 01a5 0C       		.uleb128 0xc
+ 876 01a6 DB080000 		.4byte	.LASF36
+ 877 01aa 06       		.byte	0x6
+ 878 01ab 95       		.byte	0x95
+ 879 01ac 13010000 		.4byte	0x113
+ 880 01b0 08       		.byte	0x8
+ 881 01b1 0C       		.uleb128 0xc
+ 882 01b2 42020000 		.4byte	.LASF37
+ 883 01b6 06       		.byte	0x6
+ 884 01b7 96       		.byte	0x96
+ 885 01b8 70010000 		.4byte	0x170
+ 886 01bc 0C       		.byte	0xc
+ 887 01bd 0C       		.uleb128 0xc
+ 888 01be EB000000 		.4byte	.LASF38
+ 889 01c2 06       		.byte	0x6
+ 890 01c3 97       		.byte	0x97
+ 891 01c4 13010000 		.4byte	0x113
+ 892 01c8 10       		.byte	0x10
+ 893 01c9 0C       		.uleb128 0xc
+ 894 01ca D1070000 		.4byte	.LASF39
+ 895 01ce 06       		.byte	0x6
+ 896 01cf 98       		.byte	0x98
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 20
+
+
+ 897 01d0 13010000 		.4byte	0x113
+ 898 01d4 14       		.byte	0x14
+ 899 01d5 0C       		.uleb128 0xc
+ 900 01d6 5B010000 		.4byte	.LASF40
+ 901 01da 06       		.byte	0x6
+ 902 01db 99       		.byte	0x99
+ 903 01dc C3000000 		.4byte	0xc3
+ 904 01e0 18       		.byte	0x18
+ 905 01e1 0C       		.uleb128 0xc
+ 906 01e2 DF090000 		.4byte	.LASF41
+ 907 01e6 06       		.byte	0x6
+ 908 01e7 9A       		.byte	0x9a
+ 909 01e8 7B010000 		.4byte	0x17b
+ 910 01ec 1C       		.byte	0x1c
+ 911 01ed 0C       		.uleb128 0xc
+ 912 01ee 05040000 		.4byte	.LASF42
+ 913 01f2 06       		.byte	0x6
+ 914 01f3 9B       		.byte	0x9b
+ 915 01f4 AD000000 		.4byte	0xad
+ 916 01f8 20       		.byte	0x20
+ 917 01f9 0C       		.uleb128 0xc
+ 918 01fa 0D060000 		.4byte	.LASF43
+ 919 01fe 06       		.byte	0x6
+ 920 01ff 9C       		.byte	0x9c
+ 921 0200 C3000000 		.4byte	0xc3
+ 922 0204 24       		.byte	0x24
+ 923 0205 00       		.byte	0
+ 924 0206 04       		.uleb128 0x4
+ 925 0207 EB030000 		.4byte	.LASF44
+ 926 020b 06       		.byte	0x6
+ 927 020c 9D       		.byte	0x9d
+ 928 020d 81010000 		.4byte	0x181
+ 929 0211 04       		.uleb128 0x4
+ 930 0212 93040000 		.4byte	.LASF45
+ 931 0216 07       		.byte	0x7
+ 932 0217 46       		.byte	0x46
+ 933 0218 1C020000 		.4byte	0x21c
+ 934 021c 06       		.uleb128 0x6
+ 935 021d 04       		.byte	0x4
+ 936 021e 22020000 		.4byte	0x222
+ 937 0222 08       		.uleb128 0x8
+ 938 0223 EB090000 		.4byte	.LASF47
+ 939 0227 0D       		.uleb128 0xd
+ 940 0228 CB070000 		.4byte	.LASF76
+ 941 022c 01       		.byte	0x1
+ 942 022d 50000000 		.4byte	0x50
+ 943 0231 08       		.byte	0x8
+ 944 0232 35       		.byte	0x35
+ 945 0233 E0020000 		.4byte	0x2e0
+ 946 0237 0A       		.uleb128 0xa
+ 947 0238 80050000 		.4byte	.LASF48
+ 948 023c 00       		.byte	0
+ 949 023d 0A       		.uleb128 0xa
+ 950 023e 60050000 		.4byte	.LASF49
+ 951 0242 01       		.byte	0x1
+ 952 0243 0A       		.uleb128 0xa
+ 953 0244 BB030000 		.4byte	.LASF50
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 21
+
+
+ 954 0248 02       		.byte	0x2
+ 955 0249 0A       		.uleb128 0xa
+ 956 024a BB060000 		.4byte	.LASF51
+ 957 024e 03       		.byte	0x3
+ 958 024f 0A       		.uleb128 0xa
+ 959 0250 2E020000 		.4byte	.LASF52
+ 960 0254 04       		.byte	0x4
+ 961 0255 0A       		.uleb128 0xa
+ 962 0256 80070000 		.4byte	.LASF53
+ 963 025a 05       		.byte	0x5
+ 964 025b 0A       		.uleb128 0xa
+ 965 025c 16060000 		.4byte	.LASF54
+ 966 0260 06       		.byte	0x6
+ 967 0261 0A       		.uleb128 0xa
+ 968 0262 5D060000 		.4byte	.LASF55
+ 969 0266 07       		.byte	0x7
+ 970 0267 0A       		.uleb128 0xa
+ 971 0268 BE070000 		.4byte	.LASF56
+ 972 026c 08       		.byte	0x8
+ 973 026d 0A       		.uleb128 0xa
+ 974 026e EE040000 		.4byte	.LASF57
+ 975 0272 09       		.byte	0x9
+ 976 0273 0A       		.uleb128 0xa
+ 977 0274 68000000 		.4byte	.LASF58
+ 978 0278 0A       		.byte	0xa
+ 979 0279 0A       		.uleb128 0xa
+ 980 027a 47000000 		.4byte	.LASF59
+ 981 027e 0B       		.byte	0xb
+ 982 027f 0A       		.uleb128 0xa
+ 983 0280 00000000 		.4byte	.LASF60
+ 984 0284 0C       		.byte	0xc
+ 985 0285 0A       		.uleb128 0xa
+ 986 0286 1C080000 		.4byte	.LASF61
+ 987 028a 0D       		.byte	0xd
+ 988 028b 0A       		.uleb128 0xa
+ 989 028c 2B080000 		.4byte	.LASF62
+ 990 0290 0E       		.byte	0xe
+ 991 0291 0A       		.uleb128 0xa
+ 992 0292 A5050000 		.4byte	.LASF63
+ 993 0296 0F       		.byte	0xf
+ 994 0297 0A       		.uleb128 0xa
+ 995 0298 26050000 		.4byte	.LASF64
+ 996 029c 10       		.byte	0x10
+ 997 029d 0A       		.uleb128 0xa
+ 998 029e 2B060000 		.4byte	.LASF65
+ 999 02a2 11       		.byte	0x11
+ 1000 02a3 0A       		.uleb128 0xa
+ 1001 02a4 FB010000 		.4byte	.LASF66
+ 1002 02a8 12       		.byte	0x12
+ 1003 02a9 0A       		.uleb128 0xa
+ 1004 02aa E2010000 		.4byte	.LASF67
+ 1005 02ae 13       		.byte	0x13
+ 1006 02af 0A       		.uleb128 0xa
+ 1007 02b0 6A070000 		.4byte	.LASF68
+ 1008 02b4 14       		.byte	0x14
+ 1009 02b5 0A       		.uleb128 0xa
+ 1010 02b6 47010000 		.4byte	.LASF69
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 22
+
+
+ 1011 02ba 15       		.byte	0x15
+ 1012 02bb 0A       		.uleb128 0xa
+ 1013 02bc B4050000 		.4byte	.LASF70
+ 1014 02c0 16       		.byte	0x16
+ 1015 02c1 0A       		.uleb128 0xa
+ 1016 02c2 97010000 		.4byte	.LASF71
+ 1017 02c6 17       		.byte	0x17
+ 1018 02c7 0A       		.uleb128 0xa
+ 1019 02c8 50020000 		.4byte	.LASF72
+ 1020 02cc 18       		.byte	0x18
+ 1021 02cd 0A       		.uleb128 0xa
+ 1022 02ce 70080000 		.4byte	.LASF73
+ 1023 02d2 19       		.byte	0x19
+ 1024 02d3 0A       		.uleb128 0xa
+ 1025 02d4 D3020000 		.4byte	.LASF74
+ 1026 02d8 1A       		.byte	0x1a
+ 1027 02d9 0A       		.uleb128 0xa
+ 1028 02da 80010000 		.4byte	.LASF75
+ 1029 02de 1B       		.byte	0x1b
+ 1030 02df 00       		.byte	0
+ 1031 02e0 0D       		.uleb128 0xd
+ 1032 02e1 51080000 		.4byte	.LASF77
+ 1033 02e5 01       		.byte	0x1
+ 1034 02e6 50000000 		.4byte	0x50
+ 1035 02ea 08       		.byte	0x8
+ 1036 02eb 65       		.byte	0x65
+ 1037 02ec 21030000 		.4byte	0x321
+ 1038 02f0 0A       		.uleb128 0xa
+ 1039 02f1 B1070000 		.4byte	.LASF78
+ 1040 02f5 00       		.byte	0
+ 1041 02f6 0A       		.uleb128 0xa
+ 1042 02f7 55050000 		.4byte	.LASF79
+ 1043 02fb 01       		.byte	0x1
+ 1044 02fc 0A       		.uleb128 0xa
+ 1045 02fd F9070000 		.4byte	.LASF80
+ 1046 0301 02       		.byte	0x2
+ 1047 0302 0A       		.uleb128 0xa
+ 1048 0303 E0040000 		.4byte	.LASF81
+ 1049 0307 03       		.byte	0x3
+ 1050 0308 0A       		.uleb128 0xa
+ 1051 0309 8A020000 		.4byte	.LASF82
+ 1052 030d 04       		.byte	0x4
+ 1053 030e 0A       		.uleb128 0xa
+ 1054 030f E0070000 		.4byte	.LASF83
+ 1055 0313 05       		.byte	0x5
+ 1056 0314 0A       		.uleb128 0xa
+ 1057 0315 AF030000 		.4byte	.LASF84
+ 1058 0319 06       		.byte	0x6
+ 1059 031a 0A       		.uleb128 0xa
+ 1060 031b 17010000 		.4byte	.LASF85
+ 1061 031f 07       		.byte	0x7
+ 1062 0320 00       		.byte	0
+ 1063 0321 04       		.uleb128 0x4
+ 1064 0322 36050000 		.4byte	.LASF86
+ 1065 0326 08       		.byte	0x8
+ 1066 0327 A3       		.byte	0xa3
+ 1067 0328 2C030000 		.4byte	0x32c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 23
+
+
+ 1068 032c 0B       		.uleb128 0xb
+ 1069 032d 03010000 		.4byte	.LASF88
+ 1070 0331 94       		.byte	0x94
+ 1071 0332 08       		.byte	0x8
+ 1072 0333 C6       		.byte	0xc6
+ 1073 0334 1D040000 		.4byte	0x41d
+ 1074 0338 0C       		.uleb128 0xc
+ 1075 0339 34090000 		.4byte	.LASF89
+ 1076 033d 08       		.byte	0x8
+ 1077 033e C7       		.byte	0xc7
+ 1078 033f EC000000 		.4byte	0xec
+ 1079 0343 00       		.byte	0
+ 1080 0344 0C       		.uleb128 0xc
+ 1081 0345 E6030000 		.4byte	.LASF90
+ 1082 0349 08       		.byte	0x8
+ 1083 034a C9       		.byte	0xc9
+ 1084 034b EA000000 		.4byte	0xea
+ 1085 034f 04       		.byte	0x4
+ 1086 0350 0C       		.uleb128 0xc
+ 1087 0351 8E070000 		.4byte	.LASF91
+ 1088 0355 08       		.byte	0x8
+ 1089 0356 CB       		.byte	0xcb
+ 1090 0357 C3000000 		.4byte	0xc3
+ 1091 035b 08       		.byte	0x8
+ 1092 035c 0C       		.uleb128 0xc
+ 1093 035d 65020000 		.4byte	.LASF92
+ 1094 0361 08       		.byte	0x8
+ 1095 0362 CC       		.byte	0xcc
+ 1096 0363 C3000000 		.4byte	0xc3
+ 1097 0367 0C       		.byte	0xc
+ 1098 0368 0C       		.uleb128 0xc
+ 1099 0369 31010000 		.4byte	.LASF93
+ 1100 036d 08       		.byte	0x8
+ 1101 036e CD       		.byte	0xcd
+ 1102 036f C3000000 		.4byte	0xc3
+ 1103 0373 10       		.byte	0x10
+ 1104 0374 0C       		.uleb128 0xc
+ 1105 0375 CD010000 		.4byte	.LASF94
+ 1106 0379 08       		.byte	0x8
+ 1107 037a CE       		.byte	0xce
+ 1108 037b C2050000 		.4byte	0x5c2
+ 1109 037f 14       		.byte	0x14
+ 1110 0380 0C       		.uleb128 0xc
+ 1111 0381 D3030000 		.4byte	.LASF95
+ 1112 0385 08       		.byte	0x8
+ 1113 0386 CF       		.byte	0xcf
+ 1114 0387 C5040000 		.4byte	0x4c5
+ 1115 038b 18       		.byte	0x18
+ 1116 038c 0C       		.uleb128 0xc
+ 1117 038d C2080000 		.4byte	.LASF96
+ 1118 0391 08       		.byte	0x8
+ 1119 0392 D0       		.byte	0xd0
+ 1120 0393 C3000000 		.4byte	0xc3
+ 1121 0397 1C       		.byte	0x1c
+ 1122 0398 0C       		.uleb128 0xc
+ 1123 0399 51040000 		.4byte	.LASF97
+ 1124 039d 08       		.byte	0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 24
+
+
+ 1125 039e D1       		.byte	0xd1
+ 1126 039f C3000000 		.4byte	0xc3
+ 1127 03a3 20       		.byte	0x20
+ 1128 03a4 0C       		.uleb128 0xc
+ 1129 03a5 FD000000 		.4byte	.LASF98
+ 1130 03a9 08       		.byte	0x8
+ 1131 03aa D2       		.byte	0xd2
+ 1132 03ab 15050000 		.4byte	0x515
+ 1133 03af 24       		.byte	0x24
+ 1134 03b0 0C       		.uleb128 0xc
+ 1135 03b1 86080000 		.4byte	.LASF99
+ 1136 03b5 08       		.byte	0x8
+ 1137 03b6 D3       		.byte	0xd3
+ 1138 03b7 EC000000 		.4byte	0xec
+ 1139 03bb 28       		.byte	0x28
+ 1140 03bc 0C       		.uleb128 0xc
+ 1141 03bd 26090000 		.4byte	.LASF100
+ 1142 03c1 08       		.byte	0x8
+ 1143 03c2 D4       		.byte	0xd4
+ 1144 03c3 C8050000 		.4byte	0x5c8
+ 1145 03c7 2C       		.byte	0x2c
+ 1146 03c8 0C       		.uleb128 0xc
+ 1147 03c9 9C090000 		.4byte	.LASF101
+ 1148 03cd 08       		.byte	0x8
+ 1149 03ce D5       		.byte	0xd5
+ 1150 03cf C3000000 		.4byte	0xc3
+ 1151 03d3 6C       		.byte	0x6c
+ 1152 03d4 0C       		.uleb128 0xc
+ 1153 03d5 46070000 		.4byte	.LASF102
+ 1154 03d9 08       		.byte	0x8
+ 1155 03da D6       		.byte	0xd6
+ 1156 03db C3000000 		.4byte	0xc3
+ 1157 03df 70       		.byte	0x70
+ 1158 03e0 0C       		.uleb128 0xc
+ 1159 03e1 3A080000 		.4byte	.LASF103
+ 1160 03e5 08       		.byte	0x8
+ 1161 03e6 D7       		.byte	0xd7
+ 1162 03e7 A2000000 		.4byte	0xa2
+ 1163 03eb 74       		.byte	0x74
+ 1164 03ec 0C       		.uleb128 0xc
+ 1165 03ed 1B050000 		.4byte	.LASF104
+ 1166 03f1 08       		.byte	0x8
+ 1167 03f2 D8       		.byte	0xd8
+ 1168 03f3 D8050000 		.4byte	0x5d8
+ 1169 03f7 75       		.byte	0x75
+ 1170 03f8 0C       		.uleb128 0xc
+ 1171 03f9 51060000 		.4byte	.LASF105
+ 1172 03fd 08       		.byte	0x8
+ 1173 03fe D9       		.byte	0xd9
+ 1174 03ff 25000000 		.4byte	0x25
+ 1175 0403 88       		.byte	0x88
+ 1176 0404 0C       		.uleb128 0xc
+ 1177 0405 9D080000 		.4byte	.LASF106
+ 1178 0409 08       		.byte	0x8
+ 1179 040a DA       		.byte	0xda
+ 1180 040b BC050000 		.4byte	0x5bc
+ 1181 040f 8C       		.byte	0x8c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 25
+
+
+ 1182 0410 0C       		.uleb128 0xc
+ 1183 0411 A2000000 		.4byte	.LASF107
+ 1184 0415 08       		.byte	0x8
+ 1185 0416 DB       		.byte	0xdb
+ 1186 0417 F0040000 		.4byte	0x4f0
+ 1187 041b 90       		.byte	0x90
+ 1188 041c 00       		.byte	0
+ 1189 041d 04       		.uleb128 0x4
+ 1190 041e 82060000 		.4byte	.LASF108
+ 1191 0422 08       		.byte	0x8
+ 1192 0423 A4       		.byte	0xa4
+ 1193 0424 28040000 		.4byte	0x428
+ 1194 0428 0B       		.uleb128 0xb
+ 1195 0429 80000000 		.4byte	.LASF109
+ 1196 042d 20       		.byte	0x20
+ 1197 042e 08       		.byte	0x8
+ 1198 042f BA       		.byte	0xba
+ 1199 0430 95040000 		.4byte	0x495
+ 1200 0434 0C       		.uleb128 0xc
+ 1201 0435 D9010000 		.4byte	.LASF110
+ 1202 0439 08       		.byte	0x8
+ 1203 043a BB       		.byte	0xbb
+ 1204 043b 95040000 		.4byte	0x495
+ 1205 043f 00       		.byte	0
+ 1206 0440 0C       		.uleb128 0xc
+ 1207 0441 2B040000 		.4byte	.LASF111
+ 1208 0445 08       		.byte	0x8
+ 1209 0446 BC       		.byte	0xbc
+ 1210 0447 F2000000 		.4byte	0xf2
+ 1211 044b 04       		.byte	0x4
+ 1212 044c 0C       		.uleb128 0xc
+ 1213 044d FC080000 		.4byte	.LASF112
+ 1214 0451 08       		.byte	0x8
+ 1215 0452 BD       		.byte	0xbd
+ 1216 0453 F2000000 		.4byte	0xf2
+ 1217 0457 08       		.byte	0x8
+ 1218 0458 0C       		.uleb128 0xc
+ 1219 0459 FF050000 		.4byte	.LASF113
+ 1220 045d 08       		.byte	0x8
+ 1221 045e BE       		.byte	0xbe
+ 1222 045f C3000000 		.4byte	0xc3
+ 1223 0463 0C       		.byte	0xc
+ 1224 0464 0C       		.uleb128 0xc
+ 1225 0465 4E090000 		.4byte	.LASF114
+ 1226 0469 08       		.byte	0x8
+ 1227 046a BF       		.byte	0xbf
+ 1228 046b A2000000 		.4byte	0xa2
+ 1229 046f 10       		.byte	0x10
+ 1230 0470 0C       		.uleb128 0xc
+ 1231 0471 D3060000 		.4byte	.LASF115
+ 1232 0475 08       		.byte	0x8
+ 1233 0476 C0       		.byte	0xc0
+ 1234 0477 3B050000 		.4byte	0x53b
+ 1235 047b 14       		.byte	0x14
+ 1236 047c 0C       		.uleb128 0xc
+ 1237 047d FD090000 		.4byte	.LASF116
+ 1238 0481 08       		.byte	0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 26
+
+
+ 1239 0482 C1       		.byte	0xc1
+ 1240 0483 EA000000 		.4byte	0xea
+ 1241 0487 18       		.byte	0x18
+ 1242 0488 0C       		.uleb128 0xc
+ 1243 0489 A1060000 		.4byte	.LASF117
+ 1244 048d 08       		.byte	0x8
+ 1245 048e C3       		.byte	0xc3
+ 1246 048f BC050000 		.4byte	0x5bc
+ 1247 0493 1C       		.byte	0x1c
+ 1248 0494 00       		.byte	0
+ 1249 0495 04       		.uleb128 0x4
+ 1250 0496 AD020000 		.4byte	.LASF118
+ 1251 049a 08       		.byte	0x8
+ 1252 049b A6       		.byte	0xa6
+ 1253 049c A0040000 		.4byte	0x4a0
+ 1254 04a0 06       		.uleb128 0x6
+ 1255 04a1 04       		.byte	0x4
+ 1256 04a2 A6040000 		.4byte	0x4a6
+ 1257 04a6 0E       		.uleb128 0xe
+ 1258 04a7 A2000000 		.4byte	0xa2
+ 1259 04ab BF040000 		.4byte	0x4bf
+ 1260 04af 0F       		.uleb128 0xf
+ 1261 04b0 BF040000 		.4byte	0x4bf
+ 1262 04b4 0F       		.uleb128 0xf
+ 1263 04b5 A2000000 		.4byte	0xa2
+ 1264 04b9 0F       		.uleb128 0xf
+ 1265 04ba C5040000 		.4byte	0x4c5
+ 1266 04be 00       		.byte	0
+ 1267 04bf 06       		.uleb128 0x6
+ 1268 04c0 04       		.byte	0x4
+ 1269 04c1 21030000 		.4byte	0x321
+ 1270 04c5 06       		.uleb128 0x6
+ 1271 04c6 04       		.byte	0x4
+ 1272 04c7 EC000000 		.4byte	0xec
+ 1273 04cb 04       		.uleb128 0x4
+ 1274 04cc 2E070000 		.4byte	.LASF119
+ 1275 04d0 08       		.byte	0x8
+ 1276 04d1 A7       		.byte	0xa7
+ 1277 04d2 D6040000 		.4byte	0x4d6
+ 1278 04d6 06       		.uleb128 0x6
+ 1279 04d7 04       		.byte	0x4
+ 1280 04d8 DC040000 		.4byte	0x4dc
+ 1281 04dc 0E       		.uleb128 0xe
+ 1282 04dd A2000000 		.4byte	0xa2
+ 1283 04e1 F0040000 		.4byte	0x4f0
+ 1284 04e5 0F       		.uleb128 0xf
+ 1285 04e6 BF040000 		.4byte	0x4bf
+ 1286 04ea 0F       		.uleb128 0xf
+ 1287 04eb AD000000 		.4byte	0xad
+ 1288 04ef 00       		.byte	0
+ 1289 04f0 04       		.uleb128 0x4
+ 1290 04f1 82040000 		.4byte	.LASF120
+ 1291 04f5 08       		.byte	0x8
+ 1292 04f6 A8       		.byte	0xa8
+ 1293 04f7 FB040000 		.4byte	0x4fb
+ 1294 04fb 06       		.uleb128 0x6
+ 1295 04fc 04       		.byte	0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 27
+
+
+ 1296 04fd 01050000 		.4byte	0x501
+ 1297 0501 0E       		.uleb128 0xe
+ 1298 0502 A2000000 		.4byte	0xa2
+ 1299 0506 15050000 		.4byte	0x515
+ 1300 050a 0F       		.uleb128 0xf
+ 1301 050b BF040000 		.4byte	0x4bf
+ 1302 050f 0F       		.uleb128 0xf
+ 1303 0510 C3000000 		.4byte	0xc3
+ 1304 0514 00       		.byte	0
+ 1305 0515 04       		.uleb128 0x4
+ 1306 0516 120A0000 		.4byte	.LASF121
+ 1307 051a 08       		.byte	0x8
+ 1308 051b AB       		.byte	0xab
+ 1309 051c 20050000 		.4byte	0x520
+ 1310 0520 06       		.uleb128 0x6
+ 1311 0521 04       		.byte	0x4
+ 1312 0522 26050000 		.4byte	0x526
+ 1313 0526 0E       		.uleb128 0xe
+ 1314 0527 C3000000 		.4byte	0xc3
+ 1315 052b 3B050000 		.4byte	0x53b
+ 1316 052f 0F       		.uleb128 0xf
+ 1317 0530 EA000000 		.4byte	0xea
+ 1318 0534 0F       		.uleb128 0xf
+ 1319 0535 EC000000 		.4byte	0xec
+ 1320 0539 10       		.uleb128 0x10
+ 1321 053a 00       		.byte	0
+ 1322 053b 04       		.uleb128 0x4
+ 1323 053c A9080000 		.4byte	.LASF122
+ 1324 0540 08       		.byte	0x8
+ 1325 0541 AF       		.byte	0xaf
+ 1326 0542 46050000 		.4byte	0x546
+ 1327 0546 06       		.uleb128 0x6
+ 1328 0547 04       		.byte	0x4
+ 1329 0548 4C050000 		.4byte	0x54c
+ 1330 054c 0E       		.uleb128 0xe
+ 1331 054d A2000000 		.4byte	0xa2
+ 1332 0551 60050000 		.4byte	0x560
+ 1333 0555 0F       		.uleb128 0xf
+ 1334 0556 BF040000 		.4byte	0x4bf
+ 1335 055a 0F       		.uleb128 0xf
+ 1336 055b EA000000 		.4byte	0xea
+ 1337 055f 00       		.byte	0
+ 1338 0560 11       		.uleb128 0x11
+ 1339 0561 18       		.byte	0x18
+ 1340 0562 08       		.byte	0x8
+ 1341 0563 B1       		.byte	0xb1
+ 1342 0564 B1050000 		.4byte	0x5b1
+ 1343 0568 0C       		.uleb128 0xc
+ 1344 0569 BD080000 		.4byte	.LASF123
+ 1345 056d 08       		.byte	0x8
+ 1346 056e B2       		.byte	0xb2
+ 1347 056f 29010000 		.4byte	0x129
+ 1348 0573 00       		.byte	0
+ 1349 0574 0C       		.uleb128 0xc
+ 1350 0575 75060000 		.4byte	.LASF124
+ 1351 0579 08       		.byte	0x8
+ 1352 057a B3       		.byte	0xb3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 28
+
+
+ 1353 057b CB040000 		.4byte	0x4cb
+ 1354 057f 04       		.byte	0x4
+ 1355 0580 0C       		.uleb128 0xc
+ 1356 0581 4B050000 		.4byte	.LASF125
+ 1357 0585 08       		.byte	0x8
+ 1358 0586 B4       		.byte	0xb4
+ 1359 0587 A2000000 		.4byte	0xa2
+ 1360 058b 08       		.byte	0x8
+ 1361 058c 0C       		.uleb128 0xc
+ 1362 058d FD040000 		.4byte	.LASF126
+ 1363 0591 08       		.byte	0x8
+ 1364 0592 B5       		.byte	0xb5
+ 1365 0593 11020000 		.4byte	0x211
+ 1366 0597 0C       		.byte	0xc
+ 1367 0598 0C       		.uleb128 0xc
+ 1368 0599 DA090000 		.4byte	.LASF127
+ 1369 059d 08       		.byte	0x8
+ 1370 059e B6       		.byte	0xb6
+ 1371 059f C5040000 		.4byte	0x4c5
+ 1372 05a3 10       		.byte	0x10
+ 1373 05a4 0C       		.uleb128 0xc
+ 1374 05a5 9C050000 		.4byte	.LASF128
+ 1375 05a9 08       		.byte	0x8
+ 1376 05aa B7       		.byte	0xb7
+ 1377 05ab A2000000 		.4byte	0xa2
+ 1378 05af 14       		.byte	0x14
+ 1379 05b0 00       		.byte	0
+ 1380 05b1 04       		.uleb128 0x4
+ 1381 05b2 5E070000 		.4byte	.LASF129
+ 1382 05b6 08       		.byte	0x8
+ 1383 05b7 B8       		.byte	0xb8
+ 1384 05b8 60050000 		.4byte	0x560
+ 1385 05bc 06       		.uleb128 0x6
+ 1386 05bd 04       		.byte	0x4
+ 1387 05be 1D040000 		.4byte	0x41d
+ 1388 05c2 06       		.uleb128 0x6
+ 1389 05c3 04       		.byte	0x4
+ 1390 05c4 B1050000 		.4byte	0x5b1
+ 1391 05c8 12       		.uleb128 0x12
+ 1392 05c9 EC000000 		.4byte	0xec
+ 1393 05cd D8050000 		.4byte	0x5d8
+ 1394 05d1 13       		.uleb128 0x13
+ 1395 05d2 E3000000 		.4byte	0xe3
+ 1396 05d6 0F       		.byte	0xf
+ 1397 05d7 00       		.byte	0
+ 1398 05d8 12       		.uleb128 0x12
+ 1399 05d9 A2000000 		.4byte	0xa2
+ 1400 05dd E8050000 		.4byte	0x5e8
+ 1401 05e1 13       		.uleb128 0x13
+ 1402 05e2 E3000000 		.4byte	0xe3
+ 1403 05e6 0F       		.byte	0xf
+ 1404 05e7 00       		.byte	0
+ 1405 05e8 14       		.uleb128 0x14
+ 1406 05e9 D0040000 		.4byte	.LASF144
+ 1407 05ed 01       		.byte	0x1
+ 1408 05ee 29       		.byte	0x29
+ 1409 05ef A2000000 		.4byte	0xa2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 29
+
+
+ 1410 05f3 00000000 		.4byte	.LFB69
+ 1411 05f7 C0000000 		.4byte	.LFE69-.LFB69
+ 1412 05fb 01       		.uleb128 0x1
+ 1413 05fc 9C       		.byte	0x9c
+ 1414 05fd 7E070000 		.4byte	0x77e
+ 1415 0601 15       		.uleb128 0x15
+ 1416 0602 C0090000 		.4byte	.LASF130
+ 1417 0606 01       		.byte	0x1
+ 1418 0607 29       		.byte	0x29
+ 1419 0608 BF040000 		.4byte	0x4bf
+ 1420 060c 00000000 		.4byte	.LLST0
+ 1421 0610 15       		.uleb128 0x15
+ 1422 0611 9C050000 		.4byte	.LASF128
+ 1423 0615 01       		.byte	0x1
+ 1424 0616 29       		.byte	0x29
+ 1425 0617 A2000000 		.4byte	0xa2
+ 1426 061b 42000000 		.4byte	.LLST1
+ 1427 061f 15       		.uleb128 0x15
+ 1428 0620 DA090000 		.4byte	.LASF127
+ 1429 0624 01       		.byte	0x1
+ 1430 0625 29       		.byte	0x29
+ 1431 0626 C5040000 		.4byte	0x4c5
+ 1432 062a 6B000000 		.4byte	.LLST2
+ 1433 062e 16       		.uleb128 0x16
+ 1434 062f 49060000 		.4byte	.LASF131
+ 1435 0633 01       		.byte	0x1
+ 1436 0634 2B       		.byte	0x2b
+ 1437 0635 A2000000 		.4byte	0xa2
+ 1438 0639 AD000000 		.4byte	.LLST3
+ 1439 063d 16       		.uleb128 0x16
+ 1440 063e C7090000 		.4byte	.LASF132
+ 1441 0642 01       		.byte	0x1
+ 1442 0643 2C       		.byte	0x2c
+ 1443 0644 A2000000 		.4byte	0xa2
+ 1444 0648 E3000000 		.4byte	.LLST4
+ 1445 064c 16       		.uleb128 0x16
+ 1446 064d F3060000 		.4byte	.LASF133
+ 1447 0651 01       		.byte	0x1
+ 1448 0652 2D       		.byte	0x2d
+ 1449 0653 C5040000 		.4byte	0x4c5
+ 1450 0657 05010000 		.4byte	.LLST5
+ 1451 065b 16       		.uleb128 0x16
+ 1452 065c 33040000 		.4byte	.LASF134
+ 1453 0660 01       		.byte	0x1
+ 1454 0661 39       		.byte	0x39
+ 1455 0662 C2050000 		.4byte	0x5c2
+ 1456 0666 46010000 		.4byte	.LLST6
+ 1457 066a 17       		.uleb128 0x17
+ 1458 066b 38000000 		.4byte	.LBB2
+ 1459 066f 30000000 		.4byte	.LBE2-.LBB2
+ 1460 0673 B4060000 		.4byte	0x6b4
+ 1461 0677 18       		.uleb128 0x18
+ 1462 0678 6C656E00 		.ascii	"len\000"
+ 1463 067c 01       		.byte	0x1
+ 1464 067d 34       		.byte	0x34
+ 1465 067e AD000000 		.4byte	0xad
+ 1466 0682 64010000 		.4byte	.LLST7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 30
+
+
+ 1467 0686 19       		.uleb128 0x19
+ 1468 0687 40000000 		.4byte	.LVL8
+ 1469 068b DD0C0000 		.4byte	0xcdd
+ 1470 068f 1A       		.uleb128 0x1a
+ 1471 0690 56000000 		.4byte	.LVL10
+ 1472 0694 E80C0000 		.4byte	0xce8
+ 1473 0698 A3060000 		.4byte	0x6a3
+ 1474 069c 1B       		.uleb128 0x1b
+ 1475 069d 01       		.uleb128 0x1
+ 1476 069e 50       		.byte	0x50
+ 1477 069f 02       		.uleb128 0x2
+ 1478 06a0 78       		.byte	0x78
+ 1479 06a1 00       		.sleb128 0
+ 1480 06a2 00       		.byte	0
+ 1481 06a3 1C       		.uleb128 0x1c
+ 1482 06a4 64000000 		.4byte	.LVL11
+ 1483 06a8 F30C0000 		.4byte	0xcf3
+ 1484 06ac 1B       		.uleb128 0x1b
+ 1485 06ad 01       		.uleb128 0x1
+ 1486 06ae 52       		.byte	0x52
+ 1487 06af 02       		.uleb128 0x2
+ 1488 06b0 78       		.byte	0x78
+ 1489 06b1 00       		.sleb128 0
+ 1490 06b2 00       		.byte	0
+ 1491 06b3 00       		.byte	0
+ 1492 06b4 1A       		.uleb128 0x1a
+ 1493 06b5 18000000 		.4byte	.LVL3
+ 1494 06b9 E80C0000 		.4byte	0xce8
+ 1495 06bd CA060000 		.4byte	0x6ca
+ 1496 06c1 1B       		.uleb128 0x1b
+ 1497 06c2 01       		.uleb128 0x1
+ 1498 06c3 50       		.byte	0x50
+ 1499 06c4 04       		.uleb128 0x4
+ 1500 06c5 75       		.byte	0x75
+ 1501 06c6 00       		.sleb128 0
+ 1502 06c7 32       		.byte	0x32
+ 1503 06c8 24       		.byte	0x24
+ 1504 06c9 00       		.byte	0
+ 1505 06ca 1A       		.uleb128 0x1a
+ 1506 06cb 20000000 		.4byte	.LVL6
+ 1507 06cf E80C0000 		.4byte	0xce8
+ 1508 06d3 DD060000 		.4byte	0x6dd
+ 1509 06d7 1B       		.uleb128 0x1b
+ 1510 06d8 01       		.uleb128 0x1
+ 1511 06d9 50       		.byte	0x50
+ 1512 06da 01       		.uleb128 0x1
+ 1513 06db 34       		.byte	0x34
+ 1514 06dc 00       		.byte	0
+ 1515 06dd 1A       		.uleb128 0x1a
+ 1516 06de 70000000 		.4byte	.LVL14
+ 1517 06e2 E80C0000 		.4byte	0xce8
+ 1518 06e6 F0060000 		.4byte	0x6f0
+ 1519 06ea 1B       		.uleb128 0x1b
+ 1520 06eb 01       		.uleb128 0x1
+ 1521 06ec 50       		.byte	0x50
+ 1522 06ed 01       		.uleb128 0x1
+ 1523 06ee 48       		.byte	0x48
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 31
+
+
+ 1524 06ef 00       		.byte	0
+ 1525 06f0 1A       		.uleb128 0x1a
+ 1526 06f1 86000000 		.4byte	.LVL17
+ 1527 06f5 FC0C0000 		.4byte	0xcfc
+ 1528 06f9 10070000 		.4byte	0x710
+ 1529 06fd 1B       		.uleb128 0x1b
+ 1530 06fe 01       		.uleb128 0x1
+ 1531 06ff 50       		.byte	0x50
+ 1532 0700 02       		.uleb128 0x2
+ 1533 0701 76       		.byte	0x76
+ 1534 0702 00       		.sleb128 0
+ 1535 0703 1B       		.uleb128 0x1b
+ 1536 0704 01       		.uleb128 0x1
+ 1537 0705 51       		.byte	0x51
+ 1538 0706 03       		.uleb128 0x3
+ 1539 0707 0A       		.byte	0xa
+ 1540 0708 0010     		.2byte	0x1000
+ 1541 070a 1B       		.uleb128 0x1b
+ 1542 070b 01       		.uleb128 0x1
+ 1543 070c 52       		.byte	0x52
+ 1544 070d 01       		.uleb128 0x1
+ 1545 070e 30       		.byte	0x30
+ 1546 070f 00       		.byte	0
+ 1547 0710 1A       		.uleb128 0x1a
+ 1548 0711 90000000 		.4byte	.LVL18
+ 1549 0715 FC0C0000 		.4byte	0xcfc
+ 1550 0719 2E070000 		.4byte	0x72e
+ 1551 071d 1B       		.uleb128 0x1b
+ 1552 071e 01       		.uleb128 0x1
+ 1553 071f 50       		.byte	0x50
+ 1554 0720 02       		.uleb128 0x2
+ 1555 0721 76       		.byte	0x76
+ 1556 0722 00       		.sleb128 0
+ 1557 0723 1B       		.uleb128 0x1b
+ 1558 0724 01       		.uleb128 0x1
+ 1559 0725 51       		.byte	0x51
+ 1560 0726 01       		.uleb128 0x1
+ 1561 0727 30       		.byte	0x30
+ 1562 0728 1B       		.uleb128 0x1b
+ 1563 0729 01       		.uleb128 0x1
+ 1564 072a 52       		.byte	0x52
+ 1565 072b 01       		.uleb128 0x1
+ 1566 072c 30       		.byte	0x30
+ 1567 072d 00       		.byte	0
+ 1568 072e 1A       		.uleb128 0x1a
+ 1569 072f A2000000 		.4byte	.LVL19
+ 1570 0733 070D0000 		.4byte	0xd07
+ 1571 0737 67070000 		.4byte	0x767
+ 1572 073b 1B       		.uleb128 0x1b
+ 1573 073c 01       		.uleb128 0x1
+ 1574 073d 50       		.byte	0x50
+ 1575 073e 05       		.uleb128 0x5
+ 1576 073f 03       		.byte	0x3
+ 1577 0740 00000000 		.4byte	TASK_main
+ 1578 0744 1B       		.uleb128 0x1b
+ 1579 0745 01       		.uleb128 0x1
+ 1580 0746 51       		.byte	0x51
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 32
+
+
+ 1581 0747 05       		.uleb128 0x5
+ 1582 0748 03       		.byte	0x3
+ 1583 0749 00000000 		.4byte	.LC0
+ 1584 074d 1B       		.uleb128 0x1b
+ 1585 074e 01       		.uleb128 0x1
+ 1586 074f 52       		.byte	0x52
+ 1587 0750 02       		.uleb128 0x2
+ 1588 0751 08       		.byte	0x8
+ 1589 0752 FA       		.byte	0xfa
+ 1590 0753 1B       		.uleb128 0x1b
+ 1591 0754 01       		.uleb128 0x1
+ 1592 0755 53       		.byte	0x53
+ 1593 0756 02       		.uleb128 0x2
+ 1594 0757 76       		.byte	0x76
+ 1595 0758 00       		.sleb128 0
+ 1596 0759 1B       		.uleb128 0x1b
+ 1597 075a 02       		.uleb128 0x2
+ 1598 075b 7D       		.byte	0x7d
+ 1599 075c 00       		.sleb128 0
+ 1600 075d 01       		.uleb128 0x1
+ 1601 075e 31       		.byte	0x31
+ 1602 075f 1B       		.uleb128 0x1b
+ 1603 0760 02       		.uleb128 0x2
+ 1604 0761 7D       		.byte	0x7d
+ 1605 0762 04       		.sleb128 4
+ 1606 0763 02       		.uleb128 0x2
+ 1607 0764 74       		.byte	0x74
+ 1608 0765 00       		.sleb128 0
+ 1609 0766 00       		.byte	0
+ 1610 0767 1C       		.uleb128 0x1c
+ 1611 0768 AC000000 		.4byte	.LVL21
+ 1612 076c 130D0000 		.4byte	0xd13
+ 1613 0770 1B       		.uleb128 0x1b
+ 1614 0771 01       		.uleb128 0x1
+ 1615 0772 50       		.byte	0x50
+ 1616 0773 02       		.uleb128 0x2
+ 1617 0774 76       		.byte	0x76
+ 1618 0775 00       		.sleb128 0
+ 1619 0776 1B       		.uleb128 0x1b
+ 1620 0777 01       		.uleb128 0x1
+ 1621 0778 51       		.byte	0x51
+ 1622 0779 02       		.uleb128 0x2
+ 1623 077a 74       		.byte	0x74
+ 1624 077b 00       		.sleb128 0
+ 1625 077c 00       		.byte	0
+ 1626 077d 00       		.byte	0
+ 1627 077e 1D       		.uleb128 0x1d
+ 1628 077f 36000000 		.4byte	.LASF170
+ 1629 0783 01       		.byte	0x1
+ 1630 0784 43       		.byte	0x43
+ 1631 0785 00000000 		.4byte	.LFB70
+ 1632 0789 38020000 		.4byte	.LFE70-.LFB70
+ 1633 078d 01       		.uleb128 0x1
+ 1634 078e 9C       		.byte	0x9c
+ 1635 078f 0B0C0000 		.4byte	0xc0b
+ 1636 0793 15       		.uleb128 0x15
+ 1637 0794 63040000 		.4byte	.LASF135
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 33
+
+
+ 1638 0798 01       		.byte	0x1
+ 1639 0799 43       		.byte	0x43
+ 1640 079a EA000000 		.4byte	0xea
+ 1641 079e 79010000 		.4byte	.LLST8
+ 1642 07a2 16       		.uleb128 0x16
+ 1643 07a3 C0090000 		.4byte	.LASF130
+ 1644 07a7 01       		.byte	0x1
+ 1645 07a8 44       		.byte	0x44
+ 1646 07a9 BF040000 		.4byte	0x4bf
+ 1647 07ad A5010000 		.4byte	.LLST9
+ 1648 07b1 1E       		.uleb128 0x1e
+ 1649 07b2 6300     		.ascii	"c\000"
+ 1650 07b4 01       		.byte	0x1
+ 1651 07b5 45       		.byte	0x45
+ 1652 07b6 DC000000 		.4byte	0xdc
+ 1653 07ba 02       		.uleb128 0x2
+ 1654 07bb 91       		.byte	0x91
+ 1655 07bc 43       		.sleb128 -61
+ 1656 07bd 17       		.uleb128 0x17
+ 1657 07be 0E000000 		.4byte	.LBB3
+ 1658 07c2 F2010000 		.4byte	.LBE3-.LBB3
+ 1659 07c6 FA0B0000 		.4byte	0xbfa
+ 1660 07ca 16       		.uleb128 0x16
+ 1661 07cb 61090000 		.4byte	.LASF136
+ 1662 07cf 01       		.byte	0x1
+ 1663 07d0 48       		.byte	0x48
+ 1664 07d1 0B0C0000 		.4byte	0xc0b
+ 1665 07d5 D1010000 		.4byte	.LLST10
+ 1666 07d9 16       		.uleb128 0x16
+ 1667 07da 21060000 		.4byte	.LASF137
+ 1668 07de 01       		.byte	0x1
+ 1669 07df 49       		.byte	0x49
+ 1670 07e0 C3000000 		.4byte	0xc3
+ 1671 07e4 16020000 		.4byte	.LLST11
+ 1672 07e8 1F       		.uleb128 0x1f
+ 1673 07e9 D2090000 		.4byte	.LASF138
+ 1674 07ed 01       		.byte	0x1
+ 1675 07ee 4A       		.byte	0x4a
+ 1676 07ef C3000000 		.4byte	0xc3
+ 1677 07f3 02       		.uleb128 0x2
+ 1678 07f4 91       		.byte	0x91
+ 1679 07f5 44       		.sleb128 -60
+ 1680 07f6 17       		.uleb128 0x17
+ 1681 07f7 24000000 		.4byte	.LBB4
+ 1682 07fb C0010000 		.4byte	.LBE4-.LBB4
+ 1683 07ff AA0B0000 		.4byte	0xbaa
+ 1684 0803 16       		.uleb128 0x16
+ 1685 0804 1A040000 		.4byte	.LASF139
+ 1686 0808 01       		.byte	0x1
+ 1687 0809 52       		.byte	0x52
+ 1688 080a C3000000 		.4byte	0xc3
+ 1689 080e 55020000 		.4byte	.LLST12
+ 1690 0812 16       		.uleb128 0x16
+ 1691 0813 72050000 		.4byte	.LASF140
+ 1692 0817 01       		.byte	0x1
+ 1693 0818 55       		.byte	0x55
+ 1694 0819 C3000000 		.4byte	0xc3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 34
+
+
+ 1695 081d 73020000 		.4byte	.LLST13
+ 1696 0821 16       		.uleb128 0x16
+ 1697 0822 5C080000 		.4byte	.LASF141
+ 1698 0826 01       		.byte	0x1
+ 1699 0827 5C       		.byte	0x5c
+ 1700 0828 C3000000 		.4byte	0xc3
+ 1701 082c 91020000 		.4byte	.LLST14
+ 1702 0830 20       		.uleb128 0x20
+ 1703 0831 00000000 		.4byte	.Ldebug_ranges0+0
+ 1704 0835 11090000 		.4byte	0x911
+ 1705 0839 1F       		.uleb128 0x1f
+ 1706 083a 7D040000 		.4byte	.LASF142
+ 1707 083e 01       		.byte	0x1
+ 1708 083f 5F       		.byte	0x5f
+ 1709 0840 110C0000 		.4byte	0xc11
+ 1710 0844 02       		.uleb128 0x2
+ 1711 0845 91       		.byte	0x91
+ 1712 0846 48       		.sleb128 -56
+ 1713 0847 16       		.uleb128 0x16
+ 1714 0848 46050000 		.4byte	.LASF143
+ 1715 084c 01       		.byte	0x1
+ 1716 084d 61       		.byte	0x61
+ 1717 084e C3000000 		.4byte	0xc3
+ 1718 0852 B0020000 		.4byte	.LLST15
+ 1719 0856 1A       		.uleb128 0x1a
+ 1720 0857 56010000 		.4byte	.LVL60
+ 1721 085b 1F0D0000 		.4byte	0xd1f
+ 1722 085f 75080000 		.4byte	0x875
+ 1723 0863 1B       		.uleb128 0x1b
+ 1724 0864 01       		.uleb128 0x1
+ 1725 0865 50       		.byte	0x50
+ 1726 0866 02       		.uleb128 0x2
+ 1727 0867 79       		.byte	0x79
+ 1728 0868 00       		.sleb128 0
+ 1729 0869 1B       		.uleb128 0x1b
+ 1730 086a 01       		.uleb128 0x1
+ 1731 086b 51       		.byte	0x51
+ 1732 086c 02       		.uleb128 0x2
+ 1733 086d 7A       		.byte	0x7a
+ 1734 086e 00       		.sleb128 0
+ 1735 086f 1B       		.uleb128 0x1b
+ 1736 0870 01       		.uleb128 0x1
+ 1737 0871 52       		.byte	0x52
+ 1738 0872 01       		.uleb128 0x1
+ 1739 0873 3C       		.byte	0x3c
+ 1740 0874 00       		.byte	0
+ 1741 0875 1A       		.uleb128 0x1a
+ 1742 0876 86010000 		.4byte	.LVL63
+ 1743 087a 2A0D0000 		.4byte	0xd2a
+ 1744 087e 8D080000 		.4byte	0x88d
+ 1745 0882 1B       		.uleb128 0x1b
+ 1746 0883 01       		.uleb128 0x1
+ 1747 0884 50       		.byte	0x50
+ 1748 0885 01       		.uleb128 0x1
+ 1749 0886 41       		.byte	0x41
+ 1750 0887 1B       		.uleb128 0x1b
+ 1751 0888 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 35
+
+
+ 1752 0889 51       		.byte	0x51
+ 1753 088a 01       		.uleb128 0x1
+ 1754 088b 30       		.byte	0x30
+ 1755 088c 00       		.byte	0
+ 1756 088d 19       		.uleb128 0x19
+ 1757 088e 92010000 		.4byte	.LVL64
+ 1758 0892 350D0000 		.4byte	0xd35
+ 1759 0896 21       		.uleb128 0x21
+ 1760 0897 D6010000 		.4byte	.LVL65
+ 1761 089b 02       		.uleb128 0x2
+ 1762 089c 76       		.byte	0x76
+ 1763 089d 00       		.sleb128 0
+ 1764 089e 1B       		.uleb128 0x1b
+ 1765 089f 01       		.uleb128 0x1
+ 1766 08a0 50       		.byte	0x50
+ 1767 08a1 02       		.uleb128 0x2
+ 1768 08a2 7B       		.byte	0x7b
+ 1769 08a3 00       		.sleb128 0
+ 1770 08a4 1B       		.uleb128 0x1b
+ 1771 08a5 01       		.uleb128 0x1
+ 1772 08a6 51       		.byte	0x51
+ 1773 08a7 05       		.uleb128 0x5
+ 1774 08a8 03       		.byte	0x3
+ 1775 08a9 BF000000 		.4byte	.LC7
+ 1776 08ad 1B       		.uleb128 0x1b
+ 1777 08ae 01       		.uleb128 0x1
+ 1778 08af 52       		.byte	0x52
+ 1779 08b0 04       		.uleb128 0x4
+ 1780 08b1 91       		.byte	0x91
+ 1781 08b2 BC7F     		.sleb128 -68
+ 1782 08b4 06       		.byte	0x6
+ 1783 08b5 1B       		.uleb128 0x1b
+ 1784 08b6 01       		.uleb128 0x1
+ 1785 08b7 53       		.byte	0x53
+ 1786 08b8 04       		.uleb128 0x4
+ 1787 08b9 91       		.byte	0x91
+ 1788 08ba B87F     		.sleb128 -72
+ 1789 08bc 06       		.byte	0x6
+ 1790 08bd 1B       		.uleb128 0x1b
+ 1791 08be 02       		.uleb128 0x2
+ 1792 08bf 7D       		.byte	0x7d
+ 1793 08c0 00       		.sleb128 0
+ 1794 08c1 01       		.uleb128 0x1
+ 1795 08c2 36       		.byte	0x36
+ 1796 08c3 1B       		.uleb128 0x1b
+ 1797 08c4 02       		.uleb128 0x2
+ 1798 08c5 7D       		.byte	0x7d
+ 1799 08c6 04       		.sleb128 4
+ 1800 08c7 02       		.uleb128 0x2
+ 1801 08c8 79       		.byte	0x79
+ 1802 08c9 00       		.sleb128 0
+ 1803 08ca 1B       		.uleb128 0x1b
+ 1804 08cb 02       		.uleb128 0x2
+ 1805 08cc 7D       		.byte	0x7d
+ 1806 08cd 08       		.sleb128 8
+ 1807 08ce 01       		.uleb128 0x1
+ 1808 08cf 43       		.byte	0x43
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 36
+
+
+ 1809 08d0 1B       		.uleb128 0x1b
+ 1810 08d1 02       		.uleb128 0x2
+ 1811 08d2 7D       		.byte	0x7d
+ 1812 08d3 10       		.sleb128 16
+ 1813 08d4 02       		.uleb128 0x2
+ 1814 08d5 08       		.byte	0x8
+ 1815 08d6 20       		.byte	0x20
+ 1816 08d7 1B       		.uleb128 0x1b
+ 1817 08d8 02       		.uleb128 0x2
+ 1818 08d9 7D       		.byte	0x7d
+ 1819 08da 14       		.sleb128 20
+ 1820 08db 0A       		.uleb128 0xa
+ 1821 08dc 7A       		.byte	0x7a
+ 1822 08dd 00       		.sleb128 0
+ 1823 08de F7       		.byte	0xf7
+ 1824 08df 25       		.uleb128 0x25
+ 1825 08e0 3A       		.byte	0x3a
+ 1826 08e1 F7       		.byte	0xf7
+ 1827 08e2 25       		.uleb128 0x25
+ 1828 08e3 1B       		.byte	0x1b
+ 1829 08e4 F7       		.byte	0xf7
+ 1830 08e5 00       		.uleb128 0
+ 1831 08e6 1B       		.uleb128 0x1b
+ 1832 08e7 02       		.uleb128 0x2
+ 1833 08e8 7D       		.byte	0x7d
+ 1834 08e9 18       		.sleb128 24
+ 1835 08ea 0F       		.uleb128 0xf
+ 1836 08eb 7A       		.byte	0x7a
+ 1837 08ec 00       		.sleb128 0
+ 1838 08ed 7A       		.byte	0x7a
+ 1839 08ee 00       		.sleb128 0
+ 1840 08ef F7       		.byte	0xf7
+ 1841 08f0 25       		.uleb128 0x25
+ 1842 08f1 3A       		.byte	0x3a
+ 1843 08f2 F7       		.byte	0xf7
+ 1844 08f3 25       		.uleb128 0x25
+ 1845 08f4 1B       		.byte	0x1b
+ 1846 08f5 F7       		.byte	0xf7
+ 1847 08f6 00       		.uleb128 0
+ 1848 08f7 3A       		.byte	0x3a
+ 1849 08f8 1E       		.byte	0x1e
+ 1850 08f9 1C       		.byte	0x1c
+ 1851 08fa 1B       		.uleb128 0x1b
+ 1852 08fb 02       		.uleb128 0x2
+ 1853 08fc 7D       		.byte	0x7d
+ 1854 08fd 1C       		.sleb128 28
+ 1855 08fe 02       		.uleb128 0x2
+ 1856 08ff 08       		.byte	0x8
+ 1857 0900 27       		.byte	0x27
+ 1858 0901 1B       		.uleb128 0x1b
+ 1859 0902 02       		.uleb128 0x2
+ 1860 0903 7D       		.byte	0x7d
+ 1861 0904 24       		.sleb128 36
+ 1862 0905 02       		.uleb128 0x2
+ 1863 0906 08       		.byte	0x8
+ 1864 0907 32       		.byte	0x32
+ 1865 0908 1B       		.uleb128 0x1b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 37
+
+
+ 1866 0909 02       		.uleb128 0x2
+ 1867 090a 7D       		.byte	0x7d
+ 1868 090b 2C       		.sleb128 44
+ 1869 090c 02       		.uleb128 0x2
+ 1870 090d 08       		.byte	0x8
+ 1871 090e 39       		.byte	0x39
+ 1872 090f 00       		.byte	0
+ 1873 0910 00       		.byte	0
+ 1874 0911 1A       		.uleb128 0x1a
+ 1875 0912 2C000000 		.4byte	.LVL31
+ 1876 0916 400D0000 		.4byte	0xd40
+ 1877 091a 33090000 		.4byte	0x933
+ 1878 091e 1B       		.uleb128 0x1b
+ 1879 091f 01       		.uleb128 0x1
+ 1880 0920 50       		.byte	0x50
+ 1881 0921 04       		.uleb128 0x4
+ 1882 0922 91       		.byte	0x91
+ 1883 0923 B47F     		.sleb128 -76
+ 1884 0925 06       		.byte	0x6
+ 1885 0926 1B       		.uleb128 0x1b
+ 1886 0927 01       		.uleb128 0x1
+ 1887 0928 51       		.byte	0x51
+ 1888 0929 02       		.uleb128 0x2
+ 1889 092a 75       		.byte	0x75
+ 1890 092b 00       		.sleb128 0
+ 1891 092c 1B       		.uleb128 0x1b
+ 1892 092d 01       		.uleb128 0x1
+ 1893 092e 52       		.byte	0x52
+ 1894 092f 02       		.uleb128 0x2
+ 1895 0930 91       		.byte	0x91
+ 1896 0931 44       		.sleb128 -60
+ 1897 0932 00       		.byte	0
+ 1898 0933 1A       		.uleb128 0x1a
+ 1899 0934 38000000 		.4byte	.LVL34
+ 1900 0938 FC0C0000 		.4byte	0xcfc
+ 1901 093c 51090000 		.4byte	0x951
+ 1902 0940 1B       		.uleb128 0x1b
+ 1903 0941 01       		.uleb128 0x1
+ 1904 0942 50       		.byte	0x50
+ 1905 0943 02       		.uleb128 0x2
+ 1906 0944 74       		.byte	0x74
+ 1907 0945 00       		.sleb128 0
+ 1908 0946 1B       		.uleb128 0x1b
+ 1909 0947 01       		.uleb128 0x1
+ 1910 0948 51       		.byte	0x51
+ 1911 0949 01       		.uleb128 0x1
+ 1912 094a 30       		.byte	0x30
+ 1913 094b 1B       		.uleb128 0x1b
+ 1914 094c 01       		.uleb128 0x1
+ 1915 094d 52       		.byte	0x52
+ 1916 094e 01       		.uleb128 0x1
+ 1917 094f 30       		.byte	0x30
+ 1918 0950 00       		.byte	0
+ 1919 0951 1A       		.uleb128 0x1a
+ 1920 0952 42000000 		.4byte	.LVL35
+ 1921 0956 4C0D0000 		.4byte	0xd4c
+ 1922 095a 6D090000 		.4byte	0x96d
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 38
+
+
+ 1923 095e 1B       		.uleb128 0x1b
+ 1924 095f 01       		.uleb128 0x1
+ 1925 0960 50       		.byte	0x50
+ 1926 0961 04       		.uleb128 0x4
+ 1927 0962 91       		.byte	0x91
+ 1928 0963 B47F     		.sleb128 -76
+ 1929 0965 06       		.byte	0x6
+ 1930 0966 1B       		.uleb128 0x1b
+ 1931 0967 01       		.uleb128 0x1
+ 1932 0968 51       		.byte	0x51
+ 1933 0969 02       		.uleb128 0x2
+ 1934 096a 77       		.byte	0x77
+ 1935 096b 00       		.sleb128 0
+ 1936 096c 00       		.byte	0
+ 1937 096d 1A       		.uleb128 0x1a
+ 1938 096e 52000000 		.4byte	.LVL38
+ 1939 0972 2A0D0000 		.4byte	0xd2a
+ 1940 0976 85090000 		.4byte	0x985
+ 1941 097a 1B       		.uleb128 0x1b
+ 1942 097b 01       		.uleb128 0x1
+ 1943 097c 50       		.byte	0x50
+ 1944 097d 01       		.uleb128 0x1
+ 1945 097e 41       		.byte	0x41
+ 1946 097f 1B       		.uleb128 0x1b
+ 1947 0980 01       		.uleb128 0x1
+ 1948 0981 51       		.byte	0x51
+ 1949 0982 01       		.uleb128 0x1
+ 1950 0983 30       		.byte	0x30
+ 1951 0984 00       		.byte	0
+ 1952 0985 19       		.uleb128 0x19
+ 1953 0986 58000000 		.4byte	.LVL39
+ 1954 098a 570D0000 		.4byte	0xd57
+ 1955 098e 1A       		.uleb128 0x1a
+ 1956 098f 62000000 		.4byte	.LVL40
+ 1957 0993 2A0D0000 		.4byte	0xd2a
+ 1958 0997 A6090000 		.4byte	0x9a6
+ 1959 099b 1B       		.uleb128 0x1b
+ 1960 099c 01       		.uleb128 0x1
+ 1961 099d 50       		.byte	0x50
+ 1962 099e 01       		.uleb128 0x1
+ 1963 099f 41       		.byte	0x41
+ 1964 09a0 1B       		.uleb128 0x1b
+ 1965 09a1 01       		.uleb128 0x1
+ 1966 09a2 51       		.byte	0x51
+ 1967 09a3 01       		.uleb128 0x1
+ 1968 09a4 30       		.byte	0x30
+ 1969 09a5 00       		.byte	0
+ 1970 09a6 1A       		.uleb128 0x1a
+ 1971 09a7 6C000000 		.4byte	.LVL41
+ 1972 09ab 2A0D0000 		.4byte	0xd2a
+ 1973 09af BE090000 		.4byte	0x9be
+ 1974 09b3 1B       		.uleb128 0x1b
+ 1975 09b4 01       		.uleb128 0x1
+ 1976 09b5 50       		.byte	0x50
+ 1977 09b6 01       		.uleb128 0x1
+ 1978 09b7 41       		.byte	0x41
+ 1979 09b8 1B       		.uleb128 0x1b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 39
+
+
+ 1980 09b9 01       		.uleb128 0x1
+ 1981 09ba 51       		.byte	0x51
+ 1982 09bb 01       		.uleb128 0x1
+ 1983 09bc 30       		.byte	0x30
+ 1984 09bd 00       		.byte	0
+ 1985 09be 22       		.uleb128 0x22
+ 1986 09bf 8C000000 		.4byte	.LVL42
+ 1987 09c3 02       		.uleb128 0x2
+ 1988 09c4 75       		.byte	0x75
+ 1989 09c5 00       		.sleb128 0
+ 1990 09c6 170A0000 		.4byte	0xa17
+ 1991 09ca 1B       		.uleb128 0x1b
+ 1992 09cb 01       		.uleb128 0x1
+ 1993 09cc 50       		.byte	0x50
+ 1994 09cd 02       		.uleb128 0x2
+ 1995 09ce 76       		.byte	0x76
+ 1996 09cf 00       		.sleb128 0
+ 1997 09d0 1B       		.uleb128 0x1b
+ 1998 09d1 01       		.uleb128 0x1
+ 1999 09d2 51       		.byte	0x51
+ 2000 09d3 05       		.uleb128 0x5
+ 2001 09d4 03       		.byte	0x3
+ 2002 09d5 04000000 		.4byte	.LC1
+ 2003 09d9 1B       		.uleb128 0x1b
+ 2004 09da 01       		.uleb128 0x1
+ 2005 09db 52       		.byte	0x52
+ 2006 09dc 02       		.uleb128 0x2
+ 2007 09dd 79       		.byte	0x79
+ 2008 09de 00       		.sleb128 0
+ 2009 09df 1B       		.uleb128 0x1b
+ 2010 09e0 01       		.uleb128 0x1
+ 2011 09e1 53       		.byte	0x53
+ 2012 09e2 02       		.uleb128 0x2
+ 2013 09e3 7A       		.byte	0x7a
+ 2014 09e4 00       		.sleb128 0
+ 2015 09e5 1B       		.uleb128 0x1b
+ 2016 09e6 02       		.uleb128 0x2
+ 2017 09e7 7D       		.byte	0x7d
+ 2018 09e8 00       		.sleb128 0
+ 2019 09e9 02       		.uleb128 0x2
+ 2020 09ea 7B       		.byte	0x7b
+ 2021 09eb 00       		.sleb128 0
+ 2022 09ec 1B       		.uleb128 0x1b
+ 2023 09ed 02       		.uleb128 0x2
+ 2024 09ee 7D       		.byte	0x7d
+ 2025 09ef 04       		.sleb128 4
+ 2026 09f0 02       		.uleb128 0x2
+ 2027 09f1 77       		.byte	0x77
+ 2028 09f2 00       		.sleb128 0
+ 2029 09f3 1B       		.uleb128 0x1b
+ 2030 09f4 02       		.uleb128 0x2
+ 2031 09f5 7D       		.byte	0x7d
+ 2032 09f6 0C       		.sleb128 12
+ 2033 09f7 0A       		.uleb128 0xa
+ 2034 09f8 78       		.byte	0x78
+ 2035 09f9 00       		.sleb128 0
+ 2036 09fa F7       		.byte	0xf7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 40
+
+
+ 2037 09fb 25       		.uleb128 0x25
+ 2038 09fc 3A       		.byte	0x3a
+ 2039 09fd F7       		.byte	0xf7
+ 2040 09fe 25       		.uleb128 0x25
+ 2041 09ff 1B       		.byte	0x1b
+ 2042 0a00 F7       		.byte	0xf7
+ 2043 0a01 00       		.uleb128 0
+ 2044 0a02 1B       		.uleb128 0x1b
+ 2045 0a03 02       		.uleb128 0x2
+ 2046 0a04 7D       		.byte	0x7d
+ 2047 0a05 10       		.sleb128 16
+ 2048 0a06 0F       		.uleb128 0xf
+ 2049 0a07 78       		.byte	0x78
+ 2050 0a08 00       		.sleb128 0
+ 2051 0a09 78       		.byte	0x78
+ 2052 0a0a 00       		.sleb128 0
+ 2053 0a0b F7       		.byte	0xf7
+ 2054 0a0c 25       		.uleb128 0x25
+ 2055 0a0d 3A       		.byte	0x3a
+ 2056 0a0e F7       		.byte	0xf7
+ 2057 0a0f 25       		.uleb128 0x25
+ 2058 0a10 1B       		.byte	0x1b
+ 2059 0a11 F7       		.byte	0xf7
+ 2060 0a12 00       		.uleb128 0
+ 2061 0a13 3A       		.byte	0x3a
+ 2062 0a14 1E       		.byte	0x1e
+ 2063 0a15 1C       		.byte	0x1c
+ 2064 0a16 00       		.byte	0
+ 2065 0a17 19       		.uleb128 0x19
+ 2066 0a18 90000000 		.4byte	.LVL43
+ 2067 0a1c 630D0000 		.4byte	0xd63
+ 2068 0a20 1A       		.uleb128 0x1a
+ 2069 0a21 A0000000 		.4byte	.LVL47
+ 2070 0a25 2A0D0000 		.4byte	0xd2a
+ 2071 0a29 380A0000 		.4byte	0xa38
+ 2072 0a2d 1B       		.uleb128 0x1b
+ 2073 0a2e 01       		.uleb128 0x1
+ 2074 0a2f 50       		.byte	0x50
+ 2075 0a30 01       		.uleb128 0x1
+ 2076 0a31 41       		.byte	0x41
+ 2077 0a32 1B       		.uleb128 0x1b
+ 2078 0a33 01       		.uleb128 0x1
+ 2079 0a34 51       		.byte	0x51
+ 2080 0a35 01       		.uleb128 0x1
+ 2081 0a36 30       		.byte	0x30
+ 2082 0a37 00       		.byte	0
+ 2083 0a38 22       		.uleb128 0x22
+ 2084 0a39 C8000000 		.4byte	.LVL48
+ 2085 0a3d 02       		.uleb128 0x2
+ 2086 0a3e 75       		.byte	0x75
+ 2087 0a3f 00       		.sleb128 0
+ 2088 0a40 860A0000 		.4byte	0xa86
+ 2089 0a44 1B       		.uleb128 0x1b
+ 2090 0a45 01       		.uleb128 0x1
+ 2091 0a46 50       		.byte	0x50
+ 2092 0a47 02       		.uleb128 0x2
+ 2093 0a48 78       		.byte	0x78
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 41
+
+
+ 2094 0a49 00       		.sleb128 0
+ 2095 0a4a 1B       		.uleb128 0x1b
+ 2096 0a4b 01       		.uleb128 0x1
+ 2097 0a4c 51       		.byte	0x51
+ 2098 0a4d 05       		.uleb128 0x5
+ 2099 0a4e 03       		.byte	0x3
+ 2100 0a4f 33000000 		.4byte	.LC2
+ 2101 0a53 1B       		.uleb128 0x1b
+ 2102 0a54 01       		.uleb128 0x1
+ 2103 0a55 53       		.byte	0x53
+ 2104 0a56 03       		.uleb128 0x3
+ 2105 0a57 0A       		.byte	0xa
+ 2106 0a58 00C0     		.2byte	0xc000
+ 2107 0a5a 1B       		.uleb128 0x1b
+ 2108 0a5b 02       		.uleb128 0x2
+ 2109 0a5c 7D       		.byte	0x7d
+ 2110 0a5d 00       		.sleb128 0
+ 2111 0a5e 02       		.uleb128 0x2
+ 2112 0a5f 79       		.byte	0x79
+ 2113 0a60 00       		.sleb128 0
+ 2114 0a61 1B       		.uleb128 0x1b
+ 2115 0a62 02       		.uleb128 0x2
+ 2116 0a63 7D       		.byte	0x7d
+ 2117 0a64 04       		.sleb128 4
+ 2118 0a65 06       		.uleb128 0x6
+ 2119 0a66 0A       		.byte	0xa
+ 2120 0a67 00C0     		.2byte	0xc000
+ 2121 0a69 79       		.byte	0x79
+ 2122 0a6a 00       		.sleb128 0
+ 2123 0a6b 1C       		.byte	0x1c
+ 2124 0a6c 1B       		.uleb128 0x1b
+ 2125 0a6d 02       		.uleb128 0x2
+ 2126 0a6e 7D       		.byte	0x7d
+ 2127 0a6f 08       		.sleb128 8
+ 2128 0a70 14       		.uleb128 0x14
+ 2129 0a71 79       		.byte	0x79
+ 2130 0a72 00       		.sleb128 0
+ 2131 0a73 09       		.byte	0x9
+ 2132 0a74 9C       		.byte	0x9c
+ 2133 0a75 1E       		.byte	0x1e
+ 2134 0a76 23       		.byte	0x23
+ 2135 0a77 8080AC02 		.uleb128 0x4b0000
+ 2136 0a7b F7       		.byte	0xf7
+ 2137 0a7c 25       		.uleb128 0x25
+ 2138 0a7d 0A       		.byte	0xa
+ 2139 0a7e 00C0     		.2byte	0xc000
+ 2140 0a80 F7       		.byte	0xf7
+ 2141 0a81 25       		.uleb128 0x25
+ 2142 0a82 1B       		.byte	0x1b
+ 2143 0a83 F7       		.byte	0xf7
+ 2144 0a84 00       		.uleb128 0
+ 2145 0a85 00       		.byte	0
+ 2146 0a86 1A       		.uleb128 0x1a
+ 2147 0a87 D6000000 		.4byte	.LVL49
+ 2148 0a8b 2A0D0000 		.4byte	0xd2a
+ 2149 0a8f 9E0A0000 		.4byte	0xa9e
+ 2150 0a93 1B       		.uleb128 0x1b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 42
+
+
+ 2151 0a94 01       		.uleb128 0x1
+ 2152 0a95 50       		.byte	0x50
+ 2153 0a96 01       		.uleb128 0x1
+ 2154 0a97 33       		.byte	0x33
+ 2155 0a98 1B       		.uleb128 0x1b
+ 2156 0a99 01       		.uleb128 0x1
+ 2157 0a9a 51       		.byte	0x51
+ 2158 0a9b 01       		.uleb128 0x1
+ 2159 0a9c 37       		.byte	0x37
+ 2160 0a9d 00       		.byte	0
+ 2161 0a9e 1A       		.uleb128 0x1a
+ 2162 0a9f E0000000 		.4byte	.LVL51
+ 2163 0aa3 2A0D0000 		.4byte	0xd2a
+ 2164 0aa7 B60A0000 		.4byte	0xab6
+ 2165 0aab 1B       		.uleb128 0x1b
+ 2166 0aac 01       		.uleb128 0x1
+ 2167 0aad 50       		.byte	0x50
+ 2168 0aae 01       		.uleb128 0x1
+ 2169 0aaf 41       		.byte	0x41
+ 2170 0ab0 1B       		.uleb128 0x1b
+ 2171 0ab1 01       		.uleb128 0x1
+ 2172 0ab2 51       		.byte	0x51
+ 2173 0ab3 01       		.uleb128 0x1
+ 2174 0ab4 30       		.byte	0x30
+ 2175 0ab5 00       		.byte	0
+ 2176 0ab6 1A       		.uleb128 0x1a
+ 2177 0ab7 EA000000 		.4byte	.LVL52
+ 2178 0abb 2A0D0000 		.4byte	0xd2a
+ 2179 0abf CE0A0000 		.4byte	0xace
+ 2180 0ac3 1B       		.uleb128 0x1b
+ 2181 0ac4 01       		.uleb128 0x1
+ 2182 0ac5 50       		.byte	0x50
+ 2183 0ac6 01       		.uleb128 0x1
+ 2184 0ac7 32       		.byte	0x32
+ 2185 0ac8 1B       		.uleb128 0x1b
+ 2186 0ac9 01       		.uleb128 0x1
+ 2187 0aca 51       		.byte	0x51
+ 2188 0acb 01       		.uleb128 0x1
+ 2189 0acc 30       		.byte	0x30
+ 2190 0acd 00       		.byte	0
+ 2191 0ace 22       		.uleb128 0x22
+ 2192 0acf F6000000 		.4byte	.LVL53
+ 2193 0ad3 02       		.uleb128 0x2
+ 2194 0ad4 75       		.byte	0x75
+ 2195 0ad5 00       		.sleb128 0
+ 2196 0ad6 F60A0000 		.4byte	0xaf6
+ 2197 0ada 1B       		.uleb128 0x1b
+ 2198 0adb 01       		.uleb128 0x1
+ 2199 0adc 50       		.byte	0x50
+ 2200 0add 02       		.uleb128 0x2
+ 2201 0ade 78       		.byte	0x78
+ 2202 0adf 00       		.sleb128 0
+ 2203 0ae0 1B       		.uleb128 0x1b
+ 2204 0ae1 01       		.uleb128 0x1
+ 2205 0ae2 51       		.byte	0x51
+ 2206 0ae3 05       		.uleb128 0x5
+ 2207 0ae4 03       		.byte	0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 43
+
+
+ 2208 0ae5 64000000 		.4byte	.LC3
+ 2209 0ae9 1B       		.uleb128 0x1b
+ 2210 0aea 01       		.uleb128 0x1
+ 2211 0aeb 52       		.byte	0x52
+ 2212 0aec 02       		.uleb128 0x2
+ 2213 0aed 79       		.byte	0x79
+ 2214 0aee 00       		.sleb128 0
+ 2215 0aef 1B       		.uleb128 0x1b
+ 2216 0af0 01       		.uleb128 0x1
+ 2217 0af1 53       		.byte	0x53
+ 2218 0af2 02       		.uleb128 0x2
+ 2219 0af3 7A       		.byte	0x7a
+ 2220 0af4 00       		.sleb128 0
+ 2221 0af5 00       		.byte	0
+ 2222 0af6 22       		.uleb128 0x22
+ 2223 0af7 0E010000 		.4byte	.LVL54
+ 2224 0afb 02       		.uleb128 0x2
+ 2225 0afc 75       		.byte	0x75
+ 2226 0afd 00       		.sleb128 0
+ 2227 0afe 320B0000 		.4byte	0xb32
+ 2228 0b02 1B       		.uleb128 0x1b
+ 2229 0b03 01       		.uleb128 0x1
+ 2230 0b04 51       		.byte	0x51
+ 2231 0b05 05       		.uleb128 0x5
+ 2232 0b06 03       		.byte	0x3
+ 2233 0b07 6B000000 		.4byte	.LC4
+ 2234 0b0b 1B       		.uleb128 0x1b
+ 2235 0b0c 01       		.uleb128 0x1
+ 2236 0b0d 52       		.byte	0x52
+ 2237 0b0e 01       		.uleb128 0x1
+ 2238 0b0f 36       		.byte	0x36
+ 2239 0b10 1B       		.uleb128 0x1b
+ 2240 0b11 01       		.uleb128 0x1
+ 2241 0b12 53       		.byte	0x53
+ 2242 0b13 01       		.uleb128 0x1
+ 2243 0b14 43       		.byte	0x43
+ 2244 0b15 1B       		.uleb128 0x1b
+ 2245 0b16 02       		.uleb128 0x2
+ 2246 0b17 7D       		.byte	0x7d
+ 2247 0b18 00       		.sleb128 0
+ 2248 0b19 02       		.uleb128 0x2
+ 2249 0b1a 08       		.byte	0x8
+ 2250 0b1b 20       		.byte	0x20
+ 2251 0b1c 1B       		.uleb128 0x1b
+ 2252 0b1d 02       		.uleb128 0x2
+ 2253 0b1e 7D       		.byte	0x7d
+ 2254 0b1f 04       		.sleb128 4
+ 2255 0b20 02       		.uleb128 0x2
+ 2256 0b21 08       		.byte	0x8
+ 2257 0b22 27       		.byte	0x27
+ 2258 0b23 1B       		.uleb128 0x1b
+ 2259 0b24 02       		.uleb128 0x2
+ 2260 0b25 7D       		.byte	0x7d
+ 2261 0b26 08       		.sleb128 8
+ 2262 0b27 02       		.uleb128 0x2
+ 2263 0b28 08       		.byte	0x8
+ 2264 0b29 32       		.byte	0x32
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 44
+
+
+ 2265 0b2a 1B       		.uleb128 0x1b
+ 2266 0b2b 02       		.uleb128 0x2
+ 2267 0b2c 7D       		.byte	0x7d
+ 2268 0b2d 0C       		.sleb128 12
+ 2269 0b2e 02       		.uleb128 0x2
+ 2270 0b2f 08       		.byte	0x8
+ 2271 0b30 39       		.byte	0x39
+ 2272 0b31 00       		.byte	0
+ 2273 0b32 1A       		.uleb128 0x1a
+ 2274 0b33 1C010000 		.4byte	.LVL55
+ 2275 0b37 2A0D0000 		.4byte	0xd2a
+ 2276 0b3b 4A0B0000 		.4byte	0xb4a
+ 2277 0b3f 1B       		.uleb128 0x1b
+ 2278 0b40 01       		.uleb128 0x1
+ 2279 0b41 50       		.byte	0x50
+ 2280 0b42 01       		.uleb128 0x1
+ 2281 0b43 34       		.byte	0x34
+ 2282 0b44 1B       		.uleb128 0x1b
+ 2283 0b45 01       		.uleb128 0x1
+ 2284 0b46 51       		.byte	0x51
+ 2285 0b47 01       		.uleb128 0x1
+ 2286 0b48 30       		.byte	0x30
+ 2287 0b49 00       		.byte	0
+ 2288 0b4a 22       		.uleb128 0x22
+ 2289 0b4b 24010000 		.4byte	.LVL56
+ 2290 0b4f 02       		.uleb128 0x2
+ 2291 0b50 75       		.byte	0x75
+ 2292 0b51 00       		.sleb128 0
+ 2293 0b52 660B0000 		.4byte	0xb66
+ 2294 0b56 1B       		.uleb128 0x1b
+ 2295 0b57 01       		.uleb128 0x1
+ 2296 0b58 50       		.byte	0x50
+ 2297 0b59 02       		.uleb128 0x2
+ 2298 0b5a 78       		.byte	0x78
+ 2299 0b5b 00       		.sleb128 0
+ 2300 0b5c 1B       		.uleb128 0x1b
+ 2301 0b5d 01       		.uleb128 0x1
+ 2302 0b5e 51       		.byte	0x51
+ 2303 0b5f 05       		.uleb128 0x5
+ 2304 0b60 03       		.byte	0x3
+ 2305 0b61 B7000000 		.4byte	.LC5
+ 2306 0b65 00       		.byte	0
+ 2307 0b66 1A       		.uleb128 0x1a
+ 2308 0b67 3C010000 		.4byte	.LVL58
+ 2309 0b6b DD0C0000 		.4byte	0xcdd
+ 2310 0b6f 7A0B0000 		.4byte	0xb7a
+ 2311 0b73 1B       		.uleb128 0x1b
+ 2312 0b74 01       		.uleb128 0x1
+ 2313 0b75 50       		.byte	0x50
+ 2314 0b76 02       		.uleb128 0x2
+ 2315 0b77 7A       		.byte	0x7a
+ 2316 0b78 00       		.sleb128 0
+ 2317 0b79 00       		.byte	0
+ 2318 0b7a 1A       		.uleb128 0x1a
+ 2319 0b7b 48010000 		.4byte	.LVL59
+ 2320 0b7f 6E0D0000 		.4byte	0xd6e
+ 2321 0b83 970B0000 		.4byte	0xb97
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 45
+
+
+ 2322 0b87 1B       		.uleb128 0x1b
+ 2323 0b88 01       		.uleb128 0x1
+ 2324 0b89 50       		.byte	0x50
+ 2325 0b8a 02       		.uleb128 0x2
+ 2326 0b8b 7A       		.byte	0x7a
+ 2327 0b8c 00       		.sleb128 0
+ 2328 0b8d 1B       		.uleb128 0x1b
+ 2329 0b8e 01       		.uleb128 0x1
+ 2330 0b8f 51       		.byte	0x51
+ 2331 0b90 05       		.uleb128 0x5
+ 2332 0b91 03       		.byte	0x3
+ 2333 0b92 BA000000 		.4byte	.LC6
+ 2334 0b96 00       		.byte	0
+ 2335 0b97 1C       		.uleb128 0x1c
+ 2336 0b98 E4010000 		.4byte	.LVL67
+ 2337 0b9c 790D0000 		.4byte	0xd79
+ 2338 0ba0 1B       		.uleb128 0x1b
+ 2339 0ba1 01       		.uleb128 0x1
+ 2340 0ba2 50       		.byte	0x50
+ 2341 0ba3 04       		.uleb128 0x4
+ 2342 0ba4 91       		.byte	0x91
+ 2343 0ba5 B47F     		.sleb128 -76
+ 2344 0ba7 06       		.byte	0x6
+ 2345 0ba8 00       		.byte	0
+ 2346 0ba9 00       		.byte	0
+ 2347 0baa 19       		.uleb128 0x19
+ 2348 0bab 12000000 		.4byte	.LVL27
+ 2349 0baf 840D0000 		.4byte	0xd84
+ 2350 0bb3 1A       		.uleb128 0x1a
+ 2351 0bb4 1C000000 		.4byte	.LVL30
+ 2352 0bb8 E80C0000 		.4byte	0xce8
+ 2353 0bbc CA0B0000 		.4byte	0xbca
+ 2354 0bc0 1B       		.uleb128 0x1b
+ 2355 0bc1 01       		.uleb128 0x1
+ 2356 0bc2 50       		.byte	0x50
+ 2357 0bc3 05       		.uleb128 0x5
+ 2358 0bc4 75       		.byte	0x75
+ 2359 0bc5 00       		.sleb128 0
+ 2360 0bc6 08       		.byte	0x8
+ 2361 0bc7 28       		.byte	0x28
+ 2362 0bc8 1E       		.byte	0x1e
+ 2363 0bc9 00       		.byte	0
+ 2364 0bca 23       		.uleb128 0x23
+ 2365 0bcb EE010000 		.4byte	.LVL70
+ 2366 0bcf DD0B0000 		.4byte	0xbdd
+ 2367 0bd3 1B       		.uleb128 0x1b
+ 2368 0bd4 01       		.uleb128 0x1
+ 2369 0bd5 51       		.byte	0x51
+ 2370 0bd6 05       		.uleb128 0x5
+ 2371 0bd7 03       		.byte	0x3
+ 2372 0bd8 F9000000 		.4byte	.LC8
+ 2373 0bdc 00       		.byte	0
+ 2374 0bdd 1C       		.uleb128 0x1c
+ 2375 0bde 00020000 		.4byte	.LVL71
+ 2376 0be2 900D0000 		.4byte	0xd90
+ 2377 0be6 1B       		.uleb128 0x1b
+ 2378 0be7 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 46
+
+
+ 2379 0be8 51       		.byte	0x51
+ 2380 0be9 02       		.uleb128 0x2
+ 2381 0bea 91       		.byte	0x91
+ 2382 0beb 43       		.sleb128 -61
+ 2383 0bec 1B       		.uleb128 0x1b
+ 2384 0bed 01       		.uleb128 0x1
+ 2385 0bee 52       		.byte	0x52
+ 2386 0bef 01       		.uleb128 0x1
+ 2387 0bf0 31       		.byte	0x31
+ 2388 0bf1 1B       		.uleb128 0x1b
+ 2389 0bf2 01       		.uleb128 0x1
+ 2390 0bf3 53       		.byte	0x53
+ 2391 0bf4 03       		.uleb128 0x3
+ 2392 0bf5 0A       		.byte	0xa
+ 2393 0bf6 E803     		.2byte	0x3e8
+ 2394 0bf8 00       		.byte	0
+ 2395 0bf9 00       		.byte	0
+ 2396 0bfa 1C       		.uleb128 0x1c
+ 2397 0bfb 10020000 		.4byte	.LVL72
+ 2398 0bff 9C0D0000 		.4byte	0xd9c
+ 2399 0c03 1B       		.uleb128 0x1b
+ 2400 0c04 01       		.uleb128 0x1
+ 2401 0c05 50       		.byte	0x50
+ 2402 0c06 02       		.uleb128 0x2
+ 2403 0c07 74       		.byte	0x74
+ 2404 0c08 00       		.sleb128 0
+ 2405 0c09 00       		.byte	0
+ 2406 0c0a 00       		.byte	0
+ 2407 0c0b 06       		.uleb128 0x6
+ 2408 0c0c 04       		.byte	0x4
+ 2409 0c0d 06020000 		.4byte	0x206
+ 2410 0c11 12       		.uleb128 0x12
+ 2411 0c12 DC000000 		.4byte	0xdc
+ 2412 0c16 210C0000 		.4byte	0xc21
+ 2413 0c1a 13       		.uleb128 0x13
+ 2414 0c1b E3000000 		.4byte	0xe3
+ 2415 0c1f 0C       		.byte	0xc
+ 2416 0c20 00       		.byte	0
+ 2417 0c21 14       		.uleb128 0x14
+ 2418 0c22 40090000 		.4byte	.LASF145
+ 2419 0c26 01       		.byte	0x1
+ 2420 0c27 74       		.byte	0x74
+ 2421 0c28 A2000000 		.4byte	0xa2
+ 2422 0c2c 00000000 		.4byte	.LFB71
+ 2423 0c30 32000000 		.4byte	.LFE71-.LFB71
+ 2424 0c34 01       		.uleb128 0x1
+ 2425 0c35 9C       		.byte	0x9c
+ 2426 0c36 710C0000 		.4byte	0xc71
+ 2427 0c3a 15       		.uleb128 0x15
+ 2428 0c3b C0090000 		.4byte	.LASF130
+ 2429 0c3f 01       		.byte	0x1
+ 2430 0c40 74       		.byte	0x74
+ 2431 0c41 BF040000 		.4byte	0x4bf
+ 2432 0c45 CF020000 		.4byte	.LLST16
+ 2433 0c49 24       		.uleb128 0x24
+ 2434 0c4a 6300     		.ascii	"c\000"
+ 2435 0c4c 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 47
+
+
+ 2436 0c4d 74       		.byte	0x74
+ 2437 0c4e AD000000 		.4byte	0xad
+ 2438 0c52 F0020000 		.4byte	.LLST17
+ 2439 0c56 1C       		.uleb128 0x1c
+ 2440 0c57 26000000 		.4byte	.LVL78
+ 2441 0c5b A80D0000 		.4byte	0xda8
+ 2442 0c5f 1B       		.uleb128 0x1b
+ 2443 0c60 01       		.uleb128 0x1
+ 2444 0c61 51       		.byte	0x51
+ 2445 0c62 02       		.uleb128 0x2
+ 2446 0c63 91       		.byte	0x91
+ 2447 0c64 76       		.sleb128 -10
+ 2448 0c65 1B       		.uleb128 0x1b
+ 2449 0c66 01       		.uleb128 0x1
+ 2450 0c67 52       		.byte	0x52
+ 2451 0c68 01       		.uleb128 0x1
+ 2452 0c69 31       		.byte	0x31
+ 2453 0c6a 1B       		.uleb128 0x1b
+ 2454 0c6b 01       		.uleb128 0x1
+ 2455 0c6c 53       		.byte	0x53
+ 2456 0c6d 01       		.uleb128 0x1
+ 2457 0c6e 44       		.byte	0x44
+ 2458 0c6f 00       		.byte	0
+ 2459 0c70 00       		.byte	0
+ 2460 0c71 14       		.uleb128 0x14
+ 2461 0c72 5B000000 		.4byte	.LASF146
+ 2462 0c76 01       		.byte	0x1
+ 2463 0c77 24       		.byte	0x24
+ 2464 0c78 A2000000 		.4byte	0xa2
+ 2465 0c7c 00000000 		.4byte	.LFB68
+ 2466 0c80 24000000 		.4byte	.LFE68-.LFB68
+ 2467 0c84 01       		.uleb128 0x1
+ 2468 0c85 9C       		.byte	0x9c
+ 2469 0c86 CC0C0000 		.4byte	0xccc
+ 2470 0c8a 15       		.uleb128 0x15
+ 2471 0c8b FA050000 		.4byte	.LASF147
+ 2472 0c8f 01       		.byte	0x1
+ 2473 0c90 24       		.byte	0x24
+ 2474 0c91 BC050000 		.4byte	0x5bc
+ 2475 0c95 36030000 		.4byte	.LLST18
+ 2476 0c99 1C       		.uleb128 0x1c
+ 2477 0c9a 10000000 		.4byte	.LVL83
+ 2478 0c9e B40D0000 		.4byte	0xdb4
+ 2479 0ca2 1B       		.uleb128 0x1b
+ 2480 0ca3 01       		.uleb128 0x1
+ 2481 0ca4 50       		.byte	0x50
+ 2482 0ca5 05       		.uleb128 0x5
+ 2483 0ca6 03       		.byte	0x3
+ 2484 0ca7 00000000 		.4byte	CMD_main
+ 2485 0cab 1B       		.uleb128 0x1b
+ 2486 0cac 01       		.uleb128 0x1
+ 2487 0cad 51       		.byte	0x51
+ 2488 0cae 05       		.uleb128 0x5
+ 2489 0caf 03       		.byte	0x3
+ 2490 0cb0 00000000 		.4byte	.LC0
+ 2491 0cb4 1B       		.uleb128 0x1b
+ 2492 0cb5 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 48
+
+
+ 2493 0cb6 52       		.byte	0x52
+ 2494 0cb7 05       		.uleb128 0x5
+ 2495 0cb8 03       		.byte	0x3
+ 2496 0cb9 09010000 		.4byte	.LC9
+ 2497 0cbd 1B       		.uleb128 0x1b
+ 2498 0cbe 01       		.uleb128 0x1
+ 2499 0cbf 53       		.byte	0x53
+ 2500 0cc0 01       		.uleb128 0x1
+ 2501 0cc1 30       		.byte	0x30
+ 2502 0cc2 1B       		.uleb128 0x1b
+ 2503 0cc3 02       		.uleb128 0x2
+ 2504 0cc4 7D       		.byte	0x7d
+ 2505 0cc5 00       		.sleb128 0
+ 2506 0cc6 03       		.uleb128 0x3
+ 2507 0cc7 F3       		.byte	0xf3
+ 2508 0cc8 01       		.uleb128 0x1
+ 2509 0cc9 50       		.byte	0x50
+ 2510 0cca 00       		.byte	0
+ 2511 0ccb 00       		.byte	0
+ 2512 0ccc 25       		.uleb128 0x25
+ 2513 0ccd 24010000 		.4byte	.LASF171
+ 2514 0cd1 0C       		.byte	0xc
+ 2515 0cd2 1207     		.2byte	0x712
+ 2516 0cd4 D80C0000 		.4byte	0xcd8
+ 2517 0cd8 26       		.uleb128 0x26
+ 2518 0cd9 B8000000 		.4byte	0xb8
+ 2519 0cdd 27       		.uleb128 0x27
+ 2520 0cde D9040000 		.4byte	.LASF148
+ 2521 0ce2 D9040000 		.4byte	.LASF148
+ 2522 0ce6 09       		.byte	0x9
+ 2523 0ce7 21       		.byte	0x21
+ 2524 0ce8 27       		.uleb128 0x27
+ 2525 0ce9 A2030000 		.4byte	.LASF149
+ 2526 0ced A2030000 		.4byte	.LASF149
+ 2527 0cf1 0A       		.byte	0xa
+ 2528 0cf2 B0       		.byte	0xb0
+ 2529 0cf3 28       		.uleb128 0x28
+ 2530 0cf4 83020000 		.4byte	.LASF172
+ 2531 0cf8 83020000 		.4byte	.LASF172
+ 2532 0cfc 27       		.uleb128 0x27
+ 2533 0cfd DC050000 		.4byte	.LASF150
+ 2534 0d01 DC050000 		.4byte	.LASF150
+ 2535 0d05 08       		.byte	0x8
+ 2536 0d06 FC       		.byte	0xfc
+ 2537 0d07 29       		.uleb128 0x29
+ 2538 0d08 D0050000 		.4byte	.LASF151
+ 2539 0d0c D0050000 		.4byte	.LASF151
+ 2540 0d10 06       		.byte	0x6
+ 2541 0d11 5501     		.2byte	0x155
+ 2542 0d13 29       		.uleb128 0x29
+ 2543 0d14 6C010000 		.4byte	.LASF152
+ 2544 0d18 6C010000 		.4byte	.LASF152
+ 2545 0d1c 08       		.byte	0x8
+ 2546 0d1d 0401     		.2byte	0x104
+ 2547 0d1f 27       		.uleb128 0x27
+ 2548 0d20 9A000000 		.4byte	.LASF153
+ 2549 0d24 9A000000 		.4byte	.LASF153
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 49
+
+
+ 2550 0d28 09       		.byte	0x9
+ 2551 0d29 24       		.byte	0x24
+ 2552 0d2a 27       		.uleb128 0x27
+ 2553 0d2b 1D000000 		.4byte	.LASF154
+ 2554 0d2f 1D000000 		.4byte	.LASF154
+ 2555 0d33 08       		.byte	0x8
+ 2556 0d34 FD       		.byte	0xfd
+ 2557 0d35 27       		.uleb128 0x27
+ 2558 0d36 B6010000 		.4byte	.LASF155
+ 2559 0d3a B6010000 		.4byte	.LASF155
+ 2560 0d3e 0B       		.byte	0xb
+ 2561 0d3f 09       		.byte	0x9
+ 2562 0d40 29       		.uleb128 0x29
+ 2563 0d41 E7080000 		.4byte	.LASF156
+ 2564 0d45 E7080000 		.4byte	.LASF156
+ 2565 0d49 06       		.byte	0x6
+ 2566 0d4a EC06     		.2byte	0x6ec
+ 2567 0d4c 27       		.uleb128 0x27
+ 2568 0d4d 11070000 		.4byte	.LASF157
+ 2569 0d51 11070000 		.4byte	.LASF157
+ 2570 0d55 0B       		.byte	0xb
+ 2571 0d56 08       		.byte	0x8
+ 2572 0d57 29       		.uleb128 0x29
+ 2573 0d58 09050000 		.4byte	.LASF158
+ 2574 0d5c 09050000 		.4byte	.LASF158
+ 2575 0d60 06       		.byte	0x6
+ 2576 0d61 9305     		.2byte	0x593
+ 2577 0d63 27       		.uleb128 0x27
+ 2578 0d64 FC060000 		.4byte	.LASF159
+ 2579 0d68 FC060000 		.4byte	.LASF159
+ 2580 0d6c 0A       		.byte	0xa
+ 2581 0d6d B3       		.byte	0xb3
+ 2582 0d6e 27       		.uleb128 0x27
+ 2583 0d6f 2F000000 		.4byte	.LASF160
+ 2584 0d73 2F000000 		.4byte	.LASF160
+ 2585 0d77 09       		.byte	0x9
+ 2586 0d78 1C       		.byte	0x1c
+ 2587 0d79 27       		.uleb128 0x27
+ 2588 0d7a EF070000 		.4byte	.LASF161
+ 2589 0d7e EF070000 		.4byte	.LASF161
+ 2590 0d82 0A       		.byte	0xa
+ 2591 0d83 B1       		.byte	0xb1
+ 2592 0d84 29       		.uleb128 0x29
+ 2593 0d85 0F090000 		.4byte	.LASF162
+ 2594 0d89 0F090000 		.4byte	.LASF162
+ 2595 0d8d 06       		.byte	0x6
+ 2596 0d8e B105     		.2byte	0x5b1
+ 2597 0d90 29       		.uleb128 0x29
+ 2598 0d91 87090000 		.4byte	.LASF163
+ 2599 0d95 87090000 		.4byte	.LASF163
+ 2600 0d99 07       		.byte	0x7
+ 2601 0d9a F801     		.2byte	0x1f8
+ 2602 0d9c 29       		.uleb128 0x29
+ 2603 0d9d EC020000 		.4byte	.LASF164
+ 2604 0da1 EC020000 		.4byte	.LASF164
+ 2605 0da5 08       		.byte	0x8
+ 2606 0da6 0501     		.2byte	0x105
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 50
+
+
+ 2607 0da8 29       		.uleb128 0x29
+ 2608 0da9 A9060000 		.4byte	.LASF165
+ 2609 0dad A9060000 		.4byte	.LASF165
+ 2610 0db1 07       		.byte	0x7
+ 2611 0db2 3A01     		.2byte	0x13a
+ 2612 0db4 27       		.uleb128 0x27
+ 2613 0db5 A1070000 		.4byte	.LASF166
+ 2614 0db9 A1070000 		.4byte	.LASF166
+ 2615 0dbd 08       		.byte	0x8
+ 2616 0dbe F7       		.byte	0xf7
+ 2617 0dbf 00       		.byte	0
+ 2618              		.section	.debug_abbrev,"",%progbits
+ 2619              	.Ldebug_abbrev0:
+ 2620 0000 01       		.uleb128 0x1
+ 2621 0001 11       		.uleb128 0x11
+ 2622 0002 01       		.byte	0x1
+ 2623 0003 25       		.uleb128 0x25
+ 2624 0004 0E       		.uleb128 0xe
+ 2625 0005 13       		.uleb128 0x13
+ 2626 0006 0B       		.uleb128 0xb
+ 2627 0007 03       		.uleb128 0x3
+ 2628 0008 0E       		.uleb128 0xe
+ 2629 0009 1B       		.uleb128 0x1b
+ 2630 000a 0E       		.uleb128 0xe
+ 2631 000b 55       		.uleb128 0x55
+ 2632 000c 17       		.uleb128 0x17
+ 2633 000d 11       		.uleb128 0x11
+ 2634 000e 01       		.uleb128 0x1
+ 2635 000f 10       		.uleb128 0x10
+ 2636 0010 17       		.uleb128 0x17
+ 2637 0011 00       		.byte	0
+ 2638 0012 00       		.byte	0
+ 2639 0013 02       		.uleb128 0x2
+ 2640 0014 24       		.uleb128 0x24
+ 2641 0015 00       		.byte	0
+ 2642 0016 0B       		.uleb128 0xb
+ 2643 0017 0B       		.uleb128 0xb
+ 2644 0018 3E       		.uleb128 0x3e
+ 2645 0019 0B       		.uleb128 0xb
+ 2646 001a 03       		.uleb128 0x3
+ 2647 001b 0E       		.uleb128 0xe
+ 2648 001c 00       		.byte	0
+ 2649 001d 00       		.byte	0
+ 2650 001e 03       		.uleb128 0x3
+ 2651 001f 24       		.uleb128 0x24
+ 2652 0020 00       		.byte	0
+ 2653 0021 0B       		.uleb128 0xb
+ 2654 0022 0B       		.uleb128 0xb
+ 2655 0023 3E       		.uleb128 0x3e
+ 2656 0024 0B       		.uleb128 0xb
+ 2657 0025 03       		.uleb128 0x3
+ 2658 0026 08       		.uleb128 0x8
+ 2659 0027 00       		.byte	0
+ 2660 0028 00       		.byte	0
+ 2661 0029 04       		.uleb128 0x4
+ 2662 002a 16       		.uleb128 0x16
+ 2663 002b 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 51
+
+
+ 2664 002c 03       		.uleb128 0x3
+ 2665 002d 0E       		.uleb128 0xe
+ 2666 002e 3A       		.uleb128 0x3a
+ 2667 002f 0B       		.uleb128 0xb
+ 2668 0030 3B       		.uleb128 0x3b
+ 2669 0031 0B       		.uleb128 0xb
+ 2670 0032 49       		.uleb128 0x49
+ 2671 0033 13       		.uleb128 0x13
+ 2672 0034 00       		.byte	0
+ 2673 0035 00       		.byte	0
+ 2674 0036 05       		.uleb128 0x5
+ 2675 0037 0F       		.uleb128 0xf
+ 2676 0038 00       		.byte	0
+ 2677 0039 0B       		.uleb128 0xb
+ 2678 003a 0B       		.uleb128 0xb
+ 2679 003b 00       		.byte	0
+ 2680 003c 00       		.byte	0
+ 2681 003d 06       		.uleb128 0x6
+ 2682 003e 0F       		.uleb128 0xf
+ 2683 003f 00       		.byte	0
+ 2684 0040 0B       		.uleb128 0xb
+ 2685 0041 0B       		.uleb128 0xb
+ 2686 0042 49       		.uleb128 0x49
+ 2687 0043 13       		.uleb128 0x13
+ 2688 0044 00       		.byte	0
+ 2689 0045 00       		.byte	0
+ 2690 0046 07       		.uleb128 0x7
+ 2691 0047 26       		.uleb128 0x26
+ 2692 0048 00       		.byte	0
+ 2693 0049 49       		.uleb128 0x49
+ 2694 004a 13       		.uleb128 0x13
+ 2695 004b 00       		.byte	0
+ 2696 004c 00       		.byte	0
+ 2697 004d 08       		.uleb128 0x8
+ 2698 004e 13       		.uleb128 0x13
+ 2699 004f 00       		.byte	0
+ 2700 0050 03       		.uleb128 0x3
+ 2701 0051 0E       		.uleb128 0xe
+ 2702 0052 3C       		.uleb128 0x3c
+ 2703 0053 19       		.uleb128 0x19
+ 2704 0054 00       		.byte	0
+ 2705 0055 00       		.byte	0
+ 2706 0056 09       		.uleb128 0x9
+ 2707 0057 04       		.uleb128 0x4
+ 2708 0058 01       		.byte	0x1
+ 2709 0059 0B       		.uleb128 0xb
+ 2710 005a 0B       		.uleb128 0xb
+ 2711 005b 49       		.uleb128 0x49
+ 2712 005c 13       		.uleb128 0x13
+ 2713 005d 3A       		.uleb128 0x3a
+ 2714 005e 0B       		.uleb128 0xb
+ 2715 005f 3B       		.uleb128 0x3b
+ 2716 0060 0B       		.uleb128 0xb
+ 2717 0061 01       		.uleb128 0x1
+ 2718 0062 13       		.uleb128 0x13
+ 2719 0063 00       		.byte	0
+ 2720 0064 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 52
+
+
+ 2721 0065 0A       		.uleb128 0xa
+ 2722 0066 28       		.uleb128 0x28
+ 2723 0067 00       		.byte	0
+ 2724 0068 03       		.uleb128 0x3
+ 2725 0069 0E       		.uleb128 0xe
+ 2726 006a 1C       		.uleb128 0x1c
+ 2727 006b 0B       		.uleb128 0xb
+ 2728 006c 00       		.byte	0
+ 2729 006d 00       		.byte	0
+ 2730 006e 0B       		.uleb128 0xb
+ 2731 006f 13       		.uleb128 0x13
+ 2732 0070 01       		.byte	0x1
+ 2733 0071 03       		.uleb128 0x3
+ 2734 0072 0E       		.uleb128 0xe
+ 2735 0073 0B       		.uleb128 0xb
+ 2736 0074 0B       		.uleb128 0xb
+ 2737 0075 3A       		.uleb128 0x3a
+ 2738 0076 0B       		.uleb128 0xb
+ 2739 0077 3B       		.uleb128 0x3b
+ 2740 0078 0B       		.uleb128 0xb
+ 2741 0079 01       		.uleb128 0x1
+ 2742 007a 13       		.uleb128 0x13
+ 2743 007b 00       		.byte	0
+ 2744 007c 00       		.byte	0
+ 2745 007d 0C       		.uleb128 0xc
+ 2746 007e 0D       		.uleb128 0xd
+ 2747 007f 00       		.byte	0
+ 2748 0080 03       		.uleb128 0x3
+ 2749 0081 0E       		.uleb128 0xe
+ 2750 0082 3A       		.uleb128 0x3a
+ 2751 0083 0B       		.uleb128 0xb
+ 2752 0084 3B       		.uleb128 0x3b
+ 2753 0085 0B       		.uleb128 0xb
+ 2754 0086 49       		.uleb128 0x49
+ 2755 0087 13       		.uleb128 0x13
+ 2756 0088 38       		.uleb128 0x38
+ 2757 0089 0B       		.uleb128 0xb
+ 2758 008a 00       		.byte	0
+ 2759 008b 00       		.byte	0
+ 2760 008c 0D       		.uleb128 0xd
+ 2761 008d 04       		.uleb128 0x4
+ 2762 008e 01       		.byte	0x1
+ 2763 008f 03       		.uleb128 0x3
+ 2764 0090 0E       		.uleb128 0xe
+ 2765 0091 0B       		.uleb128 0xb
+ 2766 0092 0B       		.uleb128 0xb
+ 2767 0093 49       		.uleb128 0x49
+ 2768 0094 13       		.uleb128 0x13
+ 2769 0095 3A       		.uleb128 0x3a
+ 2770 0096 0B       		.uleb128 0xb
+ 2771 0097 3B       		.uleb128 0x3b
+ 2772 0098 0B       		.uleb128 0xb
+ 2773 0099 01       		.uleb128 0x1
+ 2774 009a 13       		.uleb128 0x13
+ 2775 009b 00       		.byte	0
+ 2776 009c 00       		.byte	0
+ 2777 009d 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 53
+
+
+ 2778 009e 15       		.uleb128 0x15
+ 2779 009f 01       		.byte	0x1
+ 2780 00a0 27       		.uleb128 0x27
+ 2781 00a1 19       		.uleb128 0x19
+ 2782 00a2 49       		.uleb128 0x49
+ 2783 00a3 13       		.uleb128 0x13
+ 2784 00a4 01       		.uleb128 0x1
+ 2785 00a5 13       		.uleb128 0x13
+ 2786 00a6 00       		.byte	0
+ 2787 00a7 00       		.byte	0
+ 2788 00a8 0F       		.uleb128 0xf
+ 2789 00a9 05       		.uleb128 0x5
+ 2790 00aa 00       		.byte	0
+ 2791 00ab 49       		.uleb128 0x49
+ 2792 00ac 13       		.uleb128 0x13
+ 2793 00ad 00       		.byte	0
+ 2794 00ae 00       		.byte	0
+ 2795 00af 10       		.uleb128 0x10
+ 2796 00b0 18       		.uleb128 0x18
+ 2797 00b1 00       		.byte	0
+ 2798 00b2 00       		.byte	0
+ 2799 00b3 00       		.byte	0
+ 2800 00b4 11       		.uleb128 0x11
+ 2801 00b5 13       		.uleb128 0x13
+ 2802 00b6 01       		.byte	0x1
+ 2803 00b7 0B       		.uleb128 0xb
+ 2804 00b8 0B       		.uleb128 0xb
+ 2805 00b9 3A       		.uleb128 0x3a
+ 2806 00ba 0B       		.uleb128 0xb
+ 2807 00bb 3B       		.uleb128 0x3b
+ 2808 00bc 0B       		.uleb128 0xb
+ 2809 00bd 01       		.uleb128 0x1
+ 2810 00be 13       		.uleb128 0x13
+ 2811 00bf 00       		.byte	0
+ 2812 00c0 00       		.byte	0
+ 2813 00c1 12       		.uleb128 0x12
+ 2814 00c2 01       		.uleb128 0x1
+ 2815 00c3 01       		.byte	0x1
+ 2816 00c4 49       		.uleb128 0x49
+ 2817 00c5 13       		.uleb128 0x13
+ 2818 00c6 01       		.uleb128 0x1
+ 2819 00c7 13       		.uleb128 0x13
+ 2820 00c8 00       		.byte	0
+ 2821 00c9 00       		.byte	0
+ 2822 00ca 13       		.uleb128 0x13
+ 2823 00cb 21       		.uleb128 0x21
+ 2824 00cc 00       		.byte	0
+ 2825 00cd 49       		.uleb128 0x49
+ 2826 00ce 13       		.uleb128 0x13
+ 2827 00cf 2F       		.uleb128 0x2f
+ 2828 00d0 0B       		.uleb128 0xb
+ 2829 00d1 00       		.byte	0
+ 2830 00d2 00       		.byte	0
+ 2831 00d3 14       		.uleb128 0x14
+ 2832 00d4 2E       		.uleb128 0x2e
+ 2833 00d5 01       		.byte	0x1
+ 2834 00d6 3F       		.uleb128 0x3f
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 54
+
+
+ 2835 00d7 19       		.uleb128 0x19
+ 2836 00d8 03       		.uleb128 0x3
+ 2837 00d9 0E       		.uleb128 0xe
+ 2838 00da 3A       		.uleb128 0x3a
+ 2839 00db 0B       		.uleb128 0xb
+ 2840 00dc 3B       		.uleb128 0x3b
+ 2841 00dd 0B       		.uleb128 0xb
+ 2842 00de 27       		.uleb128 0x27
+ 2843 00df 19       		.uleb128 0x19
+ 2844 00e0 49       		.uleb128 0x49
+ 2845 00e1 13       		.uleb128 0x13
+ 2846 00e2 11       		.uleb128 0x11
+ 2847 00e3 01       		.uleb128 0x1
+ 2848 00e4 12       		.uleb128 0x12
+ 2849 00e5 06       		.uleb128 0x6
+ 2850 00e6 40       		.uleb128 0x40
+ 2851 00e7 18       		.uleb128 0x18
+ 2852 00e8 9742     		.uleb128 0x2117
+ 2853 00ea 19       		.uleb128 0x19
+ 2854 00eb 01       		.uleb128 0x1
+ 2855 00ec 13       		.uleb128 0x13
+ 2856 00ed 00       		.byte	0
+ 2857 00ee 00       		.byte	0
+ 2858 00ef 15       		.uleb128 0x15
+ 2859 00f0 05       		.uleb128 0x5
+ 2860 00f1 00       		.byte	0
+ 2861 00f2 03       		.uleb128 0x3
+ 2862 00f3 0E       		.uleb128 0xe
+ 2863 00f4 3A       		.uleb128 0x3a
+ 2864 00f5 0B       		.uleb128 0xb
+ 2865 00f6 3B       		.uleb128 0x3b
+ 2866 00f7 0B       		.uleb128 0xb
+ 2867 00f8 49       		.uleb128 0x49
+ 2868 00f9 13       		.uleb128 0x13
+ 2869 00fa 02       		.uleb128 0x2
+ 2870 00fb 17       		.uleb128 0x17
+ 2871 00fc 00       		.byte	0
+ 2872 00fd 00       		.byte	0
+ 2873 00fe 16       		.uleb128 0x16
+ 2874 00ff 34       		.uleb128 0x34
+ 2875 0100 00       		.byte	0
+ 2876 0101 03       		.uleb128 0x3
+ 2877 0102 0E       		.uleb128 0xe
+ 2878 0103 3A       		.uleb128 0x3a
+ 2879 0104 0B       		.uleb128 0xb
+ 2880 0105 3B       		.uleb128 0x3b
+ 2881 0106 0B       		.uleb128 0xb
+ 2882 0107 49       		.uleb128 0x49
+ 2883 0108 13       		.uleb128 0x13
+ 2884 0109 02       		.uleb128 0x2
+ 2885 010a 17       		.uleb128 0x17
+ 2886 010b 00       		.byte	0
+ 2887 010c 00       		.byte	0
+ 2888 010d 17       		.uleb128 0x17
+ 2889 010e 0B       		.uleb128 0xb
+ 2890 010f 01       		.byte	0x1
+ 2891 0110 11       		.uleb128 0x11
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 55
+
+
+ 2892 0111 01       		.uleb128 0x1
+ 2893 0112 12       		.uleb128 0x12
+ 2894 0113 06       		.uleb128 0x6
+ 2895 0114 01       		.uleb128 0x1
+ 2896 0115 13       		.uleb128 0x13
+ 2897 0116 00       		.byte	0
+ 2898 0117 00       		.byte	0
+ 2899 0118 18       		.uleb128 0x18
+ 2900 0119 34       		.uleb128 0x34
+ 2901 011a 00       		.byte	0
+ 2902 011b 03       		.uleb128 0x3
+ 2903 011c 08       		.uleb128 0x8
+ 2904 011d 3A       		.uleb128 0x3a
+ 2905 011e 0B       		.uleb128 0xb
+ 2906 011f 3B       		.uleb128 0x3b
+ 2907 0120 0B       		.uleb128 0xb
+ 2908 0121 49       		.uleb128 0x49
+ 2909 0122 13       		.uleb128 0x13
+ 2910 0123 02       		.uleb128 0x2
+ 2911 0124 17       		.uleb128 0x17
+ 2912 0125 00       		.byte	0
+ 2913 0126 00       		.byte	0
+ 2914 0127 19       		.uleb128 0x19
+ 2915 0128 898201   		.uleb128 0x4109
+ 2916 012b 00       		.byte	0
+ 2917 012c 11       		.uleb128 0x11
+ 2918 012d 01       		.uleb128 0x1
+ 2919 012e 31       		.uleb128 0x31
+ 2920 012f 13       		.uleb128 0x13
+ 2921 0130 00       		.byte	0
+ 2922 0131 00       		.byte	0
+ 2923 0132 1A       		.uleb128 0x1a
+ 2924 0133 898201   		.uleb128 0x4109
+ 2925 0136 01       		.byte	0x1
+ 2926 0137 11       		.uleb128 0x11
+ 2927 0138 01       		.uleb128 0x1
+ 2928 0139 31       		.uleb128 0x31
+ 2929 013a 13       		.uleb128 0x13
+ 2930 013b 01       		.uleb128 0x1
+ 2931 013c 13       		.uleb128 0x13
+ 2932 013d 00       		.byte	0
+ 2933 013e 00       		.byte	0
+ 2934 013f 1B       		.uleb128 0x1b
+ 2935 0140 8A8201   		.uleb128 0x410a
+ 2936 0143 00       		.byte	0
+ 2937 0144 02       		.uleb128 0x2
+ 2938 0145 18       		.uleb128 0x18
+ 2939 0146 9142     		.uleb128 0x2111
+ 2940 0148 18       		.uleb128 0x18
+ 2941 0149 00       		.byte	0
+ 2942 014a 00       		.byte	0
+ 2943 014b 1C       		.uleb128 0x1c
+ 2944 014c 898201   		.uleb128 0x4109
+ 2945 014f 01       		.byte	0x1
+ 2946 0150 11       		.uleb128 0x11
+ 2947 0151 01       		.uleb128 0x1
+ 2948 0152 31       		.uleb128 0x31
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 56
+
+
+ 2949 0153 13       		.uleb128 0x13
+ 2950 0154 00       		.byte	0
+ 2951 0155 00       		.byte	0
+ 2952 0156 1D       		.uleb128 0x1d
+ 2953 0157 2E       		.uleb128 0x2e
+ 2954 0158 01       		.byte	0x1
+ 2955 0159 3F       		.uleb128 0x3f
+ 2956 015a 19       		.uleb128 0x19
+ 2957 015b 03       		.uleb128 0x3
+ 2958 015c 0E       		.uleb128 0xe
+ 2959 015d 3A       		.uleb128 0x3a
+ 2960 015e 0B       		.uleb128 0xb
+ 2961 015f 3B       		.uleb128 0x3b
+ 2962 0160 0B       		.uleb128 0xb
+ 2963 0161 27       		.uleb128 0x27
+ 2964 0162 19       		.uleb128 0x19
+ 2965 0163 11       		.uleb128 0x11
+ 2966 0164 01       		.uleb128 0x1
+ 2967 0165 12       		.uleb128 0x12
+ 2968 0166 06       		.uleb128 0x6
+ 2969 0167 40       		.uleb128 0x40
+ 2970 0168 18       		.uleb128 0x18
+ 2971 0169 9742     		.uleb128 0x2117
+ 2972 016b 19       		.uleb128 0x19
+ 2973 016c 01       		.uleb128 0x1
+ 2974 016d 13       		.uleb128 0x13
+ 2975 016e 00       		.byte	0
+ 2976 016f 00       		.byte	0
+ 2977 0170 1E       		.uleb128 0x1e
+ 2978 0171 34       		.uleb128 0x34
+ 2979 0172 00       		.byte	0
+ 2980 0173 03       		.uleb128 0x3
+ 2981 0174 08       		.uleb128 0x8
+ 2982 0175 3A       		.uleb128 0x3a
+ 2983 0176 0B       		.uleb128 0xb
+ 2984 0177 3B       		.uleb128 0x3b
+ 2985 0178 0B       		.uleb128 0xb
+ 2986 0179 49       		.uleb128 0x49
+ 2987 017a 13       		.uleb128 0x13
+ 2988 017b 02       		.uleb128 0x2
+ 2989 017c 18       		.uleb128 0x18
+ 2990 017d 00       		.byte	0
+ 2991 017e 00       		.byte	0
+ 2992 017f 1F       		.uleb128 0x1f
+ 2993 0180 34       		.uleb128 0x34
+ 2994 0181 00       		.byte	0
+ 2995 0182 03       		.uleb128 0x3
+ 2996 0183 0E       		.uleb128 0xe
+ 2997 0184 3A       		.uleb128 0x3a
+ 2998 0185 0B       		.uleb128 0xb
+ 2999 0186 3B       		.uleb128 0x3b
+ 3000 0187 0B       		.uleb128 0xb
+ 3001 0188 49       		.uleb128 0x49
+ 3002 0189 13       		.uleb128 0x13
+ 3003 018a 02       		.uleb128 0x2
+ 3004 018b 18       		.uleb128 0x18
+ 3005 018c 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 57
+
+
+ 3006 018d 00       		.byte	0
+ 3007 018e 20       		.uleb128 0x20
+ 3008 018f 0B       		.uleb128 0xb
+ 3009 0190 01       		.byte	0x1
+ 3010 0191 55       		.uleb128 0x55
+ 3011 0192 17       		.uleb128 0x17
+ 3012 0193 01       		.uleb128 0x1
+ 3013 0194 13       		.uleb128 0x13
+ 3014 0195 00       		.byte	0
+ 3015 0196 00       		.byte	0
+ 3016 0197 21       		.uleb128 0x21
+ 3017 0198 898201   		.uleb128 0x4109
+ 3018 019b 01       		.byte	0x1
+ 3019 019c 11       		.uleb128 0x11
+ 3020 019d 01       		.uleb128 0x1
+ 3021 019e 9342     		.uleb128 0x2113
+ 3022 01a0 18       		.uleb128 0x18
+ 3023 01a1 00       		.byte	0
+ 3024 01a2 00       		.byte	0
+ 3025 01a3 22       		.uleb128 0x22
+ 3026 01a4 898201   		.uleb128 0x4109
+ 3027 01a7 01       		.byte	0x1
+ 3028 01a8 11       		.uleb128 0x11
+ 3029 01a9 01       		.uleb128 0x1
+ 3030 01aa 9342     		.uleb128 0x2113
+ 3031 01ac 18       		.uleb128 0x18
+ 3032 01ad 01       		.uleb128 0x1
+ 3033 01ae 13       		.uleb128 0x13
+ 3034 01af 00       		.byte	0
+ 3035 01b0 00       		.byte	0
+ 3036 01b1 23       		.uleb128 0x23
+ 3037 01b2 898201   		.uleb128 0x4109
+ 3038 01b5 01       		.byte	0x1
+ 3039 01b6 11       		.uleb128 0x11
+ 3040 01b7 01       		.uleb128 0x1
+ 3041 01b8 01       		.uleb128 0x1
+ 3042 01b9 13       		.uleb128 0x13
+ 3043 01ba 00       		.byte	0
+ 3044 01bb 00       		.byte	0
+ 3045 01bc 24       		.uleb128 0x24
+ 3046 01bd 05       		.uleb128 0x5
+ 3047 01be 00       		.byte	0
+ 3048 01bf 03       		.uleb128 0x3
+ 3049 01c0 08       		.uleb128 0x8
+ 3050 01c1 3A       		.uleb128 0x3a
+ 3051 01c2 0B       		.uleb128 0xb
+ 3052 01c3 3B       		.uleb128 0x3b
+ 3053 01c4 0B       		.uleb128 0xb
+ 3054 01c5 49       		.uleb128 0x49
+ 3055 01c6 13       		.uleb128 0x13
+ 3056 01c7 02       		.uleb128 0x2
+ 3057 01c8 17       		.uleb128 0x17
+ 3058 01c9 00       		.byte	0
+ 3059 01ca 00       		.byte	0
+ 3060 01cb 25       		.uleb128 0x25
+ 3061 01cc 34       		.uleb128 0x34
+ 3062 01cd 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 58
+
+
+ 3063 01ce 03       		.uleb128 0x3
+ 3064 01cf 0E       		.uleb128 0xe
+ 3065 01d0 3A       		.uleb128 0x3a
+ 3066 01d1 0B       		.uleb128 0xb
+ 3067 01d2 3B       		.uleb128 0x3b
+ 3068 01d3 05       		.uleb128 0x5
+ 3069 01d4 49       		.uleb128 0x49
+ 3070 01d5 13       		.uleb128 0x13
+ 3071 01d6 3F       		.uleb128 0x3f
+ 3072 01d7 19       		.uleb128 0x19
+ 3073 01d8 3C       		.uleb128 0x3c
+ 3074 01d9 19       		.uleb128 0x19
+ 3075 01da 00       		.byte	0
+ 3076 01db 00       		.byte	0
+ 3077 01dc 26       		.uleb128 0x26
+ 3078 01dd 35       		.uleb128 0x35
+ 3079 01de 00       		.byte	0
+ 3080 01df 49       		.uleb128 0x49
+ 3081 01e0 13       		.uleb128 0x13
+ 3082 01e1 00       		.byte	0
+ 3083 01e2 00       		.byte	0
+ 3084 01e3 27       		.uleb128 0x27
+ 3085 01e4 2E       		.uleb128 0x2e
+ 3086 01e5 00       		.byte	0
+ 3087 01e6 3F       		.uleb128 0x3f
+ 3088 01e7 19       		.uleb128 0x19
+ 3089 01e8 3C       		.uleb128 0x3c
+ 3090 01e9 19       		.uleb128 0x19
+ 3091 01ea 6E       		.uleb128 0x6e
+ 3092 01eb 0E       		.uleb128 0xe
+ 3093 01ec 03       		.uleb128 0x3
+ 3094 01ed 0E       		.uleb128 0xe
+ 3095 01ee 3A       		.uleb128 0x3a
+ 3096 01ef 0B       		.uleb128 0xb
+ 3097 01f0 3B       		.uleb128 0x3b
+ 3098 01f1 0B       		.uleb128 0xb
+ 3099 01f2 00       		.byte	0
+ 3100 01f3 00       		.byte	0
+ 3101 01f4 28       		.uleb128 0x28
+ 3102 01f5 2E       		.uleb128 0x2e
+ 3103 01f6 00       		.byte	0
+ 3104 01f7 3F       		.uleb128 0x3f
+ 3105 01f8 19       		.uleb128 0x19
+ 3106 01f9 3C       		.uleb128 0x3c
+ 3107 01fa 19       		.uleb128 0x19
+ 3108 01fb 6E       		.uleb128 0x6e
+ 3109 01fc 0E       		.uleb128 0xe
+ 3110 01fd 03       		.uleb128 0x3
+ 3111 01fe 0E       		.uleb128 0xe
+ 3112 01ff 00       		.byte	0
+ 3113 0200 00       		.byte	0
+ 3114 0201 29       		.uleb128 0x29
+ 3115 0202 2E       		.uleb128 0x2e
+ 3116 0203 00       		.byte	0
+ 3117 0204 3F       		.uleb128 0x3f
+ 3118 0205 19       		.uleb128 0x19
+ 3119 0206 3C       		.uleb128 0x3c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 59
+
+
+ 3120 0207 19       		.uleb128 0x19
+ 3121 0208 6E       		.uleb128 0x6e
+ 3122 0209 0E       		.uleb128 0xe
+ 3123 020a 03       		.uleb128 0x3
+ 3124 020b 0E       		.uleb128 0xe
+ 3125 020c 3A       		.uleb128 0x3a
+ 3126 020d 0B       		.uleb128 0xb
+ 3127 020e 3B       		.uleb128 0x3b
+ 3128 020f 05       		.uleb128 0x5
+ 3129 0210 00       		.byte	0
+ 3130 0211 00       		.byte	0
+ 3131 0212 00       		.byte	0
+ 3132              		.section	.debug_loc,"",%progbits
+ 3133              	.Ldebug_loc0:
+ 3134              	.LLST0:
+ 3135 0000 00000000 		.4byte	.LVL0
+ 3136 0004 14000000 		.4byte	.LVL2
+ 3137 0008 0100     		.2byte	0x1
+ 3138 000a 50       		.byte	0x50
+ 3139 000b 14000000 		.4byte	.LVL2
+ 3140 000f 68000000 		.4byte	.LVL12
+ 3141 0013 0100     		.2byte	0x1
+ 3142 0015 56       		.byte	0x56
+ 3143 0016 68000000 		.4byte	.LVL12
+ 3144 001a 6A000000 		.4byte	.LVL13
+ 3145 001e 0100     		.2byte	0x1
+ 3146 0020 50       		.byte	0x50
+ 3147 0021 6A000000 		.4byte	.LVL13
+ 3148 0025 B4000000 		.4byte	.LVL23
+ 3149 0029 0100     		.2byte	0x1
+ 3150 002b 56       		.byte	0x56
+ 3151 002c B4000000 		.4byte	.LVL23
+ 3152 0030 C0000000 		.4byte	.LFE69
+ 3153 0034 0400     		.2byte	0x4
+ 3154 0036 F3       		.byte	0xf3
+ 3155 0037 01       		.uleb128 0x1
+ 3156 0038 50       		.byte	0x50
+ 3157 0039 9F       		.byte	0x9f
+ 3158 003a 00000000 		.4byte	0
+ 3159 003e 00000000 		.4byte	0
+ 3160              	.LLST1:
+ 3161 0042 00000000 		.4byte	.LVL0
+ 3162 0046 06000000 		.4byte	.LVL1
+ 3163 004a 0100     		.2byte	0x1
+ 3164 004c 51       		.byte	0x51
+ 3165 004d 06000000 		.4byte	.LVL1
+ 3166 0051 17000000 		.4byte	.LVL3-1
+ 3167 0055 0100     		.2byte	0x1
+ 3168 0057 51       		.byte	0x51
+ 3169 0058 68000000 		.4byte	.LVL12
+ 3170 005c 6A000000 		.4byte	.LVL13
+ 3171 0060 0100     		.2byte	0x1
+ 3172 0062 51       		.byte	0x51
+ 3173 0063 00000000 		.4byte	0
+ 3174 0067 00000000 		.4byte	0
+ 3175              	.LLST2:
+ 3176 006b 00000000 		.4byte	.LVL0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 60
+
+
+ 3177 006f 17000000 		.4byte	.LVL3-1
+ 3178 0073 0100     		.2byte	0x1
+ 3179 0075 52       		.byte	0x52
+ 3180 0076 17000000 		.4byte	.LVL3-1
+ 3181 007a 68000000 		.4byte	.LVL12
+ 3182 007e 0100     		.2byte	0x1
+ 3183 0080 59       		.byte	0x59
+ 3184 0081 68000000 		.4byte	.LVL12
+ 3185 0085 6A000000 		.4byte	.LVL13
+ 3186 0089 0100     		.2byte	0x1
+ 3187 008b 52       		.byte	0x52
+ 3188 008c 6A000000 		.4byte	.LVL13
+ 3189 0090 B4000000 		.4byte	.LVL23
+ 3190 0094 0100     		.2byte	0x1
+ 3191 0096 59       		.byte	0x59
+ 3192 0097 B4000000 		.4byte	.LVL23
+ 3193 009b C0000000 		.4byte	.LFE69
+ 3194 009f 0400     		.2byte	0x4
+ 3195 00a1 F3       		.byte	0xf3
+ 3196 00a2 01       		.uleb128 0x1
+ 3197 00a3 52       		.byte	0x52
+ 3198 00a4 9F       		.byte	0x9f
+ 3199 00a5 00000000 		.4byte	0
+ 3200 00a9 00000000 		.4byte	0
+ 3201              	.LLST3:
+ 3202 00ad 00000000 		.4byte	.LVL0
+ 3203 00b1 2E000000 		.4byte	.LVL7
+ 3204 00b5 0200     		.2byte	0x2
+ 3205 00b7 30       		.byte	0x30
+ 3206 00b8 9F       		.byte	0x9f
+ 3207 00b9 2E000000 		.4byte	.LVL7
+ 3208 00bd 64000000 		.4byte	.LVL11
+ 3209 00c1 0100     		.2byte	0x1
+ 3210 00c3 54       		.byte	0x54
+ 3211 00c4 64000000 		.4byte	.LVL11
+ 3212 00c8 68000000 		.4byte	.LVL12
+ 3213 00cc 0100     		.2byte	0x1
+ 3214 00ce 5B       		.byte	0x5b
+ 3215 00cf 68000000 		.4byte	.LVL12
+ 3216 00d3 6A000000 		.4byte	.LVL13
+ 3217 00d7 0200     		.2byte	0x2
+ 3218 00d9 30       		.byte	0x30
+ 3219 00da 9F       		.byte	0x9f
+ 3220 00db 00000000 		.4byte	0
+ 3221 00df 00000000 		.4byte	0
+ 3222              	.LLST4:
+ 3223 00e3 00000000 		.4byte	.LVL0
+ 3224 00e7 A4000000 		.4byte	.LVL20
+ 3225 00eb 0300     		.2byte	0x3
+ 3226 00ed 09       		.byte	0x9
+ 3227 00ee FF       		.byte	0xff
+ 3228 00ef 9F       		.byte	0x9f
+ 3229 00f0 A4000000 		.4byte	.LVL20
+ 3230 00f4 AE000000 		.4byte	.LVL22
+ 3231 00f8 0300     		.2byte	0x3
+ 3232 00fa 09       		.byte	0x9
+ 3233 00fb FE       		.byte	0xfe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 61
+
+
+ 3234 00fc 9F       		.byte	0x9f
+ 3235 00fd 00000000 		.4byte	0
+ 3236 0101 00000000 		.4byte	0
+ 3237              	.LLST5:
+ 3238 0105 00000000 		.4byte	.LVL0
+ 3239 0109 1A000000 		.4byte	.LVL4
+ 3240 010d 0200     		.2byte	0x2
+ 3241 010f 30       		.byte	0x30
+ 3242 0110 9F       		.byte	0x9f
+ 3243 0111 1A000000 		.4byte	.LVL4
+ 3244 0115 1C000000 		.4byte	.LVL5
+ 3245 0119 0100     		.2byte	0x1
+ 3246 011b 50       		.byte	0x50
+ 3247 011c 1C000000 		.4byte	.LVL5
+ 3248 0120 68000000 		.4byte	.LVL12
+ 3249 0124 0100     		.2byte	0x1
+ 3250 0126 57       		.byte	0x57
+ 3251 0127 68000000 		.4byte	.LVL12
+ 3252 012b 6A000000 		.4byte	.LVL13
+ 3253 012f 0200     		.2byte	0x2
+ 3254 0131 30       		.byte	0x30
+ 3255 0132 9F       		.byte	0x9f
+ 3256 0133 6A000000 		.4byte	.LVL13
+ 3257 0137 B4000000 		.4byte	.LVL23
+ 3258 013b 0100     		.2byte	0x1
+ 3259 013d 57       		.byte	0x57
+ 3260 013e 00000000 		.4byte	0
+ 3261 0142 00000000 		.4byte	0
+ 3262              	.LLST6:
+ 3263 0146 72000000 		.4byte	.LVL15
+ 3264 014a 82000000 		.4byte	.LVL16
+ 3265 014e 0100     		.2byte	0x1
+ 3266 0150 50       		.byte	0x50
+ 3267 0151 82000000 		.4byte	.LVL16
+ 3268 0155 B4000000 		.4byte	.LVL23
+ 3269 0159 0100     		.2byte	0x1
+ 3270 015b 54       		.byte	0x54
+ 3271 015c 00000000 		.4byte	0
+ 3272 0160 00000000 		.4byte	0
+ 3273              	.LLST7:
+ 3274 0164 40000000 		.4byte	.LVL8
+ 3275 0168 46000000 		.4byte	.LVL9
+ 3276 016c 0300     		.2byte	0x3
+ 3277 016e 70       		.byte	0x70
+ 3278 016f 01       		.sleb128 1
+ 3279 0170 9F       		.byte	0x9f
+ 3280 0171 00000000 		.4byte	0
+ 3281 0175 00000000 		.4byte	0
+ 3282              	.LLST8:
+ 3283 0179 00000000 		.4byte	.LVL24
+ 3284 017d 0E000000 		.4byte	.LVL26
+ 3285 0181 0100     		.2byte	0x1
+ 3286 0183 50       		.byte	0x50
+ 3287 0184 0E000000 		.4byte	.LVL26
+ 3288 0188 16020000 		.4byte	.LVL73
+ 3289 018c 0100     		.2byte	0x1
+ 3290 018e 54       		.byte	0x54
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 62
+
+
+ 3291 018f 16020000 		.4byte	.LVL73
+ 3292 0193 38020000 		.4byte	.LFE70
+ 3293 0197 0400     		.2byte	0x4
+ 3294 0199 F3       		.byte	0xf3
+ 3295 019a 01       		.uleb128 0x1
+ 3296 019b 50       		.byte	0x50
+ 3297 019c 9F       		.byte	0x9f
+ 3298 019d 00000000 		.4byte	0
+ 3299 01a1 00000000 		.4byte	0
+ 3300              	.LLST9:
+ 3301 01a5 06000000 		.4byte	.LVL25
+ 3302 01a9 0E000000 		.4byte	.LVL26
+ 3303 01ad 0100     		.2byte	0x1
+ 3304 01af 50       		.byte	0x50
+ 3305 01b0 0E000000 		.4byte	.LVL26
+ 3306 01b4 16020000 		.4byte	.LVL73
+ 3307 01b8 0100     		.2byte	0x1
+ 3308 01ba 54       		.byte	0x54
+ 3309 01bb 16020000 		.4byte	.LVL73
+ 3310 01bf 38020000 		.4byte	.LFE70
+ 3311 01c3 0400     		.2byte	0x4
+ 3312 01c5 F3       		.byte	0xf3
+ 3313 01c6 01       		.uleb128 0x1
+ 3314 01c7 50       		.byte	0x50
+ 3315 01c8 9F       		.byte	0x9f
+ 3316 01c9 00000000 		.4byte	0
+ 3317 01cd 00000000 		.4byte	0
+ 3318              	.LLST10:
+ 3319 01d1 1C000000 		.4byte	.LVL30
+ 3320 01d5 2B000000 		.4byte	.LVL31-1
+ 3321 01d9 0100     		.2byte	0x1
+ 3322 01db 50       		.byte	0x50
+ 3323 01dc 2B000000 		.4byte	.LVL31-1
+ 3324 01e0 E6010000 		.4byte	.LVL68
+ 3325 01e4 0300     		.2byte	0x3
+ 3326 01e6 91       		.byte	0x91
+ 3327 01e7 B47F     		.sleb128 -76
+ 3328 01e9 E6010000 		.4byte	.LVL68
+ 3329 01ed EC010000 		.4byte	.LVL69
+ 3330 01f1 0100     		.2byte	0x1
+ 3331 01f3 50       		.byte	0x50
+ 3332 01f4 EC010000 		.4byte	.LVL69
+ 3333 01f8 16020000 		.4byte	.LVL73
+ 3334 01fc 0300     		.2byte	0x3
+ 3335 01fe 91       		.byte	0x91
+ 3336 01ff B47F     		.sleb128 -76
+ 3337 0201 16020000 		.4byte	.LVL73
+ 3338 0205 38020000 		.4byte	.LFE70
+ 3339 0209 0300     		.2byte	0x3
+ 3340 020b 7D       		.byte	0x7d
+ 3341 020c B47F     		.sleb128 -76
+ 3342 020e 00000000 		.4byte	0
+ 3343 0212 00000000 		.4byte	0
+ 3344              	.LLST11:
+ 3345 0216 14000000 		.4byte	.LVL28
+ 3346 021a 16000000 		.4byte	.LVL29
+ 3347 021e 0100     		.2byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 63
+
+
+ 3348 0220 50       		.byte	0x50
+ 3349 0221 16000000 		.4byte	.LVL29
+ 3350 0225 2E000000 		.4byte	.LVL32
+ 3351 0229 0100     		.2byte	0x1
+ 3352 022b 55       		.byte	0x55
+ 3353 022c 2E000000 		.4byte	.LVL32
+ 3354 0230 34000000 		.4byte	.LVL33
+ 3355 0234 0100     		.2byte	0x1
+ 3356 0236 50       		.byte	0x50
+ 3357 0237 34000000 		.4byte	.LVL33
+ 3358 023b E6010000 		.4byte	.LVL68
+ 3359 023f 0100     		.2byte	0x1
+ 3360 0241 57       		.byte	0x57
+ 3361 0242 E6010000 		.4byte	.LVL68
+ 3362 0246 EE010000 		.4byte	.LVL70
+ 3363 024a 0100     		.2byte	0x1
+ 3364 024c 55       		.byte	0x55
+ 3365 024d 00000000 		.4byte	0
+ 3366 0251 00000000 		.4byte	0
+ 3367              	.LLST12:
+ 3368 0255 46000000 		.4byte	.LVL36
+ 3369 0259 4A000000 		.4byte	.LVL37
+ 3370 025d 0100     		.2byte	0x1
+ 3371 025f 50       		.byte	0x50
+ 3372 0260 4A000000 		.4byte	.LVL37
+ 3373 0264 9C000000 		.4byte	.LVL46
+ 3374 0268 0100     		.2byte	0x1
+ 3375 026a 58       		.byte	0x58
+ 3376 026b 00000000 		.4byte	0
+ 3377 026f 00000000 		.4byte	0
+ 3378              	.LLST13:
+ 3379 0273 92000000 		.4byte	.LVL44
+ 3380 0277 96000000 		.4byte	.LVL45
+ 3381 027b 0100     		.2byte	0x1
+ 3382 027d 50       		.byte	0x50
+ 3383 027e 96000000 		.4byte	.LVL45
+ 3384 0282 DA000000 		.4byte	.LVL50
+ 3385 0286 0100     		.2byte	0x1
+ 3386 0288 59       		.byte	0x59
+ 3387 0289 00000000 		.4byte	0
+ 3388 028d 00000000 		.4byte	0
+ 3389              	.LLST14:
+ 3390 0291 24010000 		.4byte	.LVL56
+ 3391 0295 2E010000 		.4byte	.LVL57
+ 3392 0299 0200     		.2byte	0x2
+ 3393 029b 30       		.byte	0x30
+ 3394 029c 9F       		.byte	0x9f
+ 3395 029d 2E010000 		.4byte	.LVL57
+ 3396 02a1 E6010000 		.4byte	.LVL68
+ 3397 02a5 0100     		.2byte	0x1
+ 3398 02a7 58       		.byte	0x58
+ 3399 02a8 00000000 		.4byte	0
+ 3400 02ac 00000000 		.4byte	0
+ 3401              	.LLST15:
+ 3402 02b0 56010000 		.4byte	.LVL60
+ 3403 02b4 74010000 		.4byte	.LVL61
+ 3404 02b8 0200     		.2byte	0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 64
+
+
+ 3405 02ba 30       		.byte	0x30
+ 3406 02bb 9F       		.byte	0x9f
+ 3407 02bc 74010000 		.4byte	.LVL61
+ 3408 02c0 D6010000 		.4byte	.LVL65
+ 3409 02c4 0100     		.2byte	0x1
+ 3410 02c6 5A       		.byte	0x5a
+ 3411 02c7 00000000 		.4byte	0
+ 3412 02cb 00000000 		.4byte	0
+ 3413              	.LLST16:
+ 3414 02cf 00000000 		.4byte	.LVL74
+ 3415 02d3 0A000000 		.4byte	.LVL75
+ 3416 02d7 0100     		.2byte	0x1
+ 3417 02d9 50       		.byte	0x50
+ 3418 02da 0A000000 		.4byte	.LVL75
+ 3419 02de 32000000 		.4byte	.LFE71
+ 3420 02e2 0400     		.2byte	0x4
+ 3421 02e4 F3       		.byte	0xf3
+ 3422 02e5 01       		.uleb128 0x1
+ 3423 02e6 50       		.byte	0x50
+ 3424 02e7 9F       		.byte	0x9f
+ 3425 02e8 00000000 		.4byte	0
+ 3426 02ec 00000000 		.4byte	0
+ 3427              	.LLST17:
+ 3428 02f0 00000000 		.4byte	.LVL74
+ 3429 02f4 1A000000 		.4byte	.LVL76
+ 3430 02f8 0100     		.2byte	0x1
+ 3431 02fa 51       		.byte	0x51
+ 3432 02fb 1A000000 		.4byte	.LVL76
+ 3433 02ff 1E000000 		.4byte	.LVL77
+ 3434 0303 0200     		.2byte	0x2
+ 3435 0305 91       		.byte	0x91
+ 3436 0306 76       		.sleb128 -10
+ 3437 0307 1E000000 		.4byte	.LVL77
+ 3438 030b 2A000000 		.4byte	.LVL79
+ 3439 030f 0400     		.2byte	0x4
+ 3440 0311 F3       		.byte	0xf3
+ 3441 0312 01       		.uleb128 0x1
+ 3442 0313 51       		.byte	0x51
+ 3443 0314 9F       		.byte	0x9f
+ 3444 0315 2A000000 		.4byte	.LVL79
+ 3445 0319 2C000000 		.4byte	.LVL80
+ 3446 031d 0100     		.2byte	0x1
+ 3447 031f 51       		.byte	0x51
+ 3448 0320 2C000000 		.4byte	.LVL80
+ 3449 0324 32000000 		.4byte	.LFE71
+ 3450 0328 0400     		.2byte	0x4
+ 3451 032a F3       		.byte	0xf3
+ 3452 032b 01       		.uleb128 0x1
+ 3453 032c 51       		.byte	0x51
+ 3454 032d 9F       		.byte	0x9f
+ 3455 032e 00000000 		.4byte	0
+ 3456 0332 00000000 		.4byte	0
+ 3457              	.LLST18:
+ 3458 0336 00000000 		.4byte	.LVL81
+ 3459 033a 0C000000 		.4byte	.LVL82
+ 3460 033e 0100     		.2byte	0x1
+ 3461 0340 50       		.byte	0x50
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 65
+
+
+ 3462 0341 0C000000 		.4byte	.LVL82
+ 3463 0345 0F000000 		.4byte	.LVL83-1
+ 3464 0349 0200     		.2byte	0x2
+ 3465 034b 7D       		.byte	0x7d
+ 3466 034c 00       		.sleb128 0
+ 3467 034d 0F000000 		.4byte	.LVL83-1
+ 3468 0351 24000000 		.4byte	.LFE68
+ 3469 0355 0400     		.2byte	0x4
+ 3470 0357 F3       		.byte	0xf3
+ 3471 0358 01       		.uleb128 0x1
+ 3472 0359 50       		.byte	0x50
+ 3473 035a 9F       		.byte	0x9f
+ 3474 035b 00000000 		.4byte	0
+ 3475 035f 00000000 		.4byte	0
+ 3476              		.section	.debug_aranges,"",%progbits
+ 3477 0000 34000000 		.4byte	0x34
+ 3478 0004 0200     		.2byte	0x2
+ 3479 0006 00000000 		.4byte	.Ldebug_info0
+ 3480 000a 04       		.byte	0x4
+ 3481 000b 00       		.byte	0
+ 3482 000c 0000     		.2byte	0
+ 3483 000e 0000     		.2byte	0
+ 3484 0010 00000000 		.4byte	.LFB69
+ 3485 0014 C0000000 		.4byte	.LFE69-.LFB69
+ 3486 0018 00000000 		.4byte	.LFB70
+ 3487 001c 38020000 		.4byte	.LFE70-.LFB70
+ 3488 0020 00000000 		.4byte	.LFB71
+ 3489 0024 32000000 		.4byte	.LFE71-.LFB71
+ 3490 0028 00000000 		.4byte	.LFB68
+ 3491 002c 24000000 		.4byte	.LFE68-.LFB68
+ 3492 0030 00000000 		.4byte	0
+ 3493 0034 00000000 		.4byte	0
+ 3494              		.section	.debug_ranges,"",%progbits
+ 3495              	.Ldebug_ranges0:
+ 3496 0000 2A010000 		.4byte	.LBB5
+ 3497 0004 2E010000 		.4byte	.LBE5
+ 3498 0008 4C010000 		.4byte	.LBB6
+ 3499 000c D6010000 		.4byte	.LBE6
+ 3500 0010 00000000 		.4byte	0
+ 3501 0014 00000000 		.4byte	0
+ 3502 0018 00000000 		.4byte	.LFB69
+ 3503 001c C0000000 		.4byte	.LFE69
+ 3504 0020 00000000 		.4byte	.LFB70
+ 3505 0024 38020000 		.4byte	.LFE70
+ 3506 0028 00000000 		.4byte	.LFB71
+ 3507 002c 32000000 		.4byte	.LFE71
+ 3508 0030 00000000 		.4byte	.LFB68
+ 3509 0034 24000000 		.4byte	.LFE68
+ 3510 0038 00000000 		.4byte	0
+ 3511 003c 00000000 		.4byte	0
+ 3512              		.section	.debug_line,"",%progbits
+ 3513              	.Ldebug_line0:
+ 3514 0000 A5030000 		.section	.debug_str,"MS",%progbits,1
+ 3514      0200E202 
+ 3514      00000201 
+ 3514      FB0E0D00 
+ 3514      01010101 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 66
+
+
+ 3515              	.LASF60:
+ 3516 0000 5F565431 		.ascii	"_VT100_ERASE_LINE\000"
+ 3516      30305F45 
+ 3516      52415345 
+ 3516      5F4C494E 
+ 3516      4500
+ 3517              	.LASF30:
+ 3518 0012 65537573 		.ascii	"eSuspended\000"
+ 3518      70656E64 
+ 3518      656400
+ 3519              	.LASF154:
+ 3520 001d 5445524D 		.ascii	"TERM_getVT100Code\000"
+ 3520      5F676574 
+ 3520      56543130 
+ 3520      30436F64 
+ 3520      6500
+ 3521              	.LASF160:
+ 3522 002f 73747263 		.ascii	"strcmp\000"
+ 3522      6D7000
+ 3523              	.LASF170:
+ 3524 0036 5441534B 		.ascii	"TASK_main\000"
+ 3524      5F6D6169 
+ 3524      6E00
+ 3525              	.LASF2:
+ 3526 0040 73697A65 		.ascii	"size_t\000"
+ 3526      5F7400
+ 3527              	.LASF59:
+ 3528 0047 5F565431 		.ascii	"_VT100_ERASE_SCREEN\000"
+ 3528      30305F45 
+ 3528      52415345 
+ 3528      5F534352 
+ 3528      45454E00 
+ 3529              	.LASF146:
+ 3530 005b 52454749 		.ascii	"REGISTER_top\000"
+ 3530      53544552 
+ 3530      5F746F70 
+ 3530      00
+ 3531              	.LASF58:
+ 3532 0068 5F565431 		.ascii	"_VT100_HIDDEN\000"
+ 3532      30305F48 
+ 3532      49444445 
+ 3532      4E00
+ 3533              	.LASF3:
+ 3534 0076 5F5F7569 		.ascii	"__uint8_t\000"
+ 3534      6E74385F 
+ 3534      7400
+ 3535              	.LASF109:
+ 3536 0080 5F5F5465 		.ascii	"__TermCommandDescriptor__\000"
+ 3536      726D436F 
+ 3536      6D6D616E 
+ 3536      64446573 
+ 3536      63726970 
+ 3537              	.LASF153:
+ 3538 009a 7374726E 		.ascii	"strncpy\000"
+ 3538      63707900 
+ 3539              	.LASF107:
+ 3540 00a2 6572726F 		.ascii	"errorPrinter\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 67
+
+
+ 3540      72507269 
+ 3540      6E746572 
+ 3540      00
+ 3541              	.LASF169:
+ 3542 00af 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 3542      73657273 
+ 3542      5C636865 
+ 3542      6D695C55 
+ 3542      44335F51 
+ 3543              	.LASF13:
+ 3544 00d4 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 3544      206C6F6E 
+ 3544      6720756E 
+ 3544      7369676E 
+ 3544      65642069 
+ 3545              	.LASF38:
+ 3546 00eb 75784375 		.ascii	"uxCurrentPriority\000"
+ 3546      7272656E 
+ 3546      74507269 
+ 3546      6F726974 
+ 3546      7900
+ 3547              	.LASF98:
+ 3548 00fd 7072696E 		.ascii	"print\000"
+ 3548      7400
+ 3549              	.LASF88:
+ 3550 0103 5F5F5445 		.ascii	"__TERMINAL_HANDLE__\000"
+ 3550      524D494E 
+ 3550      414C5F48 
+ 3550      414E444C 
+ 3550      455F5F00 
+ 3551              	.LASF85:
+ 3552 0117 5F565431 		.ascii	"_VT100_WHITE\000"
+ 3552      30305F57 
+ 3552      48495445 
+ 3552      00
+ 3553              	.LASF171:
+ 3554 0124 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 3554      52784275 
+ 3554      66666572 
+ 3554      00
+ 3555              	.LASF93:
+ 3556 0131 63757272 		.ascii	"currAutocompleteCount\000"
+ 3556      4175746F 
+ 3556      636F6D70 
+ 3556      6C657465 
+ 3556      436F756E 
+ 3557              	.LASF69:
+ 3558 0147 5F565431 		.ascii	"_VT100_CURSOR_UP_BY\000"
+ 3558      30305F43 
+ 3558      5552534F 
+ 3558      525F5550 
+ 3558      5F425900 
+ 3559              	.LASF40:
+ 3560 015b 756C5275 		.ascii	"ulRunTimeCounter\000"
+ 3560      6E54696D 
+ 3560      65436F75 
+ 3560      6E746572 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 68
+
+
+ 3560      00
+ 3561              	.LASF152:
+ 3562 016c 5445524D 		.ascii	"TERM_attachProgramm\000"
+ 3562      5F617474 
+ 3562      61636850 
+ 3562      726F6772 
+ 3562      616D6D00 
+ 3563              	.LASF75:
+ 3564 0180 5F565431 		.ascii	"_VT100_CLS\000"
+ 3564      30305F43 
+ 3564      4C5300
+ 3565              	.LASF1:
+ 3566 018b 7369676E 		.ascii	"signed char\000"
+ 3566      65642063 
+ 3566      68617200 
+ 3567              	.LASF71:
+ 3568 0197 5F565431 		.ascii	"_VT100_CURSOR_RESTORE_POSITION\000"
+ 3568      30305F43 
+ 3568      5552534F 
+ 3568      525F5245 
+ 3568      53544F52 
+ 3569              	.LASF155:
+ 3570 01b6 5359535F 		.ascii	"SYS_getTaskStateString\000"
+ 3570      67657454 
+ 3570      61736B53 
+ 3570      74617465 
+ 3570      53747269 
+ 3571              	.LASF94:
+ 3572 01cd 63757272 		.ascii	"currProgram\000"
+ 3572      50726F67 
+ 3572      72616D00 
+ 3573              	.LASF110:
+ 3574 01d9 66756E63 		.ascii	"function\000"
+ 3574      74696F6E 
+ 3574      00
+ 3575              	.LASF67:
+ 3576 01e2 5F565431 		.ascii	"_VT100_CURSOR_FORWARD_BY\000"
+ 3576      30305F43 
+ 3576      5552534F 
+ 3576      525F464F 
+ 3576      52574152 
+ 3577              	.LASF66:
+ 3578 01fb 5F565431 		.ascii	"_VT100_CURSOR_BACK_BY\000"
+ 3578      30305F43 
+ 3578      5552534F 
+ 3578      525F4241 
+ 3578      434B5F42 
+ 3579              	.LASF9:
+ 3580 0211 6C6F6E67 		.ascii	"long int\000"
+ 3580      20696E74 
+ 3580      00
+ 3581              	.LASF46:
+ 3582 021a 74736B54 		.ascii	"tskTaskControlBlock\000"
+ 3582      61736B43 
+ 3582      6F6E7472 
+ 3582      6F6C426C 
+ 3582      6F636B00 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 69
+
+
+ 3583              	.LASF52:
+ 3584 022e 5F565431 		.ascii	"_VT100_RESET_ATTRIB\000"
+ 3584      30305F52 
+ 3584      45534554 
+ 3584      5F415454 
+ 3584      52494200 
+ 3585              	.LASF37:
+ 3586 0242 65437572 		.ascii	"eCurrentState\000"
+ 3586      72656E74 
+ 3586      53746174 
+ 3586      6500
+ 3587              	.LASF72:
+ 3588 0250 5F565431 		.ascii	"_VT100_CURSOR_ENABLE\000"
+ 3588      30305F43 
+ 3588      5552534F 
+ 3588      525F454E 
+ 3588      41424C45 
+ 3589              	.LASF92:
+ 3590 0265 63757272 		.ascii	"currBufferLength\000"
+ 3590      42756666 
+ 3590      65724C65 
+ 3590      6E677468 
+ 3590      00
+ 3591              	.LASF26:
+ 3592 0276 5461736B 		.ascii	"TaskHandle_t\000"
+ 3592      48616E64 
+ 3592      6C655F74 
+ 3592      00
+ 3593              	.LASF172:
+ 3594 0283 6D656D63 		.ascii	"memcpy\000"
+ 3594      707900
+ 3595              	.LASF82:
+ 3596 028a 5F565431 		.ascii	"_VT100_BLUE\000"
+ 3596      30305F42 
+ 3596      4C554500 
+ 3597              	.LASF12:
+ 3598 0296 6C6F6E67 		.ascii	"long long int\000"
+ 3598      206C6F6E 
+ 3598      6720696E 
+ 3598      7400
+ 3599              	.LASF15:
+ 3600 02a4 75696E74 		.ascii	"uint16_t\000"
+ 3600      31365F74 
+ 3600      00
+ 3601              	.LASF118:
+ 3602 02ad 5465726D 		.ascii	"TermCommandFunction\000"
+ 3602      436F6D6D 
+ 3602      616E6446 
+ 3602      756E6374 
+ 3602      696F6E00 
+ 3603              	.LASF19:
+ 3604 02c1 646F7562 		.ascii	"double\000"
+ 3604      6C6500
+ 3605              	.LASF23:
+ 3606 02c8 42617365 		.ascii	"BaseType_t\000"
+ 3606      54797065 
+ 3606      5F7400
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 70
+
+
+ 3607              	.LASF74:
+ 3608 02d3 5F565431 		.ascii	"_VT100_CURSOR_SET_COLUMN\000"
+ 3608      30305F43 
+ 3608      5552534F 
+ 3608      525F5345 
+ 3608      545F434F 
+ 3609              	.LASF164:
+ 3610 02ec 5445524D 		.ascii	"TERM_killProgramm\000"
+ 3610      5F6B696C 
+ 3610      6C50726F 
+ 3610      6772616D 
+ 3610      6D00
+ 3611              	.LASF10:
+ 3612 02fe 5F5F7569 		.ascii	"__uint32_t\000"
+ 3612      6E743332 
+ 3612      5F7400
+ 3613              	.LASF167:
+ 3614 0309 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 3614      43393920 
+ 3614      352E342E 
+ 3614      31203230 
+ 3614      31363036 
+ 3615 033c 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 3615      20726576 
+ 3615      6973696F 
+ 3615      6E203233 
+ 3615      37373135 
+ 3616 036f 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 3616      74643D67 
+ 3616      6E753939 
+ 3616      202D6666 
+ 3616      756E6374 
+ 3617              	.LASF149:
+ 3618 03a2 7076506F 		.ascii	"pvPortMalloc\000"
+ 3618      72744D61 
+ 3618      6C6C6F63 
+ 3618      00
+ 3619              	.LASF84:
+ 3620 03af 5F565431 		.ascii	"_VT100_CYAN\000"
+ 3620      30305F43 
+ 3620      59414E00 
+ 3621              	.LASF50:
+ 3622 03bb 5F565431 		.ascii	"_VT100_FOREGROUND_COLOR\000"
+ 3622      30305F46 
+ 3622      4F524547 
+ 3622      524F554E 
+ 3622      445F434F 
+ 3623              	.LASF95:
+ 3624 03d3 6175746F 		.ascii	"autocompleteBuffer\000"
+ 3624      636F6D70 
+ 3624      6C657465 
+ 3624      42756666 
+ 3624      657200
+ 3625              	.LASF90:
+ 3626 03e6 706F7274 		.ascii	"port\000"
+ 3626      00
+ 3627              	.LASF44:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 71
+
+
+ 3628 03eb 5461736B 		.ascii	"TaskStatus_t\000"
+ 3628      53746174 
+ 3628      75735F74 
+ 3628      00
+ 3629              	.LASF0:
+ 3630 03f8 756E7369 		.ascii	"unsigned int\000"
+ 3630      676E6564 
+ 3630      20696E74 
+ 3630      00
+ 3631              	.LASF42:
+ 3632 0405 75735374 		.ascii	"usStackHighWaterMark\000"
+ 3632      61636B48 
+ 3632      69676857 
+ 3632      61746572 
+ 3632      4D61726B 
+ 3633              	.LASF139:
+ 3634 041a 6370754C 		.ascii	"cpuLoad\000"
+ 3634      6F616400 
+ 3635              	.LASF27:
+ 3636 0422 6552756E 		.ascii	"eRunning\000"
+ 3636      6E696E67 
+ 3636      00
+ 3637              	.LASF111:
+ 3638 042b 636F6D6D 		.ascii	"command\000"
+ 3638      616E6400 
+ 3639              	.LASF134:
+ 3640 0433 70726F67 		.ascii	"prog\000"
+ 3640      00
+ 3641              	.LASF11:
+ 3642 0438 6C6F6E67 		.ascii	"long unsigned int\000"
+ 3642      20756E73 
+ 3642      69676E65 
+ 3642      6420696E 
+ 3642      7400
+ 3643              	.LASF28:
+ 3644 044a 65526561 		.ascii	"eReady\000"
+ 3644      647900
+ 3645              	.LASF97:
+ 3646 0451 6175746F 		.ascii	"autocompleteStart\000"
+ 3646      636F6D70 
+ 3646      6C657465 
+ 3646      53746172 
+ 3646      7400
+ 3647              	.LASF135:
+ 3648 0463 70765061 		.ascii	"pvParameters\000"
+ 3648      72616D65 
+ 3648      74657273 
+ 3648      00
+ 3649              	.LASF87:
+ 3650 0470 78544153 		.ascii	"xTASK_STATUS\000"
+ 3650      4B5F5354 
+ 3650      41545553 
+ 3650      00
+ 3651              	.LASF142:
+ 3652 047d 6E616D65 		.ascii	"name\000"
+ 3652      00
+ 3653              	.LASF120:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 72
+
+
+ 3654 0482 5465726D 		.ascii	"TermErrorPrinter\000"
+ 3654      4572726F 
+ 3654      72507269 
+ 3654      6E746572 
+ 3654      00
+ 3655              	.LASF45:
+ 3656 0493 53747265 		.ascii	"StreamBufferHandle_t\000"
+ 3656      616D4275 
+ 3656      66666572 
+ 3656      48616E64 
+ 3656      6C655F74 
+ 3657              	.LASF7:
+ 3658 04a8 73686F72 		.ascii	"short unsigned int\000"
+ 3658      7420756E 
+ 3658      7369676E 
+ 3658      65642069 
+ 3658      6E7400
+ 3659              	.LASF22:
+ 3660 04bb 53746163 		.ascii	"StackType_t\000"
+ 3660      6B547970 
+ 3660      655F7400 
+ 3661              	.LASF29:
+ 3662 04c7 65426C6F 		.ascii	"eBlocked\000"
+ 3662      636B6564 
+ 3662      00
+ 3663              	.LASF144:
+ 3664 04d0 434D445F 		.ascii	"CMD_main\000"
+ 3664      6D61696E 
+ 3664      00
+ 3665              	.LASF148:
+ 3666 04d9 7374726C 		.ascii	"strlen\000"
+ 3666      656E00
+ 3667              	.LASF81:
+ 3668 04e0 5F565431 		.ascii	"_VT100_YELLOW\000"
+ 3668      30305F59 
+ 3668      454C4C4F 
+ 3668      5700
+ 3669              	.LASF57:
+ 3670 04ee 5F565431 		.ascii	"_VT100_REVERSE\000"
+ 3670      30305F52 
+ 3670      45564552 
+ 3670      534500
+ 3671              	.LASF126:
+ 3672 04fd 696E7075 		.ascii	"inputStream\000"
+ 3672      74537472 
+ 3672      65616D00 
+ 3673              	.LASF158:
+ 3674 0509 78546173 		.ascii	"xTaskGetTickCount\000"
+ 3674      6B476574 
+ 3674      5469636B 
+ 3674      436F756E 
+ 3674      7400
+ 3675              	.LASF104:
+ 3676 051b 65736353 		.ascii	"escSeqBuff\000"
+ 3676      65714275 
+ 3676      666600
+ 3677              	.LASF64:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 73
+
+
+ 3678 0526 5F565431 		.ascii	"_VT100_WRAP_OFF\000"
+ 3678      30305F57 
+ 3678      5241505F 
+ 3678      4F464600 
+ 3679              	.LASF86:
+ 3680 0536 5445524D 		.ascii	"TERMINAL_HANDLE\000"
+ 3680      494E414C 
+ 3680      5F48414E 
+ 3680      444C4500 
+ 3681              	.LASF143:
+ 3682 0546 6C6F6164 		.ascii	"load\000"
+ 3682      00
+ 3683              	.LASF125:
+ 3684 054b 7261775F 		.ascii	"raw_input\000"
+ 3684      696E7075 
+ 3684      7400
+ 3685              	.LASF79:
+ 3686 0555 5F565431 		.ascii	"_VT100_RED\000"
+ 3686      30305F52 
+ 3686      454400
+ 3687              	.LASF49:
+ 3688 0560 5F565431 		.ascii	"_VT100_CURSOR_END\000"
+ 3688      30305F43 
+ 3688      5552534F 
+ 3688      525F454E 
+ 3688      4400
+ 3689              	.LASF140:
+ 3690 0572 68656170 		.ascii	"heapRemaining\000"
+ 3690      52656D61 
+ 3690      696E696E 
+ 3690      6700
+ 3691              	.LASF48:
+ 3692 0580 5F565431 		.ascii	"_VT100_CURSOR_POS1\000"
+ 3692      30305F43 
+ 3692      5552534F 
+ 3692      525F504F 
+ 3692      533100
+ 3693              	.LASF21:
+ 3694 0593 73697A65 		.ascii	"sizetype\000"
+ 3694      74797065 
+ 3694      00
+ 3695              	.LASF128:
+ 3696 059c 61726743 		.ascii	"argCount\000"
+ 3696      6F756E74 
+ 3696      00
+ 3697              	.LASF63:
+ 3698 05a5 5F565431 		.ascii	"_VT100_WRAP_ON\000"
+ 3698      30305F57 
+ 3698      5241505F 
+ 3698      4F4E00
+ 3699              	.LASF70:
+ 3700 05b4 5F565431 		.ascii	"_VT100_CURSOR_SAVE_POSITION\000"
+ 3700      30305F43 
+ 3700      5552534F 
+ 3700      525F5341 
+ 3700      56455F50 
+ 3701              	.LASF151:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 74
+
+
+ 3702 05d0 78546173 		.ascii	"xTaskCreate\000"
+ 3702      6B437265 
+ 3702      61746500 
+ 3703              	.LASF150:
+ 3704 05dc 5445524D 		.ascii	"TERM_sendVT100Code\000"
+ 3704      5F73656E 
+ 3704      64565431 
+ 3704      3030436F 
+ 3704      646500
+ 3705              	.LASF25:
+ 3706 05ef 5469636B 		.ascii	"TickType_t\000"
+ 3706      54797065 
+ 3706      5F7400
+ 3707              	.LASF147:
+ 3708 05fa 64657363 		.ascii	"desc\000"
+ 3708      00
+ 3709              	.LASF113:
+ 3710 05ff 636F6D6D 		.ascii	"commandLength\000"
+ 3710      616E644C 
+ 3710      656E6774 
+ 3710      6800
+ 3711              	.LASF43:
+ 3712 060d 75736564 		.ascii	"usedHeap\000"
+ 3712      48656170 
+ 3712      00
+ 3713              	.LASF54:
+ 3714 0616 5F565431 		.ascii	"_VT100_DIM\000"
+ 3714      30305F44 
+ 3714      494D00
+ 3715              	.LASF137:
+ 3716 0621 7461736B 		.ascii	"taskCount\000"
+ 3716      436F756E 
+ 3716      7400
+ 3717              	.LASF65:
+ 3718 062b 5F565431 		.ascii	"_VT100_ERASE_LINE_END\000"
+ 3718      30305F45 
+ 3718      52415345 
+ 3718      5F4C494E 
+ 3718      455F454E 
+ 3719              	.LASF34:
+ 3720 0641 7848616E 		.ascii	"xHandle\000"
+ 3720      646C6500 
+ 3721              	.LASF131:
+ 3722 0649 63757272 		.ascii	"currArg\000"
+ 3722      41726700 
+ 3723              	.LASF105:
+ 3724 0651 6563686F 		.ascii	"echoEnabled\000"
+ 3724      456E6162 
+ 3724      6C656400 
+ 3725              	.LASF55:
+ 3726 065d 5F565431 		.ascii	"_VT100_UNDERSCORE\000"
+ 3726      30305F55 
+ 3726      4E444552 
+ 3726      53434F52 
+ 3726      4500
+ 3727              	.LASF18:
+ 3728 066f 666C6F61 		.ascii	"float\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 75
+
+
+ 3728      7400
+ 3729              	.LASF124:
+ 3730 0675 696E7075 		.ascii	"inputHandler\000"
+ 3730      7448616E 
+ 3730      646C6572 
+ 3730      00
+ 3731              	.LASF108:
+ 3732 0682 5465726D 		.ascii	"TermCommandDescriptor\000"
+ 3732      436F6D6D 
+ 3732      616E6444 
+ 3732      65736372 
+ 3732      6970746F 
+ 3733              	.LASF31:
+ 3734 0698 6544656C 		.ascii	"eDeleted\000"
+ 3734      65746564 
+ 3734      00
+ 3735              	.LASF117:
+ 3736 06a1 6E657874 		.ascii	"nextCmd\000"
+ 3736      436D6400 
+ 3737              	.LASF165:
+ 3738 06a9 78537472 		.ascii	"xStreamBufferSend\000"
+ 3738      65616D42 
+ 3738      75666665 
+ 3738      7253656E 
+ 3738      6400
+ 3739              	.LASF51:
+ 3740 06bb 5F565431 		.ascii	"_VT100_BACKGROUND_COLOR\000"
+ 3740      30305F42 
+ 3740      41434B47 
+ 3740      524F554E 
+ 3740      445F434F 
+ 3741              	.LASF115:
+ 3742 06d3 41434861 		.ascii	"ACHandler\000"
+ 3742      6E646C65 
+ 3742      7200
+ 3743              	.LASF16:
+ 3744 06dd 696E7433 		.ascii	"int32_t\000"
+ 3744      325F7400 
+ 3745              	.LASF4:
+ 3746 06e5 756E7369 		.ascii	"unsigned char\000"
+ 3746      676E6564 
+ 3746      20636861 
+ 3746      7200
+ 3747              	.LASF133:
+ 3748 06f3 6370795F 		.ascii	"cpy_args\000"
+ 3748      61726773 
+ 3748      00
+ 3749              	.LASF159:
+ 3750 06fc 78506F72 		.ascii	"xPortGetFreeHeapSize\000"
+ 3750      74476574 
+ 3750      46726565 
+ 3750      48656170 
+ 3750      53697A65 
+ 3751              	.LASF157:
+ 3752 0711 5359535F 		.ascii	"SYS_getCPULoadFine\000"
+ 3752      67657443 
+ 3752      50554C6F 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 76
+
+
+ 3752      61644669 
+ 3752      6E6500
+ 3753              	.LASF5:
+ 3754 0724 73686F72 		.ascii	"short int\000"
+ 3754      7420696E 
+ 3754      7400
+ 3755              	.LASF119:
+ 3756 072e 5465726D 		.ascii	"TermCommandInputHandler\000"
+ 3756      436F6D6D 
+ 3756      616E6449 
+ 3756      6E707574 
+ 3756      48616E64 
+ 3757              	.LASF102:
+ 3758 0746 63757272 		.ascii	"currHistoryReadPosition\000"
+ 3758      48697374 
+ 3758      6F727952 
+ 3758      65616450 
+ 3758      6F736974 
+ 3759              	.LASF129:
+ 3760 075e 5465726D 		.ascii	"TermProgram\000"
+ 3760      50726F67 
+ 3760      72616D00 
+ 3761              	.LASF68:
+ 3762 076a 5F565431 		.ascii	"_VT100_CURSOR_DOWN_BY\000"
+ 3762      30305F43 
+ 3762      5552534F 
+ 3762      525F444F 
+ 3762      574E5F42 
+ 3763              	.LASF53:
+ 3764 0780 5F565431 		.ascii	"_VT100_BRIGHT\000"
+ 3764      30305F42 
+ 3764      52494748 
+ 3764      5400
+ 3765              	.LASF91:
+ 3766 078e 63757272 		.ascii	"currBufferPosition\000"
+ 3766      42756666 
+ 3766      6572506F 
+ 3766      73697469 
+ 3766      6F6E00
+ 3767              	.LASF166:
+ 3768 07a1 5445524D 		.ascii	"TERM_addCommand\000"
+ 3768      5F616464 
+ 3768      436F6D6D 
+ 3768      616E6400 
+ 3769              	.LASF78:
+ 3770 07b1 5F565431 		.ascii	"_VT100_BLACK\000"
+ 3770      30305F42 
+ 3770      4C41434B 
+ 3770      00
+ 3771              	.LASF56:
+ 3772 07be 5F565431 		.ascii	"_VT100_BLINK\000"
+ 3772      30305F42 
+ 3772      4C494E4B 
+ 3772      00
+ 3773              	.LASF76:
+ 3774 07cb 76743130 		.ascii	"vt100\000"
+ 3774      3000
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 77
+
+
+ 3775              	.LASF39:
+ 3776 07d1 75784261 		.ascii	"uxBasePriority\000"
+ 3776      73655072 
+ 3776      696F7269 
+ 3776      747900
+ 3777              	.LASF83:
+ 3778 07e0 5F565431 		.ascii	"_VT100_MAGENTA\000"
+ 3778      30305F4D 
+ 3778      4147454E 
+ 3778      544100
+ 3779              	.LASF161:
+ 3780 07ef 76506F72 		.ascii	"vPortFree\000"
+ 3780      74467265 
+ 3780      6500
+ 3781              	.LASF80:
+ 3782 07f9 5F565431 		.ascii	"_VT100_GREEN\000"
+ 3782      30305F47 
+ 3782      5245454E 
+ 3782      00
+ 3783              	.LASF168:
+ 3784 0806 2E2E5C63 		.ascii	"..\\common\\tterm\\top.c\000"
+ 3784      6F6D6D6F 
+ 3784      6E5C7474 
+ 3784      65726D5C 
+ 3784      746F702E 
+ 3785              	.LASF61:
+ 3786 081c 5F565431 		.ascii	"_VT100_FONT_G0\000"
+ 3786      30305F46 
+ 3786      4F4E545F 
+ 3786      473000
+ 3787              	.LASF62:
+ 3788 082b 5F565431 		.ascii	"_VT100_FONT_G1\000"
+ 3788      30305F46 
+ 3788      4F4E545F 
+ 3788      473100
+ 3789              	.LASF103:
+ 3790 083a 63757272 		.ascii	"currEscSeqPos\000"
+ 3790      45736353 
+ 3790      6571506F 
+ 3790      7300
+ 3791              	.LASF17:
+ 3792 0848 75696E74 		.ascii	"uint32_t\000"
+ 3792      33325F74 
+ 3792      00
+ 3793              	.LASF77:
+ 3794 0851 636F6C6F 		.ascii	"color\000"
+ 3794      7200
+ 3795              	.LASF20:
+ 3796 0857 63686172 		.ascii	"char\000"
+ 3796      00
+ 3797              	.LASF141:
+ 3798 085c 63757272 		.ascii	"currTask\000"
+ 3798      5461736B 
+ 3798      00
+ 3799              	.LASF6:
+ 3800 0865 5F5F7569 		.ascii	"__uint16_t\000"
+ 3800      6E743136 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 78
+
+
+ 3800      5F7400
+ 3801              	.LASF73:
+ 3802 0870 5F565431 		.ascii	"_VT100_CURSOR_DISABLE\000"
+ 3802      30305F43 
+ 3802      5552534F 
+ 3802      525F4449 
+ 3802      5341424C 
+ 3803              	.LASF99:
+ 3804 0886 63757272 		.ascii	"currUserName\000"
+ 3804      55736572 
+ 3804      4E616D65 
+ 3804      00
+ 3805              	.LASF8:
+ 3806 0893 5F5F696E 		.ascii	"__int32_t\000"
+ 3806      7433325F 
+ 3806      7400
+ 3807              	.LASF106:
+ 3808 089d 636D644C 		.ascii	"cmdListHead\000"
+ 3808      69737448 
+ 3808      65616400 
+ 3809              	.LASF122:
+ 3810 08a9 5465726D 		.ascii	"TermAutoCompHandler\000"
+ 3810      4175746F 
+ 3810      436F6D70 
+ 3810      48616E64 
+ 3810      6C657200 
+ 3811              	.LASF123:
+ 3812 08bd 7461736B 		.ascii	"task\000"
+ 3812      00
+ 3813              	.LASF96:
+ 3814 08c2 6175746F 		.ascii	"autocompleteBufferLength\000"
+ 3814      636F6D70 
+ 3814      6C657465 
+ 3814      42756666 
+ 3814      65724C65 
+ 3815              	.LASF36:
+ 3816 08db 78546173 		.ascii	"xTaskNumber\000"
+ 3816      6B4E756D 
+ 3816      62657200 
+ 3817              	.LASF156:
+ 3818 08e7 75785461 		.ascii	"uxTaskGetSystemState\000"
+ 3818      736B4765 
+ 3818      74537973 
+ 3818      74656D53 
+ 3818      74617465 
+ 3819              	.LASF112:
+ 3820 08fc 636F6D6D 		.ascii	"commandDescription\000"
+ 3820      616E6444 
+ 3820      65736372 
+ 3820      69707469 
+ 3820      6F6E00
+ 3821              	.LASF162:
+ 3822 090f 75785461 		.ascii	"uxTaskGetNumberOfTasks\000"
+ 3822      736B4765 
+ 3822      744E756D 
+ 3822      6265724F 
+ 3822      66546173 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 79
+
+
+ 3823              	.LASF100:
+ 3824 0926 68697374 		.ascii	"historyBuffer\000"
+ 3824      6F727942 
+ 3824      75666665 
+ 3824      7200
+ 3825              	.LASF89:
+ 3826 0934 696E7075 		.ascii	"inputBuffer\000"
+ 3826      74427566 
+ 3826      66657200 
+ 3827              	.LASF145:
+ 3828 0940 494E5055 		.ascii	"INPUT_handler\000"
+ 3828      545F6861 
+ 3828      6E646C65 
+ 3828      7200
+ 3829              	.LASF114:
+ 3830 094e 6D696E50 		.ascii	"minPermissionLevel\000"
+ 3830      65726D69 
+ 3830      7373696F 
+ 3830      6E4C6576 
+ 3830      656C00
+ 3831              	.LASF136:
+ 3832 0961 7461736B 		.ascii	"taskStats\000"
+ 3832      53746174 
+ 3832      7300
+ 3833              	.LASF32:
+ 3834 096b 65496E76 		.ascii	"eInvalid\000"
+ 3834      616C6964 
+ 3834      00
+ 3835              	.LASF35:
+ 3836 0974 70635461 		.ascii	"pcTaskName\000"
+ 3836      736B4E61 
+ 3836      6D6500
+ 3837              	.LASF14:
+ 3838 097f 75696E74 		.ascii	"uint8_t\000"
+ 3838      385F7400 
+ 3839              	.LASF163:
+ 3840 0987 78537472 		.ascii	"xStreamBufferReceive\000"
+ 3840      65616D42 
+ 3840      75666665 
+ 3840      72526563 
+ 3840      65697665 
+ 3841              	.LASF101:
+ 3842 099c 63757272 		.ascii	"currHistoryWritePosition\000"
+ 3842      48697374 
+ 3842      6F727957 
+ 3842      72697465 
+ 3842      506F7369 
+ 3843              	.LASF33:
+ 3844 09b5 65546173 		.ascii	"eTaskState\000"
+ 3844      6B537461 
+ 3844      746500
+ 3845              	.LASF130:
+ 3846 09c0 68616E64 		.ascii	"handle\000"
+ 3846      6C6500
+ 3847              	.LASF132:
+ 3848 09c7 72657475 		.ascii	"returnCode\000"
+ 3848      726E436F 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccZyO0Z2.s 			page 80
+
+
+ 3848      646500
+ 3849              	.LASF138:
+ 3850 09d2 73797354 		.ascii	"sysTime\000"
+ 3850      696D6500 
+ 3851              	.LASF127:
+ 3852 09da 61726773 		.ascii	"args\000"
+ 3852      00
+ 3853              	.LASF41:
+ 3854 09df 70785374 		.ascii	"pxStackBase\000"
+ 3854      61636B42 
+ 3854      61736500 
+ 3855              	.LASF47:
+ 3856 09eb 53747265 		.ascii	"StreamBufferDef_t\000"
+ 3856      616D4275 
+ 3856      66666572 
+ 3856      4465665F 
+ 3856      7400
+ 3857              	.LASF116:
+ 3858 09fd 41435061 		.ascii	"ACParams\000"
+ 3858      72616D73 
+ 3858      00
+ 3859              	.LASF24:
+ 3860 0a06 55426173 		.ascii	"UBaseType_t\000"
+ 3860      65547970 
+ 3860      655F7400 
+ 3861              	.LASF121:
+ 3862 0a12 5465726D 		.ascii	"TermPrintHandler\000"
+ 3862      5072696E 
+ 3862      7448616E 
+ 3862      646C6572 
+ 3862      00
+ 3863              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

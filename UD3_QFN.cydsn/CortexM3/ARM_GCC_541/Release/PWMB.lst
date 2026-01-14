@@ -1,0 +1,2451 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"PWMB.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.PWMB_Init,"ax",%progbits
+  20              		.align	1
+  21              		.global	PWMB_Init
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	PWMB_Init, %function
+  25              	PWMB_Init:
+  26              	.LFB1:
+  27              		.file 1 "Generated_Source\\PSoC5\\PWMB.c"
+   1:Generated_Source\PSoC5/PWMB.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/PWMB.c **** * File Name: PWMB.c
+   3:Generated_Source\PSoC5/PWMB.c **** * Version 3.30
+   4:Generated_Source\PSoC5/PWMB.c **** *
+   5:Generated_Source\PSoC5/PWMB.c **** * Description:
+   6:Generated_Source\PSoC5/PWMB.c **** *  The PWM User Module consist of an 8 or 16-bit counter with two 8 or 16-bit
+   7:Generated_Source\PSoC5/PWMB.c **** *  comparitors. Each instance of this user module is capable of generating
+   8:Generated_Source\PSoC5/PWMB.c **** *  two PWM outputs with the same period. The pulse width is selectable between
+   9:Generated_Source\PSoC5/PWMB.c **** *  1 and 255/65535. The period is selectable between 2 and 255/65536 clocks.
+  10:Generated_Source\PSoC5/PWMB.c **** *  The compare value output may be configured to be active when the present
+  11:Generated_Source\PSoC5/PWMB.c **** *  counter is less than or less than/equal to the compare value.
+  12:Generated_Source\PSoC5/PWMB.c **** *  A terminal count output is also provided. It generates a pulse one clock
+  13:Generated_Source\PSoC5/PWMB.c **** *  width wide when the counter is equal to zero.
+  14:Generated_Source\PSoC5/PWMB.c **** *
+  15:Generated_Source\PSoC5/PWMB.c **** * Note:
+  16:Generated_Source\PSoC5/PWMB.c **** *
+  17:Generated_Source\PSoC5/PWMB.c **** *******************************************************************************
+  18:Generated_Source\PSoC5/PWMB.c **** * Copyright 2008-2014, Cypress Semiconductor Corporation.  All rights reserved.
+  19:Generated_Source\PSoC5/PWMB.c **** * You may use this file only in accordance with the license, terms, conditions,
+  20:Generated_Source\PSoC5/PWMB.c **** * disclaimers, and limitations in the end user license agreement accompanying
+  21:Generated_Source\PSoC5/PWMB.c **** * the software package with which this file was provided.
+  22:Generated_Source\PSoC5/PWMB.c **** ********************************************************************************/
+  23:Generated_Source\PSoC5/PWMB.c **** 
+  24:Generated_Source\PSoC5/PWMB.c **** #include "PWMB.h"
+  25:Generated_Source\PSoC5/PWMB.c **** 
+  26:Generated_Source\PSoC5/PWMB.c **** /* Error message for removed <resource> through optimization */
+  27:Generated_Source\PSoC5/PWMB.c **** #ifdef PWMB_PWMUDB_genblk1_ctrlreg__REMOVED
+  28:Generated_Source\PSoC5/PWMB.c ****     #error PWM_v3_30 detected with a constant 0 for the enable or \
+  29:Generated_Source\PSoC5/PWMB.c ****          constant 1 for reset. This will prevent the component from operating.
+  30:Generated_Source\PSoC5/PWMB.c **** #endif /* PWMB_PWMUDB_genblk1_ctrlreg__REMOVED */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 2
+
+
+  31:Generated_Source\PSoC5/PWMB.c **** 
+  32:Generated_Source\PSoC5/PWMB.c **** uint8 PWMB_initVar = 0u;
+  33:Generated_Source\PSoC5/PWMB.c **** 
+  34:Generated_Source\PSoC5/PWMB.c **** 
+  35:Generated_Source\PSoC5/PWMB.c **** /*******************************************************************************
+  36:Generated_Source\PSoC5/PWMB.c **** * Function Name: PWMB_Start
+  37:Generated_Source\PSoC5/PWMB.c **** ********************************************************************************
+  38:Generated_Source\PSoC5/PWMB.c **** *
+  39:Generated_Source\PSoC5/PWMB.c **** * Summary:
+  40:Generated_Source\PSoC5/PWMB.c **** *  The start function initializes the pwm with the default values, the
+  41:Generated_Source\PSoC5/PWMB.c **** *  enables the counter to begin counting.  It does not enable interrupts,
+  42:Generated_Source\PSoC5/PWMB.c **** *  the EnableInt command should be called if interrupt generation is required.
+  43:Generated_Source\PSoC5/PWMB.c **** *
+  44:Generated_Source\PSoC5/PWMB.c **** * Parameters:
+  45:Generated_Source\PSoC5/PWMB.c **** *  None
+  46:Generated_Source\PSoC5/PWMB.c **** *
+  47:Generated_Source\PSoC5/PWMB.c **** * Return:
+  48:Generated_Source\PSoC5/PWMB.c **** *  None
+  49:Generated_Source\PSoC5/PWMB.c **** *
+  50:Generated_Source\PSoC5/PWMB.c **** * Global variables:
+  51:Generated_Source\PSoC5/PWMB.c **** *  PWMB_initVar: Is modified when this function is called for the
+  52:Generated_Source\PSoC5/PWMB.c **** *   first time. Is used to ensure that initialization happens only once.
+  53:Generated_Source\PSoC5/PWMB.c **** *
+  54:Generated_Source\PSoC5/PWMB.c **** *******************************************************************************/
+  55:Generated_Source\PSoC5/PWMB.c **** void PWMB_Start(void) 
+  56:Generated_Source\PSoC5/PWMB.c **** {
+  57:Generated_Source\PSoC5/PWMB.c ****     /* If not Initialized then initialize all required hardware and software */
+  58:Generated_Source\PSoC5/PWMB.c ****     if(PWMB_initVar == 0u)
+  59:Generated_Source\PSoC5/PWMB.c ****     {
+  60:Generated_Source\PSoC5/PWMB.c ****         PWMB_Init();
+  61:Generated_Source\PSoC5/PWMB.c ****         PWMB_initVar = 1u;
+  62:Generated_Source\PSoC5/PWMB.c ****     }
+  63:Generated_Source\PSoC5/PWMB.c ****     PWMB_Enable();
+  64:Generated_Source\PSoC5/PWMB.c **** 
+  65:Generated_Source\PSoC5/PWMB.c **** }
+  66:Generated_Source\PSoC5/PWMB.c **** 
+  67:Generated_Source\PSoC5/PWMB.c **** 
+  68:Generated_Source\PSoC5/PWMB.c **** /*******************************************************************************
+  69:Generated_Source\PSoC5/PWMB.c **** * Function Name: PWMB_Init
+  70:Generated_Source\PSoC5/PWMB.c **** ********************************************************************************
+  71:Generated_Source\PSoC5/PWMB.c **** *
+  72:Generated_Source\PSoC5/PWMB.c **** * Summary:
+  73:Generated_Source\PSoC5/PWMB.c **** *  Initialize component's parameters to the parameters set by user in the
+  74:Generated_Source\PSoC5/PWMB.c **** *  customizer of the component placed onto schematic. Usually called in
+  75:Generated_Source\PSoC5/PWMB.c **** *  PWMB_Start().
+  76:Generated_Source\PSoC5/PWMB.c **** *
+  77:Generated_Source\PSoC5/PWMB.c **** * Parameters:
+  78:Generated_Source\PSoC5/PWMB.c **** *  None
+  79:Generated_Source\PSoC5/PWMB.c **** *
+  80:Generated_Source\PSoC5/PWMB.c **** * Return:
+  81:Generated_Source\PSoC5/PWMB.c **** *  None
+  82:Generated_Source\PSoC5/PWMB.c **** *
+  83:Generated_Source\PSoC5/PWMB.c **** *******************************************************************************/
+  84:Generated_Source\PSoC5/PWMB.c **** void PWMB_Init(void) 
+  85:Generated_Source\PSoC5/PWMB.c **** {
+  28              		.loc 1 85 0
+  29              		.cfi_startproc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 3
+
+
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  86:Generated_Source\PSoC5/PWMB.c ****     #if (PWMB_UsingFixedFunction || PWMB_UseControl)
+  87:Generated_Source\PSoC5/PWMB.c ****         uint8 ctrl;
+  88:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UsingFixedFunction || PWMB_UseControl) */
+  89:Generated_Source\PSoC5/PWMB.c **** 
+  90:Generated_Source\PSoC5/PWMB.c ****     #if(!PWMB_UsingFixedFunction)
+  91:Generated_Source\PSoC5/PWMB.c ****         #if(PWMB_UseStatus)
+  92:Generated_Source\PSoC5/PWMB.c ****             /* Interrupt State Backup for Critical Region*/
+  93:Generated_Source\PSoC5/PWMB.c ****             uint8 PWMB_interruptState;
+  94:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_UseStatus) */
+  95:Generated_Source\PSoC5/PWMB.c ****     #endif /* (!PWMB_UsingFixedFunction) */
+  96:Generated_Source\PSoC5/PWMB.c **** 
+  97:Generated_Source\PSoC5/PWMB.c ****     #if (PWMB_UsingFixedFunction)
+  98:Generated_Source\PSoC5/PWMB.c ****         /* You are allowed to write the compare value (FF only) */
+  99:Generated_Source\PSoC5/PWMB.c ****         PWMB_CONTROL |= PWMB_CFG0_MODE;
+  33              		.loc 1 99 0
+  34 0000 184A     		ldr	r2, .L2
+  35 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  36 0004 43F00203 		orr	r3, r3, #2
+  37 0008 1370     		strb	r3, [r2]
+ 100:Generated_Source\PSoC5/PWMB.c ****         #if (PWMB_DeadBand2_4)
+ 101:Generated_Source\PSoC5/PWMB.c ****             PWMB_CONTROL |= PWMB_CFG0_DB;
+ 102:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_DeadBand2_4) */
+ 103:Generated_Source\PSoC5/PWMB.c **** 
+ 104:Generated_Source\PSoC5/PWMB.c ****         ctrl = PWMB_CONTROL3 & ((uint8 )(~PWMB_CTRL_CMPMODE1_MASK));
+  38              		.loc 1 104 0
+  39 000a 9378     		ldrb	r3, [r2, #2]	@ zero_extendqisi2
+  40              	.LVL0:
+ 105:Generated_Source\PSoC5/PWMB.c ****         PWMB_CONTROL3 = ctrl | PWMB_DEFAULT_COMPARE1_MODE;
+  41              		.loc 1 105 0
+  42 000c 03F08F03 		and	r3, r3, #143
+  43              	.LVL1:
+  44 0010 43F02003 		orr	r3, r3, #32
+  45 0014 9370     		strb	r3, [r2, #2]
+ 106:Generated_Source\PSoC5/PWMB.c **** 
+ 107:Generated_Source\PSoC5/PWMB.c ****          /* Clear and Set SYNCTC and SYNCCMP bits of RT1 register */
+ 108:Generated_Source\PSoC5/PWMB.c ****         PWMB_RT1 &= ((uint8)(~PWMB_RT1_MASK));
+  46              		.loc 1 108 0
+  47 0016 144B     		ldr	r3, .L2+4
+  48 0018 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+  49 001a 02F0CF02 		and	r2, r2, #207
+  50 001e 1A70     		strb	r2, [r3]
+ 109:Generated_Source\PSoC5/PWMB.c ****         PWMB_RT1 |= PWMB_SYNC;
+  51              		.loc 1 109 0
+  52 0020 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+  53 0022 42F03002 		orr	r2, r2, #48
+  54 0026 1A70     		strb	r2, [r3]
+ 110:Generated_Source\PSoC5/PWMB.c **** 
+ 111:Generated_Source\PSoC5/PWMB.c ****         /*Enable DSI Sync all all inputs of the PWM*/
+ 112:Generated_Source\PSoC5/PWMB.c ****         PWMB_RT1 &= ((uint8)(~PWMB_SYNCDSI_MASK));
+  55              		.loc 1 112 0
+  56 0028 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+  57 002a 02F0F002 		and	r2, r2, #240
+  58 002e 1A70     		strb	r2, [r3]
+ 113:Generated_Source\PSoC5/PWMB.c ****         PWMB_RT1 |= PWMB_SYNCDSI_EN;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 4
+
+
+  59              		.loc 1 113 0
+  60 0030 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+  61 0032 42F00F02 		orr	r2, r2, #15
+  62 0036 1A70     		strb	r2, [r3]
+  63              	.LVL2:
+  64              	.LBB8:
+  65              	.LBB9:
+ 114:Generated_Source\PSoC5/PWMB.c **** 
+ 115:Generated_Source\PSoC5/PWMB.c ****     #elif (PWMB_UseControl)
+ 116:Generated_Source\PSoC5/PWMB.c ****         /* Set the default compare mode defined in the parameter */
+ 117:Generated_Source\PSoC5/PWMB.c ****         ctrl = PWMB_CONTROL & ((uint8)(~PWMB_CTRL_CMPMODE2_MASK)) &
+ 118:Generated_Source\PSoC5/PWMB.c ****                 ((uint8)(~PWMB_CTRL_CMPMODE1_MASK));
+ 119:Generated_Source\PSoC5/PWMB.c ****         PWMB_CONTROL = ctrl | PWMB_DEFAULT_COMPARE2_MODE |
+ 120:Generated_Source\PSoC5/PWMB.c ****                                    PWMB_DEFAULT_COMPARE1_MODE;
+ 121:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UsingFixedFunction) */
+ 122:Generated_Source\PSoC5/PWMB.c **** 
+ 123:Generated_Source\PSoC5/PWMB.c ****     #if (!PWMB_UsingFixedFunction)
+ 124:Generated_Source\PSoC5/PWMB.c ****         #if (PWMB_Resolution == 8)
+ 125:Generated_Source\PSoC5/PWMB.c ****             /* Set FIFO 0 to 1 byte register for period*/
+ 126:Generated_Source\PSoC5/PWMB.c ****             PWMB_AUX_CONTROLDP0 |= (PWMB_AUX_CTRL_FIFO0_CLR);
+ 127:Generated_Source\PSoC5/PWMB.c ****         #else /* (PWMB_Resolution == 16)*/
+ 128:Generated_Source\PSoC5/PWMB.c ****             /* Set FIFO 0 to 1 byte register for period */
+ 129:Generated_Source\PSoC5/PWMB.c ****             PWMB_AUX_CONTROLDP0 |= (PWMB_AUX_CTRL_FIFO0_CLR);
+ 130:Generated_Source\PSoC5/PWMB.c ****             PWMB_AUX_CONTROLDP1 |= (PWMB_AUX_CTRL_FIFO0_CLR);
+ 131:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_Resolution == 8) */
+ 132:Generated_Source\PSoC5/PWMB.c **** 
+ 133:Generated_Source\PSoC5/PWMB.c ****         PWMB_WriteCounter(PWMB_INIT_PERIOD_VALUE);
+ 134:Generated_Source\PSoC5/PWMB.c ****     #endif /* (!PWMB_UsingFixedFunction) */
+ 135:Generated_Source\PSoC5/PWMB.c **** 
+ 136:Generated_Source\PSoC5/PWMB.c ****     PWMB_WritePeriod(PWMB_INIT_PERIOD_VALUE);
+ 137:Generated_Source\PSoC5/PWMB.c **** 
+ 138:Generated_Source\PSoC5/PWMB.c ****         #if (PWMB_UseOneCompareMode)
+ 139:Generated_Source\PSoC5/PWMB.c ****             PWMB_WriteCompare(PWMB_INIT_COMPARE_VALUE1);
+ 140:Generated_Source\PSoC5/PWMB.c ****         #else
+ 141:Generated_Source\PSoC5/PWMB.c ****             PWMB_WriteCompare1(PWMB_INIT_COMPARE_VALUE1);
+ 142:Generated_Source\PSoC5/PWMB.c ****             PWMB_WriteCompare2(PWMB_INIT_COMPARE_VALUE2);
+ 143:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_UseOneCompareMode) */
+ 144:Generated_Source\PSoC5/PWMB.c **** 
+ 145:Generated_Source\PSoC5/PWMB.c ****         #if (PWMB_KillModeMinTime)
+ 146:Generated_Source\PSoC5/PWMB.c ****             PWMB_WriteKillTime(PWMB_MinimumKillTime);
+ 147:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_KillModeMinTime) */
+ 148:Generated_Source\PSoC5/PWMB.c **** 
+ 149:Generated_Source\PSoC5/PWMB.c ****         #if (PWMB_DeadBandUsed)
+ 150:Generated_Source\PSoC5/PWMB.c ****             PWMB_WriteDeadTime(PWMB_INIT_DEAD_TIME);
+ 151:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_DeadBandUsed) */
+ 152:Generated_Source\PSoC5/PWMB.c **** 
+ 153:Generated_Source\PSoC5/PWMB.c ****     #if (PWMB_UseStatus || PWMB_UsingFixedFunction)
+ 154:Generated_Source\PSoC5/PWMB.c ****         PWMB_SetInterruptMode(PWMB_INIT_INTERRUPTS_MODE);
+ 155:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UseStatus || PWMB_UsingFixedFunction) */
+ 156:Generated_Source\PSoC5/PWMB.c **** 
+ 157:Generated_Source\PSoC5/PWMB.c ****     #if (PWMB_UsingFixedFunction)
+ 158:Generated_Source\PSoC5/PWMB.c ****         /* Globally Enable the Fixed Function Block chosen */
+ 159:Generated_Source\PSoC5/PWMB.c ****         PWMB_GLOBAL_ENABLE |= PWMB_BLOCK_EN_MASK;
+ 160:Generated_Source\PSoC5/PWMB.c ****         /* Set the Interrupt source to come from the status register */
+ 161:Generated_Source\PSoC5/PWMB.c ****         PWMB_CONTROL2 |= PWMB_CTRL2_IRQ_SEL;
+ 162:Generated_Source\PSoC5/PWMB.c ****     #else
+ 163:Generated_Source\PSoC5/PWMB.c ****         #if(PWMB_UseStatus)
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 5
+
+
+ 164:Generated_Source\PSoC5/PWMB.c **** 
+ 165:Generated_Source\PSoC5/PWMB.c ****             /* CyEnterCriticalRegion and CyExitCriticalRegion are used to mark following region cri
+ 166:Generated_Source\PSoC5/PWMB.c ****             /* Enter Critical Region*/
+ 167:Generated_Source\PSoC5/PWMB.c ****             PWMB_interruptState = CyEnterCriticalSection();
+ 168:Generated_Source\PSoC5/PWMB.c ****             /* Use the interrupt output of the status register for IRQ output */
+ 169:Generated_Source\PSoC5/PWMB.c ****             PWMB_STATUS_AUX_CTRL |= PWMB_STATUS_ACTL_INT_EN_MASK;
+ 170:Generated_Source\PSoC5/PWMB.c **** 
+ 171:Generated_Source\PSoC5/PWMB.c ****              /* Exit Critical Region*/
+ 172:Generated_Source\PSoC5/PWMB.c ****             CyExitCriticalSection(PWMB_interruptState);
+ 173:Generated_Source\PSoC5/PWMB.c **** 
+ 174:Generated_Source\PSoC5/PWMB.c ****             /* Clear the FIFO to enable the PWMB_STATUS_FIFOFULL
+ 175:Generated_Source\PSoC5/PWMB.c ****                    bit to be set on FIFO full. */
+ 176:Generated_Source\PSoC5/PWMB.c ****             PWMB_ClearFIFO();
+ 177:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_UseStatus) */
+ 178:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UsingFixedFunction) */
+ 179:Generated_Source\PSoC5/PWMB.c **** }
+ 180:Generated_Source\PSoC5/PWMB.c **** 
+ 181:Generated_Source\PSoC5/PWMB.c **** 
+ 182:Generated_Source\PSoC5/PWMB.c **** /*******************************************************************************
+ 183:Generated_Source\PSoC5/PWMB.c **** * Function Name: PWMB_Enable
+ 184:Generated_Source\PSoC5/PWMB.c **** ********************************************************************************
+ 185:Generated_Source\PSoC5/PWMB.c **** *
+ 186:Generated_Source\PSoC5/PWMB.c **** * Summary:
+ 187:Generated_Source\PSoC5/PWMB.c **** *  Enables the PWM block operation
+ 188:Generated_Source\PSoC5/PWMB.c **** *
+ 189:Generated_Source\PSoC5/PWMB.c **** * Parameters:
+ 190:Generated_Source\PSoC5/PWMB.c **** *  None
+ 191:Generated_Source\PSoC5/PWMB.c **** *
+ 192:Generated_Source\PSoC5/PWMB.c **** * Return:
+ 193:Generated_Source\PSoC5/PWMB.c **** *  None
+ 194:Generated_Source\PSoC5/PWMB.c **** *
+ 195:Generated_Source\PSoC5/PWMB.c **** * Side Effects:
+ 196:Generated_Source\PSoC5/PWMB.c **** *  This works only if software enable mode is chosen
+ 197:Generated_Source\PSoC5/PWMB.c **** *
+ 198:Generated_Source\PSoC5/PWMB.c **** *******************************************************************************/
+ 199:Generated_Source\PSoC5/PWMB.c **** void PWMB_Enable(void) 
+ 200:Generated_Source\PSoC5/PWMB.c **** {
+ 201:Generated_Source\PSoC5/PWMB.c ****     /* Globally Enable the Fixed Function Block chosen */
+ 202:Generated_Source\PSoC5/PWMB.c ****     #if (PWMB_UsingFixedFunction)
+ 203:Generated_Source\PSoC5/PWMB.c ****         PWMB_GLOBAL_ENABLE |= PWMB_BLOCK_EN_MASK;
+ 204:Generated_Source\PSoC5/PWMB.c ****         PWMB_GLOBAL_STBY_ENABLE |= PWMB_BLOCK_STBY_EN_MASK;
+ 205:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UsingFixedFunction) */
+ 206:Generated_Source\PSoC5/PWMB.c **** 
+ 207:Generated_Source\PSoC5/PWMB.c ****     /* Enable the PWM from the control register  */
+ 208:Generated_Source\PSoC5/PWMB.c ****     #if (PWMB_UseControl || PWMB_UsingFixedFunction)
+ 209:Generated_Source\PSoC5/PWMB.c ****         PWMB_CONTROL |= PWMB_CTRL_ENABLE;
+ 210:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UseControl || PWMB_UsingFixedFunction) */
+ 211:Generated_Source\PSoC5/PWMB.c **** }
+ 212:Generated_Source\PSoC5/PWMB.c **** 
+ 213:Generated_Source\PSoC5/PWMB.c **** 
+ 214:Generated_Source\PSoC5/PWMB.c **** /*******************************************************************************
+ 215:Generated_Source\PSoC5/PWMB.c **** * Function Name: PWMB_Stop
+ 216:Generated_Source\PSoC5/PWMB.c **** ********************************************************************************
+ 217:Generated_Source\PSoC5/PWMB.c **** *
+ 218:Generated_Source\PSoC5/PWMB.c **** * Summary:
+ 219:Generated_Source\PSoC5/PWMB.c **** *  The stop function halts the PWM, but does not change any modes or disable
+ 220:Generated_Source\PSoC5/PWMB.c **** *  interrupts.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 6
+
+
+ 221:Generated_Source\PSoC5/PWMB.c **** *
+ 222:Generated_Source\PSoC5/PWMB.c **** * Parameters:
+ 223:Generated_Source\PSoC5/PWMB.c **** *  None
+ 224:Generated_Source\PSoC5/PWMB.c **** *
+ 225:Generated_Source\PSoC5/PWMB.c **** * Return:
+ 226:Generated_Source\PSoC5/PWMB.c **** *  None
+ 227:Generated_Source\PSoC5/PWMB.c **** *
+ 228:Generated_Source\PSoC5/PWMB.c **** * Side Effects:
+ 229:Generated_Source\PSoC5/PWMB.c **** *  If the Enable mode is set to Hardware only then this function
+ 230:Generated_Source\PSoC5/PWMB.c **** *  has no effect on the operation of the PWM
+ 231:Generated_Source\PSoC5/PWMB.c **** *
+ 232:Generated_Source\PSoC5/PWMB.c **** *******************************************************************************/
+ 233:Generated_Source\PSoC5/PWMB.c **** void PWMB_Stop(void) 
+ 234:Generated_Source\PSoC5/PWMB.c **** {
+ 235:Generated_Source\PSoC5/PWMB.c ****     #if (PWMB_UseControl || PWMB_UsingFixedFunction)
+ 236:Generated_Source\PSoC5/PWMB.c ****         PWMB_CONTROL &= ((uint8)(~PWMB_CTRL_ENABLE));
+ 237:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UseControl || PWMB_UsingFixedFunction) */
+ 238:Generated_Source\PSoC5/PWMB.c **** 
+ 239:Generated_Source\PSoC5/PWMB.c ****     /* Globally disable the Fixed Function Block chosen */
+ 240:Generated_Source\PSoC5/PWMB.c ****     #if (PWMB_UsingFixedFunction)
+ 241:Generated_Source\PSoC5/PWMB.c ****         PWMB_GLOBAL_ENABLE &= ((uint8)(~PWMB_BLOCK_EN_MASK));
+ 242:Generated_Source\PSoC5/PWMB.c ****         PWMB_GLOBAL_STBY_ENABLE &= ((uint8)(~PWMB_BLOCK_STBY_EN_MASK));
+ 243:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UsingFixedFunction) */
+ 244:Generated_Source\PSoC5/PWMB.c **** }
+ 245:Generated_Source\PSoC5/PWMB.c **** 
+ 246:Generated_Source\PSoC5/PWMB.c **** #if (PWMB_UseOneCompareMode)
+ 247:Generated_Source\PSoC5/PWMB.c ****     #if (PWMB_CompareMode1SW)
+ 248:Generated_Source\PSoC5/PWMB.c **** 
+ 249:Generated_Source\PSoC5/PWMB.c **** 
+ 250:Generated_Source\PSoC5/PWMB.c ****         /*******************************************************************************
+ 251:Generated_Source\PSoC5/PWMB.c ****         * Function Name: PWMB_SetCompareMode
+ 252:Generated_Source\PSoC5/PWMB.c ****         ********************************************************************************
+ 253:Generated_Source\PSoC5/PWMB.c ****         *
+ 254:Generated_Source\PSoC5/PWMB.c ****         * Summary:
+ 255:Generated_Source\PSoC5/PWMB.c ****         *  This function writes the Compare Mode for the pwm output when in Dither mode,
+ 256:Generated_Source\PSoC5/PWMB.c ****         *  Center Align Mode or One Output Mode.
+ 257:Generated_Source\PSoC5/PWMB.c ****         *
+ 258:Generated_Source\PSoC5/PWMB.c ****         * Parameters:
+ 259:Generated_Source\PSoC5/PWMB.c ****         *  comparemode:  The new compare mode for the PWM output. Use the compare types
+ 260:Generated_Source\PSoC5/PWMB.c ****         *                defined in the H file as input arguments.
+ 261:Generated_Source\PSoC5/PWMB.c ****         *
+ 262:Generated_Source\PSoC5/PWMB.c ****         * Return:
+ 263:Generated_Source\PSoC5/PWMB.c ****         *  None
+ 264:Generated_Source\PSoC5/PWMB.c ****         *
+ 265:Generated_Source\PSoC5/PWMB.c ****         *******************************************************************************/
+ 266:Generated_Source\PSoC5/PWMB.c ****         void PWMB_SetCompareMode(uint8 comparemode) 
+ 267:Generated_Source\PSoC5/PWMB.c ****         {
+ 268:Generated_Source\PSoC5/PWMB.c ****             #if(PWMB_UsingFixedFunction)
+ 269:Generated_Source\PSoC5/PWMB.c **** 
+ 270:Generated_Source\PSoC5/PWMB.c ****                 #if(0 != PWMB_CTRL_CMPMODE1_SHIFT)
+ 271:Generated_Source\PSoC5/PWMB.c ****                     uint8 comparemodemasked = ((uint8)((uint8)comparemode << PWMB_CTRL_CMPMODE1_SHI
+ 272:Generated_Source\PSoC5/PWMB.c ****                 #else
+ 273:Generated_Source\PSoC5/PWMB.c ****                     uint8 comparemodemasked = comparemode;
+ 274:Generated_Source\PSoC5/PWMB.c ****                 #endif /* (0 != PWMB_CTRL_CMPMODE1_SHIFT) */
+ 275:Generated_Source\PSoC5/PWMB.c **** 
+ 276:Generated_Source\PSoC5/PWMB.c ****                 PWMB_CONTROL3 &= ((uint8)(~PWMB_CTRL_CMPMODE1_MASK)); /*Clear Existing Data */
+ 277:Generated_Source\PSoC5/PWMB.c ****                 PWMB_CONTROL3 |= comparemodemasked;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 7
+
+
+ 278:Generated_Source\PSoC5/PWMB.c **** 
+ 279:Generated_Source\PSoC5/PWMB.c ****             #elif (PWMB_UseControl)
+ 280:Generated_Source\PSoC5/PWMB.c **** 
+ 281:Generated_Source\PSoC5/PWMB.c ****                 #if(0 != PWMB_CTRL_CMPMODE1_SHIFT)
+ 282:Generated_Source\PSoC5/PWMB.c ****                     uint8 comparemode1masked = ((uint8)((uint8)comparemode << PWMB_CTRL_CMPMODE1_SH
+ 283:Generated_Source\PSoC5/PWMB.c ****                                                 PWMB_CTRL_CMPMODE1_MASK;
+ 284:Generated_Source\PSoC5/PWMB.c ****                 #else
+ 285:Generated_Source\PSoC5/PWMB.c ****                     uint8 comparemode1masked = comparemode & PWMB_CTRL_CMPMODE1_MASK;
+ 286:Generated_Source\PSoC5/PWMB.c ****                 #endif /* (0 != PWMB_CTRL_CMPMODE1_SHIFT) */
+ 287:Generated_Source\PSoC5/PWMB.c **** 
+ 288:Generated_Source\PSoC5/PWMB.c ****                 #if(0 != PWMB_CTRL_CMPMODE2_SHIFT)
+ 289:Generated_Source\PSoC5/PWMB.c ****                     uint8 comparemode2masked = ((uint8)((uint8)comparemode << PWMB_CTRL_CMPMODE2_SH
+ 290:Generated_Source\PSoC5/PWMB.c ****                                                PWMB_CTRL_CMPMODE2_MASK;
+ 291:Generated_Source\PSoC5/PWMB.c ****                 #else
+ 292:Generated_Source\PSoC5/PWMB.c ****                     uint8 comparemode2masked = comparemode & PWMB_CTRL_CMPMODE2_MASK;
+ 293:Generated_Source\PSoC5/PWMB.c ****                 #endif /* (0 != PWMB_CTRL_CMPMODE2_SHIFT) */
+ 294:Generated_Source\PSoC5/PWMB.c **** 
+ 295:Generated_Source\PSoC5/PWMB.c ****                 /*Clear existing mode */
+ 296:Generated_Source\PSoC5/PWMB.c ****                 PWMB_CONTROL &= ((uint8)(~(PWMB_CTRL_CMPMODE1_MASK |
+ 297:Generated_Source\PSoC5/PWMB.c ****                                             PWMB_CTRL_CMPMODE2_MASK)));
+ 298:Generated_Source\PSoC5/PWMB.c ****                 PWMB_CONTROL |= (comparemode1masked | comparemode2masked);
+ 299:Generated_Source\PSoC5/PWMB.c **** 
+ 300:Generated_Source\PSoC5/PWMB.c ****             #else
+ 301:Generated_Source\PSoC5/PWMB.c ****                 uint8 temp = comparemode;
+ 302:Generated_Source\PSoC5/PWMB.c ****             #endif /* (PWMB_UsingFixedFunction) */
+ 303:Generated_Source\PSoC5/PWMB.c ****         }
+ 304:Generated_Source\PSoC5/PWMB.c ****     #endif /* PWMB_CompareMode1SW */
+ 305:Generated_Source\PSoC5/PWMB.c **** 
+ 306:Generated_Source\PSoC5/PWMB.c **** #else /* UseOneCompareMode */
+ 307:Generated_Source\PSoC5/PWMB.c **** 
+ 308:Generated_Source\PSoC5/PWMB.c ****     #if (PWMB_CompareMode1SW)
+ 309:Generated_Source\PSoC5/PWMB.c **** 
+ 310:Generated_Source\PSoC5/PWMB.c **** 
+ 311:Generated_Source\PSoC5/PWMB.c ****         /*******************************************************************************
+ 312:Generated_Source\PSoC5/PWMB.c ****         * Function Name: PWMB_SetCompareMode1
+ 313:Generated_Source\PSoC5/PWMB.c ****         ********************************************************************************
+ 314:Generated_Source\PSoC5/PWMB.c ****         *
+ 315:Generated_Source\PSoC5/PWMB.c ****         * Summary:
+ 316:Generated_Source\PSoC5/PWMB.c ****         *  This function writes the Compare Mode for the pwm or pwm1 output
+ 317:Generated_Source\PSoC5/PWMB.c ****         *
+ 318:Generated_Source\PSoC5/PWMB.c ****         * Parameters:
+ 319:Generated_Source\PSoC5/PWMB.c ****         *  comparemode:  The new compare mode for the PWM output. Use the compare types
+ 320:Generated_Source\PSoC5/PWMB.c ****         *                defined in the H file as input arguments.
+ 321:Generated_Source\PSoC5/PWMB.c ****         *
+ 322:Generated_Source\PSoC5/PWMB.c ****         * Return:
+ 323:Generated_Source\PSoC5/PWMB.c ****         *  None
+ 324:Generated_Source\PSoC5/PWMB.c ****         *
+ 325:Generated_Source\PSoC5/PWMB.c ****         *******************************************************************************/
+ 326:Generated_Source\PSoC5/PWMB.c ****         void PWMB_SetCompareMode1(uint8 comparemode) 
+ 327:Generated_Source\PSoC5/PWMB.c ****         {
+ 328:Generated_Source\PSoC5/PWMB.c ****             #if(0 != PWMB_CTRL_CMPMODE1_SHIFT)
+ 329:Generated_Source\PSoC5/PWMB.c ****                 uint8 comparemodemasked = ((uint8)((uint8)comparemode << PWMB_CTRL_CMPMODE1_SHIFT))
+ 330:Generated_Source\PSoC5/PWMB.c ****                                            PWMB_CTRL_CMPMODE1_MASK;
+ 331:Generated_Source\PSoC5/PWMB.c ****             #else
+ 332:Generated_Source\PSoC5/PWMB.c ****                 uint8 comparemodemasked = comparemode & PWMB_CTRL_CMPMODE1_MASK;
+ 333:Generated_Source\PSoC5/PWMB.c ****             #endif /* (0 != PWMB_CTRL_CMPMODE1_SHIFT) */
+ 334:Generated_Source\PSoC5/PWMB.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 8
+
+
+ 335:Generated_Source\PSoC5/PWMB.c ****             #if (PWMB_UseControl)
+ 336:Generated_Source\PSoC5/PWMB.c ****                 PWMB_CONTROL &= ((uint8)(~PWMB_CTRL_CMPMODE1_MASK)); /*Clear existing mode */
+ 337:Generated_Source\PSoC5/PWMB.c ****                 PWMB_CONTROL |= comparemodemasked;
+ 338:Generated_Source\PSoC5/PWMB.c ****             #endif /* (PWMB_UseControl) */
+ 339:Generated_Source\PSoC5/PWMB.c ****         }
+ 340:Generated_Source\PSoC5/PWMB.c ****     #endif /* PWMB_CompareMode1SW */
+ 341:Generated_Source\PSoC5/PWMB.c **** 
+ 342:Generated_Source\PSoC5/PWMB.c **** #if (PWMB_CompareMode2SW)
+ 343:Generated_Source\PSoC5/PWMB.c **** 
+ 344:Generated_Source\PSoC5/PWMB.c **** 
+ 345:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 346:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_SetCompareMode2
+ 347:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 348:Generated_Source\PSoC5/PWMB.c ****     *
+ 349:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 350:Generated_Source\PSoC5/PWMB.c ****     *  This function writes the Compare Mode for the pwm or pwm2 output
+ 351:Generated_Source\PSoC5/PWMB.c ****     *
+ 352:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 353:Generated_Source\PSoC5/PWMB.c ****     *  comparemode:  The new compare mode for the PWM output. Use the compare types
+ 354:Generated_Source\PSoC5/PWMB.c ****     *                defined in the H file as input arguments.
+ 355:Generated_Source\PSoC5/PWMB.c ****     *
+ 356:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 357:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 358:Generated_Source\PSoC5/PWMB.c ****     *
+ 359:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 360:Generated_Source\PSoC5/PWMB.c ****     void PWMB_SetCompareMode2(uint8 comparemode) 
+ 361:Generated_Source\PSoC5/PWMB.c ****     {
+ 362:Generated_Source\PSoC5/PWMB.c **** 
+ 363:Generated_Source\PSoC5/PWMB.c ****         #if(0 != PWMB_CTRL_CMPMODE2_SHIFT)
+ 364:Generated_Source\PSoC5/PWMB.c ****             uint8 comparemodemasked = ((uint8)((uint8)comparemode << PWMB_CTRL_CMPMODE2_SHIFT)) &
+ 365:Generated_Source\PSoC5/PWMB.c ****                                                  PWMB_CTRL_CMPMODE2_MASK;
+ 366:Generated_Source\PSoC5/PWMB.c ****         #else
+ 367:Generated_Source\PSoC5/PWMB.c ****             uint8 comparemodemasked = comparemode & PWMB_CTRL_CMPMODE2_MASK;
+ 368:Generated_Source\PSoC5/PWMB.c ****         #endif /* (0 != PWMB_CTRL_CMPMODE2_SHIFT) */
+ 369:Generated_Source\PSoC5/PWMB.c **** 
+ 370:Generated_Source\PSoC5/PWMB.c ****         #if (PWMB_UseControl)
+ 371:Generated_Source\PSoC5/PWMB.c ****             PWMB_CONTROL &= ((uint8)(~PWMB_CTRL_CMPMODE2_MASK)); /*Clear existing mode */
+ 372:Generated_Source\PSoC5/PWMB.c ****             PWMB_CONTROL |= comparemodemasked;
+ 373:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_UseControl) */
+ 374:Generated_Source\PSoC5/PWMB.c ****     }
+ 375:Generated_Source\PSoC5/PWMB.c ****     #endif /*PWMB_CompareMode2SW */
+ 376:Generated_Source\PSoC5/PWMB.c **** 
+ 377:Generated_Source\PSoC5/PWMB.c **** #endif /* UseOneCompareMode */
+ 378:Generated_Source\PSoC5/PWMB.c **** 
+ 379:Generated_Source\PSoC5/PWMB.c **** 
+ 380:Generated_Source\PSoC5/PWMB.c **** #if (!PWMB_UsingFixedFunction)
+ 381:Generated_Source\PSoC5/PWMB.c **** 
+ 382:Generated_Source\PSoC5/PWMB.c **** 
+ 383:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 384:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_WriteCounter
+ 385:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 386:Generated_Source\PSoC5/PWMB.c ****     *
+ 387:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 388:Generated_Source\PSoC5/PWMB.c ****     *  Writes a new counter value directly to the counter register. This will be
+ 389:Generated_Source\PSoC5/PWMB.c ****     *  implemented for that currently running period and only that period. This API
+ 390:Generated_Source\PSoC5/PWMB.c ****     *  is valid only for UDB implementation and not available for fixed function
+ 391:Generated_Source\PSoC5/PWMB.c ****     *  PWM implementation.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 9
+
+
+ 392:Generated_Source\PSoC5/PWMB.c ****     *
+ 393:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 394:Generated_Source\PSoC5/PWMB.c ****     *  counter:  The period new period counter value.
+ 395:Generated_Source\PSoC5/PWMB.c ****     *
+ 396:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 397:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 398:Generated_Source\PSoC5/PWMB.c ****     *
+ 399:Generated_Source\PSoC5/PWMB.c ****     * Side Effects:
+ 400:Generated_Source\PSoC5/PWMB.c ****     *  The PWM Period will be reloaded when a counter value will be a zero
+ 401:Generated_Source\PSoC5/PWMB.c ****     *
+ 402:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 403:Generated_Source\PSoC5/PWMB.c ****     void PWMB_WriteCounter(uint16 counter) \
+ 404:Generated_Source\PSoC5/PWMB.c ****                                        
+ 405:Generated_Source\PSoC5/PWMB.c ****     {
+ 406:Generated_Source\PSoC5/PWMB.c ****         CY_SET_REG16(PWMB_COUNTER_LSB_PTR, counter);
+ 407:Generated_Source\PSoC5/PWMB.c ****     }
+ 408:Generated_Source\PSoC5/PWMB.c **** 
+ 409:Generated_Source\PSoC5/PWMB.c **** 
+ 410:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 411:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_ReadCounter
+ 412:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 413:Generated_Source\PSoC5/PWMB.c ****     *
+ 414:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 415:Generated_Source\PSoC5/PWMB.c ****     *  This function returns the current value of the counter.  It doesn't matter
+ 416:Generated_Source\PSoC5/PWMB.c ****     *  if the counter is enabled or running.
+ 417:Generated_Source\PSoC5/PWMB.c ****     *
+ 418:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 419:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 420:Generated_Source\PSoC5/PWMB.c ****     *
+ 421:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 422:Generated_Source\PSoC5/PWMB.c ****     *  The current value of the counter.
+ 423:Generated_Source\PSoC5/PWMB.c ****     *
+ 424:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 425:Generated_Source\PSoC5/PWMB.c ****     uint16 PWMB_ReadCounter(void) 
+ 426:Generated_Source\PSoC5/PWMB.c ****     {
+ 427:Generated_Source\PSoC5/PWMB.c ****         /* Force capture by reading Accumulator */
+ 428:Generated_Source\PSoC5/PWMB.c ****         /* Must first do a software capture to be able to read the counter */
+ 429:Generated_Source\PSoC5/PWMB.c ****         /* It is up to the user code to make sure there isn't already captured data in the FIFO */
+ 430:Generated_Source\PSoC5/PWMB.c ****           (void)CY_GET_REG8(PWMB_COUNTERCAP_LSB_PTR_8BIT);
+ 431:Generated_Source\PSoC5/PWMB.c **** 
+ 432:Generated_Source\PSoC5/PWMB.c ****         /* Read the data from the FIFO */
+ 433:Generated_Source\PSoC5/PWMB.c ****         return (CY_GET_REG16(PWMB_CAPTURE_LSB_PTR));
+ 434:Generated_Source\PSoC5/PWMB.c ****     }
+ 435:Generated_Source\PSoC5/PWMB.c **** 
+ 436:Generated_Source\PSoC5/PWMB.c ****     #if (PWMB_UseStatus)
+ 437:Generated_Source\PSoC5/PWMB.c **** 
+ 438:Generated_Source\PSoC5/PWMB.c **** 
+ 439:Generated_Source\PSoC5/PWMB.c ****         /*******************************************************************************
+ 440:Generated_Source\PSoC5/PWMB.c ****         * Function Name: PWMB_ClearFIFO
+ 441:Generated_Source\PSoC5/PWMB.c ****         ********************************************************************************
+ 442:Generated_Source\PSoC5/PWMB.c ****         *
+ 443:Generated_Source\PSoC5/PWMB.c ****         * Summary:
+ 444:Generated_Source\PSoC5/PWMB.c ****         *  This function clears all capture data from the capture FIFO
+ 445:Generated_Source\PSoC5/PWMB.c ****         *
+ 446:Generated_Source\PSoC5/PWMB.c ****         * Parameters:
+ 447:Generated_Source\PSoC5/PWMB.c ****         *  None
+ 448:Generated_Source\PSoC5/PWMB.c ****         *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 10
+
+
+ 449:Generated_Source\PSoC5/PWMB.c ****         * Return:
+ 450:Generated_Source\PSoC5/PWMB.c ****         *  None
+ 451:Generated_Source\PSoC5/PWMB.c ****         *
+ 452:Generated_Source\PSoC5/PWMB.c ****         *******************************************************************************/
+ 453:Generated_Source\PSoC5/PWMB.c ****         void PWMB_ClearFIFO(void) 
+ 454:Generated_Source\PSoC5/PWMB.c ****         {
+ 455:Generated_Source\PSoC5/PWMB.c ****             while(0u != (PWMB_ReadStatusRegister() & PWMB_STATUS_FIFONEMPTY))
+ 456:Generated_Source\PSoC5/PWMB.c ****             {
+ 457:Generated_Source\PSoC5/PWMB.c ****                 (void)PWMB_ReadCapture();
+ 458:Generated_Source\PSoC5/PWMB.c ****             }
+ 459:Generated_Source\PSoC5/PWMB.c ****         }
+ 460:Generated_Source\PSoC5/PWMB.c **** 
+ 461:Generated_Source\PSoC5/PWMB.c ****     #endif /* PWMB_UseStatus */
+ 462:Generated_Source\PSoC5/PWMB.c **** 
+ 463:Generated_Source\PSoC5/PWMB.c **** #endif /* !PWMB_UsingFixedFunction */
+ 464:Generated_Source\PSoC5/PWMB.c **** 
+ 465:Generated_Source\PSoC5/PWMB.c **** 
+ 466:Generated_Source\PSoC5/PWMB.c **** /*******************************************************************************
+ 467:Generated_Source\PSoC5/PWMB.c **** * Function Name: PWMB_WritePeriod
+ 468:Generated_Source\PSoC5/PWMB.c **** ********************************************************************************
+ 469:Generated_Source\PSoC5/PWMB.c **** *
+ 470:Generated_Source\PSoC5/PWMB.c **** * Summary:
+ 471:Generated_Source\PSoC5/PWMB.c **** *  This function is used to change the period of the counter.  The new period
+ 472:Generated_Source\PSoC5/PWMB.c **** *  will be loaded the next time terminal count is detected.
+ 473:Generated_Source\PSoC5/PWMB.c **** *
+ 474:Generated_Source\PSoC5/PWMB.c **** * Parameters:
+ 475:Generated_Source\PSoC5/PWMB.c **** *  period:  Period value. May be between 1 and (2^Resolution)-1.  A value of 0
+ 476:Generated_Source\PSoC5/PWMB.c **** *           will result in the counter remaining at zero.
+ 477:Generated_Source\PSoC5/PWMB.c **** *
+ 478:Generated_Source\PSoC5/PWMB.c **** * Return:
+ 479:Generated_Source\PSoC5/PWMB.c **** *  None
+ 480:Generated_Source\PSoC5/PWMB.c **** *
+ 481:Generated_Source\PSoC5/PWMB.c **** *******************************************************************************/
+ 482:Generated_Source\PSoC5/PWMB.c **** void PWMB_WritePeriod(uint16 period) 
+ 483:Generated_Source\PSoC5/PWMB.c **** {
+ 484:Generated_Source\PSoC5/PWMB.c ****     #if(PWMB_UsingFixedFunction)
+ 485:Generated_Source\PSoC5/PWMB.c ****         CY_SET_REG16(PWMB_PERIOD_LSB_PTR, (uint16)period);
+  66              		.loc 1 485 0
+  67 0038 7F22     		movs	r2, #127
+  68 003a 23F8072C 		strh	r2, [r3, #-7]	@ movhi
+  69              	.LVL3:
+  70              	.LBE9:
+  71              	.LBE8:
+  72              	.LBB10:
+  73              	.LBB11:
+ 486:Generated_Source\PSoC5/PWMB.c ****     #else
+ 487:Generated_Source\PSoC5/PWMB.c ****         CY_SET_REG16(PWMB_PERIOD_LSB_PTR, period);
+ 488:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UsingFixedFunction) */
+ 489:Generated_Source\PSoC5/PWMB.c **** }
+ 490:Generated_Source\PSoC5/PWMB.c **** 
+ 491:Generated_Source\PSoC5/PWMB.c **** #if (PWMB_UseOneCompareMode)
+ 492:Generated_Source\PSoC5/PWMB.c **** 
+ 493:Generated_Source\PSoC5/PWMB.c **** 
+ 494:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 495:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_WriteCompare
+ 496:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 497:Generated_Source\PSoC5/PWMB.c ****     *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 11
+
+
+ 498:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 499:Generated_Source\PSoC5/PWMB.c ****     *  This funtion is used to change the compare1 value when the PWM is in Dither
+ 500:Generated_Source\PSoC5/PWMB.c ****     *  mode. The compare output will reflect the new value on the next UDB clock.
+ 501:Generated_Source\PSoC5/PWMB.c ****     *  The compare output will be driven high when the present counter value is
+ 502:Generated_Source\PSoC5/PWMB.c ****     *  compared to the compare value based on the compare mode defined in
+ 503:Generated_Source\PSoC5/PWMB.c ****     *  Dither Mode.
+ 504:Generated_Source\PSoC5/PWMB.c ****     *
+ 505:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 506:Generated_Source\PSoC5/PWMB.c ****     *  compare:  New compare value.
+ 507:Generated_Source\PSoC5/PWMB.c ****     *
+ 508:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 509:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 510:Generated_Source\PSoC5/PWMB.c ****     *
+ 511:Generated_Source\PSoC5/PWMB.c ****     * Side Effects:
+ 512:Generated_Source\PSoC5/PWMB.c ****     *  This function is only available if the PWM mode parameter is set to
+ 513:Generated_Source\PSoC5/PWMB.c ****     *  Dither Mode, Center Aligned Mode or One Output Mode
+ 514:Generated_Source\PSoC5/PWMB.c ****     *
+ 515:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 516:Generated_Source\PSoC5/PWMB.c ****     void PWMB_WriteCompare(uint16 compare) \
+ 517:Generated_Source\PSoC5/PWMB.c ****                                        
+ 518:Generated_Source\PSoC5/PWMB.c ****     {
+ 519:Generated_Source\PSoC5/PWMB.c ****         #if(PWMB_UsingFixedFunction)
+ 520:Generated_Source\PSoC5/PWMB.c ****             CY_SET_REG16(PWMB_COMPARE1_LSB_PTR, (uint16)compare);
+  74              		.loc 1 520 0
+  75 003e 0422     		movs	r2, #4
+  76 0040 23F8052C 		strh	r2, [r3, #-5]	@ movhi
+  77              	.LVL4:
+  78              	.LBE11:
+  79              	.LBE10:
+  80              	.LBB12:
+  81              	.LBB13:
+ 521:Generated_Source\PSoC5/PWMB.c ****         #else
+ 522:Generated_Source\PSoC5/PWMB.c ****             CY_SET_REG16(PWMB_COMPARE1_LSB_PTR, compare);
+ 523:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_UsingFixedFunction) */
+ 524:Generated_Source\PSoC5/PWMB.c **** 
+ 525:Generated_Source\PSoC5/PWMB.c ****         #if (PWMB_PWMMode == PWMB__B_PWM__DITHER)
+ 526:Generated_Source\PSoC5/PWMB.c ****             #if(PWMB_UsingFixedFunction)
+ 527:Generated_Source\PSoC5/PWMB.c ****                 CY_SET_REG16(PWMB_COMPARE2_LSB_PTR, (uint16)(compare + 1u));
+ 528:Generated_Source\PSoC5/PWMB.c ****             #else
+ 529:Generated_Source\PSoC5/PWMB.c ****                 CY_SET_REG16(PWMB_COMPARE2_LSB_PTR, (compare + 1u));
+ 530:Generated_Source\PSoC5/PWMB.c ****             #endif /* (PWMB_UsingFixedFunction) */
+ 531:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_PWMMode == PWMB__B_PWM__DITHER) */
+ 532:Generated_Source\PSoC5/PWMB.c ****     }
+ 533:Generated_Source\PSoC5/PWMB.c **** 
+ 534:Generated_Source\PSoC5/PWMB.c **** 
+ 535:Generated_Source\PSoC5/PWMB.c **** #else
+ 536:Generated_Source\PSoC5/PWMB.c **** 
+ 537:Generated_Source\PSoC5/PWMB.c **** 
+ 538:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 539:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_WriteCompare1
+ 540:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 541:Generated_Source\PSoC5/PWMB.c ****     *
+ 542:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 543:Generated_Source\PSoC5/PWMB.c ****     *  This funtion is used to change the compare1 value.  The compare output will
+ 544:Generated_Source\PSoC5/PWMB.c ****     *  reflect the new value on the next UDB clock.  The compare output will be
+ 545:Generated_Source\PSoC5/PWMB.c ****     *  driven high when the present counter value is less than or less than or
+ 546:Generated_Source\PSoC5/PWMB.c ****     *  equal to the compare register, depending on the mode.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 12
+
+
+ 547:Generated_Source\PSoC5/PWMB.c ****     *
+ 548:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 549:Generated_Source\PSoC5/PWMB.c ****     *  compare:  New compare value.
+ 550:Generated_Source\PSoC5/PWMB.c ****     *
+ 551:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 552:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 553:Generated_Source\PSoC5/PWMB.c ****     *
+ 554:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 555:Generated_Source\PSoC5/PWMB.c ****     void PWMB_WriteCompare1(uint16 compare) \
+ 556:Generated_Source\PSoC5/PWMB.c ****                                         
+ 557:Generated_Source\PSoC5/PWMB.c ****     {
+ 558:Generated_Source\PSoC5/PWMB.c ****         #if(PWMB_UsingFixedFunction)
+ 559:Generated_Source\PSoC5/PWMB.c ****             CY_SET_REG16(PWMB_COMPARE1_LSB_PTR, (uint16)compare);
+ 560:Generated_Source\PSoC5/PWMB.c ****         #else
+ 561:Generated_Source\PSoC5/PWMB.c ****             CY_SET_REG16(PWMB_COMPARE1_LSB_PTR, compare);
+ 562:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_UsingFixedFunction) */
+ 563:Generated_Source\PSoC5/PWMB.c ****     }
+ 564:Generated_Source\PSoC5/PWMB.c **** 
+ 565:Generated_Source\PSoC5/PWMB.c **** 
+ 566:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 567:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_WriteCompare2
+ 568:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 569:Generated_Source\PSoC5/PWMB.c ****     *
+ 570:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 571:Generated_Source\PSoC5/PWMB.c ****     *  This funtion is used to change the compare value, for compare1 output.
+ 572:Generated_Source\PSoC5/PWMB.c ****     *  The compare output will reflect the new value on the next UDB clock.
+ 573:Generated_Source\PSoC5/PWMB.c ****     *  The compare output will be driven high when the present counter value is
+ 574:Generated_Source\PSoC5/PWMB.c ****     *  less than or less than or equal to the compare register, depending on the
+ 575:Generated_Source\PSoC5/PWMB.c ****     *  mode.
+ 576:Generated_Source\PSoC5/PWMB.c ****     *
+ 577:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 578:Generated_Source\PSoC5/PWMB.c ****     *  compare:  New compare value.
+ 579:Generated_Source\PSoC5/PWMB.c ****     *
+ 580:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 581:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 582:Generated_Source\PSoC5/PWMB.c ****     *
+ 583:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 584:Generated_Source\PSoC5/PWMB.c ****     void PWMB_WriteCompare2(uint16 compare) \
+ 585:Generated_Source\PSoC5/PWMB.c ****                                         
+ 586:Generated_Source\PSoC5/PWMB.c ****     {
+ 587:Generated_Source\PSoC5/PWMB.c ****         #if(PWMB_UsingFixedFunction)
+ 588:Generated_Source\PSoC5/PWMB.c ****             CY_SET_REG16(PWMB_COMPARE2_LSB_PTR, compare);
+ 589:Generated_Source\PSoC5/PWMB.c ****         #else
+ 590:Generated_Source\PSoC5/PWMB.c ****             CY_SET_REG16(PWMB_COMPARE2_LSB_PTR, compare);
+ 591:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_UsingFixedFunction) */
+ 592:Generated_Source\PSoC5/PWMB.c ****     }
+ 593:Generated_Source\PSoC5/PWMB.c **** #endif /* UseOneCompareMode */
+ 594:Generated_Source\PSoC5/PWMB.c **** 
+ 595:Generated_Source\PSoC5/PWMB.c **** #if (PWMB_DeadBandUsed)
+ 596:Generated_Source\PSoC5/PWMB.c **** 
+ 597:Generated_Source\PSoC5/PWMB.c **** 
+ 598:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 599:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_WriteDeadTime
+ 600:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 601:Generated_Source\PSoC5/PWMB.c ****     *
+ 602:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 603:Generated_Source\PSoC5/PWMB.c ****     *  This function writes the dead-band counts to the corresponding register
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 13
+
+
+ 604:Generated_Source\PSoC5/PWMB.c ****     *
+ 605:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 606:Generated_Source\PSoC5/PWMB.c ****     *  deadtime:  Number of counts for dead time
+ 607:Generated_Source\PSoC5/PWMB.c ****     *
+ 608:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 609:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 610:Generated_Source\PSoC5/PWMB.c ****     *
+ 611:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 612:Generated_Source\PSoC5/PWMB.c ****     void PWMB_WriteDeadTime(uint8 deadtime) 
+ 613:Generated_Source\PSoC5/PWMB.c ****     {
+ 614:Generated_Source\PSoC5/PWMB.c ****         /* If using the Dead Band 1-255 mode then just write the register */
+ 615:Generated_Source\PSoC5/PWMB.c ****         #if(!PWMB_DeadBand2_4)
+ 616:Generated_Source\PSoC5/PWMB.c ****             CY_SET_REG8(PWMB_DEADBAND_COUNT_PTR, deadtime);
+ 617:Generated_Source\PSoC5/PWMB.c ****         #else
+ 618:Generated_Source\PSoC5/PWMB.c ****             /* Otherwise the data has to be masked and offset */
+ 619:Generated_Source\PSoC5/PWMB.c ****             /* Clear existing data */
+ 620:Generated_Source\PSoC5/PWMB.c ****             PWMB_DEADBAND_COUNT &= ((uint8)(~PWMB_DEADBAND_COUNT_MASK));
+ 621:Generated_Source\PSoC5/PWMB.c **** 
+ 622:Generated_Source\PSoC5/PWMB.c ****             /* Set new dead time */
+ 623:Generated_Source\PSoC5/PWMB.c ****             #if(PWMB_DEADBAND_COUNT_SHIFT)
+ 624:Generated_Source\PSoC5/PWMB.c ****                 PWMB_DEADBAND_COUNT |= ((uint8)((uint8)deadtime << PWMB_DEADBAND_COUNT_SHIFT)) &
+ 625:Generated_Source\PSoC5/PWMB.c ****                                                     PWMB_DEADBAND_COUNT_MASK;
+ 626:Generated_Source\PSoC5/PWMB.c ****             #else
+ 627:Generated_Source\PSoC5/PWMB.c ****                 PWMB_DEADBAND_COUNT |= deadtime & PWMB_DEADBAND_COUNT_MASK;
+ 628:Generated_Source\PSoC5/PWMB.c ****             #endif /* (PWMB_DEADBAND_COUNT_SHIFT) */
+ 629:Generated_Source\PSoC5/PWMB.c **** 
+ 630:Generated_Source\PSoC5/PWMB.c ****         #endif /* (!PWMB_DeadBand2_4) */
+ 631:Generated_Source\PSoC5/PWMB.c ****     }
+ 632:Generated_Source\PSoC5/PWMB.c **** 
+ 633:Generated_Source\PSoC5/PWMB.c **** 
+ 634:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 635:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_ReadDeadTime
+ 636:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 637:Generated_Source\PSoC5/PWMB.c ****     *
+ 638:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 639:Generated_Source\PSoC5/PWMB.c ****     *  This function reads the dead-band counts from the corresponding register
+ 640:Generated_Source\PSoC5/PWMB.c ****     *
+ 641:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 642:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 643:Generated_Source\PSoC5/PWMB.c ****     *
+ 644:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 645:Generated_Source\PSoC5/PWMB.c ****     *  Dead Band Counts
+ 646:Generated_Source\PSoC5/PWMB.c ****     *
+ 647:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 648:Generated_Source\PSoC5/PWMB.c ****     uint8 PWMB_ReadDeadTime(void) 
+ 649:Generated_Source\PSoC5/PWMB.c ****     {
+ 650:Generated_Source\PSoC5/PWMB.c ****         /* If using the Dead Band 1-255 mode then just read the register */
+ 651:Generated_Source\PSoC5/PWMB.c ****         #if(!PWMB_DeadBand2_4)
+ 652:Generated_Source\PSoC5/PWMB.c ****             return (CY_GET_REG8(PWMB_DEADBAND_COUNT_PTR));
+ 653:Generated_Source\PSoC5/PWMB.c ****         #else
+ 654:Generated_Source\PSoC5/PWMB.c **** 
+ 655:Generated_Source\PSoC5/PWMB.c ****             /* Otherwise the data has to be masked and offset */
+ 656:Generated_Source\PSoC5/PWMB.c ****             #if(PWMB_DEADBAND_COUNT_SHIFT)
+ 657:Generated_Source\PSoC5/PWMB.c ****                 return ((uint8)(((uint8)(PWMB_DEADBAND_COUNT & PWMB_DEADBAND_COUNT_MASK)) >>
+ 658:Generated_Source\PSoC5/PWMB.c ****                                                                            PWMB_DEADBAND_COUNT_SHIF
+ 659:Generated_Source\PSoC5/PWMB.c ****             #else
+ 660:Generated_Source\PSoC5/PWMB.c ****                 return (PWMB_DEADBAND_COUNT & PWMB_DEADBAND_COUNT_MASK);
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 14
+
+
+ 661:Generated_Source\PSoC5/PWMB.c ****             #endif /* (PWMB_DEADBAND_COUNT_SHIFT) */
+ 662:Generated_Source\PSoC5/PWMB.c ****         #endif /* (!PWMB_DeadBand2_4) */
+ 663:Generated_Source\PSoC5/PWMB.c ****     }
+ 664:Generated_Source\PSoC5/PWMB.c **** #endif /* DeadBandUsed */
+ 665:Generated_Source\PSoC5/PWMB.c **** 
+ 666:Generated_Source\PSoC5/PWMB.c **** #if (PWMB_UseStatus || PWMB_UsingFixedFunction)
+ 667:Generated_Source\PSoC5/PWMB.c **** 
+ 668:Generated_Source\PSoC5/PWMB.c **** 
+ 669:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 670:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_SetInterruptMode
+ 671:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 672:Generated_Source\PSoC5/PWMB.c ****     *
+ 673:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 674:Generated_Source\PSoC5/PWMB.c ****     *  This function configures the interrupts mask control of theinterrupt
+ 675:Generated_Source\PSoC5/PWMB.c ****     *  source status register.
+ 676:Generated_Source\PSoC5/PWMB.c ****     *
+ 677:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 678:Generated_Source\PSoC5/PWMB.c ****     *  uint8 interruptMode: Bit field containing the interrupt sources enabled
+ 679:Generated_Source\PSoC5/PWMB.c ****     *
+ 680:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 681:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 682:Generated_Source\PSoC5/PWMB.c ****     *
+ 683:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 684:Generated_Source\PSoC5/PWMB.c ****     void PWMB_SetInterruptMode(uint8 interruptMode) 
+ 685:Generated_Source\PSoC5/PWMB.c ****     {
+ 686:Generated_Source\PSoC5/PWMB.c ****         CY_SET_REG8(PWMB_STATUS_MASK_PTR, interruptMode);
+  82              		.loc 1 686 0
+  83 0044 0022     		movs	r2, #0
+  84 0046 03F8082C 		strb	r2, [r3, #-8]
+  85              	.LVL5:
+  86              	.LBE13:
+  87              	.LBE12:
+ 159:Generated_Source\PSoC5/PWMB.c ****         /* Set the Interrupt source to come from the status register */
+  88              		.loc 1 159 0
+  89 004a 084A     		ldr	r2, .L2+8
+  90 004c 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  91 004e 43F00403 		orr	r3, r3, #4
+  92 0052 1370     		strb	r3, [r2]
+ 161:Generated_Source\PSoC5/PWMB.c ****     #else
+  93              		.loc 1 161 0
+  94 0054 92F8763B 		ldrb	r3, [r2, #2934]	@ zero_extendqisi2
+  95 0058 43F00103 		orr	r3, r3, #1
+  96 005c 82F8763B 		strb	r3, [r2, #2934]
+  97 0060 7047     		bx	lr
+  98              	.L3:
+  99 0062 00BF     		.align	2
+ 100              	.L2:
+ 101 0064 184F0040 		.word	1073762072
+ 102 0068 234F0040 		.word	1073762083
+ 103 006c A3430040 		.word	1073759139
+ 104              		.cfi_endproc
+ 105              	.LFE1:
+ 106              		.size	PWMB_Init, .-PWMB_Init
+ 107              		.section	.text.PWMB_Enable,"ax",%progbits
+ 108              		.align	1
+ 109              		.global	PWMB_Enable
+ 110              		.thumb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 15
+
+
+ 111              		.thumb_func
+ 112              		.type	PWMB_Enable, %function
+ 113              	PWMB_Enable:
+ 114              	.LFB2:
+ 200:Generated_Source\PSoC5/PWMB.c ****     /* Globally Enable the Fixed Function Block chosen */
+ 115              		.loc 1 200 0
+ 116              		.cfi_startproc
+ 117              		@ args = 0, pretend = 0, frame = 0
+ 118              		@ frame_needed = 0, uses_anonymous_args = 0
+ 119              		@ link register save eliminated.
+ 203:Generated_Source\PSoC5/PWMB.c ****         PWMB_GLOBAL_STBY_ENABLE |= PWMB_BLOCK_STBY_EN_MASK;
+ 120              		.loc 1 203 0
+ 121 0000 074A     		ldr	r2, .L5
+ 122 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 123 0004 43F00403 		orr	r3, r3, #4
+ 124 0008 1370     		strb	r3, [r2]
+ 204:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UsingFixedFunction) */
+ 125              		.loc 1 204 0
+ 126 000a 137C     		ldrb	r3, [r2, #16]	@ zero_extendqisi2
+ 127 000c 43F00403 		orr	r3, r3, #4
+ 128 0010 1374     		strb	r3, [r2, #16]
+ 209:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UseControl || PWMB_UsingFixedFunction) */
+ 129              		.loc 1 209 0
+ 130 0012 92F8753B 		ldrb	r3, [r2, #2933]	@ zero_extendqisi2
+ 131 0016 43F00103 		orr	r3, r3, #1
+ 132 001a 82F8753B 		strb	r3, [r2, #2933]
+ 133 001e 7047     		bx	lr
+ 134              	.L6:
+ 135              		.align	2
+ 136              	.L5:
+ 137 0020 A3430040 		.word	1073759139
+ 138              		.cfi_endproc
+ 139              	.LFE2:
+ 140              		.size	PWMB_Enable, .-PWMB_Enable
+ 141              		.section	.text.PWMB_Start,"ax",%progbits
+ 142              		.align	1
+ 143              		.global	PWMB_Start
+ 144              		.thumb
+ 145              		.thumb_func
+ 146              		.type	PWMB_Start, %function
+ 147              	PWMB_Start:
+ 148              	.LFB0:
+  56:Generated_Source\PSoC5/PWMB.c ****     /* If not Initialized then initialize all required hardware and software */
+ 149              		.loc 1 56 0
+ 150              		.cfi_startproc
+ 151              		@ args = 0, pretend = 0, frame = 0
+ 152              		@ frame_needed = 0, uses_anonymous_args = 0
+ 153 0000 08B5     		push	{r3, lr}
+ 154              		.cfi_def_cfa_offset 8
+ 155              		.cfi_offset 3, -8
+ 156              		.cfi_offset 14, -4
+  58:Generated_Source\PSoC5/PWMB.c ****     {
+ 157              		.loc 1 58 0
+ 158 0002 0549     		ldr	r1, .L10
+ 159 0004 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 160 0006 1BB9     		cbnz	r3, .L8
+  60:Generated_Source\PSoC5/PWMB.c ****         PWMB_initVar = 1u;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 16
+
+
+ 161              		.loc 1 60 0
+ 162 0008 FFF7FEFF 		bl	PWMB_Init
+ 163              	.LVL6:
+  61:Generated_Source\PSoC5/PWMB.c ****     }
+ 164              		.loc 1 61 0
+ 165 000c 0123     		movs	r3, #1
+ 166 000e 0B70     		strb	r3, [r1]
+ 167              	.L8:
+  65:Generated_Source\PSoC5/PWMB.c **** 
+ 168              		.loc 1 65 0
+ 169 0010 BDE80840 		pop	{r3, lr}
+ 170              		.cfi_restore 14
+ 171              		.cfi_restore 3
+ 172              		.cfi_def_cfa_offset 0
+  63:Generated_Source\PSoC5/PWMB.c **** 
+ 173              		.loc 1 63 0
+ 174 0014 FFF7FEBF 		b	PWMB_Enable
+ 175              	.LVL7:
+ 176              	.L11:
+ 177              		.align	2
+ 178              	.L10:
+ 179 0018 00000000 		.word	.LANCHOR0
+ 180              		.cfi_endproc
+ 181              	.LFE0:
+ 182              		.size	PWMB_Start, .-PWMB_Start
+ 183              		.section	.text.PWMB_Stop,"ax",%progbits
+ 184              		.align	1
+ 185              		.global	PWMB_Stop
+ 186              		.thumb
+ 187              		.thumb_func
+ 188              		.type	PWMB_Stop, %function
+ 189              	PWMB_Stop:
+ 190              	.LFB3:
+ 234:Generated_Source\PSoC5/PWMB.c ****     #if (PWMB_UseControl || PWMB_UsingFixedFunction)
+ 191              		.loc 1 234 0
+ 192              		.cfi_startproc
+ 193              		@ args = 0, pretend = 0, frame = 0
+ 194              		@ frame_needed = 0, uses_anonymous_args = 0
+ 195              		@ link register save eliminated.
+ 236:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UseControl || PWMB_UsingFixedFunction) */
+ 196              		.loc 1 236 0
+ 197 0000 084A     		ldr	r2, .L13
+ 198 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 241:Generated_Source\PSoC5/PWMB.c ****         PWMB_GLOBAL_STBY_ENABLE &= ((uint8)(~PWMB_BLOCK_STBY_EN_MASK));
+ 199              		.loc 1 241 0
+ 200 0004 A2F67532 		subw	r2, r2, #2933
+ 236:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UseControl || PWMB_UsingFixedFunction) */
+ 201              		.loc 1 236 0
+ 202 0008 03F0FE03 		and	r3, r3, #254
+ 203 000c 82F8753B 		strb	r3, [r2, #2933]
+ 241:Generated_Source\PSoC5/PWMB.c ****         PWMB_GLOBAL_STBY_ENABLE &= ((uint8)(~PWMB_BLOCK_STBY_EN_MASK));
+ 204              		.loc 1 241 0
+ 205 0010 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 206 0012 03F0FB03 		and	r3, r3, #251
+ 207 0016 1370     		strb	r3, [r2]
+ 242:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UsingFixedFunction) */
+ 208              		.loc 1 242 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 17
+
+
+ 209 0018 137C     		ldrb	r3, [r2, #16]	@ zero_extendqisi2
+ 210 001a 03F0FB03 		and	r3, r3, #251
+ 211 001e 1374     		strb	r3, [r2, #16]
+ 212 0020 7047     		bx	lr
+ 213              	.L14:
+ 214 0022 00BF     		.align	2
+ 215              	.L13:
+ 216 0024 184F0040 		.word	1073762072
+ 217              		.cfi_endproc
+ 218              	.LFE3:
+ 219              		.size	PWMB_Stop, .-PWMB_Stop
+ 220              		.section	.text.PWMB_WritePeriod,"ax",%progbits
+ 221              		.align	1
+ 222              		.global	PWMB_WritePeriod
+ 223              		.thumb
+ 224              		.thumb_func
+ 225              		.type	PWMB_WritePeriod, %function
+ 226              	PWMB_WritePeriod:
+ 227              	.LFB4:
+ 483:Generated_Source\PSoC5/PWMB.c ****     #if(PWMB_UsingFixedFunction)
+ 228              		.loc 1 483 0
+ 229              		.cfi_startproc
+ 230              		@ args = 0, pretend = 0, frame = 0
+ 231              		@ frame_needed = 0, uses_anonymous_args = 0
+ 232              		@ link register save eliminated.
+ 233              	.LVL8:
+ 485:Generated_Source\PSoC5/PWMB.c ****     #else
+ 234              		.loc 1 485 0
+ 235 0000 014B     		ldr	r3, .L16
+ 236 0002 1880     		strh	r0, [r3]	@ movhi
+ 237 0004 7047     		bx	lr
+ 238              	.L17:
+ 239 0006 00BF     		.align	2
+ 240              	.L16:
+ 241 0008 1C4F0040 		.word	1073762076
+ 242              		.cfi_endproc
+ 243              	.LFE4:
+ 244              		.size	PWMB_WritePeriod, .-PWMB_WritePeriod
+ 245              		.section	.text.PWMB_WriteCompare,"ax",%progbits
+ 246              		.align	1
+ 247              		.global	PWMB_WriteCompare
+ 248              		.thumb
+ 249              		.thumb_func
+ 250              		.type	PWMB_WriteCompare, %function
+ 251              	PWMB_WriteCompare:
+ 252              	.LFB5:
+ 518:Generated_Source\PSoC5/PWMB.c ****         #if(PWMB_UsingFixedFunction)
+ 253              		.loc 1 518 0
+ 254              		.cfi_startproc
+ 255              		@ args = 0, pretend = 0, frame = 0
+ 256              		@ frame_needed = 0, uses_anonymous_args = 0
+ 257              		@ link register save eliminated.
+ 258              	.LVL9:
+ 520:Generated_Source\PSoC5/PWMB.c ****         #else
+ 259              		.loc 1 520 0
+ 260 0000 014B     		ldr	r3, .L19
+ 261 0002 1880     		strh	r0, [r3]	@ movhi
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 18
+
+
+ 262 0004 7047     		bx	lr
+ 263              	.L20:
+ 264 0006 00BF     		.align	2
+ 265              	.L19:
+ 266 0008 1E4F0040 		.word	1073762078
+ 267              		.cfi_endproc
+ 268              	.LFE5:
+ 269              		.size	PWMB_WriteCompare, .-PWMB_WriteCompare
+ 270              		.section	.text.PWMB_SetInterruptMode,"ax",%progbits
+ 271              		.align	1
+ 272              		.global	PWMB_SetInterruptMode
+ 273              		.thumb
+ 274              		.thumb_func
+ 275              		.type	PWMB_SetInterruptMode, %function
+ 276              	PWMB_SetInterruptMode:
+ 277              	.LFB6:
+ 685:Generated_Source\PSoC5/PWMB.c ****         CY_SET_REG8(PWMB_STATUS_MASK_PTR, interruptMode);
+ 278              		.loc 1 685 0
+ 279              		.cfi_startproc
+ 280              		@ args = 0, pretend = 0, frame = 0
+ 281              		@ frame_needed = 0, uses_anonymous_args = 0
+ 282              		@ link register save eliminated.
+ 283              	.LVL10:
+ 284              		.loc 1 686 0
+ 285 0000 014B     		ldr	r3, .L22
+ 286 0002 1870     		strb	r0, [r3]
+ 287 0004 7047     		bx	lr
+ 288              	.L23:
+ 289 0006 00BF     		.align	2
+ 290              	.L22:
+ 291 0008 1B4F0040 		.word	1073762075
+ 292              		.cfi_endproc
+ 293              	.LFE6:
+ 294              		.size	PWMB_SetInterruptMode, .-PWMB_SetInterruptMode
+ 295              		.section	.text.PWMB_ReadStatusRegister,"ax",%progbits
+ 296              		.align	1
+ 297              		.global	PWMB_ReadStatusRegister
+ 298              		.thumb
+ 299              		.thumb_func
+ 300              		.type	PWMB_ReadStatusRegister, %function
+ 301              	PWMB_ReadStatusRegister:
+ 302              	.LFB7:
+ 687:Generated_Source\PSoC5/PWMB.c ****     }
+ 688:Generated_Source\PSoC5/PWMB.c **** 
+ 689:Generated_Source\PSoC5/PWMB.c **** 
+ 690:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 691:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_ReadStatusRegister
+ 692:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 693:Generated_Source\PSoC5/PWMB.c ****     *
+ 694:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 695:Generated_Source\PSoC5/PWMB.c ****     *  This function returns the current state of the status register.
+ 696:Generated_Source\PSoC5/PWMB.c ****     *
+ 697:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 698:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 699:Generated_Source\PSoC5/PWMB.c ****     *
+ 700:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 701:Generated_Source\PSoC5/PWMB.c ****     *  uint8 : Current status register value. The status register bits are:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 19
+
+
+ 702:Generated_Source\PSoC5/PWMB.c ****     *  [7:6] : Unused(0)
+ 703:Generated_Source\PSoC5/PWMB.c ****     *  [5]   : Kill event output
+ 704:Generated_Source\PSoC5/PWMB.c ****     *  [4]   : FIFO not empty
+ 705:Generated_Source\PSoC5/PWMB.c ****     *  [3]   : FIFO full
+ 706:Generated_Source\PSoC5/PWMB.c ****     *  [2]   : Terminal count
+ 707:Generated_Source\PSoC5/PWMB.c ****     *  [1]   : Compare output 2
+ 708:Generated_Source\PSoC5/PWMB.c ****     *  [0]   : Compare output 1
+ 709:Generated_Source\PSoC5/PWMB.c ****     *
+ 710:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 711:Generated_Source\PSoC5/PWMB.c ****     uint8 PWMB_ReadStatusRegister(void) 
+ 712:Generated_Source\PSoC5/PWMB.c ****     {
+ 303              		.loc 1 712 0
+ 304              		.cfi_startproc
+ 305              		@ args = 0, pretend = 0, frame = 0
+ 306              		@ frame_needed = 0, uses_anonymous_args = 0
+ 307              		@ link register save eliminated.
+ 713:Generated_Source\PSoC5/PWMB.c ****         return (CY_GET_REG8(PWMB_STATUS_PTR));
+ 308              		.loc 1 713 0
+ 309 0000 014B     		ldr	r3, .L25
+ 310 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 714:Generated_Source\PSoC5/PWMB.c ****     }
+ 311              		.loc 1 714 0
+ 312 0004 7047     		bx	lr
+ 313              	.L26:
+ 314 0006 00BF     		.align	2
+ 315              	.L25:
+ 316 0008 1B4F0040 		.word	1073762075
+ 317              		.cfi_endproc
+ 318              	.LFE7:
+ 319              		.size	PWMB_ReadStatusRegister, .-PWMB_ReadStatusRegister
+ 320              		.section	.text.PWMB_ReadControlRegister,"ax",%progbits
+ 321              		.align	1
+ 322              		.global	PWMB_ReadControlRegister
+ 323              		.thumb
+ 324              		.thumb_func
+ 325              		.type	PWMB_ReadControlRegister, %function
+ 326              	PWMB_ReadControlRegister:
+ 327              	.LFB8:
+ 715:Generated_Source\PSoC5/PWMB.c **** 
+ 716:Generated_Source\PSoC5/PWMB.c **** #endif /* (PWMB_UseStatus || PWMB_UsingFixedFunction) */
+ 717:Generated_Source\PSoC5/PWMB.c **** 
+ 718:Generated_Source\PSoC5/PWMB.c **** 
+ 719:Generated_Source\PSoC5/PWMB.c **** #if (PWMB_UseControl)
+ 720:Generated_Source\PSoC5/PWMB.c **** 
+ 721:Generated_Source\PSoC5/PWMB.c **** 
+ 722:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 723:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_ReadControlRegister
+ 724:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 725:Generated_Source\PSoC5/PWMB.c ****     *
+ 726:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 727:Generated_Source\PSoC5/PWMB.c ****     *  Returns the current state of the control register. This API is available
+ 728:Generated_Source\PSoC5/PWMB.c ****     *  only if the control register is not removed.
+ 729:Generated_Source\PSoC5/PWMB.c ****     *
+ 730:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 731:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 732:Generated_Source\PSoC5/PWMB.c ****     *
+ 733:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 20
+
+
+ 734:Generated_Source\PSoC5/PWMB.c ****     *  uint8 : Current control register value
+ 735:Generated_Source\PSoC5/PWMB.c ****     *
+ 736:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 737:Generated_Source\PSoC5/PWMB.c ****     uint8 PWMB_ReadControlRegister(void) 
+ 738:Generated_Source\PSoC5/PWMB.c ****     {
+ 328              		.loc 1 738 0
+ 329              		.cfi_startproc
+ 330              		@ args = 0, pretend = 0, frame = 0
+ 331              		@ frame_needed = 0, uses_anonymous_args = 0
+ 332              		@ link register save eliminated.
+ 739:Generated_Source\PSoC5/PWMB.c ****         uint8 result;
+ 740:Generated_Source\PSoC5/PWMB.c **** 
+ 741:Generated_Source\PSoC5/PWMB.c ****         result = CY_GET_REG8(PWMB_CONTROL_PTR);
+ 333              		.loc 1 741 0
+ 334 0000 014B     		ldr	r3, .L28
+ 335 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 336              	.LVL11:
+ 742:Generated_Source\PSoC5/PWMB.c ****         return (result);
+ 743:Generated_Source\PSoC5/PWMB.c ****     }
+ 337              		.loc 1 743 0
+ 338 0004 7047     		bx	lr
+ 339              	.L29:
+ 340 0006 00BF     		.align	2
+ 341              	.L28:
+ 342 0008 184F0040 		.word	1073762072
+ 343              		.cfi_endproc
+ 344              	.LFE8:
+ 345              		.size	PWMB_ReadControlRegister, .-PWMB_ReadControlRegister
+ 346              		.section	.text.PWMB_WriteControlRegister,"ax",%progbits
+ 347              		.align	1
+ 348              		.global	PWMB_WriteControlRegister
+ 349              		.thumb
+ 350              		.thumb_func
+ 351              		.type	PWMB_WriteControlRegister, %function
+ 352              	PWMB_WriteControlRegister:
+ 353              	.LFB9:
+ 744:Generated_Source\PSoC5/PWMB.c **** 
+ 745:Generated_Source\PSoC5/PWMB.c **** 
+ 746:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 747:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_WriteControlRegister
+ 748:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 749:Generated_Source\PSoC5/PWMB.c ****     *
+ 750:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 751:Generated_Source\PSoC5/PWMB.c ****     *  Sets the bit field of the control register. This API is available only if
+ 752:Generated_Source\PSoC5/PWMB.c ****     *  the control register is not removed.
+ 753:Generated_Source\PSoC5/PWMB.c ****     *
+ 754:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 755:Generated_Source\PSoC5/PWMB.c ****     *  uint8 control: Control register bit field, The status register bits are:
+ 756:Generated_Source\PSoC5/PWMB.c ****     *  [7]   : PWM Enable
+ 757:Generated_Source\PSoC5/PWMB.c ****     *  [6]   : Reset
+ 758:Generated_Source\PSoC5/PWMB.c ****     *  [5:3] : Compare Mode2
+ 759:Generated_Source\PSoC5/PWMB.c ****     *  [2:0] : Compare Mode2
+ 760:Generated_Source\PSoC5/PWMB.c ****     *
+ 761:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 762:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 763:Generated_Source\PSoC5/PWMB.c ****     *
+ 764:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 21
+
+
+ 765:Generated_Source\PSoC5/PWMB.c ****     void PWMB_WriteControlRegister(uint8 control) 
+ 766:Generated_Source\PSoC5/PWMB.c ****     {
+ 354              		.loc 1 766 0
+ 355              		.cfi_startproc
+ 356              		@ args = 0, pretend = 0, frame = 0
+ 357              		@ frame_needed = 0, uses_anonymous_args = 0
+ 358              		@ link register save eliminated.
+ 359              	.LVL12:
+ 767:Generated_Source\PSoC5/PWMB.c ****         CY_SET_REG8(PWMB_CONTROL_PTR, control);
+ 360              		.loc 1 767 0
+ 361 0000 014B     		ldr	r3, .L31
+ 362 0002 1870     		strb	r0, [r3]
+ 363 0004 7047     		bx	lr
+ 364              	.L32:
+ 365 0006 00BF     		.align	2
+ 366              	.L31:
+ 367 0008 184F0040 		.word	1073762072
+ 368              		.cfi_endproc
+ 369              	.LFE9:
+ 370              		.size	PWMB_WriteControlRegister, .-PWMB_WriteControlRegister
+ 371              		.section	.text.PWMB_ReadCompare,"ax",%progbits
+ 372              		.align	1
+ 373              		.global	PWMB_ReadCompare
+ 374              		.thumb
+ 375              		.thumb_func
+ 376              		.type	PWMB_ReadCompare, %function
+ 377              	PWMB_ReadCompare:
+ 378              	.LFB10:
+ 768:Generated_Source\PSoC5/PWMB.c ****     }
+ 769:Generated_Source\PSoC5/PWMB.c **** 
+ 770:Generated_Source\PSoC5/PWMB.c **** #endif /* (PWMB_UseControl) */
+ 771:Generated_Source\PSoC5/PWMB.c **** 
+ 772:Generated_Source\PSoC5/PWMB.c **** 
+ 773:Generated_Source\PSoC5/PWMB.c **** #if (!PWMB_UsingFixedFunction)
+ 774:Generated_Source\PSoC5/PWMB.c **** 
+ 775:Generated_Source\PSoC5/PWMB.c **** 
+ 776:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 777:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_ReadCapture
+ 778:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 779:Generated_Source\PSoC5/PWMB.c ****     *
+ 780:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 781:Generated_Source\PSoC5/PWMB.c ****     *  Reads the capture value from the capture FIFO.
+ 782:Generated_Source\PSoC5/PWMB.c ****     *
+ 783:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 784:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 785:Generated_Source\PSoC5/PWMB.c ****     *
+ 786:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 787:Generated_Source\PSoC5/PWMB.c ****     *  uint8/uint16: The current capture value
+ 788:Generated_Source\PSoC5/PWMB.c ****     *
+ 789:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 790:Generated_Source\PSoC5/PWMB.c ****     uint16 PWMB_ReadCapture(void) 
+ 791:Generated_Source\PSoC5/PWMB.c ****     {
+ 792:Generated_Source\PSoC5/PWMB.c ****         return (CY_GET_REG16(PWMB_CAPTURE_LSB_PTR));
+ 793:Generated_Source\PSoC5/PWMB.c ****     }
+ 794:Generated_Source\PSoC5/PWMB.c **** 
+ 795:Generated_Source\PSoC5/PWMB.c **** #endif /* (!PWMB_UsingFixedFunction) */
+ 796:Generated_Source\PSoC5/PWMB.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 22
+
+
+ 797:Generated_Source\PSoC5/PWMB.c **** 
+ 798:Generated_Source\PSoC5/PWMB.c **** #if (PWMB_UseOneCompareMode)
+ 799:Generated_Source\PSoC5/PWMB.c **** 
+ 800:Generated_Source\PSoC5/PWMB.c **** 
+ 801:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 802:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_ReadCompare
+ 803:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 804:Generated_Source\PSoC5/PWMB.c ****     *
+ 805:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 806:Generated_Source\PSoC5/PWMB.c ****     *  Reads the compare value for the compare output when the PWM Mode parameter is
+ 807:Generated_Source\PSoC5/PWMB.c ****     *  set to Dither mode, Center Aligned mode, or One Output mode.
+ 808:Generated_Source\PSoC5/PWMB.c ****     *
+ 809:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 810:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 811:Generated_Source\PSoC5/PWMB.c ****     *
+ 812:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 813:Generated_Source\PSoC5/PWMB.c ****     *  uint8/uint16: Current compare value
+ 814:Generated_Source\PSoC5/PWMB.c ****     *
+ 815:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 816:Generated_Source\PSoC5/PWMB.c ****     uint16 PWMB_ReadCompare(void) 
+ 817:Generated_Source\PSoC5/PWMB.c ****     {
+ 379              		.loc 1 817 0
+ 380              		.cfi_startproc
+ 381              		@ args = 0, pretend = 0, frame = 0
+ 382              		@ frame_needed = 0, uses_anonymous_args = 0
+ 383              		@ link register save eliminated.
+ 818:Generated_Source\PSoC5/PWMB.c ****         #if(PWMB_UsingFixedFunction)
+ 819:Generated_Source\PSoC5/PWMB.c ****             return ((uint16)CY_GET_REG16(PWMB_COMPARE1_LSB_PTR));
+ 384              		.loc 1 819 0
+ 385 0000 014B     		ldr	r3, .L34
+ 386 0002 1888     		ldrh	r0, [r3]
+ 820:Generated_Source\PSoC5/PWMB.c ****         #else
+ 821:Generated_Source\PSoC5/PWMB.c ****             return (CY_GET_REG16(PWMB_COMPARE1_LSB_PTR));
+ 822:Generated_Source\PSoC5/PWMB.c ****         #endif /* (PWMB_UsingFixedFunction) */
+ 823:Generated_Source\PSoC5/PWMB.c ****     }
+ 387              		.loc 1 823 0
+ 388 0004 80B2     		uxth	r0, r0
+ 389 0006 7047     		bx	lr
+ 390              	.L35:
+ 391              		.align	2
+ 392              	.L34:
+ 393 0008 1E4F0040 		.word	1073762078
+ 394              		.cfi_endproc
+ 395              	.LFE10:
+ 396              		.size	PWMB_ReadCompare, .-PWMB_ReadCompare
+ 397              		.section	.text.PWMB_ReadPeriod,"ax",%progbits
+ 398              		.align	1
+ 399              		.global	PWMB_ReadPeriod
+ 400              		.thumb
+ 401              		.thumb_func
+ 402              		.type	PWMB_ReadPeriod, %function
+ 403              	PWMB_ReadPeriod:
+ 404              	.LFB11:
+ 824:Generated_Source\PSoC5/PWMB.c **** 
+ 825:Generated_Source\PSoC5/PWMB.c **** #else
+ 826:Generated_Source\PSoC5/PWMB.c **** 
+ 827:Generated_Source\PSoC5/PWMB.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 23
+
+
+ 828:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 829:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_ReadCompare1
+ 830:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 831:Generated_Source\PSoC5/PWMB.c ****     *
+ 832:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 833:Generated_Source\PSoC5/PWMB.c ****     *  Reads the compare value for the compare1 output.
+ 834:Generated_Source\PSoC5/PWMB.c ****     *
+ 835:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 836:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 837:Generated_Source\PSoC5/PWMB.c ****     *
+ 838:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 839:Generated_Source\PSoC5/PWMB.c ****     *  uint8/uint16: Current compare value.
+ 840:Generated_Source\PSoC5/PWMB.c ****     *
+ 841:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 842:Generated_Source\PSoC5/PWMB.c ****     uint16 PWMB_ReadCompare1(void) 
+ 843:Generated_Source\PSoC5/PWMB.c ****     {
+ 844:Generated_Source\PSoC5/PWMB.c ****         return (CY_GET_REG16(PWMB_COMPARE1_LSB_PTR));
+ 845:Generated_Source\PSoC5/PWMB.c ****     }
+ 846:Generated_Source\PSoC5/PWMB.c **** 
+ 847:Generated_Source\PSoC5/PWMB.c **** 
+ 848:Generated_Source\PSoC5/PWMB.c ****     /*******************************************************************************
+ 849:Generated_Source\PSoC5/PWMB.c ****     * Function Name: PWMB_ReadCompare2
+ 850:Generated_Source\PSoC5/PWMB.c ****     ********************************************************************************
+ 851:Generated_Source\PSoC5/PWMB.c ****     *
+ 852:Generated_Source\PSoC5/PWMB.c ****     * Summary:
+ 853:Generated_Source\PSoC5/PWMB.c ****     *  Reads the compare value for the compare2 output.
+ 854:Generated_Source\PSoC5/PWMB.c ****     *
+ 855:Generated_Source\PSoC5/PWMB.c ****     * Parameters:
+ 856:Generated_Source\PSoC5/PWMB.c ****     *  None
+ 857:Generated_Source\PSoC5/PWMB.c ****     *
+ 858:Generated_Source\PSoC5/PWMB.c ****     * Return:
+ 859:Generated_Source\PSoC5/PWMB.c ****     *  uint8/uint16: Current compare value.
+ 860:Generated_Source\PSoC5/PWMB.c ****     *
+ 861:Generated_Source\PSoC5/PWMB.c ****     *******************************************************************************/
+ 862:Generated_Source\PSoC5/PWMB.c ****     uint16 PWMB_ReadCompare2(void) 
+ 863:Generated_Source\PSoC5/PWMB.c ****     {
+ 864:Generated_Source\PSoC5/PWMB.c ****         return (CY_GET_REG16(PWMB_COMPARE2_LSB_PTR));
+ 865:Generated_Source\PSoC5/PWMB.c ****     }
+ 866:Generated_Source\PSoC5/PWMB.c **** 
+ 867:Generated_Source\PSoC5/PWMB.c **** #endif /* (PWMB_UseOneCompareMode) */
+ 868:Generated_Source\PSoC5/PWMB.c **** 
+ 869:Generated_Source\PSoC5/PWMB.c **** 
+ 870:Generated_Source\PSoC5/PWMB.c **** /*******************************************************************************
+ 871:Generated_Source\PSoC5/PWMB.c **** * Function Name: PWMB_ReadPeriod
+ 872:Generated_Source\PSoC5/PWMB.c **** ********************************************************************************
+ 873:Generated_Source\PSoC5/PWMB.c **** *
+ 874:Generated_Source\PSoC5/PWMB.c **** * Summary:
+ 875:Generated_Source\PSoC5/PWMB.c **** *  Reads the period value used by the PWM hardware.
+ 876:Generated_Source\PSoC5/PWMB.c **** *
+ 877:Generated_Source\PSoC5/PWMB.c **** * Parameters:
+ 878:Generated_Source\PSoC5/PWMB.c **** *  None
+ 879:Generated_Source\PSoC5/PWMB.c **** *
+ 880:Generated_Source\PSoC5/PWMB.c **** * Return:
+ 881:Generated_Source\PSoC5/PWMB.c **** *  uint8/16: Period value
+ 882:Generated_Source\PSoC5/PWMB.c **** *
+ 883:Generated_Source\PSoC5/PWMB.c **** *******************************************************************************/
+ 884:Generated_Source\PSoC5/PWMB.c **** uint16 PWMB_ReadPeriod(void) 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 24
+
+
+ 885:Generated_Source\PSoC5/PWMB.c **** {
+ 405              		.loc 1 885 0
+ 406              		.cfi_startproc
+ 407              		@ args = 0, pretend = 0, frame = 0
+ 408              		@ frame_needed = 0, uses_anonymous_args = 0
+ 409              		@ link register save eliminated.
+ 886:Generated_Source\PSoC5/PWMB.c ****     #if(PWMB_UsingFixedFunction)
+ 887:Generated_Source\PSoC5/PWMB.c ****         return ((uint16)CY_GET_REG16(PWMB_PERIOD_LSB_PTR));
+ 410              		.loc 1 887 0
+ 411 0000 014B     		ldr	r3, .L37
+ 412 0002 1888     		ldrh	r0, [r3]
+ 888:Generated_Source\PSoC5/PWMB.c ****     #else
+ 889:Generated_Source\PSoC5/PWMB.c ****         return (CY_GET_REG16(PWMB_PERIOD_LSB_PTR));
+ 890:Generated_Source\PSoC5/PWMB.c ****     #endif /* (PWMB_UsingFixedFunction) */
+ 891:Generated_Source\PSoC5/PWMB.c **** }
+ 413              		.loc 1 891 0
+ 414 0004 80B2     		uxth	r0, r0
+ 415 0006 7047     		bx	lr
+ 416              	.L38:
+ 417              		.align	2
+ 418              	.L37:
+ 419 0008 1C4F0040 		.word	1073762076
+ 420              		.cfi_endproc
+ 421              	.LFE11:
+ 422              		.size	PWMB_ReadPeriod, .-PWMB_ReadPeriod
+ 423              		.global	PWMB_initVar
+ 424              		.bss
+ 425              		.set	.LANCHOR0,. + 0
+ 426              		.type	PWMB_initVar, %object
+ 427              		.size	PWMB_initVar, 1
+ 428              	PWMB_initVar:
+ 429 0000 00       		.space	1
+ 430              		.text
+ 431              	.Letext0:
+ 432              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+ 433              		.section	.debug_info,"",%progbits
+ 434              	.Ldebug_info0:
+ 435 0000 C0020000 		.4byte	0x2c0
+ 436 0004 0400     		.2byte	0x4
+ 437 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 438 000a 04       		.byte	0x4
+ 439 000b 01       		.uleb128 0x1
+ 440 000c B2000000 		.4byte	.LASF33
+ 441 0010 0C       		.byte	0xc
+ 442 0011 17020000 		.4byte	.LASF34
+ 443 0015 D7010000 		.4byte	.LASF35
+ 444 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 445 001d 00000000 		.4byte	0
+ 446 0021 00000000 		.4byte	.Ldebug_line0
+ 447 0025 02       		.uleb128 0x2
+ 448 0026 01       		.byte	0x1
+ 449 0027 06       		.byte	0x6
+ 450 0028 35020000 		.4byte	.LASF0
+ 451 002c 02       		.uleb128 0x2
+ 452 002d 01       		.byte	0x1
+ 453 002e 08       		.byte	0x8
+ 454 002f 8D000000 		.4byte	.LASF1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 25
+
+
+ 455 0033 02       		.uleb128 0x2
+ 456 0034 02       		.byte	0x2
+ 457 0035 05       		.byte	0x5
+ 458 0036 CD010000 		.4byte	.LASF2
+ 459 003a 02       		.uleb128 0x2
+ 460 003b 02       		.byte	0x2
+ 461 003c 07       		.byte	0x7
+ 462 003d 18000000 		.4byte	.LASF3
+ 463 0041 02       		.uleb128 0x2
+ 464 0042 04       		.byte	0x4
+ 465 0043 05       		.byte	0x5
+ 466 0044 FC010000 		.4byte	.LASF4
+ 467 0048 02       		.uleb128 0x2
+ 468 0049 04       		.byte	0x4
+ 469 004a 07       		.byte	0x7
+ 470 004b A0000000 		.4byte	.LASF5
+ 471 004f 02       		.uleb128 0x2
+ 472 0050 08       		.byte	0x8
+ 473 0051 05       		.byte	0x5
+ 474 0052 B1010000 		.4byte	.LASF6
+ 475 0056 02       		.uleb128 0x2
+ 476 0057 08       		.byte	0x8
+ 477 0058 07       		.byte	0x7
+ 478 0059 85010000 		.4byte	.LASF7
+ 479 005d 03       		.uleb128 0x3
+ 480 005e 04       		.byte	0x4
+ 481 005f 05       		.byte	0x5
+ 482 0060 696E7400 		.ascii	"int\000"
+ 483 0064 02       		.uleb128 0x2
+ 484 0065 04       		.byte	0x4
+ 485 0066 07       		.byte	0x7
+ 486 0067 67010000 		.4byte	.LASF8
+ 487 006b 04       		.uleb128 0x4
+ 488 006c 4B010000 		.4byte	.LASF9
+ 489 0070 02       		.byte	0x2
+ 490 0071 9201     		.2byte	0x192
+ 491 0073 2C000000 		.4byte	0x2c
+ 492 0077 04       		.uleb128 0x4
+ 493 0078 60010000 		.4byte	.LASF10
+ 494 007c 02       		.byte	0x2
+ 495 007d 9301     		.2byte	0x193
+ 496 007f 3A000000 		.4byte	0x3a
+ 497 0083 02       		.uleb128 0x2
+ 498 0084 04       		.byte	0x4
+ 499 0085 04       		.byte	0x4
+ 500 0086 69000000 		.4byte	.LASF11
+ 501 008a 02       		.uleb128 0x2
+ 502 008b 08       		.byte	0x8
+ 503 008c 04       		.byte	0x4
+ 504 008d 59010000 		.4byte	.LASF12
+ 505 0091 02       		.uleb128 0x2
+ 506 0092 01       		.byte	0x1
+ 507 0093 08       		.byte	0x8
+ 508 0094 05020000 		.4byte	.LASF13
+ 509 0098 04       		.uleb128 0x4
+ 510 0099 9B000000 		.4byte	.LASF14
+ 511 009d 02       		.byte	0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 26
+
+
+ 512 009e 3C02     		.2byte	0x23c
+ 513 00a0 A4000000 		.4byte	0xa4
+ 514 00a4 05       		.uleb128 0x5
+ 515 00a5 6B000000 		.4byte	0x6b
+ 516 00a9 04       		.uleb128 0x4
+ 517 00aa 00000000 		.4byte	.LASF15
+ 518 00ae 02       		.byte	0x2
+ 519 00af 3D02     		.2byte	0x23d
+ 520 00b1 B5000000 		.4byte	0xb5
+ 521 00b5 05       		.uleb128 0x5
+ 522 00b6 77000000 		.4byte	0x77
+ 523 00ba 02       		.uleb128 0x2
+ 524 00bb 04       		.byte	0x4
+ 525 00bc 07       		.byte	0x7
+ 526 00bd A8010000 		.4byte	.LASF16
+ 527 00c1 06       		.uleb128 0x6
+ 528 00c2 49020000 		.4byte	.LASF17
+ 529 00c6 01       		.byte	0x1
+ 530 00c7 AC02     		.2byte	0x2ac
+ 531 00c9 01       		.byte	0x1
+ 532 00ca DB000000 		.4byte	0xdb
+ 533 00ce 07       		.uleb128 0x7
+ 534 00cf BF010000 		.4byte	.LASF19
+ 535 00d3 01       		.byte	0x1
+ 536 00d4 AC02     		.2byte	0x2ac
+ 537 00d6 6B000000 		.4byte	0x6b
+ 538 00da 00       		.byte	0
+ 539 00db 06       		.uleb128 0x6
+ 540 00dc 7B000000 		.4byte	.LASF18
+ 541 00e0 01       		.byte	0x1
+ 542 00e1 0402     		.2byte	0x204
+ 543 00e3 01       		.byte	0x1
+ 544 00e4 F5000000 		.4byte	0xf5
+ 545 00e8 07       		.uleb128 0x7
+ 546 00e9 41020000 		.4byte	.LASF20
+ 547 00ed 01       		.byte	0x1
+ 548 00ee 0402     		.2byte	0x204
+ 549 00f0 77000000 		.4byte	0x77
+ 550 00f4 00       		.byte	0
+ 551 00f5 06       		.uleb128 0x6
+ 552 00f6 90020000 		.4byte	.LASF21
+ 553 00fa 01       		.byte	0x1
+ 554 00fb E201     		.2byte	0x1e2
+ 555 00fd 01       		.byte	0x1
+ 556 00fe 0F010000 		.4byte	0x10f
+ 557 0102 07       		.uleb128 0x7
+ 558 0103 11000000 		.4byte	.LASF22
+ 559 0107 01       		.byte	0x1
+ 560 0108 E201     		.2byte	0x1e2
+ 561 010a 77000000 		.4byte	0x77
+ 562 010e 00       		.byte	0
+ 563 010f 08       		.uleb128 0x8
+ 564 0110 2B000000 		.4byte	.LASF23
+ 565 0114 01       		.byte	0x1
+ 566 0115 54       		.byte	0x54
+ 567 0116 00000000 		.4byte	.LFB1
+ 568 011a 70000000 		.4byte	.LFE1-.LFB1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 27
+
+
+ 569 011e 01       		.uleb128 0x1
+ 570 011f 9C       		.byte	0x9c
+ 571 0120 87010000 		.4byte	0x187
+ 572 0124 09       		.uleb128 0x9
+ 573 0125 A3010000 		.4byte	.LASF27
+ 574 0129 01       		.byte	0x1
+ 575 012a 57       		.byte	0x57
+ 576 012b 6B000000 		.4byte	0x6b
+ 577 012f 00000000 		.4byte	.LLST0
+ 578 0133 0A       		.uleb128 0xa
+ 579 0134 F5000000 		.4byte	0xf5
+ 580 0138 38000000 		.4byte	.LBB8
+ 581 013c 06000000 		.4byte	.LBE8-.LBB8
+ 582 0140 01       		.byte	0x1
+ 583 0141 88       		.byte	0x88
+ 584 0142 50010000 		.4byte	0x150
+ 585 0146 0B       		.uleb128 0xb
+ 586 0147 02010000 		.4byte	0x102
+ 587 014b 18000000 		.4byte	.LLST1
+ 588 014f 00       		.byte	0
+ 589 0150 0A       		.uleb128 0xa
+ 590 0151 DB000000 		.4byte	0xdb
+ 591 0155 3E000000 		.4byte	.LBB10
+ 592 0159 06000000 		.4byte	.LBE10-.LBB10
+ 593 015d 01       		.byte	0x1
+ 594 015e 8B       		.byte	0x8b
+ 595 015f 6D010000 		.4byte	0x16d
+ 596 0163 0B       		.uleb128 0xb
+ 597 0164 E8000000 		.4byte	0xe8
+ 598 0168 2D000000 		.4byte	.LLST2
+ 599 016c 00       		.byte	0
+ 600 016d 0C       		.uleb128 0xc
+ 601 016e C1000000 		.4byte	0xc1
+ 602 0172 44000000 		.4byte	.LBB12
+ 603 0176 06000000 		.4byte	.LBE12-.LBB12
+ 604 017a 01       		.byte	0x1
+ 605 017b 9A       		.byte	0x9a
+ 606 017c 0B       		.uleb128 0xb
+ 607 017d CE000000 		.4byte	0xce
+ 608 0181 41000000 		.4byte	.LLST3
+ 609 0185 00       		.byte	0
+ 610 0186 00       		.byte	0
+ 611 0187 0D       		.uleb128 0xd
+ 612 0188 6F000000 		.4byte	.LASF25
+ 613 018c 01       		.byte	0x1
+ 614 018d C7       		.byte	0xc7
+ 615 018e 00000000 		.4byte	.LFB2
+ 616 0192 24000000 		.4byte	.LFE2-.LFB2
+ 617 0196 01       		.uleb128 0x1
+ 618 0197 9C       		.byte	0x9c
+ 619 0198 08       		.uleb128 0x8
+ 620 0199 06000000 		.4byte	.LASF24
+ 621 019d 01       		.byte	0x1
+ 622 019e 37       		.byte	0x37
+ 623 019f 00000000 		.4byte	.LFB0
+ 624 01a3 1C000000 		.4byte	.LFE0-.LFB0
+ 625 01a7 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 28
+
+
+ 626 01a8 9C       		.byte	0x9c
+ 627 01a9 C0010000 		.4byte	0x1c0
+ 628 01ad 0E       		.uleb128 0xe
+ 629 01ae 0C000000 		.4byte	.LVL6
+ 630 01b2 0F010000 		.4byte	0x10f
+ 631 01b6 0F       		.uleb128 0xf
+ 632 01b7 18000000 		.4byte	.LVL7
+ 633 01bb 87010000 		.4byte	0x187
+ 634 01bf 00       		.byte	0
+ 635 01c0 0D       		.uleb128 0xd
+ 636 01c1 45000000 		.4byte	.LASF26
+ 637 01c5 01       		.byte	0x1
+ 638 01c6 E9       		.byte	0xe9
+ 639 01c7 00000000 		.4byte	.LFB3
+ 640 01cb 28000000 		.4byte	.LFE3-.LFB3
+ 641 01cf 01       		.uleb128 0x1
+ 642 01d0 9C       		.byte	0x9c
+ 643 01d1 10       		.uleb128 0x10
+ 644 01d2 F5000000 		.4byte	0xf5
+ 645 01d6 00000000 		.4byte	.LFB4
+ 646 01da 0C000000 		.4byte	.LFE4-.LFB4
+ 647 01de 01       		.uleb128 0x1
+ 648 01df 9C       		.byte	0x9c
+ 649 01e0 EC010000 		.4byte	0x1ec
+ 650 01e4 11       		.uleb128 0x11
+ 651 01e5 02010000 		.4byte	0x102
+ 652 01e9 01       		.uleb128 0x1
+ 653 01ea 50       		.byte	0x50
+ 654 01eb 00       		.byte	0
+ 655 01ec 10       		.uleb128 0x10
+ 656 01ed DB000000 		.4byte	0xdb
+ 657 01f1 00000000 		.4byte	.LFB5
+ 658 01f5 0C000000 		.4byte	.LFE5-.LFB5
+ 659 01f9 01       		.uleb128 0x1
+ 660 01fa 9C       		.byte	0x9c
+ 661 01fb 07020000 		.4byte	0x207
+ 662 01ff 11       		.uleb128 0x11
+ 663 0200 E8000000 		.4byte	0xe8
+ 664 0204 01       		.uleb128 0x1
+ 665 0205 50       		.byte	0x50
+ 666 0206 00       		.byte	0
+ 667 0207 10       		.uleb128 0x10
+ 668 0208 C1000000 		.4byte	0xc1
+ 669 020c 00000000 		.4byte	.LFB6
+ 670 0210 0C000000 		.4byte	.LFE6-.LFB6
+ 671 0214 01       		.uleb128 0x1
+ 672 0215 9C       		.byte	0x9c
+ 673 0216 22020000 		.4byte	0x222
+ 674 021a 11       		.uleb128 0x11
+ 675 021b CE000000 		.4byte	0xce
+ 676 021f 01       		.uleb128 0x1
+ 677 0220 50       		.byte	0x50
+ 678 0221 00       		.byte	0
+ 679 0222 12       		.uleb128 0x12
+ 680 0223 5F020000 		.4byte	.LASF30
+ 681 0227 01       		.byte	0x1
+ 682 0228 C702     		.2byte	0x2c7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 29
+
+
+ 683 022a 6B000000 		.4byte	0x6b
+ 684 022e 00000000 		.4byte	.LFB7
+ 685 0232 0C000000 		.4byte	.LFE7-.LFB7
+ 686 0236 01       		.uleb128 0x1
+ 687 0237 9C       		.byte	0x9c
+ 688 0238 13       		.uleb128 0x13
+ 689 0239 77020000 		.4byte	.LASF36
+ 690 023d 01       		.byte	0x1
+ 691 023e E102     		.2byte	0x2e1
+ 692 0240 6B000000 		.4byte	0x6b
+ 693 0244 00000000 		.4byte	.LFB8
+ 694 0248 0C000000 		.4byte	.LFE8-.LFB8
+ 695 024c 01       		.uleb128 0x1
+ 696 024d 9C       		.byte	0x9c
+ 697 024e 61020000 		.4byte	0x261
+ 698 0252 14       		.uleb128 0x14
+ 699 0253 9C010000 		.4byte	.LASF28
+ 700 0257 01       		.byte	0x1
+ 701 0258 E302     		.2byte	0x2e3
+ 702 025a 6B000000 		.4byte	0x6b
+ 703 025e 01       		.uleb128 0x1
+ 704 025f 50       		.byte	0x50
+ 705 0260 00       		.byte	0
+ 706 0261 15       		.uleb128 0x15
+ 707 0262 4F000000 		.4byte	.LASF29
+ 708 0266 01       		.byte	0x1
+ 709 0267 FD02     		.2byte	0x2fd
+ 710 0269 00000000 		.4byte	.LFB9
+ 711 026d 0C000000 		.4byte	.LFE9-.LFB9
+ 712 0271 01       		.uleb128 0x1
+ 713 0272 9C       		.byte	0x9c
+ 714 0273 86020000 		.4byte	0x286
+ 715 0277 16       		.uleb128 0x16
+ 716 0278 51010000 		.4byte	.LASF37
+ 717 027c 01       		.byte	0x1
+ 718 027d FD02     		.2byte	0x2fd
+ 719 027f 6B000000 		.4byte	0x6b
+ 720 0283 01       		.uleb128 0x1
+ 721 0284 50       		.byte	0x50
+ 722 0285 00       		.byte	0
+ 723 0286 12       		.uleb128 0x12
+ 724 0287 74010000 		.4byte	.LASF31
+ 725 028b 01       		.byte	0x1
+ 726 028c 3003     		.2byte	0x330
+ 727 028e 77000000 		.4byte	0x77
+ 728 0292 00000000 		.4byte	.LFB10
+ 729 0296 0C000000 		.4byte	.LFE10-.LFB10
+ 730 029a 01       		.uleb128 0x1
+ 731 029b 9C       		.byte	0x9c
+ 732 029c 12       		.uleb128 0x12
+ 733 029d 35000000 		.4byte	.LASF32
+ 734 02a1 01       		.byte	0x1
+ 735 02a2 7403     		.2byte	0x374
+ 736 02a4 77000000 		.4byte	0x77
+ 737 02a8 00000000 		.4byte	.LFB11
+ 738 02ac 0C000000 		.4byte	.LFE11-.LFB11
+ 739 02b0 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 30
+
+
+ 740 02b1 9C       		.byte	0x9c
+ 741 02b2 17       		.uleb128 0x17
+ 742 02b3 0A020000 		.4byte	.LASF38
+ 743 02b7 01       		.byte	0x1
+ 744 02b8 20       		.byte	0x20
+ 745 02b9 6B000000 		.4byte	0x6b
+ 746 02bd 05       		.uleb128 0x5
+ 747 02be 03       		.byte	0x3
+ 748 02bf 00000000 		.4byte	PWMB_initVar
+ 749 02c3 00       		.byte	0
+ 750              		.section	.debug_abbrev,"",%progbits
+ 751              	.Ldebug_abbrev0:
+ 752 0000 01       		.uleb128 0x1
+ 753 0001 11       		.uleb128 0x11
+ 754 0002 01       		.byte	0x1
+ 755 0003 25       		.uleb128 0x25
+ 756 0004 0E       		.uleb128 0xe
+ 757 0005 13       		.uleb128 0x13
+ 758 0006 0B       		.uleb128 0xb
+ 759 0007 03       		.uleb128 0x3
+ 760 0008 0E       		.uleb128 0xe
+ 761 0009 1B       		.uleb128 0x1b
+ 762 000a 0E       		.uleb128 0xe
+ 763 000b 55       		.uleb128 0x55
+ 764 000c 17       		.uleb128 0x17
+ 765 000d 11       		.uleb128 0x11
+ 766 000e 01       		.uleb128 0x1
+ 767 000f 10       		.uleb128 0x10
+ 768 0010 17       		.uleb128 0x17
+ 769 0011 00       		.byte	0
+ 770 0012 00       		.byte	0
+ 771 0013 02       		.uleb128 0x2
+ 772 0014 24       		.uleb128 0x24
+ 773 0015 00       		.byte	0
+ 774 0016 0B       		.uleb128 0xb
+ 775 0017 0B       		.uleb128 0xb
+ 776 0018 3E       		.uleb128 0x3e
+ 777 0019 0B       		.uleb128 0xb
+ 778 001a 03       		.uleb128 0x3
+ 779 001b 0E       		.uleb128 0xe
+ 780 001c 00       		.byte	0
+ 781 001d 00       		.byte	0
+ 782 001e 03       		.uleb128 0x3
+ 783 001f 24       		.uleb128 0x24
+ 784 0020 00       		.byte	0
+ 785 0021 0B       		.uleb128 0xb
+ 786 0022 0B       		.uleb128 0xb
+ 787 0023 3E       		.uleb128 0x3e
+ 788 0024 0B       		.uleb128 0xb
+ 789 0025 03       		.uleb128 0x3
+ 790 0026 08       		.uleb128 0x8
+ 791 0027 00       		.byte	0
+ 792 0028 00       		.byte	0
+ 793 0029 04       		.uleb128 0x4
+ 794 002a 16       		.uleb128 0x16
+ 795 002b 00       		.byte	0
+ 796 002c 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 31
+
+
+ 797 002d 0E       		.uleb128 0xe
+ 798 002e 3A       		.uleb128 0x3a
+ 799 002f 0B       		.uleb128 0xb
+ 800 0030 3B       		.uleb128 0x3b
+ 801 0031 05       		.uleb128 0x5
+ 802 0032 49       		.uleb128 0x49
+ 803 0033 13       		.uleb128 0x13
+ 804 0034 00       		.byte	0
+ 805 0035 00       		.byte	0
+ 806 0036 05       		.uleb128 0x5
+ 807 0037 35       		.uleb128 0x35
+ 808 0038 00       		.byte	0
+ 809 0039 49       		.uleb128 0x49
+ 810 003a 13       		.uleb128 0x13
+ 811 003b 00       		.byte	0
+ 812 003c 00       		.byte	0
+ 813 003d 06       		.uleb128 0x6
+ 814 003e 2E       		.uleb128 0x2e
+ 815 003f 01       		.byte	0x1
+ 816 0040 3F       		.uleb128 0x3f
+ 817 0041 19       		.uleb128 0x19
+ 818 0042 03       		.uleb128 0x3
+ 819 0043 0E       		.uleb128 0xe
+ 820 0044 3A       		.uleb128 0x3a
+ 821 0045 0B       		.uleb128 0xb
+ 822 0046 3B       		.uleb128 0x3b
+ 823 0047 05       		.uleb128 0x5
+ 824 0048 27       		.uleb128 0x27
+ 825 0049 19       		.uleb128 0x19
+ 826 004a 20       		.uleb128 0x20
+ 827 004b 0B       		.uleb128 0xb
+ 828 004c 01       		.uleb128 0x1
+ 829 004d 13       		.uleb128 0x13
+ 830 004e 00       		.byte	0
+ 831 004f 00       		.byte	0
+ 832 0050 07       		.uleb128 0x7
+ 833 0051 05       		.uleb128 0x5
+ 834 0052 00       		.byte	0
+ 835 0053 03       		.uleb128 0x3
+ 836 0054 0E       		.uleb128 0xe
+ 837 0055 3A       		.uleb128 0x3a
+ 838 0056 0B       		.uleb128 0xb
+ 839 0057 3B       		.uleb128 0x3b
+ 840 0058 05       		.uleb128 0x5
+ 841 0059 49       		.uleb128 0x49
+ 842 005a 13       		.uleb128 0x13
+ 843 005b 00       		.byte	0
+ 844 005c 00       		.byte	0
+ 845 005d 08       		.uleb128 0x8
+ 846 005e 2E       		.uleb128 0x2e
+ 847 005f 01       		.byte	0x1
+ 848 0060 3F       		.uleb128 0x3f
+ 849 0061 19       		.uleb128 0x19
+ 850 0062 03       		.uleb128 0x3
+ 851 0063 0E       		.uleb128 0xe
+ 852 0064 3A       		.uleb128 0x3a
+ 853 0065 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 32
+
+
+ 854 0066 3B       		.uleb128 0x3b
+ 855 0067 0B       		.uleb128 0xb
+ 856 0068 27       		.uleb128 0x27
+ 857 0069 19       		.uleb128 0x19
+ 858 006a 11       		.uleb128 0x11
+ 859 006b 01       		.uleb128 0x1
+ 860 006c 12       		.uleb128 0x12
+ 861 006d 06       		.uleb128 0x6
+ 862 006e 40       		.uleb128 0x40
+ 863 006f 18       		.uleb128 0x18
+ 864 0070 9742     		.uleb128 0x2117
+ 865 0072 19       		.uleb128 0x19
+ 866 0073 01       		.uleb128 0x1
+ 867 0074 13       		.uleb128 0x13
+ 868 0075 00       		.byte	0
+ 869 0076 00       		.byte	0
+ 870 0077 09       		.uleb128 0x9
+ 871 0078 34       		.uleb128 0x34
+ 872 0079 00       		.byte	0
+ 873 007a 03       		.uleb128 0x3
+ 874 007b 0E       		.uleb128 0xe
+ 875 007c 3A       		.uleb128 0x3a
+ 876 007d 0B       		.uleb128 0xb
+ 877 007e 3B       		.uleb128 0x3b
+ 878 007f 0B       		.uleb128 0xb
+ 879 0080 49       		.uleb128 0x49
+ 880 0081 13       		.uleb128 0x13
+ 881 0082 02       		.uleb128 0x2
+ 882 0083 17       		.uleb128 0x17
+ 883 0084 00       		.byte	0
+ 884 0085 00       		.byte	0
+ 885 0086 0A       		.uleb128 0xa
+ 886 0087 1D       		.uleb128 0x1d
+ 887 0088 01       		.byte	0x1
+ 888 0089 31       		.uleb128 0x31
+ 889 008a 13       		.uleb128 0x13
+ 890 008b 11       		.uleb128 0x11
+ 891 008c 01       		.uleb128 0x1
+ 892 008d 12       		.uleb128 0x12
+ 893 008e 06       		.uleb128 0x6
+ 894 008f 58       		.uleb128 0x58
+ 895 0090 0B       		.uleb128 0xb
+ 896 0091 59       		.uleb128 0x59
+ 897 0092 0B       		.uleb128 0xb
+ 898 0093 01       		.uleb128 0x1
+ 899 0094 13       		.uleb128 0x13
+ 900 0095 00       		.byte	0
+ 901 0096 00       		.byte	0
+ 902 0097 0B       		.uleb128 0xb
+ 903 0098 05       		.uleb128 0x5
+ 904 0099 00       		.byte	0
+ 905 009a 31       		.uleb128 0x31
+ 906 009b 13       		.uleb128 0x13
+ 907 009c 02       		.uleb128 0x2
+ 908 009d 17       		.uleb128 0x17
+ 909 009e 00       		.byte	0
+ 910 009f 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 33
+
+
+ 911 00a0 0C       		.uleb128 0xc
+ 912 00a1 1D       		.uleb128 0x1d
+ 913 00a2 01       		.byte	0x1
+ 914 00a3 31       		.uleb128 0x31
+ 915 00a4 13       		.uleb128 0x13
+ 916 00a5 11       		.uleb128 0x11
+ 917 00a6 01       		.uleb128 0x1
+ 918 00a7 12       		.uleb128 0x12
+ 919 00a8 06       		.uleb128 0x6
+ 920 00a9 58       		.uleb128 0x58
+ 921 00aa 0B       		.uleb128 0xb
+ 922 00ab 59       		.uleb128 0x59
+ 923 00ac 0B       		.uleb128 0xb
+ 924 00ad 00       		.byte	0
+ 925 00ae 00       		.byte	0
+ 926 00af 0D       		.uleb128 0xd
+ 927 00b0 2E       		.uleb128 0x2e
+ 928 00b1 00       		.byte	0
+ 929 00b2 3F       		.uleb128 0x3f
+ 930 00b3 19       		.uleb128 0x19
+ 931 00b4 03       		.uleb128 0x3
+ 932 00b5 0E       		.uleb128 0xe
+ 933 00b6 3A       		.uleb128 0x3a
+ 934 00b7 0B       		.uleb128 0xb
+ 935 00b8 3B       		.uleb128 0x3b
+ 936 00b9 0B       		.uleb128 0xb
+ 937 00ba 27       		.uleb128 0x27
+ 938 00bb 19       		.uleb128 0x19
+ 939 00bc 11       		.uleb128 0x11
+ 940 00bd 01       		.uleb128 0x1
+ 941 00be 12       		.uleb128 0x12
+ 942 00bf 06       		.uleb128 0x6
+ 943 00c0 40       		.uleb128 0x40
+ 944 00c1 18       		.uleb128 0x18
+ 945 00c2 9742     		.uleb128 0x2117
+ 946 00c4 19       		.uleb128 0x19
+ 947 00c5 00       		.byte	0
+ 948 00c6 00       		.byte	0
+ 949 00c7 0E       		.uleb128 0xe
+ 950 00c8 898201   		.uleb128 0x4109
+ 951 00cb 00       		.byte	0
+ 952 00cc 11       		.uleb128 0x11
+ 953 00cd 01       		.uleb128 0x1
+ 954 00ce 31       		.uleb128 0x31
+ 955 00cf 13       		.uleb128 0x13
+ 956 00d0 00       		.byte	0
+ 957 00d1 00       		.byte	0
+ 958 00d2 0F       		.uleb128 0xf
+ 959 00d3 898201   		.uleb128 0x4109
+ 960 00d6 00       		.byte	0
+ 961 00d7 11       		.uleb128 0x11
+ 962 00d8 01       		.uleb128 0x1
+ 963 00d9 9542     		.uleb128 0x2115
+ 964 00db 19       		.uleb128 0x19
+ 965 00dc 31       		.uleb128 0x31
+ 966 00dd 13       		.uleb128 0x13
+ 967 00de 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 34
+
+
+ 968 00df 00       		.byte	0
+ 969 00e0 10       		.uleb128 0x10
+ 970 00e1 2E       		.uleb128 0x2e
+ 971 00e2 01       		.byte	0x1
+ 972 00e3 31       		.uleb128 0x31
+ 973 00e4 13       		.uleb128 0x13
+ 974 00e5 11       		.uleb128 0x11
+ 975 00e6 01       		.uleb128 0x1
+ 976 00e7 12       		.uleb128 0x12
+ 977 00e8 06       		.uleb128 0x6
+ 978 00e9 40       		.uleb128 0x40
+ 979 00ea 18       		.uleb128 0x18
+ 980 00eb 9742     		.uleb128 0x2117
+ 981 00ed 19       		.uleb128 0x19
+ 982 00ee 01       		.uleb128 0x1
+ 983 00ef 13       		.uleb128 0x13
+ 984 00f0 00       		.byte	0
+ 985 00f1 00       		.byte	0
+ 986 00f2 11       		.uleb128 0x11
+ 987 00f3 05       		.uleb128 0x5
+ 988 00f4 00       		.byte	0
+ 989 00f5 31       		.uleb128 0x31
+ 990 00f6 13       		.uleb128 0x13
+ 991 00f7 02       		.uleb128 0x2
+ 992 00f8 18       		.uleb128 0x18
+ 993 00f9 00       		.byte	0
+ 994 00fa 00       		.byte	0
+ 995 00fb 12       		.uleb128 0x12
+ 996 00fc 2E       		.uleb128 0x2e
+ 997 00fd 00       		.byte	0
+ 998 00fe 3F       		.uleb128 0x3f
+ 999 00ff 19       		.uleb128 0x19
+ 1000 0100 03       		.uleb128 0x3
+ 1001 0101 0E       		.uleb128 0xe
+ 1002 0102 3A       		.uleb128 0x3a
+ 1003 0103 0B       		.uleb128 0xb
+ 1004 0104 3B       		.uleb128 0x3b
+ 1005 0105 05       		.uleb128 0x5
+ 1006 0106 27       		.uleb128 0x27
+ 1007 0107 19       		.uleb128 0x19
+ 1008 0108 49       		.uleb128 0x49
+ 1009 0109 13       		.uleb128 0x13
+ 1010 010a 11       		.uleb128 0x11
+ 1011 010b 01       		.uleb128 0x1
+ 1012 010c 12       		.uleb128 0x12
+ 1013 010d 06       		.uleb128 0x6
+ 1014 010e 40       		.uleb128 0x40
+ 1015 010f 18       		.uleb128 0x18
+ 1016 0110 9742     		.uleb128 0x2117
+ 1017 0112 19       		.uleb128 0x19
+ 1018 0113 00       		.byte	0
+ 1019 0114 00       		.byte	0
+ 1020 0115 13       		.uleb128 0x13
+ 1021 0116 2E       		.uleb128 0x2e
+ 1022 0117 01       		.byte	0x1
+ 1023 0118 3F       		.uleb128 0x3f
+ 1024 0119 19       		.uleb128 0x19
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 35
+
+
+ 1025 011a 03       		.uleb128 0x3
+ 1026 011b 0E       		.uleb128 0xe
+ 1027 011c 3A       		.uleb128 0x3a
+ 1028 011d 0B       		.uleb128 0xb
+ 1029 011e 3B       		.uleb128 0x3b
+ 1030 011f 05       		.uleb128 0x5
+ 1031 0120 27       		.uleb128 0x27
+ 1032 0121 19       		.uleb128 0x19
+ 1033 0122 49       		.uleb128 0x49
+ 1034 0123 13       		.uleb128 0x13
+ 1035 0124 11       		.uleb128 0x11
+ 1036 0125 01       		.uleb128 0x1
+ 1037 0126 12       		.uleb128 0x12
+ 1038 0127 06       		.uleb128 0x6
+ 1039 0128 40       		.uleb128 0x40
+ 1040 0129 18       		.uleb128 0x18
+ 1041 012a 9742     		.uleb128 0x2117
+ 1042 012c 19       		.uleb128 0x19
+ 1043 012d 01       		.uleb128 0x1
+ 1044 012e 13       		.uleb128 0x13
+ 1045 012f 00       		.byte	0
+ 1046 0130 00       		.byte	0
+ 1047 0131 14       		.uleb128 0x14
+ 1048 0132 34       		.uleb128 0x34
+ 1049 0133 00       		.byte	0
+ 1050 0134 03       		.uleb128 0x3
+ 1051 0135 0E       		.uleb128 0xe
+ 1052 0136 3A       		.uleb128 0x3a
+ 1053 0137 0B       		.uleb128 0xb
+ 1054 0138 3B       		.uleb128 0x3b
+ 1055 0139 05       		.uleb128 0x5
+ 1056 013a 49       		.uleb128 0x49
+ 1057 013b 13       		.uleb128 0x13
+ 1058 013c 02       		.uleb128 0x2
+ 1059 013d 18       		.uleb128 0x18
+ 1060 013e 00       		.byte	0
+ 1061 013f 00       		.byte	0
+ 1062 0140 15       		.uleb128 0x15
+ 1063 0141 2E       		.uleb128 0x2e
+ 1064 0142 01       		.byte	0x1
+ 1065 0143 3F       		.uleb128 0x3f
+ 1066 0144 19       		.uleb128 0x19
+ 1067 0145 03       		.uleb128 0x3
+ 1068 0146 0E       		.uleb128 0xe
+ 1069 0147 3A       		.uleb128 0x3a
+ 1070 0148 0B       		.uleb128 0xb
+ 1071 0149 3B       		.uleb128 0x3b
+ 1072 014a 05       		.uleb128 0x5
+ 1073 014b 27       		.uleb128 0x27
+ 1074 014c 19       		.uleb128 0x19
+ 1075 014d 11       		.uleb128 0x11
+ 1076 014e 01       		.uleb128 0x1
+ 1077 014f 12       		.uleb128 0x12
+ 1078 0150 06       		.uleb128 0x6
+ 1079 0151 40       		.uleb128 0x40
+ 1080 0152 18       		.uleb128 0x18
+ 1081 0153 9742     		.uleb128 0x2117
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 36
+
+
+ 1082 0155 19       		.uleb128 0x19
+ 1083 0156 01       		.uleb128 0x1
+ 1084 0157 13       		.uleb128 0x13
+ 1085 0158 00       		.byte	0
+ 1086 0159 00       		.byte	0
+ 1087 015a 16       		.uleb128 0x16
+ 1088 015b 05       		.uleb128 0x5
+ 1089 015c 00       		.byte	0
+ 1090 015d 03       		.uleb128 0x3
+ 1091 015e 0E       		.uleb128 0xe
+ 1092 015f 3A       		.uleb128 0x3a
+ 1093 0160 0B       		.uleb128 0xb
+ 1094 0161 3B       		.uleb128 0x3b
+ 1095 0162 05       		.uleb128 0x5
+ 1096 0163 49       		.uleb128 0x49
+ 1097 0164 13       		.uleb128 0x13
+ 1098 0165 02       		.uleb128 0x2
+ 1099 0166 18       		.uleb128 0x18
+ 1100 0167 00       		.byte	0
+ 1101 0168 00       		.byte	0
+ 1102 0169 17       		.uleb128 0x17
+ 1103 016a 34       		.uleb128 0x34
+ 1104 016b 00       		.byte	0
+ 1105 016c 03       		.uleb128 0x3
+ 1106 016d 0E       		.uleb128 0xe
+ 1107 016e 3A       		.uleb128 0x3a
+ 1108 016f 0B       		.uleb128 0xb
+ 1109 0170 3B       		.uleb128 0x3b
+ 1110 0171 0B       		.uleb128 0xb
+ 1111 0172 49       		.uleb128 0x49
+ 1112 0173 13       		.uleb128 0x13
+ 1113 0174 3F       		.uleb128 0x3f
+ 1114 0175 19       		.uleb128 0x19
+ 1115 0176 02       		.uleb128 0x2
+ 1116 0177 18       		.uleb128 0x18
+ 1117 0178 00       		.byte	0
+ 1118 0179 00       		.byte	0
+ 1119 017a 00       		.byte	0
+ 1120              		.section	.debug_loc,"",%progbits
+ 1121              	.Ldebug_loc0:
+ 1122              	.LLST0:
+ 1123 0000 0C000000 		.4byte	.LVL0
+ 1124 0004 10000000 		.4byte	.LVL1
+ 1125 0008 0600     		.2byte	0x6
+ 1126 000a 73       		.byte	0x73
+ 1127 000b 00       		.sleb128 0
+ 1128 000c 09       		.byte	0x9
+ 1129 000d 8F       		.byte	0x8f
+ 1130 000e 1A       		.byte	0x1a
+ 1131 000f 9F       		.byte	0x9f
+ 1132 0010 00000000 		.4byte	0
+ 1133 0014 00000000 		.4byte	0
+ 1134              	.LLST1:
+ 1135 0018 38000000 		.4byte	.LVL2
+ 1136 001c 3E000000 		.4byte	.LVL3
+ 1137 0020 0300     		.2byte	0x3
+ 1138 0022 08       		.byte	0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 37
+
+
+ 1139 0023 7F       		.byte	0x7f
+ 1140 0024 9F       		.byte	0x9f
+ 1141 0025 00000000 		.4byte	0
+ 1142 0029 00000000 		.4byte	0
+ 1143              	.LLST2:
+ 1144 002d 3E000000 		.4byte	.LVL3
+ 1145 0031 44000000 		.4byte	.LVL4
+ 1146 0035 0200     		.2byte	0x2
+ 1147 0037 34       		.byte	0x34
+ 1148 0038 9F       		.byte	0x9f
+ 1149 0039 00000000 		.4byte	0
+ 1150 003d 00000000 		.4byte	0
+ 1151              	.LLST3:
+ 1152 0041 44000000 		.4byte	.LVL4
+ 1153 0045 4A000000 		.4byte	.LVL5
+ 1154 0049 0200     		.2byte	0x2
+ 1155 004b 30       		.byte	0x30
+ 1156 004c 9F       		.byte	0x9f
+ 1157 004d 00000000 		.4byte	0
+ 1158 0051 00000000 		.4byte	0
+ 1159              		.section	.debug_aranges,"",%progbits
+ 1160 0000 74000000 		.4byte	0x74
+ 1161 0004 0200     		.2byte	0x2
+ 1162 0006 00000000 		.4byte	.Ldebug_info0
+ 1163 000a 04       		.byte	0x4
+ 1164 000b 00       		.byte	0
+ 1165 000c 0000     		.2byte	0
+ 1166 000e 0000     		.2byte	0
+ 1167 0010 00000000 		.4byte	.LFB1
+ 1168 0014 70000000 		.4byte	.LFE1-.LFB1
+ 1169 0018 00000000 		.4byte	.LFB2
+ 1170 001c 24000000 		.4byte	.LFE2-.LFB2
+ 1171 0020 00000000 		.4byte	.LFB0
+ 1172 0024 1C000000 		.4byte	.LFE0-.LFB0
+ 1173 0028 00000000 		.4byte	.LFB3
+ 1174 002c 28000000 		.4byte	.LFE3-.LFB3
+ 1175 0030 00000000 		.4byte	.LFB4
+ 1176 0034 0C000000 		.4byte	.LFE4-.LFB4
+ 1177 0038 00000000 		.4byte	.LFB5
+ 1178 003c 0C000000 		.4byte	.LFE5-.LFB5
+ 1179 0040 00000000 		.4byte	.LFB6
+ 1180 0044 0C000000 		.4byte	.LFE6-.LFB6
+ 1181 0048 00000000 		.4byte	.LFB7
+ 1182 004c 0C000000 		.4byte	.LFE7-.LFB7
+ 1183 0050 00000000 		.4byte	.LFB8
+ 1184 0054 0C000000 		.4byte	.LFE8-.LFB8
+ 1185 0058 00000000 		.4byte	.LFB9
+ 1186 005c 0C000000 		.4byte	.LFE9-.LFB9
+ 1187 0060 00000000 		.4byte	.LFB10
+ 1188 0064 0C000000 		.4byte	.LFE10-.LFB10
+ 1189 0068 00000000 		.4byte	.LFB11
+ 1190 006c 0C000000 		.4byte	.LFE11-.LFB11
+ 1191 0070 00000000 		.4byte	0
+ 1192 0074 00000000 		.4byte	0
+ 1193              		.section	.debug_ranges,"",%progbits
+ 1194              	.Ldebug_ranges0:
+ 1195 0000 00000000 		.4byte	.LFB1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 38
+
+
+ 1196 0004 70000000 		.4byte	.LFE1
+ 1197 0008 00000000 		.4byte	.LFB2
+ 1198 000c 24000000 		.4byte	.LFE2
+ 1199 0010 00000000 		.4byte	.LFB0
+ 1200 0014 1C000000 		.4byte	.LFE0
+ 1201 0018 00000000 		.4byte	.LFB3
+ 1202 001c 28000000 		.4byte	.LFE3
+ 1203 0020 00000000 		.4byte	.LFB4
+ 1204 0024 0C000000 		.4byte	.LFE4
+ 1205 0028 00000000 		.4byte	.LFB5
+ 1206 002c 0C000000 		.4byte	.LFE5
+ 1207 0030 00000000 		.4byte	.LFB6
+ 1208 0034 0C000000 		.4byte	.LFE6
+ 1209 0038 00000000 		.4byte	.LFB7
+ 1210 003c 0C000000 		.4byte	.LFE7
+ 1211 0040 00000000 		.4byte	.LFB8
+ 1212 0044 0C000000 		.4byte	.LFE8
+ 1213 0048 00000000 		.4byte	.LFB9
+ 1214 004c 0C000000 		.4byte	.LFE9
+ 1215 0050 00000000 		.4byte	.LFB10
+ 1216 0054 0C000000 		.4byte	.LFE10
+ 1217 0058 00000000 		.4byte	.LFB11
+ 1218 005c 0C000000 		.4byte	.LFE11
+ 1219 0060 00000000 		.4byte	0
+ 1220 0064 00000000 		.4byte	0
+ 1221              		.section	.debug_line,"",%progbits
+ 1222              	.Ldebug_line0:
+ 1223 0000 38010000 		.section	.debug_str,"MS",%progbits,1
+ 1223      02004100 
+ 1223      00000201 
+ 1223      FB0E0D00 
+ 1223      01010101 
+ 1224              	.LASF15:
+ 1225 0000 72656731 		.ascii	"reg16\000"
+ 1225      3600
+ 1226              	.LASF24:
+ 1227 0006 50574D42 		.ascii	"PWMB_Start\000"
+ 1227      5F537461 
+ 1227      727400
+ 1228              	.LASF22:
+ 1229 0011 70657269 		.ascii	"period\000"
+ 1229      6F6400
+ 1230              	.LASF3:
+ 1231 0018 73686F72 		.ascii	"short unsigned int\000"
+ 1231      7420756E 
+ 1231      7369676E 
+ 1231      65642069 
+ 1231      6E7400
+ 1232              	.LASF23:
+ 1233 002b 50574D42 		.ascii	"PWMB_Init\000"
+ 1233      5F496E69 
+ 1233      7400
+ 1234              	.LASF32:
+ 1235 0035 50574D42 		.ascii	"PWMB_ReadPeriod\000"
+ 1235      5F526561 
+ 1235      64506572 
+ 1235      696F6400 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 39
+
+
+ 1236              	.LASF26:
+ 1237 0045 50574D42 		.ascii	"PWMB_Stop\000"
+ 1237      5F53746F 
+ 1237      7000
+ 1238              	.LASF29:
+ 1239 004f 50574D42 		.ascii	"PWMB_WriteControlRegister\000"
+ 1239      5F577269 
+ 1239      7465436F 
+ 1239      6E74726F 
+ 1239      6C526567 
+ 1240              	.LASF11:
+ 1241 0069 666C6F61 		.ascii	"float\000"
+ 1241      7400
+ 1242              	.LASF25:
+ 1243 006f 50574D42 		.ascii	"PWMB_Enable\000"
+ 1243      5F456E61 
+ 1243      626C6500 
+ 1244              	.LASF18:
+ 1245 007b 50574D42 		.ascii	"PWMB_WriteCompare\000"
+ 1245      5F577269 
+ 1245      7465436F 
+ 1245      6D706172 
+ 1245      6500
+ 1246              	.LASF1:
+ 1247 008d 756E7369 		.ascii	"unsigned char\000"
+ 1247      676E6564 
+ 1247      20636861 
+ 1247      7200
+ 1248              	.LASF14:
+ 1249 009b 72656738 		.ascii	"reg8\000"
+ 1249      00
+ 1250              	.LASF5:
+ 1251 00a0 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1251      20756E73 
+ 1251      69676E65 
+ 1251      6420696E 
+ 1251      7400
+ 1252              	.LASF33:
+ 1253 00b2 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1253      43393920 
+ 1253      352E342E 
+ 1253      31203230 
+ 1253      31363036 
+ 1254 00e5 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1254      20726576 
+ 1254      6973696F 
+ 1254      6E203233 
+ 1254      37373135 
+ 1255 0118 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 1255      74643D67 
+ 1255      6E753939 
+ 1255      202D6666 
+ 1255      756E6374 
+ 1256              	.LASF9:
+ 1257 014b 75696E74 		.ascii	"uint8\000"
+ 1257      3800
+ 1258              	.LASF37:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 40
+
+
+ 1259 0151 636F6E74 		.ascii	"control\000"
+ 1259      726F6C00 
+ 1260              	.LASF12:
+ 1261 0159 646F7562 		.ascii	"double\000"
+ 1261      6C6500
+ 1262              	.LASF10:
+ 1263 0160 75696E74 		.ascii	"uint16\000"
+ 1263      313600
+ 1264              	.LASF8:
+ 1265 0167 756E7369 		.ascii	"unsigned int\000"
+ 1265      676E6564 
+ 1265      20696E74 
+ 1265      00
+ 1266              	.LASF31:
+ 1267 0174 50574D42 		.ascii	"PWMB_ReadCompare\000"
+ 1267      5F526561 
+ 1267      64436F6D 
+ 1267      70617265 
+ 1267      00
+ 1268              	.LASF7:
+ 1269 0185 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1269      206C6F6E 
+ 1269      6720756E 
+ 1269      7369676E 
+ 1269      65642069 
+ 1270              	.LASF28:
+ 1271 019c 72657375 		.ascii	"result\000"
+ 1271      6C7400
+ 1272              	.LASF27:
+ 1273 01a3 6374726C 		.ascii	"ctrl\000"
+ 1273      00
+ 1274              	.LASF16:
+ 1275 01a8 73697A65 		.ascii	"sizetype\000"
+ 1275      74797065 
+ 1275      00
+ 1276              	.LASF6:
+ 1277 01b1 6C6F6E67 		.ascii	"long long int\000"
+ 1277      206C6F6E 
+ 1277      6720696E 
+ 1277      7400
+ 1278              	.LASF19:
+ 1279 01bf 696E7465 		.ascii	"interruptMode\000"
+ 1279      72727570 
+ 1279      744D6F64 
+ 1279      6500
+ 1280              	.LASF2:
+ 1281 01cd 73686F72 		.ascii	"short int\000"
+ 1281      7420696E 
+ 1281      7400
+ 1282              	.LASF35:
+ 1283 01d7 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 1283      73657273 
+ 1283      5C636865 
+ 1283      6D695C55 
+ 1283      44335F51 
+ 1284              	.LASF4:
+ 1285 01fc 6C6F6E67 		.ascii	"long int\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccIkIp1U.s 			page 41
+
+
+ 1285      20696E74 
+ 1285      00
+ 1286              	.LASF13:
+ 1287 0205 63686172 		.ascii	"char\000"
+ 1287      00
+ 1288              	.LASF38:
+ 1289 020a 50574D42 		.ascii	"PWMB_initVar\000"
+ 1289      5F696E69 
+ 1289      74566172 
+ 1289      00
+ 1290              	.LASF34:
+ 1291 0217 47656E65 		.ascii	"Generated_Source\\PSoC5\\PWMB.c\000"
+ 1291      72617465 
+ 1291      645F536F 
+ 1291      75726365 
+ 1291      5C50536F 
+ 1292              	.LASF0:
+ 1293 0235 7369676E 		.ascii	"signed char\000"
+ 1293      65642063 
+ 1293      68617200 
+ 1294              	.LASF20:
+ 1295 0241 636F6D70 		.ascii	"compare\000"
+ 1295      61726500 
+ 1296              	.LASF17:
+ 1297 0249 50574D42 		.ascii	"PWMB_SetInterruptMode\000"
+ 1297      5F536574 
+ 1297      496E7465 
+ 1297      72727570 
+ 1297      744D6F64 
+ 1298              	.LASF30:
+ 1299 025f 50574D42 		.ascii	"PWMB_ReadStatusRegister\000"
+ 1299      5F526561 
+ 1299      64537461 
+ 1299      74757352 
+ 1299      65676973 
+ 1300              	.LASF36:
+ 1301 0277 50574D42 		.ascii	"PWMB_ReadControlRegister\000"
+ 1301      5F526561 
+ 1301      64436F6E 
+ 1301      74726F6C 
+ 1301      52656769 
+ 1302              	.LASF21:
+ 1303 0290 50574D42 		.ascii	"PWMB_WritePeriod\000"
+ 1303      5F577269 
+ 1303      74655065 
+ 1303      72696F64 
+ 1303      00
+ 1304              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

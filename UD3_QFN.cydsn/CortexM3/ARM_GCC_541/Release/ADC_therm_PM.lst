@@ -1,0 +1,982 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"ADC_therm_PM.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.ADC_therm_SaveConfig,"ax",%progbits
+  20              		.align	1
+  21              		.global	ADC_therm_SaveConfig
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	ADC_therm_SaveConfig, %function
+  25              	ADC_therm_SaveConfig:
+  26              	.LFB0:
+  27              		.file 1 "Generated_Source\\PSoC5\\ADC_therm_PM.c"
+   1:Generated_Source\PSoC5/ADC_therm_PM.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/ADC_therm_PM.c **** * File Name: ADC_therm_PM.c
+   3:Generated_Source\PSoC5/ADC_therm_PM.c **** * Version 3.20
+   4:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+   5:Generated_Source\PSoC5/ADC_therm_PM.c **** * Description:
+   6:Generated_Source\PSoC5/ADC_therm_PM.c **** *  This file provides the power manager source code to the API for the
+   7:Generated_Source\PSoC5/ADC_therm_PM.c **** *  Delta-Sigma ADC Component.
+   8:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+   9:Generated_Source\PSoC5/ADC_therm_PM.c **** * Note:
+  10:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  11:Generated_Source\PSoC5/ADC_therm_PM.c **** ********************************************************************************
+  12:Generated_Source\PSoC5/ADC_therm_PM.c **** * Copyright 2008-2015, Cypress Semiconductor Corporation.  All rights reserved.
+  13:Generated_Source\PSoC5/ADC_therm_PM.c **** * You may use this file only in accordance with the license, terms, conditions,
+  14:Generated_Source\PSoC5/ADC_therm_PM.c **** * disclaimers, and limitations in the end user license agreement accompanying
+  15:Generated_Source\PSoC5/ADC_therm_PM.c **** * the software package with which this file was provided.
+  16:Generated_Source\PSoC5/ADC_therm_PM.c **** *******************************************************************************/
+  17:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+  18:Generated_Source\PSoC5/ADC_therm_PM.c **** #include "ADC_therm.h"
+  19:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+  20:Generated_Source\PSoC5/ADC_therm_PM.c **** static ADC_therm_BACKUP_STRUCT ADC_therm_backup =
+  21:Generated_Source\PSoC5/ADC_therm_PM.c **** {
+  22:Generated_Source\PSoC5/ADC_therm_PM.c ****     ADC_therm_DISABLED,
+  23:Generated_Source\PSoC5/ADC_therm_PM.c ****     ADC_therm_CFG1_DEC_CR
+  24:Generated_Source\PSoC5/ADC_therm_PM.c **** };
+  25:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+  26:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+  27:Generated_Source\PSoC5/ADC_therm_PM.c **** /*******************************************************************************
+  28:Generated_Source\PSoC5/ADC_therm_PM.c **** * Function Name: ADC_therm_SaveConfig
+  29:Generated_Source\PSoC5/ADC_therm_PM.c **** ********************************************************************************
+  30:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 2
+
+
+  31:Generated_Source\PSoC5/ADC_therm_PM.c **** * Summary:
+  32:Generated_Source\PSoC5/ADC_therm_PM.c **** *  Save the register configuration which are not retention.
+  33:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  34:Generated_Source\PSoC5/ADC_therm_PM.c **** * Parameters:
+  35:Generated_Source\PSoC5/ADC_therm_PM.c **** *  None
+  36:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  37:Generated_Source\PSoC5/ADC_therm_PM.c **** * Return:
+  38:Generated_Source\PSoC5/ADC_therm_PM.c **** *  None
+  39:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  40:Generated_Source\PSoC5/ADC_therm_PM.c **** * Global variables:
+  41:Generated_Source\PSoC5/ADC_therm_PM.c **** *  ADC_therm_backup:  This global structure variable is used to store
+  42:Generated_Source\PSoC5/ADC_therm_PM.c **** *  configuration registers which are non retention whenever user wants to go
+  43:Generated_Source\PSoC5/ADC_therm_PM.c **** *  sleep mode by calling Sleep() API.
+  44:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  45:Generated_Source\PSoC5/ADC_therm_PM.c **** *******************************************************************************/
+  46:Generated_Source\PSoC5/ADC_therm_PM.c **** void ADC_therm_SaveConfig(void) 
+  47:Generated_Source\PSoC5/ADC_therm_PM.c **** {
+  28              		.loc 1 47 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  48:Generated_Source\PSoC5/ADC_therm_PM.c ****     ADC_therm_backup.deccr = ADC_therm_DEC_CR_REG;
+  33              		.loc 1 48 0
+  34 0000 024B     		ldr	r3, .L2
+  35 0002 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+  36 0004 024B     		ldr	r3, .L2+4
+  37 0006 5A70     		strb	r2, [r3, #1]
+  38 0008 7047     		bx	lr
+  39              	.L3:
+  40 000a 00BF     		.align	2
+  41              	.L2:
+  42 000c 004E0040 		.word	1073761792
+  43 0010 00000000 		.word	.LANCHOR0
+  44              		.cfi_endproc
+  45              	.LFE0:
+  46              		.size	ADC_therm_SaveConfig, .-ADC_therm_SaveConfig
+  47              		.section	.text.ADC_therm_RestoreConfig,"ax",%progbits
+  48              		.align	1
+  49              		.global	ADC_therm_RestoreConfig
+  50              		.thumb
+  51              		.thumb_func
+  52              		.type	ADC_therm_RestoreConfig, %function
+  53              	ADC_therm_RestoreConfig:
+  54              	.LFB1:
+  49:Generated_Source\PSoC5/ADC_therm_PM.c **** }
+  50:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+  51:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+  52:Generated_Source\PSoC5/ADC_therm_PM.c **** /*******************************************************************************
+  53:Generated_Source\PSoC5/ADC_therm_PM.c **** * Function Name: ADC_therm_RestoreConfig
+  54:Generated_Source\PSoC5/ADC_therm_PM.c **** ********************************************************************************
+  55:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  56:Generated_Source\PSoC5/ADC_therm_PM.c **** * Summary:
+  57:Generated_Source\PSoC5/ADC_therm_PM.c **** *  Restore the register configurations which are not retention.
+  58:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  59:Generated_Source\PSoC5/ADC_therm_PM.c **** * Parameters:
+  60:Generated_Source\PSoC5/ADC_therm_PM.c **** *  None
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 3
+
+
+  61:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  62:Generated_Source\PSoC5/ADC_therm_PM.c **** * Return:
+  63:Generated_Source\PSoC5/ADC_therm_PM.c **** *  None
+  64:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  65:Generated_Source\PSoC5/ADC_therm_PM.c **** * Global variables:
+  66:Generated_Source\PSoC5/ADC_therm_PM.c **** *  ADC_therm_backup:  This global structure variable is used to restore
+  67:Generated_Source\PSoC5/ADC_therm_PM.c **** *  configuration registers which are non retention whenever user wants to switch
+  68:Generated_Source\PSoC5/ADC_therm_PM.c **** *  to active power mode by calling Wakeup() API.
+  69:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  70:Generated_Source\PSoC5/ADC_therm_PM.c **** *******************************************************************************/
+  71:Generated_Source\PSoC5/ADC_therm_PM.c **** void ADC_therm_RestoreConfig(void) 
+  72:Generated_Source\PSoC5/ADC_therm_PM.c **** {
+  55              		.loc 1 72 0
+  56              		.cfi_startproc
+  57              		@ args = 0, pretend = 0, frame = 0
+  58              		@ frame_needed = 0, uses_anonymous_args = 0
+  59              		@ link register save eliminated.
+  73:Generated_Source\PSoC5/ADC_therm_PM.c ****     ADC_therm_DEC_CR_REG = ADC_therm_backup.deccr;
+  60              		.loc 1 73 0
+  61 0000 024B     		ldr	r3, .L5
+  62 0002 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+  63 0004 024B     		ldr	r3, .L5+4
+  64 0006 1A70     		strb	r2, [r3]
+  65 0008 7047     		bx	lr
+  66              	.L6:
+  67 000a 00BF     		.align	2
+  68              	.L5:
+  69 000c 00000000 		.word	.LANCHOR0
+  70 0010 004E0040 		.word	1073761792
+  71              		.cfi_endproc
+  72              	.LFE1:
+  73              		.size	ADC_therm_RestoreConfig, .-ADC_therm_RestoreConfig
+  74              		.section	.text.ADC_therm_Sleep,"ax",%progbits
+  75              		.align	1
+  76              		.global	ADC_therm_Sleep
+  77              		.thumb
+  78              		.thumb_func
+  79              		.type	ADC_therm_Sleep, %function
+  80              	ADC_therm_Sleep:
+  81              	.LFB2:
+  74:Generated_Source\PSoC5/ADC_therm_PM.c **** }
+  75:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+  76:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+  77:Generated_Source\PSoC5/ADC_therm_PM.c **** /*******************************************************************************
+  78:Generated_Source\PSoC5/ADC_therm_PM.c **** * Function Name: ADC_therm_Sleep
+  79:Generated_Source\PSoC5/ADC_therm_PM.c **** ********************************************************************************
+  80:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  81:Generated_Source\PSoC5/ADC_therm_PM.c **** * Summary:
+  82:Generated_Source\PSoC5/ADC_therm_PM.c **** *  Stops the operation of the block and saves the user configuration.
+  83:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  84:Generated_Source\PSoC5/ADC_therm_PM.c **** * Parameters:
+  85:Generated_Source\PSoC5/ADC_therm_PM.c **** *  None
+  86:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  87:Generated_Source\PSoC5/ADC_therm_PM.c **** * Return:
+  88:Generated_Source\PSoC5/ADC_therm_PM.c **** *  None
+  89:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  90:Generated_Source\PSoC5/ADC_therm_PM.c **** * Global variables:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 4
+
+
+  91:Generated_Source\PSoC5/ADC_therm_PM.c **** *  ADC_therm_backup:  The structure field 'enableState' is modified
+  92:Generated_Source\PSoC5/ADC_therm_PM.c **** *  depending on the enable state of the block before entering to sleep mode.
+  93:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+  94:Generated_Source\PSoC5/ADC_therm_PM.c **** *******************************************************************************/
+  95:Generated_Source\PSoC5/ADC_therm_PM.c **** void ADC_therm_Sleep(void) 
+  96:Generated_Source\PSoC5/ADC_therm_PM.c **** {
+  82              		.loc 1 96 0
+  83              		.cfi_startproc
+  84              		@ args = 0, pretend = 0, frame = 0
+  85              		@ frame_needed = 0, uses_anonymous_args = 0
+  86 0000 08B5     		push	{r3, lr}
+  87              		.cfi_def_cfa_offset 8
+  88              		.cfi_offset 3, -8
+  89              		.cfi_offset 14, -4
+  97:Generated_Source\PSoC5/ADC_therm_PM.c ****     /* Save ADC enable state */
+  98:Generated_Source\PSoC5/ADC_therm_PM.c ****     if((ADC_therm_ACT_PWR_DEC_EN == (ADC_therm_PWRMGR_DEC_REG & ADC_therm_ACT_PWR_DEC_EN)) &&
+  90              		.loc 1 98 0
+  91 0002 0D4A     		ldr	r2, .L21
+  92 0004 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  93 0006 13F0010F 		tst	r3, #1
+  94 000a 0C4B     		ldr	r3, .L21+4
+  95 000c 0DD0     		beq	.L8
+  99:Generated_Source\PSoC5/ADC_therm_PM.c ****        (ADC_therm_ACT_PWR_DSM_EN == (ADC_therm_PWRMGR_DSM_REG & ADC_therm_ACT_PWR_DSM_EN)))
+  96              		.loc 1 99 0 discriminator 1
+  97 000e 1278     		ldrb	r2, [r2]	@ zero_extendqisi2
+  98:Generated_Source\PSoC5/ADC_therm_PM.c ****        (ADC_therm_ACT_PWR_DSM_EN == (ADC_therm_PWRMGR_DSM_REG & ADC_therm_ACT_PWR_DSM_EN)))
+  98              		.loc 1 98 0 discriminator 1
+  99 0010 D106     		lsls	r1, r2, #27
+ 100 0012 0AD5     		bpl	.L8
+ 100:Generated_Source\PSoC5/ADC_therm_PM.c ****     {
+ 101:Generated_Source\PSoC5/ADC_therm_PM.c ****         /* Component is enabled */
+ 102:Generated_Source\PSoC5/ADC_therm_PM.c ****         ADC_therm_backup.enableState = ADC_therm_ENABLED;
+ 101              		.loc 1 102 0
+ 102 0014 0122     		movs	r2, #1
+ 103 0016 1A70     		strb	r2, [r3]
+ 103:Generated_Source\PSoC5/ADC_therm_PM.c ****         if((ADC_therm_DEC_CR_REG & ADC_therm_DEC_START_CONV) != 0u)
+ 104              		.loc 1 103 0
+ 105 0018 094A     		ldr	r2, .L21+8
+ 106 001a 1278     		ldrb	r2, [r2]	@ zero_extendqisi2
+ 107 001c D207     		lsls	r2, r2, #31
+ 104:Generated_Source\PSoC5/ADC_therm_PM.c ****         {   
+ 105:Generated_Source\PSoC5/ADC_therm_PM.c ****             /* Conversion is started */
+ 106:Generated_Source\PSoC5/ADC_therm_PM.c ****             ADC_therm_backup.enableState |= ADC_therm_STARTED;
+ 108              		.loc 1 106 0
+ 109 001e 44BF     		itt	mi
+ 110 0020 0322     		movmi	r2, #3
+ 111 0022 1A70     		strbmi	r2, [r3]
+ 107:Generated_Source\PSoC5/ADC_therm_PM.c ****         }
+ 108:Generated_Source\PSoC5/ADC_therm_PM.c **** 		
+ 109:Generated_Source\PSoC5/ADC_therm_PM.c ****         /* Stop the configuration */
+ 110:Generated_Source\PSoC5/ADC_therm_PM.c ****         ADC_therm_Stop();
+ 112              		.loc 1 110 0
+ 113 0024 FFF7FEFF 		bl	ADC_therm_Stop
+ 114              	.LVL0:
+ 115 0028 01E0     		b	.L10
+ 116              	.L8:
+ 111:Generated_Source\PSoC5/ADC_therm_PM.c ****     }
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 5
+
+
+ 112:Generated_Source\PSoC5/ADC_therm_PM.c ****     else
+ 113:Generated_Source\PSoC5/ADC_therm_PM.c ****     {
+ 114:Generated_Source\PSoC5/ADC_therm_PM.c ****         /* Component is disabled */
+ 115:Generated_Source\PSoC5/ADC_therm_PM.c ****         ADC_therm_backup.enableState = ADC_therm_DISABLED;
+ 117              		.loc 1 115 0
+ 118 002a 0022     		movs	r2, #0
+ 119 002c 1A70     		strb	r2, [r3]
+ 120              	.L10:
+ 116:Generated_Source\PSoC5/ADC_therm_PM.c ****     }
+ 117:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+ 118:Generated_Source\PSoC5/ADC_therm_PM.c ****     /* Save the user configuration */
+ 119:Generated_Source\PSoC5/ADC_therm_PM.c ****     ADC_therm_SaveConfig();
+ 120:Generated_Source\PSoC5/ADC_therm_PM.c **** }
+ 121              		.loc 1 120 0
+ 122 002e BDE80840 		pop	{r3, lr}
+ 123              		.cfi_restore 14
+ 124              		.cfi_restore 3
+ 125              		.cfi_def_cfa_offset 0
+ 119:Generated_Source\PSoC5/ADC_therm_PM.c **** }
+ 126              		.loc 1 119 0
+ 127 0032 FFF7FEBF 		b	ADC_therm_SaveConfig
+ 128              	.LVL1:
+ 129              	.L22:
+ 130 0036 00BF     		.align	2
+ 131              	.L21:
+ 132 0038 AA430040 		.word	1073759146
+ 133 003c 00000000 		.word	.LANCHOR0
+ 134 0040 004E0040 		.word	1073761792
+ 135              		.cfi_endproc
+ 136              	.LFE2:
+ 137              		.size	ADC_therm_Sleep, .-ADC_therm_Sleep
+ 138              		.section	.text.ADC_therm_Wakeup,"ax",%progbits
+ 139              		.align	1
+ 140              		.global	ADC_therm_Wakeup
+ 141              		.thumb
+ 142              		.thumb_func
+ 143              		.type	ADC_therm_Wakeup, %function
+ 144              	ADC_therm_Wakeup:
+ 145              	.LFB3:
+ 121:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+ 122:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+ 123:Generated_Source\PSoC5/ADC_therm_PM.c **** /*******************************************************************************
+ 124:Generated_Source\PSoC5/ADC_therm_PM.c **** * Function Name: ADC_therm_Wakeup
+ 125:Generated_Source\PSoC5/ADC_therm_PM.c **** ********************************************************************************
+ 126:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+ 127:Generated_Source\PSoC5/ADC_therm_PM.c **** * Summary:
+ 128:Generated_Source\PSoC5/ADC_therm_PM.c **** *  Restores the user configuration and enables the power to the block.
+ 129:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+ 130:Generated_Source\PSoC5/ADC_therm_PM.c **** * Parameters:
+ 131:Generated_Source\PSoC5/ADC_therm_PM.c **** *  None
+ 132:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+ 133:Generated_Source\PSoC5/ADC_therm_PM.c **** * Return:
+ 134:Generated_Source\PSoC5/ADC_therm_PM.c **** *  None
+ 135:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+ 136:Generated_Source\PSoC5/ADC_therm_PM.c **** * Global variables:
+ 137:Generated_Source\PSoC5/ADC_therm_PM.c **** *  ADC_therm_backup:  The structure field 'enableState' is used to
+ 138:Generated_Source\PSoC5/ADC_therm_PM.c **** *  restore the enable state of block after wakeup from sleep mode.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 6
+
+
+ 139:Generated_Source\PSoC5/ADC_therm_PM.c **** *
+ 140:Generated_Source\PSoC5/ADC_therm_PM.c **** *******************************************************************************/
+ 141:Generated_Source\PSoC5/ADC_therm_PM.c **** void ADC_therm_Wakeup(void) 
+ 142:Generated_Source\PSoC5/ADC_therm_PM.c **** {
+ 146              		.loc 1 142 0
+ 147              		.cfi_startproc
+ 148              		@ args = 0, pretend = 0, frame = 0
+ 149              		@ frame_needed = 0, uses_anonymous_args = 0
+ 150 0000 10B5     		push	{r4, lr}
+ 151              		.cfi_def_cfa_offset 8
+ 152              		.cfi_offset 4, -8
+ 153              		.cfi_offset 14, -4
+ 143:Generated_Source\PSoC5/ADC_therm_PM.c ****     /* Restore the configuration */
+ 144:Generated_Source\PSoC5/ADC_therm_PM.c ****     ADC_therm_RestoreConfig();
+ 145:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+ 146:Generated_Source\PSoC5/ADC_therm_PM.c ****     /* Enables the component operation */
+ 147:Generated_Source\PSoC5/ADC_therm_PM.c ****     if(ADC_therm_backup.enableState != ADC_therm_DISABLED)
+ 154              		.loc 1 147 0
+ 155 0002 074C     		ldr	r4, .L30
+ 144:Generated_Source\PSoC5/ADC_therm_PM.c **** 
+ 156              		.loc 1 144 0
+ 157 0004 FFF7FEFF 		bl	ADC_therm_RestoreConfig
+ 158              	.LVL2:
+ 159              		.loc 1 147 0
+ 160 0008 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 161 000a 43B1     		cbz	r3, .L23
+ 148:Generated_Source\PSoC5/ADC_therm_PM.c ****     {
+ 149:Generated_Source\PSoC5/ADC_therm_PM.c ****         ADC_therm_Enable();
+ 162              		.loc 1 149 0
+ 163 000c FFF7FEFF 		bl	ADC_therm_Enable
+ 164              	.LVL3:
+ 150:Generated_Source\PSoC5/ADC_therm_PM.c ****         if((ADC_therm_backup.enableState & ADC_therm_STARTED) != 0u)
+ 165              		.loc 1 150 0
+ 166 0010 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 167 0012 9B07     		lsls	r3, r3, #30
+ 168 0014 03D5     		bpl	.L23
+ 151:Generated_Source\PSoC5/ADC_therm_PM.c ****         {
+ 152:Generated_Source\PSoC5/ADC_therm_PM.c ****             ADC_therm_StartConvert();
+ 153:Generated_Source\PSoC5/ADC_therm_PM.c ****         }
+ 154:Generated_Source\PSoC5/ADC_therm_PM.c ****     } /* Do nothing if component was disable before */
+ 155:Generated_Source\PSoC5/ADC_therm_PM.c **** }
+ 169              		.loc 1 155 0
+ 170 0016 BDE81040 		pop	{r4, lr}
+ 171              		.cfi_remember_state
+ 172              		.cfi_restore 14
+ 173              		.cfi_restore 4
+ 174              		.cfi_def_cfa_offset 0
+ 152:Generated_Source\PSoC5/ADC_therm_PM.c ****         }
+ 175              		.loc 1 152 0
+ 176 001a FFF7FEBF 		b	ADC_therm_StartConvert
+ 177              	.LVL4:
+ 178              	.L23:
+ 179              		.cfi_restore_state
+ 180 001e 10BD     		pop	{r4, pc}
+ 181              	.L31:
+ 182              		.align	2
+ 183              	.L30:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 7
+
+
+ 184 0020 00000000 		.word	.LANCHOR0
+ 185              		.cfi_endproc
+ 186              	.LFE3:
+ 187              		.size	ADC_therm_Wakeup, .-ADC_therm_Wakeup
+ 188              		.data
+ 189              		.set	.LANCHOR0,. + 0
+ 190              		.type	ADC_therm_backup, %object
+ 191              		.size	ADC_therm_backup, 2
+ 192              	ADC_therm_backup:
+ 193 0000 00       		.byte	0
+ 194 0001 30       		.byte	48
+ 195              		.text
+ 196              	.Letext0:
+ 197              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+ 198              		.file 3 "Generated_Source\\PSoC5\\ADC_therm.h"
+ 199              		.section	.debug_info,"",%progbits
+ 200              	.Ldebug_info0:
+ 201 0000 7A010000 		.4byte	0x17a
+ 202 0004 0400     		.2byte	0x4
+ 203 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 204 000a 04       		.byte	0x4
+ 205 000b 01       		.uleb128 0x1
+ 206 000c 6F000000 		.4byte	.LASF25
+ 207 0010 0C       		.byte	0xc
+ 208 0011 38000000 		.4byte	.LASF26
+ 209 0015 7E010000 		.4byte	.LASF27
+ 210 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 211 001d 00000000 		.4byte	0
+ 212 0021 00000000 		.4byte	.Ldebug_line0
+ 213 0025 02       		.uleb128 0x2
+ 214 0026 01       		.byte	0x1
+ 215 0027 06       		.byte	0x6
+ 216 0028 D0010000 		.4byte	.LASF0
+ 217 002c 02       		.uleb128 0x2
+ 218 002d 01       		.byte	0x1
+ 219 002e 08       		.byte	0x8
+ 220 002f 61010000 		.4byte	.LASF1
+ 221 0033 02       		.uleb128 0x2
+ 222 0034 02       		.byte	0x2
+ 223 0035 05       		.byte	0x5
+ 224 0036 AC010000 		.4byte	.LASF2
+ 225 003a 02       		.uleb128 0x2
+ 226 003b 02       		.byte	0x2
+ 227 003c 07       		.byte	0x7
+ 228 003d BD010000 		.4byte	.LASF3
+ 229 0041 02       		.uleb128 0x2
+ 230 0042 04       		.byte	0x4
+ 231 0043 05       		.byte	0x5
+ 232 0044 A3010000 		.4byte	.LASF4
+ 233 0048 02       		.uleb128 0x2
+ 234 0049 04       		.byte	0x4
+ 235 004a 07       		.byte	0x7
+ 236 004b 0E010000 		.4byte	.LASF5
+ 237 004f 02       		.uleb128 0x2
+ 238 0050 08       		.byte	0x8
+ 239 0051 05       		.byte	0x5
+ 240 0052 00000000 		.4byte	.LASF6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 8
+
+
+ 241 0056 02       		.uleb128 0x2
+ 242 0057 08       		.byte	0x8
+ 243 0058 07       		.byte	0x7
+ 244 0059 20010000 		.4byte	.LASF7
+ 245 005d 03       		.uleb128 0x3
+ 246 005e 04       		.byte	0x4
+ 247 005f 05       		.byte	0x5
+ 248 0060 696E7400 		.ascii	"int\000"
+ 249 0064 02       		.uleb128 0x2
+ 250 0065 04       		.byte	0x4
+ 251 0066 07       		.byte	0x7
+ 252 0067 1A000000 		.4byte	.LASF8
+ 253 006b 04       		.uleb128 0x4
+ 254 006c 08010000 		.4byte	.LASF12
+ 255 0070 02       		.byte	0x2
+ 256 0071 9201     		.2byte	0x192
+ 257 0073 2C000000 		.4byte	0x2c
+ 258 0077 02       		.uleb128 0x2
+ 259 0078 04       		.byte	0x4
+ 260 0079 04       		.byte	0x4
+ 261 007a 0B020000 		.4byte	.LASF9
+ 262 007e 02       		.uleb128 0x2
+ 263 007f 08       		.byte	0x8
+ 264 0080 04       		.byte	0x4
+ 265 0081 B6010000 		.4byte	.LASF10
+ 266 0085 02       		.uleb128 0x2
+ 267 0086 01       		.byte	0x1
+ 268 0087 08       		.byte	0x8
+ 269 0088 5C010000 		.4byte	.LASF11
+ 270 008c 04       		.uleb128 0x4
+ 271 008d 40020000 		.4byte	.LASF13
+ 272 0091 02       		.byte	0x2
+ 273 0092 3C02     		.2byte	0x23c
+ 274 0094 98000000 		.4byte	0x98
+ 275 0098 05       		.uleb128 0x5
+ 276 0099 6B000000 		.4byte	0x6b
+ 277 009d 02       		.uleb128 0x2
+ 278 009e 04       		.byte	0x4
+ 279 009f 07       		.byte	0x7
+ 280 00a0 45020000 		.4byte	.LASF14
+ 281 00a4 06       		.uleb128 0x6
+ 282 00a5 02       		.byte	0x2
+ 283 00a6 03       		.byte	0x3
+ 284 00a7 28       		.byte	0x28
+ 285 00a8 C5000000 		.4byte	0xc5
+ 286 00ac 07       		.uleb128 0x7
+ 287 00ad 0E000000 		.4byte	.LASF15
+ 288 00b1 03       		.byte	0x3
+ 289 00b2 2A       		.byte	0x2a
+ 290 00b3 6B000000 		.4byte	0x6b
+ 291 00b7 00       		.byte	0
+ 292 00b8 07       		.uleb128 0x7
+ 293 00b9 F4010000 		.4byte	.LASF16
+ 294 00bd 03       		.byte	0x3
+ 295 00be 2B       		.byte	0x2b
+ 296 00bf 6B000000 		.4byte	0x6b
+ 297 00c3 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 9
+
+
+ 298 00c4 00       		.byte	0
+ 299 00c5 08       		.uleb128 0x8
+ 300 00c6 28020000 		.4byte	.LASF17
+ 301 00ca 03       		.byte	0x3
+ 302 00cb 2C       		.byte	0x2c
+ 303 00cc A4000000 		.4byte	0xa4
+ 304 00d0 09       		.uleb128 0x9
+ 305 00d1 47010000 		.4byte	.LASF18
+ 306 00d5 01       		.byte	0x1
+ 307 00d6 2E       		.byte	0x2e
+ 308 00d7 00000000 		.4byte	.LFB0
+ 309 00db 14000000 		.4byte	.LFE0-.LFB0
+ 310 00df 01       		.uleb128 0x1
+ 311 00e0 9C       		.byte	0x9c
+ 312 00e1 09       		.uleb128 0x9
+ 313 00e2 DC010000 		.4byte	.LASF19
+ 314 00e6 01       		.byte	0x1
+ 315 00e7 47       		.byte	0x47
+ 316 00e8 00000000 		.4byte	.LFB1
+ 317 00ec 14000000 		.4byte	.LFE1-.LFB1
+ 318 00f0 01       		.uleb128 0x1
+ 319 00f1 9C       		.byte	0x9c
+ 320 00f2 0A       		.uleb128 0xa
+ 321 00f3 37010000 		.4byte	.LASF20
+ 322 00f7 01       		.byte	0x1
+ 323 00f8 5F       		.byte	0x5f
+ 324 00f9 00000000 		.4byte	.LFB2
+ 325 00fd 44000000 		.4byte	.LFE2-.LFB2
+ 326 0101 01       		.uleb128 0x1
+ 327 0102 9C       		.byte	0x9c
+ 328 0103 1A010000 		.4byte	0x11a
+ 329 0107 0B       		.uleb128 0xb
+ 330 0108 28000000 		.4byte	.LVL0
+ 331 010c 5C010000 		.4byte	0x15c
+ 332 0110 0C       		.uleb128 0xc
+ 333 0111 36000000 		.4byte	.LVL1
+ 334 0115 D0000000 		.4byte	0xd0
+ 335 0119 00       		.byte	0
+ 336 011a 0A       		.uleb128 0xa
+ 337 011b 27000000 		.4byte	.LASF21
+ 338 011f 01       		.byte	0x1
+ 339 0120 8D       		.byte	0x8d
+ 340 0121 00000000 		.4byte	.LFB3
+ 341 0125 24000000 		.4byte	.LFE3-.LFB3
+ 342 0129 01       		.uleb128 0x1
+ 343 012a 9C       		.byte	0x9c
+ 344 012b 4B010000 		.4byte	0x14b
+ 345 012f 0B       		.uleb128 0xb
+ 346 0130 08000000 		.4byte	.LVL2
+ 347 0134 E1000000 		.4byte	0xe1
+ 348 0138 0B       		.uleb128 0xb
+ 349 0139 10000000 		.4byte	.LVL3
+ 350 013d 67010000 		.4byte	0x167
+ 351 0141 0C       		.uleb128 0xc
+ 352 0142 1E000000 		.4byte	.LVL4
+ 353 0146 72010000 		.4byte	0x172
+ 354 014a 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 10
+
+
+ 355 014b 0D       		.uleb128 0xd
+ 356 014c FA010000 		.4byte	.LASF28
+ 357 0150 01       		.byte	0x1
+ 358 0151 14       		.byte	0x14
+ 359 0152 C5000000 		.4byte	0xc5
+ 360 0156 05       		.uleb128 0x5
+ 361 0157 03       		.byte	0x3
+ 362 0158 00000000 		.4byte	ADC_therm_backup
+ 363 015c 0E       		.uleb128 0xe
+ 364 015d 6F010000 		.4byte	.LASF22
+ 365 0161 6F010000 		.4byte	.LASF22
+ 366 0165 03       		.byte	0x3
+ 367 0166 3B       		.byte	0x3b
+ 368 0167 0E       		.uleb128 0xe
+ 369 0168 5E000000 		.4byte	.LASF23
+ 370 016c 5E000000 		.4byte	.LASF23
+ 371 0170 03       		.byte	0x3
+ 372 0171 4D       		.byte	0x4d
+ 373 0172 0E       		.uleb128 0xe
+ 374 0173 11020000 		.4byte	.LASF24
+ 375 0177 11020000 		.4byte	.LASF24
+ 376 017b 03       		.byte	0x3
+ 377 017c 3D       		.byte	0x3d
+ 378 017d 00       		.byte	0
+ 379              		.section	.debug_abbrev,"",%progbits
+ 380              	.Ldebug_abbrev0:
+ 381 0000 01       		.uleb128 0x1
+ 382 0001 11       		.uleb128 0x11
+ 383 0002 01       		.byte	0x1
+ 384 0003 25       		.uleb128 0x25
+ 385 0004 0E       		.uleb128 0xe
+ 386 0005 13       		.uleb128 0x13
+ 387 0006 0B       		.uleb128 0xb
+ 388 0007 03       		.uleb128 0x3
+ 389 0008 0E       		.uleb128 0xe
+ 390 0009 1B       		.uleb128 0x1b
+ 391 000a 0E       		.uleb128 0xe
+ 392 000b 55       		.uleb128 0x55
+ 393 000c 17       		.uleb128 0x17
+ 394 000d 11       		.uleb128 0x11
+ 395 000e 01       		.uleb128 0x1
+ 396 000f 10       		.uleb128 0x10
+ 397 0010 17       		.uleb128 0x17
+ 398 0011 00       		.byte	0
+ 399 0012 00       		.byte	0
+ 400 0013 02       		.uleb128 0x2
+ 401 0014 24       		.uleb128 0x24
+ 402 0015 00       		.byte	0
+ 403 0016 0B       		.uleb128 0xb
+ 404 0017 0B       		.uleb128 0xb
+ 405 0018 3E       		.uleb128 0x3e
+ 406 0019 0B       		.uleb128 0xb
+ 407 001a 03       		.uleb128 0x3
+ 408 001b 0E       		.uleb128 0xe
+ 409 001c 00       		.byte	0
+ 410 001d 00       		.byte	0
+ 411 001e 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 11
+
+
+ 412 001f 24       		.uleb128 0x24
+ 413 0020 00       		.byte	0
+ 414 0021 0B       		.uleb128 0xb
+ 415 0022 0B       		.uleb128 0xb
+ 416 0023 3E       		.uleb128 0x3e
+ 417 0024 0B       		.uleb128 0xb
+ 418 0025 03       		.uleb128 0x3
+ 419 0026 08       		.uleb128 0x8
+ 420 0027 00       		.byte	0
+ 421 0028 00       		.byte	0
+ 422 0029 04       		.uleb128 0x4
+ 423 002a 16       		.uleb128 0x16
+ 424 002b 00       		.byte	0
+ 425 002c 03       		.uleb128 0x3
+ 426 002d 0E       		.uleb128 0xe
+ 427 002e 3A       		.uleb128 0x3a
+ 428 002f 0B       		.uleb128 0xb
+ 429 0030 3B       		.uleb128 0x3b
+ 430 0031 05       		.uleb128 0x5
+ 431 0032 49       		.uleb128 0x49
+ 432 0033 13       		.uleb128 0x13
+ 433 0034 00       		.byte	0
+ 434 0035 00       		.byte	0
+ 435 0036 05       		.uleb128 0x5
+ 436 0037 35       		.uleb128 0x35
+ 437 0038 00       		.byte	0
+ 438 0039 49       		.uleb128 0x49
+ 439 003a 13       		.uleb128 0x13
+ 440 003b 00       		.byte	0
+ 441 003c 00       		.byte	0
+ 442 003d 06       		.uleb128 0x6
+ 443 003e 13       		.uleb128 0x13
+ 444 003f 01       		.byte	0x1
+ 445 0040 0B       		.uleb128 0xb
+ 446 0041 0B       		.uleb128 0xb
+ 447 0042 3A       		.uleb128 0x3a
+ 448 0043 0B       		.uleb128 0xb
+ 449 0044 3B       		.uleb128 0x3b
+ 450 0045 0B       		.uleb128 0xb
+ 451 0046 01       		.uleb128 0x1
+ 452 0047 13       		.uleb128 0x13
+ 453 0048 00       		.byte	0
+ 454 0049 00       		.byte	0
+ 455 004a 07       		.uleb128 0x7
+ 456 004b 0D       		.uleb128 0xd
+ 457 004c 00       		.byte	0
+ 458 004d 03       		.uleb128 0x3
+ 459 004e 0E       		.uleb128 0xe
+ 460 004f 3A       		.uleb128 0x3a
+ 461 0050 0B       		.uleb128 0xb
+ 462 0051 3B       		.uleb128 0x3b
+ 463 0052 0B       		.uleb128 0xb
+ 464 0053 49       		.uleb128 0x49
+ 465 0054 13       		.uleb128 0x13
+ 466 0055 38       		.uleb128 0x38
+ 467 0056 0B       		.uleb128 0xb
+ 468 0057 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 12
+
+
+ 469 0058 00       		.byte	0
+ 470 0059 08       		.uleb128 0x8
+ 471 005a 16       		.uleb128 0x16
+ 472 005b 00       		.byte	0
+ 473 005c 03       		.uleb128 0x3
+ 474 005d 0E       		.uleb128 0xe
+ 475 005e 3A       		.uleb128 0x3a
+ 476 005f 0B       		.uleb128 0xb
+ 477 0060 3B       		.uleb128 0x3b
+ 478 0061 0B       		.uleb128 0xb
+ 479 0062 49       		.uleb128 0x49
+ 480 0063 13       		.uleb128 0x13
+ 481 0064 00       		.byte	0
+ 482 0065 00       		.byte	0
+ 483 0066 09       		.uleb128 0x9
+ 484 0067 2E       		.uleb128 0x2e
+ 485 0068 00       		.byte	0
+ 486 0069 3F       		.uleb128 0x3f
+ 487 006a 19       		.uleb128 0x19
+ 488 006b 03       		.uleb128 0x3
+ 489 006c 0E       		.uleb128 0xe
+ 490 006d 3A       		.uleb128 0x3a
+ 491 006e 0B       		.uleb128 0xb
+ 492 006f 3B       		.uleb128 0x3b
+ 493 0070 0B       		.uleb128 0xb
+ 494 0071 27       		.uleb128 0x27
+ 495 0072 19       		.uleb128 0x19
+ 496 0073 11       		.uleb128 0x11
+ 497 0074 01       		.uleb128 0x1
+ 498 0075 12       		.uleb128 0x12
+ 499 0076 06       		.uleb128 0x6
+ 500 0077 40       		.uleb128 0x40
+ 501 0078 18       		.uleb128 0x18
+ 502 0079 9742     		.uleb128 0x2117
+ 503 007b 19       		.uleb128 0x19
+ 504 007c 00       		.byte	0
+ 505 007d 00       		.byte	0
+ 506 007e 0A       		.uleb128 0xa
+ 507 007f 2E       		.uleb128 0x2e
+ 508 0080 01       		.byte	0x1
+ 509 0081 3F       		.uleb128 0x3f
+ 510 0082 19       		.uleb128 0x19
+ 511 0083 03       		.uleb128 0x3
+ 512 0084 0E       		.uleb128 0xe
+ 513 0085 3A       		.uleb128 0x3a
+ 514 0086 0B       		.uleb128 0xb
+ 515 0087 3B       		.uleb128 0x3b
+ 516 0088 0B       		.uleb128 0xb
+ 517 0089 27       		.uleb128 0x27
+ 518 008a 19       		.uleb128 0x19
+ 519 008b 11       		.uleb128 0x11
+ 520 008c 01       		.uleb128 0x1
+ 521 008d 12       		.uleb128 0x12
+ 522 008e 06       		.uleb128 0x6
+ 523 008f 40       		.uleb128 0x40
+ 524 0090 18       		.uleb128 0x18
+ 525 0091 9742     		.uleb128 0x2117
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 13
+
+
+ 526 0093 19       		.uleb128 0x19
+ 527 0094 01       		.uleb128 0x1
+ 528 0095 13       		.uleb128 0x13
+ 529 0096 00       		.byte	0
+ 530 0097 00       		.byte	0
+ 531 0098 0B       		.uleb128 0xb
+ 532 0099 898201   		.uleb128 0x4109
+ 533 009c 00       		.byte	0
+ 534 009d 11       		.uleb128 0x11
+ 535 009e 01       		.uleb128 0x1
+ 536 009f 31       		.uleb128 0x31
+ 537 00a0 13       		.uleb128 0x13
+ 538 00a1 00       		.byte	0
+ 539 00a2 00       		.byte	0
+ 540 00a3 0C       		.uleb128 0xc
+ 541 00a4 898201   		.uleb128 0x4109
+ 542 00a7 00       		.byte	0
+ 543 00a8 11       		.uleb128 0x11
+ 544 00a9 01       		.uleb128 0x1
+ 545 00aa 9542     		.uleb128 0x2115
+ 546 00ac 19       		.uleb128 0x19
+ 547 00ad 31       		.uleb128 0x31
+ 548 00ae 13       		.uleb128 0x13
+ 549 00af 00       		.byte	0
+ 550 00b0 00       		.byte	0
+ 551 00b1 0D       		.uleb128 0xd
+ 552 00b2 34       		.uleb128 0x34
+ 553 00b3 00       		.byte	0
+ 554 00b4 03       		.uleb128 0x3
+ 555 00b5 0E       		.uleb128 0xe
+ 556 00b6 3A       		.uleb128 0x3a
+ 557 00b7 0B       		.uleb128 0xb
+ 558 00b8 3B       		.uleb128 0x3b
+ 559 00b9 0B       		.uleb128 0xb
+ 560 00ba 49       		.uleb128 0x49
+ 561 00bb 13       		.uleb128 0x13
+ 562 00bc 02       		.uleb128 0x2
+ 563 00bd 18       		.uleb128 0x18
+ 564 00be 00       		.byte	0
+ 565 00bf 00       		.byte	0
+ 566 00c0 0E       		.uleb128 0xe
+ 567 00c1 2E       		.uleb128 0x2e
+ 568 00c2 00       		.byte	0
+ 569 00c3 3F       		.uleb128 0x3f
+ 570 00c4 19       		.uleb128 0x19
+ 571 00c5 3C       		.uleb128 0x3c
+ 572 00c6 19       		.uleb128 0x19
+ 573 00c7 6E       		.uleb128 0x6e
+ 574 00c8 0E       		.uleb128 0xe
+ 575 00c9 03       		.uleb128 0x3
+ 576 00ca 0E       		.uleb128 0xe
+ 577 00cb 3A       		.uleb128 0x3a
+ 578 00cc 0B       		.uleb128 0xb
+ 579 00cd 3B       		.uleb128 0x3b
+ 580 00ce 0B       		.uleb128 0xb
+ 581 00cf 00       		.byte	0
+ 582 00d0 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 14
+
+
+ 583 00d1 00       		.byte	0
+ 584              		.section	.debug_aranges,"",%progbits
+ 585 0000 34000000 		.4byte	0x34
+ 586 0004 0200     		.2byte	0x2
+ 587 0006 00000000 		.4byte	.Ldebug_info0
+ 588 000a 04       		.byte	0x4
+ 589 000b 00       		.byte	0
+ 590 000c 0000     		.2byte	0
+ 591 000e 0000     		.2byte	0
+ 592 0010 00000000 		.4byte	.LFB0
+ 593 0014 14000000 		.4byte	.LFE0-.LFB0
+ 594 0018 00000000 		.4byte	.LFB1
+ 595 001c 14000000 		.4byte	.LFE1-.LFB1
+ 596 0020 00000000 		.4byte	.LFB2
+ 597 0024 44000000 		.4byte	.LFE2-.LFB2
+ 598 0028 00000000 		.4byte	.LFB3
+ 599 002c 24000000 		.4byte	.LFE3-.LFB3
+ 600 0030 00000000 		.4byte	0
+ 601 0034 00000000 		.4byte	0
+ 602              		.section	.debug_ranges,"",%progbits
+ 603              	.Ldebug_ranges0:
+ 604 0000 00000000 		.4byte	.LFB0
+ 605 0004 14000000 		.4byte	.LFE0
+ 606 0008 00000000 		.4byte	.LFB1
+ 607 000c 14000000 		.4byte	.LFE1
+ 608 0010 00000000 		.4byte	.LFB2
+ 609 0014 44000000 		.4byte	.LFE2
+ 610 0018 00000000 		.4byte	.LFB3
+ 611 001c 24000000 		.4byte	.LFE3
+ 612 0020 00000000 		.4byte	0
+ 613 0024 00000000 		.4byte	0
+ 614              		.section	.debug_line,"",%progbits
+ 615              	.Ldebug_line0:
+ 616 0000 B8000000 		.section	.debug_str,"MS",%progbits,1
+ 616      02005800 
+ 616      00000201 
+ 616      FB0E0D00 
+ 616      01010101 
+ 617              	.LASF6:
+ 618 0000 6C6F6E67 		.ascii	"long long int\000"
+ 618      206C6F6E 
+ 618      6720696E 
+ 618      7400
+ 619              	.LASF15:
+ 620 000e 656E6162 		.ascii	"enableState\000"
+ 620      6C655374 
+ 620      61746500 
+ 621              	.LASF8:
+ 622 001a 756E7369 		.ascii	"unsigned int\000"
+ 622      676E6564 
+ 622      20696E74 
+ 622      00
+ 623              	.LASF21:
+ 624 0027 4144435F 		.ascii	"ADC_therm_Wakeup\000"
+ 624      74686572 
+ 624      6D5F5761 
+ 624      6B657570 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 15
+
+
+ 624      00
+ 625              	.LASF26:
+ 626 0038 47656E65 		.ascii	"Generated_Source\\PSoC5\\ADC_therm_PM.c\000"
+ 626      72617465 
+ 626      645F536F 
+ 626      75726365 
+ 626      5C50536F 
+ 627              	.LASF23:
+ 628 005e 4144435F 		.ascii	"ADC_therm_Enable\000"
+ 628      74686572 
+ 628      6D5F456E 
+ 628      61626C65 
+ 628      00
+ 629              	.LASF25:
+ 630 006f 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 630      43393920 
+ 630      352E342E 
+ 630      31203230 
+ 630      31363036 
+ 631 00a2 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 631      20726576 
+ 631      6973696F 
+ 631      6E203233 
+ 631      37373135 
+ 632 00d5 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 632      74643D67 
+ 632      6E753939 
+ 632      202D6666 
+ 632      756E6374 
+ 633              	.LASF12:
+ 634 0108 75696E74 		.ascii	"uint8\000"
+ 634      3800
+ 635              	.LASF5:
+ 636 010e 6C6F6E67 		.ascii	"long unsigned int\000"
+ 636      20756E73 
+ 636      69676E65 
+ 636      6420696E 
+ 636      7400
+ 637              	.LASF7:
+ 638 0120 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 638      206C6F6E 
+ 638      6720756E 
+ 638      7369676E 
+ 638      65642069 
+ 639              	.LASF20:
+ 640 0137 4144435F 		.ascii	"ADC_therm_Sleep\000"
+ 640      74686572 
+ 640      6D5F536C 
+ 640      65657000 
+ 641              	.LASF18:
+ 642 0147 4144435F 		.ascii	"ADC_therm_SaveConfig\000"
+ 642      74686572 
+ 642      6D5F5361 
+ 642      7665436F 
+ 642      6E666967 
+ 643              	.LASF11:
+ 644 015c 63686172 		.ascii	"char\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 16
+
+
+ 644      00
+ 645              	.LASF1:
+ 646 0161 756E7369 		.ascii	"unsigned char\000"
+ 646      676E6564 
+ 646      20636861 
+ 646      7200
+ 647              	.LASF22:
+ 648 016f 4144435F 		.ascii	"ADC_therm_Stop\000"
+ 648      74686572 
+ 648      6D5F5374 
+ 648      6F7000
+ 649              	.LASF27:
+ 650 017e 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 650      73657273 
+ 650      5C636865 
+ 650      6D695C55 
+ 650      44335F51 
+ 651              	.LASF4:
+ 652 01a3 6C6F6E67 		.ascii	"long int\000"
+ 652      20696E74 
+ 652      00
+ 653              	.LASF2:
+ 654 01ac 73686F72 		.ascii	"short int\000"
+ 654      7420696E 
+ 654      7400
+ 655              	.LASF10:
+ 656 01b6 646F7562 		.ascii	"double\000"
+ 656      6C6500
+ 657              	.LASF3:
+ 658 01bd 73686F72 		.ascii	"short unsigned int\000"
+ 658      7420756E 
+ 658      7369676E 
+ 658      65642069 
+ 658      6E7400
+ 659              	.LASF0:
+ 660 01d0 7369676E 		.ascii	"signed char\000"
+ 660      65642063 
+ 660      68617200 
+ 661              	.LASF19:
+ 662 01dc 4144435F 		.ascii	"ADC_therm_RestoreConfig\000"
+ 662      74686572 
+ 662      6D5F5265 
+ 662      73746F72 
+ 662      65436F6E 
+ 663              	.LASF16:
+ 664 01f4 64656363 		.ascii	"deccr\000"
+ 664      7200
+ 665              	.LASF28:
+ 666 01fa 4144435F 		.ascii	"ADC_therm_backup\000"
+ 666      74686572 
+ 666      6D5F6261 
+ 666      636B7570 
+ 666      00
+ 667              	.LASF9:
+ 668 020b 666C6F61 		.ascii	"float\000"
+ 668      7400
+ 669              	.LASF24:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccYmaWRP.s 			page 17
+
+
+ 670 0211 4144435F 		.ascii	"ADC_therm_StartConvert\000"
+ 670      74686572 
+ 670      6D5F5374 
+ 670      61727443 
+ 670      6F6E7665 
+ 671              	.LASF17:
+ 672 0228 4144435F 		.ascii	"ADC_therm_BACKUP_STRUCT\000"
+ 672      74686572 
+ 672      6D5F4241 
+ 672      434B5550 
+ 672      5F535452 
+ 673              	.LASF13:
+ 674 0240 72656738 		.ascii	"reg8\000"
+ 674      00
+ 675              	.LASF14:
+ 676 0245 73697A65 		.ascii	"sizetype\000"
+ 676      74797065 
+ 676      00
+ 677              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

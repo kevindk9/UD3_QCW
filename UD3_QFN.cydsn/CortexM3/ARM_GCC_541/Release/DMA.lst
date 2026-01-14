@@ -1,0 +1,3704 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"DMA.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.initialize_DMA,"ax",%progbits
+  20              		.align	1
+  21              		.global	initialize_DMA
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	initialize_DMA, %function
+  25              	initialize_DMA:
+  26              	.LFB63:
+  27              		.file 1 "..\\common\\ud3core\\DMA.c"
+   1:..\common\ud3core/DMA.c **** /*
+   2:..\common\ud3core/DMA.c ****  * UD3
+   3:..\common\ud3core/DMA.c ****  *
+   4:..\common\ud3core/DMA.c ****  * Copyright (c) 2018 Jens Kerrinnes
+   5:..\common\ud3core/DMA.c ****  * Copyright (c) 2015 Steve Ward
+   6:..\common\ud3core/DMA.c ****  *
+   7:..\common\ud3core/DMA.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   8:..\common\ud3core/DMA.c ****  * this software and associated documentation files (the "Software"), to deal in
+   9:..\common\ud3core/DMA.c ****  * the Software without restriction, including without limitation the rights to
+  10:..\common\ud3core/DMA.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+  11:..\common\ud3core/DMA.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  12:..\common\ud3core/DMA.c ****  * subject to the following conditions:
+  13:..\common\ud3core/DMA.c ****  *
+  14:..\common\ud3core/DMA.c ****  * The above copyright notice and this permission notice shall be included in all
+  15:..\common\ud3core/DMA.c ****  * copies or substantial portions of the Software.
+  16:..\common\ud3core/DMA.c ****  *
+  17:..\common\ud3core/DMA.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  18:..\common\ud3core/DMA.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  19:..\common\ud3core/DMA.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  20:..\common\ud3core/DMA.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  21:..\common\ud3core/DMA.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  22:..\common\ud3core/DMA.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  23:..\common\ud3core/DMA.c **** */
+  24:..\common\ud3core/DMA.c **** 
+  25:..\common\ud3core/DMA.c **** #include "DMA.h"
+  26:..\common\ud3core/DMA.c **** #include "ZCDtoPWM.h"
+  27:..\common\ud3core/DMA.c **** #include <device.h>
+  28:..\common\ud3core/DMA.c **** 
+  29:..\common\ud3core/DMA.c **** void initialize_DMA(void) {
+  28              		.loc 1 29 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 2
+
+
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 2DE9F843 		push	{r3, r4, r5, r6, r7, r8, r9, lr}
+  33              		.cfi_def_cfa_offset 32
+  34              		.cfi_offset 3, -32
+  35              		.cfi_offset 4, -28
+  36              		.cfi_offset 5, -24
+  37              		.cfi_offset 6, -20
+  38              		.cfi_offset 7, -16
+  39              		.cfi_offset 8, -12
+  40              		.cfi_offset 9, -8
+  41              		.cfi_offset 14, -4
+  30:..\common\ud3core/DMA.c **** 	/* Variable declarations for FBC_to_ram_DMA */
+  31:..\common\ud3core/DMA.c **** 	/* Move these variable declarations to the top of the function */
+  32:..\common\ud3core/DMA.c **** 	uint8 FBC_to_ram_DMA_Chan;
+  33:..\common\ud3core/DMA.c **** 	uint8 FBC_to_ram_DMA_TD[1];
+  34:..\common\ud3core/DMA.c **** 	FBC_to_ram_DMA_Chan = FBC_to_ram_DMA_DmaInitialize(FBC_to_ram_DMA_BYTES_PER_BURST, FBC_to_ram_DMA_
+  42              		.loc 1 34 0
+  43 0004 4FF48042 		mov	r2, #16384
+  44 0008 41F6FF73 		movw	r3, #8191
+  45 000c 0121     		movs	r1, #1
+  46 000e 0220     		movs	r0, #2
+  47 0010 FFF7FEFF 		bl	FBC_to_ram_DMA_DmaInitialize
+  48              	.LVL0:
+  49 0014 0646     		mov	r6, r0
+  50              	.LVL1:
+  35:..\common\ud3core/DMA.c **** 													   HI16(FBC_to_ram_DMA_SRC_BASE), HI16(FBC_to_ram_DMA_DST_BASE));
+  36:..\common\ud3core/DMA.c **** 	FBC_to_ram_DMA_TD[0] = CyDmaTdAllocate();
+  51              		.loc 1 36 0
+  52 0016 FFF7FEFF 		bl	CyDmaTdAllocate
+  53              	.LVL2:
+  54 001a 0546     		mov	r5, r0
+  55              	.LVL3:
+  37:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(FBC_to_ram_DMA_TD[0], 2, FBC_to_ram_DMA_TD[0], FBC_to_ram_DMA__TD_TERMOUT_
+  38:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(FBC_to_ram_DMA_TD[0], LO16((uint32)FB_capture_CAPTURE_LSB_PTR), LO16((uint32)&fb
+  56              		.loc 1 38 0
+  57 001c BD4C     		ldr	r4, .L2
+  37:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(FBC_to_ram_DMA_TD[0], 2, FBC_to_ram_DMA_TD[0], FBC_to_ram_DMA__TD_TERMOUT_
+  58              		.loc 1 37 0
+  59 001e 0423     		movs	r3, #4
+  60              		.loc 1 38 0
+  61 0020 A4B2     		uxth	r4, r4
+  37:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(FBC_to_ram_DMA_TD[0], 2, FBC_to_ram_DMA_TD[0], FBC_to_ram_DMA__TD_TERMOUT_
+  62              		.loc 1 37 0
+  63 0022 0246     		mov	r2, r0
+  64 0024 0221     		movs	r1, #2
+  65 0026 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+  66              	.LVL4:
+  67              		.loc 1 38 0
+  68 002a 2246     		mov	r2, r4
+  69 002c 44F60871 		movw	r1, #20232
+  70 0030 2846     		mov	r0, r5
+  71 0032 FFF7FEFF 		bl	CyDmaTdSetAddress
+  72              	.LVL5:
+  39:..\common\ud3core/DMA.c **** 	CyDmaChSetInitialTd(FBC_to_ram_DMA_Chan, FBC_to_ram_DMA_TD[0]);
+  73              		.loc 1 39 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 3
+
+
+  74 0036 2946     		mov	r1, r5
+  75 0038 3046     		mov	r0, r6
+  76 003a FFF7FEFF 		bl	CyDmaChSetInitialTd
+  77              	.LVL6:
+  40:..\common\ud3core/DMA.c **** 	CyDmaChEnable(FBC_to_ram_DMA_Chan, 1);
+  78              		.loc 1 40 0
+  79 003e 0121     		movs	r1, #1
+  80 0040 3046     		mov	r0, r6
+  81 0042 FFF7FEFF 		bl	CyDmaChEnable
+  82              	.LVL7:
+  41:..\common\ud3core/DMA.c **** 
+  42:..\common\ud3core/DMA.c **** 	/* Variable declarations for ram_to_filter_DMA */
+  43:..\common\ud3core/DMA.c **** 	/* Move these variable declarations to the top of the function */
+  44:..\common\ud3core/DMA.c **** 	uint8 ram_to_filter_DMA_Chan;
+  45:..\common\ud3core/DMA.c **** 	uint8 ram_to_filter_DMA_TD[1];
+  46:..\common\ud3core/DMA.c **** 	ram_to_filter_DMA_Chan = ram_to_filter_DMA_DmaInitialize(ram_to_filter_DMA_BYTES_PER_BURST, ram_to
+  83              		.loc 1 46 0
+  84 0046 4FF48043 		mov	r3, #16384
+  85 004a 41F6FF72 		movw	r2, #8191
+  86 004e 0121     		movs	r1, #1
+  87 0050 0220     		movs	r0, #2
+  88 0052 FFF7FEFF 		bl	ram_to_filter_DMA_DmaInitialize
+  89              	.LVL8:
+  90 0056 0646     		mov	r6, r0
+  91              	.LVL9:
+  47:..\common\ud3core/DMA.c **** 															 HI16(ram_to_filter_DMA_SRC_BASE), HI16(ram_to_filter_DMA_DST_BASE));
+  48:..\common\ud3core/DMA.c **** 	ram_to_filter_DMA_TD[0] = CyDmaTdAllocate();
+  92              		.loc 1 48 0
+  93 0058 FFF7FEFF 		bl	CyDmaTdAllocate
+  94              	.LVL10:
+  95 005c 0546     		mov	r5, r0
+  96              	.LVL11:
+  49:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(ram_to_filter_DMA_TD[0], 2, ram_to_filter_DMA_TD[0], ram_to_filter_DMA__TD
+  97              		.loc 1 49 0
+  98 005e 0023     		movs	r3, #0
+  99 0060 0246     		mov	r2, r0
+ 100 0062 0221     		movs	r1, #2
+ 101 0064 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 102              	.LVL12:
+  50:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(ram_to_filter_DMA_TD[0], LO16((uint32)&fb_filter_in), LO16((uint32)FB_Filter_STA
+ 103              		.loc 1 50 0
+ 104 0068 4CF2A072 		movw	r2, #51104
+ 105 006c 2146     		mov	r1, r4
+ 106 006e 2846     		mov	r0, r5
+ 107 0070 FFF7FEFF 		bl	CyDmaTdSetAddress
+ 108              	.LVL13:
+  51:..\common\ud3core/DMA.c **** 	CyDmaChSetInitialTd(ram_to_filter_DMA_Chan, ram_to_filter_DMA_TD[0]);
+ 109              		.loc 1 51 0
+ 110 0074 2946     		mov	r1, r5
+ 111 0076 3046     		mov	r0, r6
+ 112 0078 FFF7FEFF 		bl	CyDmaChSetInitialTd
+ 113              	.LVL14:
+  52:..\common\ud3core/DMA.c **** 	CyDmaChEnable(ram_to_filter_DMA_Chan, 1);
+ 114              		.loc 1 52 0
+ 115 007c 0121     		movs	r1, #1
+ 116 007e 3046     		mov	r0, r6
+ 117 0080 FFF7FEFF 		bl	CyDmaChEnable
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 4
+
+
+ 118              	.LVL15:
+  53:..\common\ud3core/DMA.c **** 
+  54:..\common\ud3core/DMA.c **** 	/* Variable declarations for filter_to_fram_DMA */
+  55:..\common\ud3core/DMA.c **** 	/* Move these variable declarations to the top of the function */
+  56:..\common\ud3core/DMA.c **** 	uint8 filter_to_fram_DMA_Chan;
+  57:..\common\ud3core/DMA.c **** 	uint8 filter_to_fram_DMA_TD[1];
+  58:..\common\ud3core/DMA.c **** 	filter_to_fram_DMA_Chan = filter_to_fram_DMA_DmaInitialize(filter_to_fram_DMA_BYTES_PER_BURST, fil
+ 119              		.loc 1 58 0
+ 120 0084 41F6FF73 		movw	r3, #8191
+ 121 0088 4FF48042 		mov	r2, #16384
+ 122 008c 0121     		movs	r1, #1
+ 123 008e 0220     		movs	r0, #2
+ 124 0090 FFF7FEFF 		bl	filter_to_fram_DMA_DmaInitialize
+ 125              	.LVL16:
+ 126 0094 0646     		mov	r6, r0
+ 127              	.LVL17:
+  59:..\common\ud3core/DMA.c **** 															   HI16(filter_to_fram_DMA_SRC_BASE), HI16(filter_to_fram_DMA_DST_BASE));
+  60:..\common\ud3core/DMA.c **** 	filter_to_fram_DMA_TD[0] = CyDmaTdAllocate();
+ 128              		.loc 1 60 0
+ 129 0096 FFF7FEFF 		bl	CyDmaTdAllocate
+ 130              	.LVL18:
+ 131 009a 0546     		mov	r5, r0
+ 132              	.LVL19:
+  61:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(filter_to_fram_DMA_TD[0], 2, filter_to_fram_DMA_TD[0], filter_to_fram_DMA_
+  62:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(filter_to_fram_DMA_TD[0], LO16((uint32)FB_Filter_HOLDA_PTR), LO16((uint32)&fb_fi
+ 133              		.loc 1 62 0
+ 134 009c 9E4C     		ldr	r4, .L2+4
+  61:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(filter_to_fram_DMA_TD[0], 2, filter_to_fram_DMA_TD[0], filter_to_fram_DMA_
+ 135              		.loc 1 61 0
+ 136 009e 0023     		movs	r3, #0
+ 137              		.loc 1 62 0
+ 138 00a0 A4B2     		uxth	r4, r4
+  61:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(filter_to_fram_DMA_TD[0], 2, filter_to_fram_DMA_TD[0], filter_to_fram_DMA_
+ 139              		.loc 1 61 0
+ 140 00a2 0246     		mov	r2, r0
+ 141 00a4 0221     		movs	r1, #2
+ 142 00a6 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 143              	.LVL20:
+ 144              		.loc 1 62 0
+ 145 00aa 2246     		mov	r2, r4
+ 146 00ac 4CF2A871 		movw	r1, #51112
+ 147 00b0 2846     		mov	r0, r5
+ 148 00b2 FFF7FEFF 		bl	CyDmaTdSetAddress
+ 149              	.LVL21:
+  63:..\common\ud3core/DMA.c **** 	CyDmaChSetInitialTd(filter_to_fram_DMA_Chan, filter_to_fram_DMA_TD[0]);
+ 150              		.loc 1 63 0
+ 151 00b6 2946     		mov	r1, r5
+ 152 00b8 3046     		mov	r0, r6
+ 153 00ba FFF7FEFF 		bl	CyDmaChSetInitialTd
+ 154              	.LVL22:
+  64:..\common\ud3core/DMA.c **** 	CyDmaChEnable(filter_to_fram_DMA_Chan, 1);
+ 155              		.loc 1 64 0
+ 156 00be 0121     		movs	r1, #1
+ 157 00c0 3046     		mov	r0, r6
+ 158 00c2 FFF7FEFF 		bl	CyDmaChEnable
+ 159              	.LVL23:
+  65:..\common\ud3core/DMA.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 5
+
+
+  66:..\common\ud3core/DMA.c **** 	/* Variable declarations for fram_to_PWMA_DMA */
+  67:..\common\ud3core/DMA.c **** 	/* Move these variable declarations to the top of the function */
+  68:..\common\ud3core/DMA.c **** 	uint8 fram_to_PWMA_DMA_Chan;
+  69:..\common\ud3core/DMA.c **** 	uint8 fram_to_PWMA_DMA_TD[1];
+  70:..\common\ud3core/DMA.c **** 	fram_to_PWMA_DMA_Chan = fram_to_PWMA_DMA_DmaInitialize(fram_to_PWMA_DMA_BYTES_PER_BURST, fram_to_P
+ 160              		.loc 1 70 0
+ 161 00c6 4FF48043 		mov	r3, #16384
+ 162 00ca 41F6FF72 		movw	r2, #8191
+ 163 00ce 0121     		movs	r1, #1
+ 164 00d0 0220     		movs	r0, #2
+ 165 00d2 FFF7FEFF 		bl	fram_to_PWMA_DMA_DmaInitialize
+ 166              	.LVL24:
+ 167 00d6 0646     		mov	r6, r0
+ 168              	.LVL25:
+  71:..\common\ud3core/DMA.c **** 														   HI16(fram_to_PWMA_DMA_SRC_BASE), HI16(fram_to_PWMA_DMA_DST_BASE));
+  72:..\common\ud3core/DMA.c **** 	fram_to_PWMA_DMA_TD[0] = CyDmaTdAllocate();
+ 169              		.loc 1 72 0
+ 170 00d8 FFF7FEFF 		bl	CyDmaTdAllocate
+ 171              	.LVL26:
+ 172 00dc 0546     		mov	r5, r0
+ 173              	.LVL27:
+  73:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(fram_to_PWMA_DMA_TD[0], 2, fram_to_PWMA_DMA_TD[0], fram_to_PWMA_DMA__TD_TE
+ 174              		.loc 1 73 0
+ 175 00de 0023     		movs	r3, #0
+ 176 00e0 0246     		mov	r2, r0
+ 177 00e2 0221     		movs	r1, #2
+ 178 00e4 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 179              	.LVL28:
+  74:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(fram_to_PWMA_DMA_TD[0], LO16((uint32)&fb_filter_out), LO16((uint32)PWMA_COMPARE1
+ 180              		.loc 1 74 0
+ 181 00e8 44F61272 		movw	r2, #20242
+ 182 00ec 2146     		mov	r1, r4
+ 183 00ee 2846     		mov	r0, r5
+ 184 00f0 FFF7FEFF 		bl	CyDmaTdSetAddress
+ 185              	.LVL29:
+  75:..\common\ud3core/DMA.c **** 	CyDmaChSetInitialTd(fram_to_PWMA_DMA_Chan, fram_to_PWMA_DMA_TD[0]);
+ 186              		.loc 1 75 0
+ 187 00f4 2946     		mov	r1, r5
+ 188 00f6 3046     		mov	r0, r6
+ 189 00f8 FFF7FEFF 		bl	CyDmaChSetInitialTd
+ 190              	.LVL30:
+  76:..\common\ud3core/DMA.c **** 	CyDmaChEnable(fram_to_PWMA_DMA_Chan, 1);
+ 191              		.loc 1 76 0
+ 192 00fc 0121     		movs	r1, #1
+ 193 00fe 3046     		mov	r0, r6
+ 194 0100 FFF7FEFF 		bl	CyDmaChEnable
+ 195              	.LVL31:
+  77:..\common\ud3core/DMA.c **** 
+  78:..\common\ud3core/DMA.c **** 	/* Variable declarations for PWMA_init_DMA */
+  79:..\common\ud3core/DMA.c **** 	/* Move these variable declarations to the top of the function */
+  80:..\common\ud3core/DMA.c **** 	uint8 PWMA_init_DMA_Chan;
+  81:..\common\ud3core/DMA.c **** 	uint8 PWMA_init_DMA_TD[4];
+  82:..\common\ud3core/DMA.c **** 	PWMA_init_DMA_Chan = PWMA_init_DMA_DmaInitialize(PWMA_init_DMA_BYTES_PER_BURST, PWMA_init_DMA_REQU
+ 196              		.loc 1 82 0
+ 197 0104 4FF48043 		mov	r3, #16384
+ 198 0108 41F6FF72 		movw	r2, #8191
+ 199 010c 0121     		movs	r1, #1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 6
+
+
+ 200 010e 0820     		movs	r0, #8
+ 201 0110 FFF7FEFF 		bl	PWMA_init_DMA_DmaInitialize
+ 202              	.LVL32:
+ 203 0114 8146     		mov	r9, r0
+ 204              	.LVL33:
+  83:..\common\ud3core/DMA.c **** 													 HI16(PWMA_init_DMA_SRC_BASE), HI16(PWMA_init_DMA_DST_BASE));
+  84:..\common\ud3core/DMA.c **** 	PWMA_init_DMA_TD[0] = CyDmaTdAllocate();
+ 205              		.loc 1 84 0
+ 206 0116 FFF7FEFF 		bl	CyDmaTdAllocate
+ 207              	.LVL34:
+ 208 011a 0546     		mov	r5, r0
+ 209              	.LVL35:
+  85:..\common\ud3core/DMA.c **** 	PWMA_init_DMA_TD[1] = CyDmaTdAllocate();
+ 210              		.loc 1 85 0
+ 211 011c FFF7FEFF 		bl	CyDmaTdAllocate
+ 212              	.LVL36:
+ 213 0120 8046     		mov	r8, r0
+ 214              	.LVL37:
+  86:..\common\ud3core/DMA.c **** 	PWMA_init_DMA_TD[2] = CyDmaTdAllocate();
+ 215              		.loc 1 86 0
+ 216 0122 FFF7FEFF 		bl	CyDmaTdAllocate
+ 217              	.LVL38:
+ 218 0126 0746     		mov	r7, r0
+ 219              	.LVL39:
+  87:..\common\ud3core/DMA.c **** 	PWMA_init_DMA_TD[3] = CyDmaTdAllocate();
+ 220              		.loc 1 87 0
+ 221 0128 FFF7FEFF 		bl	CyDmaTdAllocate
+ 222              	.LVL40:
+ 223 012c 0646     		mov	r6, r0
+ 224              	.LVL41:
+  88:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(PWMA_init_DMA_TD[0], 2, PWMA_init_DMA_TD[1], TD_AUTO_EXEC_NEXT);
+ 225              		.loc 1 88 0
+ 226 012e 4246     		mov	r2, r8
+ 227 0130 2023     		movs	r3, #32
+ 228 0132 0221     		movs	r1, #2
+ 229 0134 2846     		mov	r0, r5
+ 230 0136 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 231              	.LVL42:
+  89:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(PWMA_init_DMA_TD[1], 2, PWMA_init_DMA_TD[2], TD_AUTO_EXEC_NEXT);
+ 232              		.loc 1 89 0
+ 233 013a 3A46     		mov	r2, r7
+ 234 013c 2023     		movs	r3, #32
+ 235 013e 0221     		movs	r1, #2
+ 236 0140 4046     		mov	r0, r8
+ 237 0142 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 238              	.LVL43:
+  90:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(PWMA_init_DMA_TD[2], 2, PWMA_init_DMA_TD[3], TD_AUTO_EXEC_NEXT);
+  91:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(PWMA_init_DMA_TD[3], 2, PWMA_init_DMA_TD[0], PWMA_init_DMA__TD_TERMOUT_EN)
+  92:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(PWMA_init_DMA_TD[0], LO16((uint32)&params.pwma_start_prd), LO16((uint32)PWMA_PER
+ 239              		.loc 1 92 0
+ 240 0146 754C     		ldr	r4, .L2+8
+  90:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(PWMA_init_DMA_TD[2], 2, PWMA_init_DMA_TD[3], TD_AUTO_EXEC_NEXT);
+ 241              		.loc 1 90 0
+ 242 0148 3246     		mov	r2, r6
+ 243 014a 2023     		movs	r3, #32
+ 244 014c 0221     		movs	r1, #2
+ 245 014e 3846     		mov	r0, r7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 7
+
+
+ 246 0150 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 247              	.LVL44:
+  91:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(PWMA_init_DMA_TD[0], LO16((uint32)&params.pwma_start_prd), LO16((uint32)PWMA_PER
+ 248              		.loc 1 91 0
+ 249 0154 0023     		movs	r3, #0
+ 250 0156 2A46     		mov	r2, r5
+ 251 0158 0221     		movs	r1, #2
+ 252 015a 3046     		mov	r0, r6
+ 253 015c FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 254              	.LVL45:
+ 255              		.loc 1 92 0
+ 256 0160 A1B2     		uxth	r1, r4
+ 257 0162 44F61072 		movw	r2, #20240
+ 258 0166 2846     		mov	r0, r5
+ 259 0168 FFF7FEFF 		bl	CyDmaTdSetAddress
+ 260              	.LVL46:
+  93:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(PWMA_init_DMA_TD[1], LO16((uint32)&params.pwma_start_cmp), LO16((uint32)PWMA_COM
+ 261              		.loc 1 93 0
+ 262 016c A11C     		adds	r1, r4, #2
+ 263 016e 44F61272 		movw	r2, #20242
+ 264 0172 89B2     		uxth	r1, r1
+ 265 0174 4046     		mov	r0, r8
+ 266 0176 FFF7FEFF 		bl	CyDmaTdSetAddress
+ 267              	.LVL47:
+  94:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(PWMA_init_DMA_TD[2], LO16((uint32)&params.pwmb_start_prd), LO16((uint32)PWMB_PER
+ 268              		.loc 1 94 0
+ 269 017a 211D     		adds	r1, r4, #4
+ 270 017c 44F61C72 		movw	r2, #20252
+ 271 0180 89B2     		uxth	r1, r1
+ 272 0182 3846     		mov	r0, r7
+ 273 0184 FFF7FEFF 		bl	CyDmaTdSetAddress
+ 274              	.LVL48:
+  95:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(PWMA_init_DMA_TD[3], LO16((uint32)&params.pwmb_start_cmp), LO16((uint32)PWMB_COM
+ 275              		.loc 1 95 0
+ 276 0188 A11D     		adds	r1, r4, #6
+ 277 018a 44F61E72 		movw	r2, #20254
+ 278 018e 89B2     		uxth	r1, r1
+ 279 0190 3046     		mov	r0, r6
+ 280 0192 FFF7FEFF 		bl	CyDmaTdSetAddress
+ 281              	.LVL49:
+  96:..\common\ud3core/DMA.c **** 	CyDmaChSetInitialTd(PWMA_init_DMA_Chan, PWMA_init_DMA_TD[0]);
+ 282              		.loc 1 96 0
+ 283 0196 2946     		mov	r1, r5
+ 284 0198 4846     		mov	r0, r9
+ 285 019a FFF7FEFF 		bl	CyDmaChSetInitialTd
+ 286              	.LVL50:
+  97:..\common\ud3core/DMA.c **** 	CyDmaChEnable(PWMA_init_DMA_Chan, 1);
+ 287              		.loc 1 97 0
+ 288 019e 0121     		movs	r1, #1
+ 289 01a0 4846     		mov	r0, r9
+ 290 01a2 FFF7FEFF 		bl	CyDmaChEnable
+ 291              	.LVL51:
+  98:..\common\ud3core/DMA.c **** 
+  99:..\common\ud3core/DMA.c **** 	/* Variable declarations for PSBINIT_DMA */
+ 100:..\common\ud3core/DMA.c **** 	/* Move these variable declarations to the top of the function */
+ 101:..\common\ud3core/DMA.c **** 	uint8 PSBINIT_DMA_Chan;
+ 102:..\common\ud3core/DMA.c **** 	uint8 PSBINIT_DMA_TD[2];
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 8
+
+
+ 103:..\common\ud3core/DMA.c **** 	PSBINIT_DMA_Chan = PSBINIT_DMA_DmaInitialize(PSBINIT_DMA_BYTES_PER_BURST, PSBINIT_DMA_REQUEST_PER_
+ 292              		.loc 1 103 0
+ 293 01a6 4FF48043 		mov	r3, #16384
+ 294 01aa 41F6FF72 		movw	r2, #8191
+ 295 01ae 0121     		movs	r1, #1
+ 296 01b0 0420     		movs	r0, #4
+ 297 01b2 FFF7FEFF 		bl	PSBINIT_DMA_DmaInitialize
+ 298              	.LVL52:
+ 299 01b6 0746     		mov	r7, r0
+ 300              	.LVL53:
+ 104:..\common\ud3core/DMA.c **** 												 HI16(PSBINIT_DMA_SRC_BASE), HI16(PSBINIT_DMA_DST_BASE));
+ 105:..\common\ud3core/DMA.c **** 	PSBINIT_DMA_TD[0] = CyDmaTdAllocate();
+ 301              		.loc 1 105 0
+ 302 01b8 FFF7FEFF 		bl	CyDmaTdAllocate
+ 303              	.LVL54:
+ 304 01bc 0546     		mov	r5, r0
+ 305              	.LVL55:
+ 106:..\common\ud3core/DMA.c **** 	PSBINIT_DMA_TD[1] = CyDmaTdAllocate();
+ 306              		.loc 1 106 0
+ 307 01be FFF7FEFF 		bl	CyDmaTdAllocate
+ 308              	.LVL56:
+ 309 01c2 0646     		mov	r6, r0
+ 310              	.LVL57:
+ 107:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(PSBINIT_DMA_TD[0], 2, PSBINIT_DMA_TD[1], TD_AUTO_EXEC_NEXT);
+ 311              		.loc 1 107 0
+ 312 01c4 0246     		mov	r2, r0
+ 313 01c6 2023     		movs	r3, #32
+ 314 01c8 0221     		movs	r1, #2
+ 315 01ca 2846     		mov	r0, r5
+ 316              	.LVL58:
+ 317 01cc FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 318              	.LVL59:
+ 108:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(PSBINIT_DMA_TD[1], 2, PSBINIT_DMA_TD[0], PSBINIT_DMA__TD_TERMOUT_EN);
+ 319              		.loc 1 108 0
+ 320 01d0 0023     		movs	r3, #0
+ 321 01d2 2A46     		mov	r2, r5
+ 322 01d4 0221     		movs	r1, #2
+ 323 01d6 3046     		mov	r0, r6
+ 324 01d8 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 325              	.LVL60:
+ 109:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(PSBINIT_DMA_TD[0], LO16((uint32)&params.pwm_top), LO16((uint32)PWMB_PERIOD_LSB_P
+ 326              		.loc 1 109 0
+ 327 01dc 04F10801 		add	r1, r4, #8
+ 110:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(PSBINIT_DMA_TD[1], LO16((uint32)&params.pwmb_psb_val), LO16((uint32)PWMB_COMPARE
+ 328              		.loc 1 110 0
+ 329 01e0 0C34     		adds	r4, r4, #12
+ 330 01e2 A4B2     		uxth	r4, r4
+ 109:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(PSBINIT_DMA_TD[0], LO16((uint32)&params.pwm_top), LO16((uint32)PWMB_PERIOD_LSB_P
+ 331              		.loc 1 109 0
+ 332 01e4 44F61C72 		movw	r2, #20252
+ 333 01e8 89B2     		uxth	r1, r1
+ 334 01ea 2846     		mov	r0, r5
+ 335 01ec FFF7FEFF 		bl	CyDmaTdSetAddress
+ 336              	.LVL61:
+ 337              		.loc 1 110 0
+ 338 01f0 44F61E72 		movw	r2, #20254
+ 339 01f4 2146     		mov	r1, r4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 9
+
+
+ 340 01f6 3046     		mov	r0, r6
+ 341 01f8 FFF7FEFF 		bl	CyDmaTdSetAddress
+ 342              	.LVL62:
+ 111:..\common\ud3core/DMA.c **** 	CyDmaChSetInitialTd(PSBINIT_DMA_Chan, PSBINIT_DMA_TD[0]);
+ 343              		.loc 1 111 0
+ 344 01fc 2946     		mov	r1, r5
+ 345 01fe 3846     		mov	r0, r7
+ 346 0200 FFF7FEFF 		bl	CyDmaChSetInitialTd
+ 347              	.LVL63:
+ 112:..\common\ud3core/DMA.c **** 	CyDmaChEnable(PSBINIT_DMA_Chan, 1);
+ 348              		.loc 1 112 0
+ 349 0204 0121     		movs	r1, #1
+ 350 0206 3846     		mov	r0, r7
+ 351 0208 FFF7FEFF 		bl	CyDmaChEnable
+ 352              	.LVL64:
+ 113:..\common\ud3core/DMA.c **** 
+ 114:..\common\ud3core/DMA.c **** 	/* Variable declarations for PWMB_PSB_DMA */
+ 115:..\common\ud3core/DMA.c **** 	/* Move these variable declarations to the top of the function */
+ 116:..\common\ud3core/DMA.c **** 	uint8 PWMB_PSB_DMA_Chan;
+ 117:..\common\ud3core/DMA.c **** 	uint8 PWMB_PSB_DMA_TD[1];
+ 118:..\common\ud3core/DMA.c **** 	PWMB_PSB_DMA_Chan = PWMB_PSB_DMA_DmaInitialize(PWMB_PSB_DMA_BYTES_PER_BURST, PWMB_PSB_DMA_REQUEST_
+ 353              		.loc 1 118 0
+ 354 020c 4FF48043 		mov	r3, #16384
+ 355 0210 41F6FF72 		movw	r2, #8191
+ 356 0214 0121     		movs	r1, #1
+ 357 0216 0220     		movs	r0, #2
+ 358 0218 FFF7FEFF 		bl	PWMB_PSB_DMA_DmaInitialize
+ 359              	.LVL65:
+ 360 021c 0646     		mov	r6, r0
+ 361              	.LVL66:
+ 119:..\common\ud3core/DMA.c **** 												   HI16(PWMB_PSB_DMA_SRC_BASE), HI16(PWMB_PSB_DMA_DST_BASE));
+ 120:..\common\ud3core/DMA.c **** 	PWMB_PSB_DMA_TD[0] = CyDmaTdAllocate();
+ 362              		.loc 1 120 0
+ 363 021e FFF7FEFF 		bl	CyDmaTdAllocate
+ 364              	.LVL67:
+ 365 0222 0546     		mov	r5, r0
+ 366              	.LVL68:
+ 121:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(PWMB_PSB_DMA_TD[0], 2, PWMB_PSB_DMA_TD[0], PWMB_PSB_DMA__TD_TERMOUT_EN); /
+ 367              		.loc 1 121 0
+ 368 0224 0423     		movs	r3, #4
+ 369 0226 0246     		mov	r2, r0
+ 370 0228 0221     		movs	r1, #2
+ 371 022a FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 372              	.LVL69:
+ 122:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(PWMB_PSB_DMA_TD[0], LO16((uint32)&params.pwmb_psb_val), LO16((uint32)PWMB_COMPAR
+ 373              		.loc 1 122 0
+ 374 022e 44F61E72 		movw	r2, #20254
+ 375 0232 2146     		mov	r1, r4
+ 376 0234 2846     		mov	r0, r5
+ 377 0236 FFF7FEFF 		bl	CyDmaTdSetAddress
+ 378              	.LVL70:
+ 123:..\common\ud3core/DMA.c **** 	CyDmaChSetInitialTd(PWMB_PSB_DMA_Chan, PWMB_PSB_DMA_TD[0]);
+ 379              		.loc 1 123 0
+ 380 023a 2946     		mov	r1, r5
+ 381 023c 3046     		mov	r0, r6
+ 382 023e FFF7FEFF 		bl	CyDmaChSetInitialTd
+ 383              	.LVL71:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 10
+
+
+ 124:..\common\ud3core/DMA.c **** 	CyDmaChEnable(PWMB_PSB_DMA_Chan, 1);
+ 384              		.loc 1 124 0
+ 385 0242 0121     		movs	r1, #1
+ 386 0244 3046     		mov	r0, r6
+ 387 0246 FFF7FEFF 		bl	CyDmaChEnable
+ 388              	.LVL72:
+ 125:..\common\ud3core/DMA.c **** 
+ 126:..\common\ud3core/DMA.c **** 	/* Variable declarations for QCW_CL_DMA */
+ 127:..\common\ud3core/DMA.c **** 	/* Move these variable declarations to the top of the function */
+ 128:..\common\ud3core/DMA.c **** 	uint8 QCW_CL_DMA_Chan;
+ 129:..\common\ud3core/DMA.c **** 	uint8 QCW_CL_DMA_TD[2];
+ 130:..\common\ud3core/DMA.c **** 	QCW_CL_DMA_Chan = QCW_CL_DMA_DmaInitialize(QCW_CL_DMA_BYTES_PER_BURST, QCW_CL_DMA_REQUEST_PER_BURS
+ 389              		.loc 1 130 0
+ 390 024a 4FF48043 		mov	r3, #16384
+ 391 024e 41F6FF72 		movw	r2, #8191
+ 392 0252 0121     		movs	r1, #1
+ 393 0254 0220     		movs	r0, #2
+ 394 0256 FFF7FEFF 		bl	QCW_CL_DMA_DmaInitialize
+ 395              	.LVL73:
+ 396 025a 0746     		mov	r7, r0
+ 397              	.LVL74:
+ 131:..\common\ud3core/DMA.c **** 											   HI16(QCW_CL_DMA_SRC_BASE), HI16(QCW_CL_DMA_DST_BASE));
+ 132:..\common\ud3core/DMA.c **** 	QCW_CL_DMA_TD[0] = CyDmaTdAllocate();
+ 398              		.loc 1 132 0
+ 399 025c FFF7FEFF 		bl	CyDmaTdAllocate
+ 400              	.LVL75:
+ 401 0260 0546     		mov	r5, r0
+ 402              	.LVL76:
+ 133:..\common\ud3core/DMA.c **** 	QCW_CL_DMA_TD[1] = CyDmaTdAllocate();
+ 403              		.loc 1 133 0
+ 404 0262 FFF7FEFF 		bl	CyDmaTdAllocate
+ 405              	.LVL77:
+ 406 0266 0646     		mov	r6, r0
+ 407              	.LVL78:
+ 134:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(QCW_CL_DMA_TD[0], 1, QCW_CL_DMA_TD[1], TD_AUTO_EXEC_NEXT);
+ 135:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(QCW_CL_DMA_TD[1], 1, QCW_CL_DMA_TD[0], 0);
+ 136:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(QCW_CL_DMA_TD[0], LO16((uint32)&ct1_dac_val[2]), LO16((uint32)CT1_dac_Data_PTR))
+ 408              		.loc 1 136 0
+ 409 0268 2D4C     		ldr	r4, .L2+12
+ 134:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(QCW_CL_DMA_TD[0], 1, QCW_CL_DMA_TD[1], TD_AUTO_EXEC_NEXT);
+ 410              		.loc 1 134 0
+ 411 026a 0246     		mov	r2, r0
+ 412 026c 2023     		movs	r3, #32
+ 413 026e 0121     		movs	r1, #1
+ 414 0270 2846     		mov	r0, r5
+ 415              	.LVL79:
+ 416 0272 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 417              	.LVL80:
+ 418              		.loc 1 136 0
+ 419 0276 1FFA84F8 		uxth	r8, r4
+ 420              	.LVL81:
+ 135:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(QCW_CL_DMA_TD[0], LO16((uint32)&ct1_dac_val[2]), LO16((uint32)CT1_dac_Data_PTR))
+ 421              		.loc 1 135 0
+ 422 027a 0023     		movs	r3, #0
+ 423 027c 2A46     		mov	r2, r5
+ 424 027e 0121     		movs	r1, #1
+ 425 0280 3046     		mov	r0, r6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 11
+
+
+ 426 0282 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 427              	.LVL82:
+ 428              		.loc 1 136 0
+ 429 0286 4146     		mov	r1, r8
+ 430 0288 4FF4B742 		mov	r2, #23424
+ 431 028c 2846     		mov	r0, r5
+ 432 028e FFF7FEFF 		bl	CyDmaTdSetAddress
+ 433              	.LVL83:
+ 137:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(QCW_CL_DMA_TD[1], LO16((uint32)&ct1_dac_val[2]), LO16((uint32)CT1_dac_Data_PTR))
+ 434              		.loc 1 137 0
+ 435 0292 4FF4B742 		mov	r2, #23424
+ 436 0296 4146     		mov	r1, r8
+ 437 0298 3046     		mov	r0, r6
+ 438 029a FFF7FEFF 		bl	CyDmaTdSetAddress
+ 439              	.LVL84:
+ 138:..\common\ud3core/DMA.c **** 	CyDmaChSetInitialTd(QCW_CL_DMA_Chan, QCW_CL_DMA_TD[0]);
+ 440              		.loc 1 138 0
+ 441 029e 2946     		mov	r1, r5
+ 442 02a0 3846     		mov	r0, r7
+ 443 02a2 FFF7FEFF 		bl	CyDmaChSetInitialTd
+ 444              	.LVL85:
+ 139:..\common\ud3core/DMA.c **** 	CyDmaChEnable(QCW_CL_DMA_Chan, 1);
+ 445              		.loc 1 139 0
+ 446 02a6 0121     		movs	r1, #1
+ 447 02a8 3846     		mov	r0, r7
+ 448 02aa FFF7FEFF 		bl	CyDmaChEnable
+ 449              	.LVL86:
+ 140:..\common\ud3core/DMA.c **** 
+ 141:..\common\ud3core/DMA.c **** 	/* Variable declarations for TR1_CL_DMA */
+ 142:..\common\ud3core/DMA.c **** 	/* Move these variable declarations to the top of the function */
+ 143:..\common\ud3core/DMA.c **** 	uint8 TR1_CL_DMA_Chan;
+ 144:..\common\ud3core/DMA.c **** 	uint8 TR1_CL_DMA_TD[2];
+ 145:..\common\ud3core/DMA.c **** 	TR1_CL_DMA_Chan = TR1_CL_DMA_DmaInitialize(TR1_CL_DMA_BYTES_PER_BURST, TR1_CL_DMA_REQUEST_PER_BURS
+ 450              		.loc 1 145 0
+ 451 02ae 4FF48043 		mov	r3, #16384
+ 452 02b2 41F6FF72 		movw	r2, #8191
+ 453 02b6 0121     		movs	r1, #1
+ 454 02b8 0220     		movs	r0, #2
+ 455 02ba FFF7FEFF 		bl	TR1_CL_DMA_DmaInitialize
+ 456              	.LVL87:
+ 457 02be 0746     		mov	r7, r0
+ 458              	.LVL88:
+ 146:..\common\ud3core/DMA.c **** 											   HI16(TR1_CL_DMA_SRC_BASE), HI16(TR1_CL_DMA_DST_BASE));
+ 147:..\common\ud3core/DMA.c **** 	TR1_CL_DMA_TD[0] = CyDmaTdAllocate();
+ 459              		.loc 1 147 0
+ 460 02c0 FFF7FEFF 		bl	CyDmaTdAllocate
+ 461              	.LVL89:
+ 462 02c4 0546     		mov	r5, r0
+ 463              	.LVL90:
+ 148:..\common\ud3core/DMA.c **** 	TR1_CL_DMA_TD[1] = CyDmaTdAllocate();
+ 464              		.loc 1 148 0
+ 465 02c6 FFF7FEFF 		bl	CyDmaTdAllocate
+ 466              	.LVL91:
+ 467 02ca 0646     		mov	r6, r0
+ 468              	.LVL92:
+ 149:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(TR1_CL_DMA_TD[0], 1, TR1_CL_DMA_TD[1], TD_AUTO_EXEC_NEXT);
+ 469              		.loc 1 149 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 12
+
+
+ 470 02cc 0246     		mov	r2, r0
+ 471 02ce 2023     		movs	r3, #32
+ 472 02d0 0121     		movs	r1, #1
+ 473 02d2 2846     		mov	r0, r5
+ 474              	.LVL93:
+ 150:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(TR1_CL_DMA_TD[1], 1, TR1_CL_DMA_TD[0], 0);
+ 151:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(TR1_CL_DMA_TD[0], LO16((uint32)&ct1_dac_val[0]), LO16((uint32)CT1_dac_Data_PTR))
+ 475              		.loc 1 151 0
+ 476 02d4 023C     		subs	r4, r4, #2
+ 149:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(TR1_CL_DMA_TD[0], 1, TR1_CL_DMA_TD[1], TD_AUTO_EXEC_NEXT);
+ 477              		.loc 1 149 0
+ 478 02d6 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 479              	.LVL94:
+ 480              		.loc 1 151 0
+ 481 02da A4B2     		uxth	r4, r4
+ 150:..\common\ud3core/DMA.c **** 	CyDmaTdSetConfiguration(TR1_CL_DMA_TD[1], 1, TR1_CL_DMA_TD[0], 0);
+ 482              		.loc 1 150 0
+ 483 02dc 0023     		movs	r3, #0
+ 484 02de 2A46     		mov	r2, r5
+ 485 02e0 0121     		movs	r1, #1
+ 486 02e2 3046     		mov	r0, r6
+ 487 02e4 FFF7FEFF 		bl	CyDmaTdSetConfiguration
+ 488              	.LVL95:
+ 489              		.loc 1 151 0
+ 490 02e8 2146     		mov	r1, r4
+ 491 02ea 4FF4B742 		mov	r2, #23424
+ 492 02ee 2846     		mov	r0, r5
+ 493 02f0 FFF7FEFF 		bl	CyDmaTdSetAddress
+ 494              	.LVL96:
+ 152:..\common\ud3core/DMA.c **** 	CyDmaTdSetAddress(TR1_CL_DMA_TD[1], LO16((uint32)&ct1_dac_val[0]), LO16((uint32)CT1_dac_Data_PTR))
+ 495              		.loc 1 152 0
+ 496 02f4 2146     		mov	r1, r4
+ 497 02f6 4FF4B742 		mov	r2, #23424
+ 498 02fa 3046     		mov	r0, r6
+ 499 02fc FFF7FEFF 		bl	CyDmaTdSetAddress
+ 500              	.LVL97:
+ 153:..\common\ud3core/DMA.c **** 	CyDmaChSetInitialTd(TR1_CL_DMA_Chan, TR1_CL_DMA_TD[0]);
+ 501              		.loc 1 153 0
+ 502 0300 2946     		mov	r1, r5
+ 503 0302 3846     		mov	r0, r7
+ 504 0304 FFF7FEFF 		bl	CyDmaChSetInitialTd
+ 505              	.LVL98:
+ 154:..\common\ud3core/DMA.c **** 	CyDmaChEnable(TR1_CL_DMA_Chan, 1);
+ 506              		.loc 1 154 0
+ 507 0308 3846     		mov	r0, r7
+ 155:..\common\ud3core/DMA.c ****     
+ 156:..\common\ud3core/DMA.c **** }
+ 508              		.loc 1 156 0
+ 509 030a BDE8F843 		pop	{r3, r4, r5, r6, r7, r8, r9, lr}
+ 510              		.cfi_restore 14
+ 511              		.cfi_restore 9
+ 512              		.cfi_restore 8
+ 513              		.cfi_restore 7
+ 514              		.cfi_restore 6
+ 515              		.cfi_restore 5
+ 516              		.cfi_restore 4
+ 517              		.cfi_restore 3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 13
+
+
+ 518              		.cfi_def_cfa_offset 0
+ 519              	.LVL99:
+ 154:..\common\ud3core/DMA.c **** 	CyDmaChEnable(TR1_CL_DMA_Chan, 1);
+ 520              		.loc 1 154 0
+ 521 030e 0121     		movs	r1, #1
+ 522 0310 FFF7FEBF 		b	CyDmaChEnable
+ 523              	.LVL100:
+ 524              	.L3:
+ 525              		.align	2
+ 526              	.L2:
+ 527 0314 00000000 		.word	fb_filter_in
+ 528 0318 00000000 		.word	fb_filter_out
+ 529 031c 02000000 		.word	params+2
+ 530 0320 02000000 		.word	ct1_dac_val+2
+ 531              		.cfi_endproc
+ 532              	.LFE63:
+ 533              		.size	initialize_DMA, .-initialize_DMA
+ 534              		.comm	ct1_dac_val,3,1
+ 535              		.comm	params,26,2
+ 536              		.text
+ 537              	.Letext0:
+ 538              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 539              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 540              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 541              		.file 5 "..\\common\\ud3core\\ZCDtoPWM.h"
+ 542              		.file 6 "Generated_Source\\PSoC5/core_cm3.h"
+ 543              		.file 7 "Generated_Source\\PSoC5/FBC_to_ram_DMA_dma.h"
+ 544              		.file 8 "Generated_Source\\PSoC5/CYDMAC.H"
+ 545              		.file 9 "Generated_Source\\PSoC5/ram_to_filter_DMA_dma.h"
+ 546              		.file 10 "Generated_Source\\PSoC5/filter_to_fram_DMA_dma.h"
+ 547              		.file 11 "Generated_Source\\PSoC5/fram_to_PWMA_DMA_dma.h"
+ 548              		.file 12 "Generated_Source\\PSoC5/PWMA_init_DMA_dma.h"
+ 549              		.file 13 "Generated_Source\\PSoC5/PSBINIT_DMA_dma.h"
+ 550              		.file 14 "Generated_Source\\PSoC5/PWMB_PSB_DMA_dma.h"
+ 551              		.file 15 "Generated_Source\\PSoC5/QCW_CL_DMA_dma.h"
+ 552              		.file 16 "Generated_Source\\PSoC5/TR1_CL_DMA_dma.h"
+ 553              		.section	.debug_info,"",%progbits
+ 554              	.Ldebug_info0:
+ 555 0000 C60B0000 		.4byte	0xbc6
+ 556 0004 0400     		.2byte	0x4
+ 557 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 558 000a 04       		.byte	0x4
+ 559 000b 01       		.uleb128 0x1
+ 560 000c F0000000 		.4byte	.LASF76
+ 561 0010 0C       		.byte	0xc
+ 562 0011 6B050000 		.4byte	.LASF77
+ 563 0015 1D050000 		.4byte	.LASF78
+ 564 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 565 001d 00000000 		.4byte	0
+ 566 0021 00000000 		.4byte	.Ldebug_line0
+ 567 0025 02       		.uleb128 0x2
+ 568 0026 01       		.byte	0x1
+ 569 0027 06       		.byte	0x6
+ 570 0028 22030000 		.4byte	.LASF0
+ 571 002c 03       		.uleb128 0x3
+ 572 002d 99020000 		.4byte	.LASF3
+ 573 0031 02       		.byte	0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 14
+
+
+ 574 0032 1D       		.byte	0x1d
+ 575 0033 37000000 		.4byte	0x37
+ 576 0037 02       		.uleb128 0x2
+ 577 0038 01       		.byte	0x1
+ 578 0039 08       		.byte	0x8
+ 579 003a 14030000 		.4byte	.LASF1
+ 580 003e 02       		.uleb128 0x2
+ 581 003f 02       		.byte	0x2
+ 582 0040 05       		.byte	0x5
+ 583 0041 9A000000 		.4byte	.LASF2
+ 584 0045 03       		.uleb128 0x3
+ 585 0046 E5000000 		.4byte	.LASF4
+ 586 004a 02       		.byte	0x2
+ 587 004b 2B       		.byte	0x2b
+ 588 004c 50000000 		.4byte	0x50
+ 589 0050 02       		.uleb128 0x2
+ 590 0051 02       		.byte	0x2
+ 591 0052 07       		.byte	0x7
+ 592 0053 99030000 		.4byte	.LASF5
+ 593 0057 03       		.uleb128 0x3
+ 594 0058 AB040000 		.4byte	.LASF6
+ 595 005c 02       		.byte	0x2
+ 596 005d 3F       		.byte	0x3f
+ 597 005e 62000000 		.4byte	0x62
+ 598 0062 02       		.uleb128 0x2
+ 599 0063 04       		.byte	0x4
+ 600 0064 05       		.byte	0x5
+ 601 0065 90020000 		.4byte	.LASF7
+ 602 0069 02       		.uleb128 0x2
+ 603 006a 04       		.byte	0x4
+ 604 006b 07       		.byte	0x7
+ 605 006c 55040000 		.4byte	.LASF8
+ 606 0070 02       		.uleb128 0x2
+ 607 0071 08       		.byte	0x8
+ 608 0072 05       		.byte	0x5
+ 609 0073 67020000 		.4byte	.LASF9
+ 610 0077 02       		.uleb128 0x2
+ 611 0078 08       		.byte	0x8
+ 612 0079 07       		.byte	0x7
+ 613 007a 2E030000 		.4byte	.LASF10
+ 614 007e 04       		.uleb128 0x4
+ 615 007f 04       		.byte	0x4
+ 616 0080 05       		.byte	0x5
+ 617 0081 696E7400 		.ascii	"int\000"
+ 618 0085 02       		.uleb128 0x2
+ 619 0086 04       		.byte	0x4
+ 620 0087 07       		.byte	0x7
+ 621 0088 45030000 		.4byte	.LASF11
+ 622 008c 03       		.uleb128 0x3
+ 623 008d FE010000 		.4byte	.LASF12
+ 624 0091 03       		.byte	0x3
+ 625 0092 18       		.byte	0x18
+ 626 0093 2C000000 		.4byte	0x2c
+ 627 0097 03       		.uleb128 0x3
+ 628 0098 52030000 		.4byte	.LASF13
+ 629 009c 03       		.byte	0x3
+ 630 009d 24       		.byte	0x24
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 15
+
+
+ 631 009e 45000000 		.4byte	0x45
+ 632 00a2 03       		.uleb128 0x3
+ 633 00a3 D9030000 		.4byte	.LASF14
+ 634 00a7 03       		.byte	0x3
+ 635 00a8 2C       		.byte	0x2c
+ 636 00a9 57000000 		.4byte	0x57
+ 637 00ad 05       		.uleb128 0x5
+ 638 00ae 06020000 		.4byte	.LASF15
+ 639 00b2 04       		.byte	0x4
+ 640 00b3 9201     		.2byte	0x192
+ 641 00b5 37000000 		.4byte	0x37
+ 642 00b9 05       		.uleb128 0x5
+ 643 00ba F7010000 		.4byte	.LASF16
+ 644 00be 04       		.byte	0x4
+ 645 00bf 9301     		.2byte	0x193
+ 646 00c1 50000000 		.4byte	0x50
+ 647 00c5 05       		.uleb128 0x5
+ 648 00c6 67040000 		.4byte	.LASF17
+ 649 00ca 04       		.byte	0x4
+ 650 00cb 9401     		.2byte	0x194
+ 651 00cd 69000000 		.4byte	0x69
+ 652 00d1 02       		.uleb128 0x2
+ 653 00d2 04       		.byte	0x4
+ 654 00d3 04       		.byte	0x4
+ 655 00d4 46020000 		.4byte	.LASF18
+ 656 00d8 02       		.uleb128 0x2
+ 657 00d9 08       		.byte	0x8
+ 658 00da 04       		.byte	0x4
+ 659 00db 6A000000 		.4byte	.LASF19
+ 660 00df 02       		.uleb128 0x2
+ 661 00e0 01       		.byte	0x1
+ 662 00e1 08       		.byte	0x8
+ 663 00e2 8B020000 		.4byte	.LASF20
+ 664 00e6 05       		.uleb128 0x5
+ 665 00e7 50040000 		.4byte	.LASF21
+ 666 00eb 04       		.byte	0x4
+ 667 00ec 3C02     		.2byte	0x23c
+ 668 00ee F2000000 		.4byte	0xf2
+ 669 00f2 06       		.uleb128 0x6
+ 670 00f3 AD000000 		.4byte	0xad
+ 671 00f7 05       		.uleb128 0x5
+ 672 00f8 80000000 		.4byte	.LASF22
+ 673 00fc 04       		.byte	0x4
+ 674 00fd 3D02     		.2byte	0x23d
+ 675 00ff 03010000 		.4byte	0x103
+ 676 0103 06       		.uleb128 0x6
+ 677 0104 B9000000 		.4byte	0xb9
+ 678 0108 02       		.uleb128 0x2
+ 679 0109 04       		.byte	0x4
+ 680 010a 07       		.byte	0x7
+ 681 010b CA000000 		.4byte	.LASF23
+ 682 010f 07       		.uleb128 0x7
+ 683 0110 AD000000 		.4byte	0xad
+ 684 0114 1F010000 		.4byte	0x11f
+ 685 0118 08       		.uleb128 0x8
+ 686 0119 08010000 		.4byte	0x108
+ 687 011d 03       		.byte	0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 16
+
+
+ 688 011e 00       		.byte	0
+ 689 011f 09       		.uleb128 0x9
+ 690 0120 1A       		.byte	0x1a
+ 691 0121 05       		.byte	0x5
+ 692 0122 21       		.byte	0x21
+ 693 0123 D0010000 		.4byte	0x1d0
+ 694 0127 0A       		.uleb128 0xa
+ 695 0128 02030000 		.4byte	.LASF24
+ 696 012c 05       		.byte	0x5
+ 697 012d 23       		.byte	0x23
+ 698 012e AD000000 		.4byte	0xad
+ 699 0132 00       		.byte	0
+ 700 0133 0A       		.uleb128 0xa
+ 701 0134 71000000 		.4byte	.LASF25
+ 702 0138 05       		.byte	0x5
+ 703 0139 24       		.byte	0x24
+ 704 013a B9000000 		.4byte	0xb9
+ 705 013e 02       		.byte	0x2
+ 706 013f 0A       		.uleb128 0xa
+ 707 0140 1B020000 		.4byte	.LASF26
+ 708 0144 05       		.byte	0x5
+ 709 0145 25       		.byte	0x25
+ 710 0146 B9000000 		.4byte	0xb9
+ 711 014a 04       		.byte	0x4
+ 712 014b 0A       		.uleb128 0xa
+ 713 014c A9010000 		.4byte	.LASF27
+ 714 0150 05       		.byte	0x5
+ 715 0151 26       		.byte	0x26
+ 716 0152 B9000000 		.4byte	0xb9
+ 717 0156 06       		.byte	0x6
+ 718 0157 0A       		.uleb128 0xa
+ 719 0158 89010000 		.4byte	.LASF28
+ 720 015c 05       		.byte	0x5
+ 721 015d 27       		.byte	0x27
+ 722 015e B9000000 		.4byte	0xb9
+ 723 0162 08       		.byte	0x8
+ 724 0163 0A       		.uleb128 0xa
+ 725 0164 42050000 		.4byte	.LASF29
+ 726 0168 05       		.byte	0x5
+ 727 0169 28       		.byte	0x28
+ 728 016a B9000000 		.4byte	0xb9
+ 729 016e 0A       		.byte	0xa
+ 730 016f 0A       		.uleb128 0xa
+ 731 0170 D7040000 		.4byte	.LASF30
+ 732 0174 05       		.byte	0x5
+ 733 0175 29       		.byte	0x29
+ 734 0176 B9000000 		.4byte	0xb9
+ 735 017a 0C       		.byte	0xc
+ 736 017b 0A       		.uleb128 0xa
+ 737 017c FE030000 		.4byte	.LASF31
+ 738 0180 05       		.byte	0x5
+ 739 0181 2A       		.byte	0x2a
+ 740 0182 B9000000 		.4byte	0xb9
+ 741 0186 0E       		.byte	0xe
+ 742 0187 0A       		.uleb128 0xa
+ 743 0188 C4040000 		.4byte	.LASF32
+ 744 018c 05       		.byte	0x5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 17
+
+
+ 745 018d 2B       		.byte	0x2b
+ 746 018e B9000000 		.4byte	0xb9
+ 747 0192 10       		.byte	0x10
+ 748 0193 0A       		.uleb128 0xa
+ 749 0194 3B020000 		.4byte	.LASF33
+ 750 0198 05       		.byte	0x5
+ 751 0199 2C       		.byte	0x2c
+ 752 019a B9000000 		.4byte	0xb9
+ 753 019e 12       		.byte	0x12
+ 754 019f 0A       		.uleb128 0xa
+ 755 01a0 D3000000 		.4byte	.LASF34
+ 756 01a4 05       		.byte	0x5
+ 757 01a5 2D       		.byte	0x2d
+ 758 01a6 AD000000 		.4byte	0xad
+ 759 01aa 14       		.byte	0x14
+ 760 01ab 0A       		.uleb128 0xa
+ 761 01ac 98040000 		.4byte	.LASF35
+ 762 01b0 05       		.byte	0x5
+ 763 01b1 2E       		.byte	0x2e
+ 764 01b2 AD000000 		.4byte	0xad
+ 765 01b6 15       		.byte	0x15
+ 766 01b7 0A       		.uleb128 0xa
+ 767 01b8 79030000 		.4byte	.LASF36
+ 768 01bc 05       		.byte	0x5
+ 769 01bd 2F       		.byte	0x2f
+ 770 01be 97000000 		.4byte	0x97
+ 771 01c2 16       		.byte	0x16
+ 772 01c3 0A       		.uleb128 0xa
+ 773 01c4 B5040000 		.4byte	.LASF37
+ 774 01c8 05       		.byte	0x5
+ 775 01c9 30       		.byte	0x30
+ 776 01ca 97000000 		.4byte	0x97
+ 777 01ce 18       		.byte	0x18
+ 778 01cf 00       		.byte	0
+ 779 01d0 03       		.uleb128 0x3
+ 780 01d1 29000000 		.4byte	.LASF38
+ 781 01d5 05       		.byte	0x5
+ 782 01d6 31       		.byte	0x31
+ 783 01d7 1F010000 		.4byte	0x11f
+ 784 01db 0B       		.uleb128 0xb
+ 785 01dc A3020000 		.4byte	.LASF79
+ 786 01e0 01       		.byte	0x1
+ 787 01e1 1D       		.byte	0x1d
+ 788 01e2 00000000 		.4byte	.LFB63
+ 789 01e6 24030000 		.4byte	.LFE63-.LFB63
+ 790 01ea 01       		.uleb128 0x1
+ 791 01eb 9C       		.byte	0x9c
+ 792 01ec B10A0000 		.4byte	0xab1
+ 793 01f0 0C       		.uleb128 0xc
+ 794 01f1 E4040000 		.4byte	.LASF39
+ 795 01f5 01       		.byte	0x1
+ 796 01f6 20       		.byte	0x20
+ 797 01f7 AD000000 		.4byte	0xad
+ 798 01fb 00000000 		.4byte	.LLST0
+ 799 01ff 0C       		.uleb128 0xc
+ 800 0200 34000000 		.4byte	.LASF40
+ 801 0204 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 18
+
+
+ 802 0205 21       		.byte	0x21
+ 803 0206 B10A0000 		.4byte	0xab1
+ 804 020a 13000000 		.4byte	.LLST1
+ 805 020e 0C       		.uleb128 0xc
+ 806 020f AC030000 		.4byte	.LASF41
+ 807 0213 01       		.byte	0x1
+ 808 0214 2C       		.byte	0x2c
+ 809 0215 AD000000 		.4byte	0xad
+ 810 0219 28000000 		.4byte	.LLST2
+ 811 021d 0C       		.uleb128 0xc
+ 812 021e 83050000 		.4byte	.LASF42
+ 813 0222 01       		.byte	0x1
+ 814 0223 2D       		.byte	0x2d
+ 815 0224 B10A0000 		.4byte	0xab1
+ 816 0228 3B000000 		.4byte	.LLST3
+ 817 022c 0C       		.uleb128 0xc
+ 818 022d F8040000 		.4byte	.LASF43
+ 819 0231 01       		.byte	0x1
+ 820 0232 38       		.byte	0x38
+ 821 0233 AD000000 		.4byte	0xad
+ 822 0237 50000000 		.4byte	.LLST4
+ 823 023b 0C       		.uleb128 0xc
+ 824 023c 75020000 		.4byte	.LASF44
+ 825 0240 01       		.byte	0x1
+ 826 0241 39       		.byte	0x39
+ 827 0242 B10A0000 		.4byte	0xab1
+ 828 0246 63000000 		.4byte	.LLST5
+ 829 024a 0C       		.uleb128 0xc
+ 830 024b C3030000 		.4byte	.LASF45
+ 831 024f 01       		.byte	0x1
+ 832 0250 44       		.byte	0x44
+ 833 0251 AD000000 		.4byte	0xad
+ 834 0255 78000000 		.4byte	.LLST6
+ 835 0259 0C       		.uleb128 0xc
+ 836 025a 86000000 		.4byte	.LASF46
+ 837 025e 01       		.byte	0x1
+ 838 025f 45       		.byte	0x45
+ 839 0260 B10A0000 		.4byte	0xab1
+ 840 0264 8B000000 		.4byte	.LLST7
+ 841 0268 0C       		.uleb128 0xc
+ 842 0269 86030000 		.4byte	.LASF47
+ 843 026d 01       		.byte	0x1
+ 844 026e 50       		.byte	0x50
+ 845 026f AD000000 		.4byte	0xad
+ 846 0273 A0000000 		.4byte	.LLST8
+ 847 0277 0C       		.uleb128 0xc
+ 848 0278 98010000 		.4byte	.LASF48
+ 849 027c 01       		.byte	0x1
+ 850 027d 51       		.byte	0x51
+ 851 027e 0F010000 		.4byte	0x10f
+ 852 0282 B3000000 		.4byte	.LLST9
+ 853 0286 0C       		.uleb128 0xc
+ 854 0287 2A020000 		.4byte	.LASF49
+ 855 028b 01       		.byte	0x1
+ 856 028c 65       		.byte	0x65
+ 857 028d AD000000 		.4byte	0xad
+ 858 0291 41010000 		.4byte	.LLST10
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 19
+
+
+ 859 0295 0C       		.uleb128 0xc
+ 860 0296 0C020000 		.4byte	.LASF50
+ 861 029a 01       		.byte	0x1
+ 862 029b 66       		.byte	0x66
+ 863 029c C10A0000 		.4byte	0xac1
+ 864 02a0 54010000 		.4byte	.LLST11
+ 865 02a4 0C       		.uleb128 0xc
+ 866 02a5 46000000 		.4byte	.LASF51
+ 867 02a9 01       		.byte	0x1
+ 868 02aa 74       		.byte	0x74
+ 869 02ab AD000000 		.4byte	0xad
+ 870 02af 8A010000 		.4byte	.LLST12
+ 871 02b3 0C       		.uleb128 0xc
+ 872 02b4 5B030000 		.4byte	.LASF52
+ 873 02b8 01       		.byte	0x1
+ 874 02b9 75       		.byte	0x75
+ 875 02ba B10A0000 		.4byte	0xab1
+ 876 02be 9D010000 		.4byte	.LLST13
+ 877 02c2 0C       		.uleb128 0xc
+ 878 02c3 88040000 		.4byte	.LASF53
+ 879 02c7 01       		.byte	0x1
+ 880 02c8 80       		.byte	0x80
+ 881 02c9 AD000000 		.4byte	0xad
+ 882 02cd B2010000 		.4byte	.LLST14
+ 883 02d1 0C       		.uleb128 0xc
+ 884 02d2 F4020000 		.4byte	.LASF54
+ 885 02d6 01       		.byte	0x1
+ 886 02d7 81       		.byte	0x81
+ 887 02d8 C10A0000 		.4byte	0xac1
+ 888 02dc C5010000 		.4byte	.LLST15
+ 889 02e0 0C       		.uleb128 0xc
+ 890 02e1 27040000 		.4byte	.LASF55
+ 891 02e5 01       		.byte	0x1
+ 892 02e6 8F       		.byte	0x8f
+ 893 02e7 AD000000 		.4byte	0xad
+ 894 02eb FB010000 		.4byte	.LLST16
+ 895 02ef 0C       		.uleb128 0xc
+ 896 02f0 B9020000 		.4byte	.LASF56
+ 897 02f4 01       		.byte	0x1
+ 898 02f5 90       		.byte	0x90
+ 899 02f6 C10A0000 		.4byte	0xac1
+ 900 02fa 0E020000 		.4byte	.LLST17
+ 901 02fe 0D       		.uleb128 0xd
+ 902 02ff 14000000 		.4byte	.LVL0
+ 903 0303 2F0B0000 		.4byte	0xb2f
+ 904 0307 24030000 		.4byte	0x324
+ 905 030b 0E       		.uleb128 0xe
+ 906 030c 01       		.uleb128 0x1
+ 907 030d 50       		.byte	0x50
+ 908 030e 01       		.uleb128 0x1
+ 909 030f 32       		.byte	0x32
+ 910 0310 0E       		.uleb128 0xe
+ 911 0311 01       		.uleb128 0x1
+ 912 0312 51       		.byte	0x51
+ 913 0313 01       		.uleb128 0x1
+ 914 0314 31       		.byte	0x31
+ 915 0315 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 20
+
+
+ 916 0316 01       		.uleb128 0x1
+ 917 0317 52       		.byte	0x52
+ 918 0318 03       		.uleb128 0x3
+ 919 0319 0A       		.byte	0xa
+ 920 031a 0040     		.2byte	0x4000
+ 921 031c 0E       		.uleb128 0xe
+ 922 031d 01       		.uleb128 0x1
+ 923 031e 53       		.byte	0x53
+ 924 031f 03       		.uleb128 0x3
+ 925 0320 0A       		.byte	0xa
+ 926 0321 FF1F     		.2byte	0x1fff
+ 927 0323 00       		.byte	0
+ 928 0324 0F       		.uleb128 0xf
+ 929 0325 1A000000 		.4byte	.LVL2
+ 930 0329 3A0B0000 		.4byte	0xb3a
+ 931 032d 0D       		.uleb128 0xd
+ 932 032e 2A000000 		.4byte	.LVL4
+ 933 0332 450B0000 		.4byte	0xb45
+ 934 0336 51030000 		.4byte	0x351
+ 935 033a 0E       		.uleb128 0xe
+ 936 033b 01       		.uleb128 0x1
+ 937 033c 50       		.byte	0x50
+ 938 033d 02       		.uleb128 0x2
+ 939 033e 75       		.byte	0x75
+ 940 033f 00       		.sleb128 0
+ 941 0340 0E       		.uleb128 0xe
+ 942 0341 01       		.uleb128 0x1
+ 943 0342 51       		.byte	0x51
+ 944 0343 01       		.uleb128 0x1
+ 945 0344 32       		.byte	0x32
+ 946 0345 0E       		.uleb128 0xe
+ 947 0346 01       		.uleb128 0x1
+ 948 0347 52       		.byte	0x52
+ 949 0348 02       		.uleb128 0x2
+ 950 0349 75       		.byte	0x75
+ 951 034a 00       		.sleb128 0
+ 952 034b 0E       		.uleb128 0xe
+ 953 034c 01       		.uleb128 0x1
+ 954 034d 53       		.byte	0x53
+ 955 034e 01       		.uleb128 0x1
+ 956 034f 34       		.byte	0x34
+ 957 0350 00       		.byte	0
+ 958 0351 0D       		.uleb128 0xd
+ 959 0352 36000000 		.4byte	.LVL5
+ 960 0356 500B0000 		.4byte	0xb50
+ 961 035a 72030000 		.4byte	0x372
+ 962 035e 0E       		.uleb128 0xe
+ 963 035f 01       		.uleb128 0x1
+ 964 0360 50       		.byte	0x50
+ 965 0361 02       		.uleb128 0x2
+ 966 0362 75       		.byte	0x75
+ 967 0363 00       		.sleb128 0
+ 968 0364 0E       		.uleb128 0xe
+ 969 0365 01       		.uleb128 0x1
+ 970 0366 51       		.byte	0x51
+ 971 0367 03       		.uleb128 0x3
+ 972 0368 0A       		.byte	0xa
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 21
+
+
+ 973 0369 084F     		.2byte	0x4f08
+ 974 036b 0E       		.uleb128 0xe
+ 975 036c 01       		.uleb128 0x1
+ 976 036d 52       		.byte	0x52
+ 977 036e 02       		.uleb128 0x2
+ 978 036f 74       		.byte	0x74
+ 979 0370 00       		.sleb128 0
+ 980 0371 00       		.byte	0
+ 981 0372 0D       		.uleb128 0xd
+ 982 0373 3E000000 		.4byte	.LVL6
+ 983 0377 5B0B0000 		.4byte	0xb5b
+ 984 037b 8C030000 		.4byte	0x38c
+ 985 037f 0E       		.uleb128 0xe
+ 986 0380 01       		.uleb128 0x1
+ 987 0381 50       		.byte	0x50
+ 988 0382 02       		.uleb128 0x2
+ 989 0383 76       		.byte	0x76
+ 990 0384 00       		.sleb128 0
+ 991 0385 0E       		.uleb128 0xe
+ 992 0386 01       		.uleb128 0x1
+ 993 0387 51       		.byte	0x51
+ 994 0388 02       		.uleb128 0x2
+ 995 0389 75       		.byte	0x75
+ 996 038a 00       		.sleb128 0
+ 997 038b 00       		.byte	0
+ 998 038c 0D       		.uleb128 0xd
+ 999 038d 46000000 		.4byte	.LVL7
+ 1000 0391 660B0000 		.4byte	0xb66
+ 1001 0395 A5030000 		.4byte	0x3a5
+ 1002 0399 0E       		.uleb128 0xe
+ 1003 039a 01       		.uleb128 0x1
+ 1004 039b 50       		.byte	0x50
+ 1005 039c 02       		.uleb128 0x2
+ 1006 039d 76       		.byte	0x76
+ 1007 039e 00       		.sleb128 0
+ 1008 039f 0E       		.uleb128 0xe
+ 1009 03a0 01       		.uleb128 0x1
+ 1010 03a1 51       		.byte	0x51
+ 1011 03a2 01       		.uleb128 0x1
+ 1012 03a3 31       		.byte	0x31
+ 1013 03a4 00       		.byte	0
+ 1014 03a5 0D       		.uleb128 0xd
+ 1015 03a6 56000000 		.4byte	.LVL8
+ 1016 03aa 710B0000 		.4byte	0xb71
+ 1017 03ae CB030000 		.4byte	0x3cb
+ 1018 03b2 0E       		.uleb128 0xe
+ 1019 03b3 01       		.uleb128 0x1
+ 1020 03b4 50       		.byte	0x50
+ 1021 03b5 01       		.uleb128 0x1
+ 1022 03b6 32       		.byte	0x32
+ 1023 03b7 0E       		.uleb128 0xe
+ 1024 03b8 01       		.uleb128 0x1
+ 1025 03b9 51       		.byte	0x51
+ 1026 03ba 01       		.uleb128 0x1
+ 1027 03bb 31       		.byte	0x31
+ 1028 03bc 0E       		.uleb128 0xe
+ 1029 03bd 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 22
+
+
+ 1030 03be 52       		.byte	0x52
+ 1031 03bf 03       		.uleb128 0x3
+ 1032 03c0 0A       		.byte	0xa
+ 1033 03c1 FF1F     		.2byte	0x1fff
+ 1034 03c3 0E       		.uleb128 0xe
+ 1035 03c4 01       		.uleb128 0x1
+ 1036 03c5 53       		.byte	0x53
+ 1037 03c6 03       		.uleb128 0x3
+ 1038 03c7 0A       		.byte	0xa
+ 1039 03c8 0040     		.2byte	0x4000
+ 1040 03ca 00       		.byte	0
+ 1041 03cb 0F       		.uleb128 0xf
+ 1042 03cc 5C000000 		.4byte	.LVL10
+ 1043 03d0 3A0B0000 		.4byte	0xb3a
+ 1044 03d4 0D       		.uleb128 0xd
+ 1045 03d5 68000000 		.4byte	.LVL12
+ 1046 03d9 450B0000 		.4byte	0xb45
+ 1047 03dd F8030000 		.4byte	0x3f8
+ 1048 03e1 0E       		.uleb128 0xe
+ 1049 03e2 01       		.uleb128 0x1
+ 1050 03e3 50       		.byte	0x50
+ 1051 03e4 02       		.uleb128 0x2
+ 1052 03e5 75       		.byte	0x75
+ 1053 03e6 00       		.sleb128 0
+ 1054 03e7 0E       		.uleb128 0xe
+ 1055 03e8 01       		.uleb128 0x1
+ 1056 03e9 51       		.byte	0x51
+ 1057 03ea 01       		.uleb128 0x1
+ 1058 03eb 32       		.byte	0x32
+ 1059 03ec 0E       		.uleb128 0xe
+ 1060 03ed 01       		.uleb128 0x1
+ 1061 03ee 52       		.byte	0x52
+ 1062 03ef 02       		.uleb128 0x2
+ 1063 03f0 75       		.byte	0x75
+ 1064 03f1 00       		.sleb128 0
+ 1065 03f2 0E       		.uleb128 0xe
+ 1066 03f3 01       		.uleb128 0x1
+ 1067 03f4 53       		.byte	0x53
+ 1068 03f5 01       		.uleb128 0x1
+ 1069 03f6 30       		.byte	0x30
+ 1070 03f7 00       		.byte	0
+ 1071 03f8 0D       		.uleb128 0xd
+ 1072 03f9 74000000 		.4byte	.LVL13
+ 1073 03fd 500B0000 		.4byte	0xb50
+ 1074 0401 19040000 		.4byte	0x419
+ 1075 0405 0E       		.uleb128 0xe
+ 1076 0406 01       		.uleb128 0x1
+ 1077 0407 50       		.byte	0x50
+ 1078 0408 02       		.uleb128 0x2
+ 1079 0409 75       		.byte	0x75
+ 1080 040a 00       		.sleb128 0
+ 1081 040b 0E       		.uleb128 0xe
+ 1082 040c 01       		.uleb128 0x1
+ 1083 040d 51       		.byte	0x51
+ 1084 040e 02       		.uleb128 0x2
+ 1085 040f 74       		.byte	0x74
+ 1086 0410 00       		.sleb128 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 23
+
+
+ 1087 0411 0E       		.uleb128 0xe
+ 1088 0412 01       		.uleb128 0x1
+ 1089 0413 52       		.byte	0x52
+ 1090 0414 03       		.uleb128 0x3
+ 1091 0415 0B       		.byte	0xb
+ 1092 0416 A0C7     		.2byte	0xc7a0
+ 1093 0418 00       		.byte	0
+ 1094 0419 0D       		.uleb128 0xd
+ 1095 041a 7C000000 		.4byte	.LVL14
+ 1096 041e 5B0B0000 		.4byte	0xb5b
+ 1097 0422 33040000 		.4byte	0x433
+ 1098 0426 0E       		.uleb128 0xe
+ 1099 0427 01       		.uleb128 0x1
+ 1100 0428 50       		.byte	0x50
+ 1101 0429 02       		.uleb128 0x2
+ 1102 042a 76       		.byte	0x76
+ 1103 042b 00       		.sleb128 0
+ 1104 042c 0E       		.uleb128 0xe
+ 1105 042d 01       		.uleb128 0x1
+ 1106 042e 51       		.byte	0x51
+ 1107 042f 02       		.uleb128 0x2
+ 1108 0430 75       		.byte	0x75
+ 1109 0431 00       		.sleb128 0
+ 1110 0432 00       		.byte	0
+ 1111 0433 0D       		.uleb128 0xd
+ 1112 0434 84000000 		.4byte	.LVL15
+ 1113 0438 660B0000 		.4byte	0xb66
+ 1114 043c 4C040000 		.4byte	0x44c
+ 1115 0440 0E       		.uleb128 0xe
+ 1116 0441 01       		.uleb128 0x1
+ 1117 0442 50       		.byte	0x50
+ 1118 0443 02       		.uleb128 0x2
+ 1119 0444 76       		.byte	0x76
+ 1120 0445 00       		.sleb128 0
+ 1121 0446 0E       		.uleb128 0xe
+ 1122 0447 01       		.uleb128 0x1
+ 1123 0448 51       		.byte	0x51
+ 1124 0449 01       		.uleb128 0x1
+ 1125 044a 31       		.byte	0x31
+ 1126 044b 00       		.byte	0
+ 1127 044c 0D       		.uleb128 0xd
+ 1128 044d 94000000 		.4byte	.LVL16
+ 1129 0451 7C0B0000 		.4byte	0xb7c
+ 1130 0455 72040000 		.4byte	0x472
+ 1131 0459 0E       		.uleb128 0xe
+ 1132 045a 01       		.uleb128 0x1
+ 1133 045b 50       		.byte	0x50
+ 1134 045c 01       		.uleb128 0x1
+ 1135 045d 32       		.byte	0x32
+ 1136 045e 0E       		.uleb128 0xe
+ 1137 045f 01       		.uleb128 0x1
+ 1138 0460 51       		.byte	0x51
+ 1139 0461 01       		.uleb128 0x1
+ 1140 0462 31       		.byte	0x31
+ 1141 0463 0E       		.uleb128 0xe
+ 1142 0464 01       		.uleb128 0x1
+ 1143 0465 52       		.byte	0x52
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 24
+
+
+ 1144 0466 03       		.uleb128 0x3
+ 1145 0467 0A       		.byte	0xa
+ 1146 0468 0040     		.2byte	0x4000
+ 1147 046a 0E       		.uleb128 0xe
+ 1148 046b 01       		.uleb128 0x1
+ 1149 046c 53       		.byte	0x53
+ 1150 046d 03       		.uleb128 0x3
+ 1151 046e 0A       		.byte	0xa
+ 1152 046f FF1F     		.2byte	0x1fff
+ 1153 0471 00       		.byte	0
+ 1154 0472 0F       		.uleb128 0xf
+ 1155 0473 9A000000 		.4byte	.LVL18
+ 1156 0477 3A0B0000 		.4byte	0xb3a
+ 1157 047b 0D       		.uleb128 0xd
+ 1158 047c AA000000 		.4byte	.LVL20
+ 1159 0480 450B0000 		.4byte	0xb45
+ 1160 0484 9F040000 		.4byte	0x49f
+ 1161 0488 0E       		.uleb128 0xe
+ 1162 0489 01       		.uleb128 0x1
+ 1163 048a 50       		.byte	0x50
+ 1164 048b 02       		.uleb128 0x2
+ 1165 048c 75       		.byte	0x75
+ 1166 048d 00       		.sleb128 0
+ 1167 048e 0E       		.uleb128 0xe
+ 1168 048f 01       		.uleb128 0x1
+ 1169 0490 51       		.byte	0x51
+ 1170 0491 01       		.uleb128 0x1
+ 1171 0492 32       		.byte	0x32
+ 1172 0493 0E       		.uleb128 0xe
+ 1173 0494 01       		.uleb128 0x1
+ 1174 0495 52       		.byte	0x52
+ 1175 0496 02       		.uleb128 0x2
+ 1176 0497 75       		.byte	0x75
+ 1177 0498 00       		.sleb128 0
+ 1178 0499 0E       		.uleb128 0xe
+ 1179 049a 01       		.uleb128 0x1
+ 1180 049b 53       		.byte	0x53
+ 1181 049c 01       		.uleb128 0x1
+ 1182 049d 30       		.byte	0x30
+ 1183 049e 00       		.byte	0
+ 1184 049f 0D       		.uleb128 0xd
+ 1185 04a0 B6000000 		.4byte	.LVL21
+ 1186 04a4 500B0000 		.4byte	0xb50
+ 1187 04a8 C0040000 		.4byte	0x4c0
+ 1188 04ac 0E       		.uleb128 0xe
+ 1189 04ad 01       		.uleb128 0x1
+ 1190 04ae 50       		.byte	0x50
+ 1191 04af 02       		.uleb128 0x2
+ 1192 04b0 75       		.byte	0x75
+ 1193 04b1 00       		.sleb128 0
+ 1194 04b2 0E       		.uleb128 0xe
+ 1195 04b3 01       		.uleb128 0x1
+ 1196 04b4 51       		.byte	0x51
+ 1197 04b5 03       		.uleb128 0x3
+ 1198 04b6 0B       		.byte	0xb
+ 1199 04b7 A8C7     		.2byte	0xc7a8
+ 1200 04b9 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 25
+
+
+ 1201 04ba 01       		.uleb128 0x1
+ 1202 04bb 52       		.byte	0x52
+ 1203 04bc 02       		.uleb128 0x2
+ 1204 04bd 74       		.byte	0x74
+ 1205 04be 00       		.sleb128 0
+ 1206 04bf 00       		.byte	0
+ 1207 04c0 0D       		.uleb128 0xd
+ 1208 04c1 BE000000 		.4byte	.LVL22
+ 1209 04c5 5B0B0000 		.4byte	0xb5b
+ 1210 04c9 DA040000 		.4byte	0x4da
+ 1211 04cd 0E       		.uleb128 0xe
+ 1212 04ce 01       		.uleb128 0x1
+ 1213 04cf 50       		.byte	0x50
+ 1214 04d0 02       		.uleb128 0x2
+ 1215 04d1 76       		.byte	0x76
+ 1216 04d2 00       		.sleb128 0
+ 1217 04d3 0E       		.uleb128 0xe
+ 1218 04d4 01       		.uleb128 0x1
+ 1219 04d5 51       		.byte	0x51
+ 1220 04d6 02       		.uleb128 0x2
+ 1221 04d7 75       		.byte	0x75
+ 1222 04d8 00       		.sleb128 0
+ 1223 04d9 00       		.byte	0
+ 1224 04da 0D       		.uleb128 0xd
+ 1225 04db C6000000 		.4byte	.LVL23
+ 1226 04df 660B0000 		.4byte	0xb66
+ 1227 04e3 F3040000 		.4byte	0x4f3
+ 1228 04e7 0E       		.uleb128 0xe
+ 1229 04e8 01       		.uleb128 0x1
+ 1230 04e9 50       		.byte	0x50
+ 1231 04ea 02       		.uleb128 0x2
+ 1232 04eb 76       		.byte	0x76
+ 1233 04ec 00       		.sleb128 0
+ 1234 04ed 0E       		.uleb128 0xe
+ 1235 04ee 01       		.uleb128 0x1
+ 1236 04ef 51       		.byte	0x51
+ 1237 04f0 01       		.uleb128 0x1
+ 1238 04f1 31       		.byte	0x31
+ 1239 04f2 00       		.byte	0
+ 1240 04f3 0D       		.uleb128 0xd
+ 1241 04f4 D6000000 		.4byte	.LVL24
+ 1242 04f8 870B0000 		.4byte	0xb87
+ 1243 04fc 19050000 		.4byte	0x519
+ 1244 0500 0E       		.uleb128 0xe
+ 1245 0501 01       		.uleb128 0x1
+ 1246 0502 50       		.byte	0x50
+ 1247 0503 01       		.uleb128 0x1
+ 1248 0504 32       		.byte	0x32
+ 1249 0505 0E       		.uleb128 0xe
+ 1250 0506 01       		.uleb128 0x1
+ 1251 0507 51       		.byte	0x51
+ 1252 0508 01       		.uleb128 0x1
+ 1253 0509 31       		.byte	0x31
+ 1254 050a 0E       		.uleb128 0xe
+ 1255 050b 01       		.uleb128 0x1
+ 1256 050c 52       		.byte	0x52
+ 1257 050d 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 26
+
+
+ 1258 050e 0A       		.byte	0xa
+ 1259 050f FF1F     		.2byte	0x1fff
+ 1260 0511 0E       		.uleb128 0xe
+ 1261 0512 01       		.uleb128 0x1
+ 1262 0513 53       		.byte	0x53
+ 1263 0514 03       		.uleb128 0x3
+ 1264 0515 0A       		.byte	0xa
+ 1265 0516 0040     		.2byte	0x4000
+ 1266 0518 00       		.byte	0
+ 1267 0519 0F       		.uleb128 0xf
+ 1268 051a DC000000 		.4byte	.LVL26
+ 1269 051e 3A0B0000 		.4byte	0xb3a
+ 1270 0522 0D       		.uleb128 0xd
+ 1271 0523 E8000000 		.4byte	.LVL28
+ 1272 0527 450B0000 		.4byte	0xb45
+ 1273 052b 46050000 		.4byte	0x546
+ 1274 052f 0E       		.uleb128 0xe
+ 1275 0530 01       		.uleb128 0x1
+ 1276 0531 50       		.byte	0x50
+ 1277 0532 02       		.uleb128 0x2
+ 1278 0533 75       		.byte	0x75
+ 1279 0534 00       		.sleb128 0
+ 1280 0535 0E       		.uleb128 0xe
+ 1281 0536 01       		.uleb128 0x1
+ 1282 0537 51       		.byte	0x51
+ 1283 0538 01       		.uleb128 0x1
+ 1284 0539 32       		.byte	0x32
+ 1285 053a 0E       		.uleb128 0xe
+ 1286 053b 01       		.uleb128 0x1
+ 1287 053c 52       		.byte	0x52
+ 1288 053d 02       		.uleb128 0x2
+ 1289 053e 75       		.byte	0x75
+ 1290 053f 00       		.sleb128 0
+ 1291 0540 0E       		.uleb128 0xe
+ 1292 0541 01       		.uleb128 0x1
+ 1293 0542 53       		.byte	0x53
+ 1294 0543 01       		.uleb128 0x1
+ 1295 0544 30       		.byte	0x30
+ 1296 0545 00       		.byte	0
+ 1297 0546 0D       		.uleb128 0xd
+ 1298 0547 F4000000 		.4byte	.LVL29
+ 1299 054b 500B0000 		.4byte	0xb50
+ 1300 054f 67050000 		.4byte	0x567
+ 1301 0553 0E       		.uleb128 0xe
+ 1302 0554 01       		.uleb128 0x1
+ 1303 0555 50       		.byte	0x50
+ 1304 0556 02       		.uleb128 0x2
+ 1305 0557 75       		.byte	0x75
+ 1306 0558 00       		.sleb128 0
+ 1307 0559 0E       		.uleb128 0xe
+ 1308 055a 01       		.uleb128 0x1
+ 1309 055b 51       		.byte	0x51
+ 1310 055c 02       		.uleb128 0x2
+ 1311 055d 74       		.byte	0x74
+ 1312 055e 00       		.sleb128 0
+ 1313 055f 0E       		.uleb128 0xe
+ 1314 0560 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 27
+
+
+ 1315 0561 52       		.byte	0x52
+ 1316 0562 03       		.uleb128 0x3
+ 1317 0563 0A       		.byte	0xa
+ 1318 0564 124F     		.2byte	0x4f12
+ 1319 0566 00       		.byte	0
+ 1320 0567 0D       		.uleb128 0xd
+ 1321 0568 FC000000 		.4byte	.LVL30
+ 1322 056c 5B0B0000 		.4byte	0xb5b
+ 1323 0570 81050000 		.4byte	0x581
+ 1324 0574 0E       		.uleb128 0xe
+ 1325 0575 01       		.uleb128 0x1
+ 1326 0576 50       		.byte	0x50
+ 1327 0577 02       		.uleb128 0x2
+ 1328 0578 76       		.byte	0x76
+ 1329 0579 00       		.sleb128 0
+ 1330 057a 0E       		.uleb128 0xe
+ 1331 057b 01       		.uleb128 0x1
+ 1332 057c 51       		.byte	0x51
+ 1333 057d 02       		.uleb128 0x2
+ 1334 057e 75       		.byte	0x75
+ 1335 057f 00       		.sleb128 0
+ 1336 0580 00       		.byte	0
+ 1337 0581 0D       		.uleb128 0xd
+ 1338 0582 04010000 		.4byte	.LVL31
+ 1339 0586 660B0000 		.4byte	0xb66
+ 1340 058a 9A050000 		.4byte	0x59a
+ 1341 058e 0E       		.uleb128 0xe
+ 1342 058f 01       		.uleb128 0x1
+ 1343 0590 50       		.byte	0x50
+ 1344 0591 02       		.uleb128 0x2
+ 1345 0592 76       		.byte	0x76
+ 1346 0593 00       		.sleb128 0
+ 1347 0594 0E       		.uleb128 0xe
+ 1348 0595 01       		.uleb128 0x1
+ 1349 0596 51       		.byte	0x51
+ 1350 0597 01       		.uleb128 0x1
+ 1351 0598 31       		.byte	0x31
+ 1352 0599 00       		.byte	0
+ 1353 059a 0D       		.uleb128 0xd
+ 1354 059b 14010000 		.4byte	.LVL32
+ 1355 059f 920B0000 		.4byte	0xb92
+ 1356 05a3 C0050000 		.4byte	0x5c0
+ 1357 05a7 0E       		.uleb128 0xe
+ 1358 05a8 01       		.uleb128 0x1
+ 1359 05a9 50       		.byte	0x50
+ 1360 05aa 01       		.uleb128 0x1
+ 1361 05ab 38       		.byte	0x38
+ 1362 05ac 0E       		.uleb128 0xe
+ 1363 05ad 01       		.uleb128 0x1
+ 1364 05ae 51       		.byte	0x51
+ 1365 05af 01       		.uleb128 0x1
+ 1366 05b0 31       		.byte	0x31
+ 1367 05b1 0E       		.uleb128 0xe
+ 1368 05b2 01       		.uleb128 0x1
+ 1369 05b3 52       		.byte	0x52
+ 1370 05b4 03       		.uleb128 0x3
+ 1371 05b5 0A       		.byte	0xa
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 28
+
+
+ 1372 05b6 FF1F     		.2byte	0x1fff
+ 1373 05b8 0E       		.uleb128 0xe
+ 1374 05b9 01       		.uleb128 0x1
+ 1375 05ba 53       		.byte	0x53
+ 1376 05bb 03       		.uleb128 0x3
+ 1377 05bc 0A       		.byte	0xa
+ 1378 05bd 0040     		.2byte	0x4000
+ 1379 05bf 00       		.byte	0
+ 1380 05c0 0F       		.uleb128 0xf
+ 1381 05c1 1A010000 		.4byte	.LVL34
+ 1382 05c5 3A0B0000 		.4byte	0xb3a
+ 1383 05c9 0F       		.uleb128 0xf
+ 1384 05ca 20010000 		.4byte	.LVL36
+ 1385 05ce 3A0B0000 		.4byte	0xb3a
+ 1386 05d2 0F       		.uleb128 0xf
+ 1387 05d3 26010000 		.4byte	.LVL38
+ 1388 05d7 3A0B0000 		.4byte	0xb3a
+ 1389 05db 0F       		.uleb128 0xf
+ 1390 05dc 2C010000 		.4byte	.LVL40
+ 1391 05e0 3A0B0000 		.4byte	0xb3a
+ 1392 05e4 0D       		.uleb128 0xd
+ 1393 05e5 3A010000 		.4byte	.LVL42
+ 1394 05e9 450B0000 		.4byte	0xb45
+ 1395 05ed 09060000 		.4byte	0x609
+ 1396 05f1 0E       		.uleb128 0xe
+ 1397 05f2 01       		.uleb128 0x1
+ 1398 05f3 50       		.byte	0x50
+ 1399 05f4 02       		.uleb128 0x2
+ 1400 05f5 75       		.byte	0x75
+ 1401 05f6 00       		.sleb128 0
+ 1402 05f7 0E       		.uleb128 0xe
+ 1403 05f8 01       		.uleb128 0x1
+ 1404 05f9 51       		.byte	0x51
+ 1405 05fa 01       		.uleb128 0x1
+ 1406 05fb 32       		.byte	0x32
+ 1407 05fc 0E       		.uleb128 0xe
+ 1408 05fd 01       		.uleb128 0x1
+ 1409 05fe 52       		.byte	0x52
+ 1410 05ff 02       		.uleb128 0x2
+ 1411 0600 78       		.byte	0x78
+ 1412 0601 00       		.sleb128 0
+ 1413 0602 0E       		.uleb128 0xe
+ 1414 0603 01       		.uleb128 0x1
+ 1415 0604 53       		.byte	0x53
+ 1416 0605 02       		.uleb128 0x2
+ 1417 0606 08       		.byte	0x8
+ 1418 0607 20       		.byte	0x20
+ 1419 0608 00       		.byte	0
+ 1420 0609 0D       		.uleb128 0xd
+ 1421 060a 46010000 		.4byte	.LVL43
+ 1422 060e 450B0000 		.4byte	0xb45
+ 1423 0612 2E060000 		.4byte	0x62e
+ 1424 0616 0E       		.uleb128 0xe
+ 1425 0617 01       		.uleb128 0x1
+ 1426 0618 50       		.byte	0x50
+ 1427 0619 02       		.uleb128 0x2
+ 1428 061a 78       		.byte	0x78
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 29
+
+
+ 1429 061b 00       		.sleb128 0
+ 1430 061c 0E       		.uleb128 0xe
+ 1431 061d 01       		.uleb128 0x1
+ 1432 061e 51       		.byte	0x51
+ 1433 061f 01       		.uleb128 0x1
+ 1434 0620 32       		.byte	0x32
+ 1435 0621 0E       		.uleb128 0xe
+ 1436 0622 01       		.uleb128 0x1
+ 1437 0623 52       		.byte	0x52
+ 1438 0624 02       		.uleb128 0x2
+ 1439 0625 77       		.byte	0x77
+ 1440 0626 00       		.sleb128 0
+ 1441 0627 0E       		.uleb128 0xe
+ 1442 0628 01       		.uleb128 0x1
+ 1443 0629 53       		.byte	0x53
+ 1444 062a 02       		.uleb128 0x2
+ 1445 062b 08       		.byte	0x8
+ 1446 062c 20       		.byte	0x20
+ 1447 062d 00       		.byte	0
+ 1448 062e 0D       		.uleb128 0xd
+ 1449 062f 54010000 		.4byte	.LVL44
+ 1450 0633 450B0000 		.4byte	0xb45
+ 1451 0637 53060000 		.4byte	0x653
+ 1452 063b 0E       		.uleb128 0xe
+ 1453 063c 01       		.uleb128 0x1
+ 1454 063d 50       		.byte	0x50
+ 1455 063e 02       		.uleb128 0x2
+ 1456 063f 77       		.byte	0x77
+ 1457 0640 00       		.sleb128 0
+ 1458 0641 0E       		.uleb128 0xe
+ 1459 0642 01       		.uleb128 0x1
+ 1460 0643 51       		.byte	0x51
+ 1461 0644 01       		.uleb128 0x1
+ 1462 0645 32       		.byte	0x32
+ 1463 0646 0E       		.uleb128 0xe
+ 1464 0647 01       		.uleb128 0x1
+ 1465 0648 52       		.byte	0x52
+ 1466 0649 02       		.uleb128 0x2
+ 1467 064a 76       		.byte	0x76
+ 1468 064b 00       		.sleb128 0
+ 1469 064c 0E       		.uleb128 0xe
+ 1470 064d 01       		.uleb128 0x1
+ 1471 064e 53       		.byte	0x53
+ 1472 064f 02       		.uleb128 0x2
+ 1473 0650 08       		.byte	0x8
+ 1474 0651 20       		.byte	0x20
+ 1475 0652 00       		.byte	0
+ 1476 0653 0D       		.uleb128 0xd
+ 1477 0654 60010000 		.4byte	.LVL45
+ 1478 0658 450B0000 		.4byte	0xb45
+ 1479 065c 77060000 		.4byte	0x677
+ 1480 0660 0E       		.uleb128 0xe
+ 1481 0661 01       		.uleb128 0x1
+ 1482 0662 50       		.byte	0x50
+ 1483 0663 02       		.uleb128 0x2
+ 1484 0664 76       		.byte	0x76
+ 1485 0665 00       		.sleb128 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 30
+
+
+ 1486 0666 0E       		.uleb128 0xe
+ 1487 0667 01       		.uleb128 0x1
+ 1488 0668 51       		.byte	0x51
+ 1489 0669 01       		.uleb128 0x1
+ 1490 066a 32       		.byte	0x32
+ 1491 066b 0E       		.uleb128 0xe
+ 1492 066c 01       		.uleb128 0x1
+ 1493 066d 52       		.byte	0x52
+ 1494 066e 02       		.uleb128 0x2
+ 1495 066f 75       		.byte	0x75
+ 1496 0670 00       		.sleb128 0
+ 1497 0671 0E       		.uleb128 0xe
+ 1498 0672 01       		.uleb128 0x1
+ 1499 0673 53       		.byte	0x53
+ 1500 0674 01       		.uleb128 0x1
+ 1501 0675 30       		.byte	0x30
+ 1502 0676 00       		.byte	0
+ 1503 0677 0D       		.uleb128 0xd
+ 1504 0678 6C010000 		.4byte	.LVL46
+ 1505 067c 500B0000 		.4byte	0xb50
+ 1506 0680 98060000 		.4byte	0x698
+ 1507 0684 0E       		.uleb128 0xe
+ 1508 0685 01       		.uleb128 0x1
+ 1509 0686 50       		.byte	0x50
+ 1510 0687 02       		.uleb128 0x2
+ 1511 0688 75       		.byte	0x75
+ 1512 0689 00       		.sleb128 0
+ 1513 068a 0E       		.uleb128 0xe
+ 1514 068b 01       		.uleb128 0x1
+ 1515 068c 51       		.byte	0x51
+ 1516 068d 02       		.uleb128 0x2
+ 1517 068e 74       		.byte	0x74
+ 1518 068f 00       		.sleb128 0
+ 1519 0690 0E       		.uleb128 0xe
+ 1520 0691 01       		.uleb128 0x1
+ 1521 0692 52       		.byte	0x52
+ 1522 0693 03       		.uleb128 0x3
+ 1523 0694 0A       		.byte	0xa
+ 1524 0695 104F     		.2byte	0x4f10
+ 1525 0697 00       		.byte	0
+ 1526 0698 0D       		.uleb128 0xd
+ 1527 0699 7A010000 		.4byte	.LVL47
+ 1528 069d 500B0000 		.4byte	0xb50
+ 1529 06a1 B9060000 		.4byte	0x6b9
+ 1530 06a5 0E       		.uleb128 0xe
+ 1531 06a6 01       		.uleb128 0x1
+ 1532 06a7 50       		.byte	0x50
+ 1533 06a8 02       		.uleb128 0x2
+ 1534 06a9 78       		.byte	0x78
+ 1535 06aa 00       		.sleb128 0
+ 1536 06ab 0E       		.uleb128 0xe
+ 1537 06ac 01       		.uleb128 0x1
+ 1538 06ad 51       		.byte	0x51
+ 1539 06ae 02       		.uleb128 0x2
+ 1540 06af 74       		.byte	0x74
+ 1541 06b0 02       		.sleb128 2
+ 1542 06b1 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 31
+
+
+ 1543 06b2 01       		.uleb128 0x1
+ 1544 06b3 52       		.byte	0x52
+ 1545 06b4 03       		.uleb128 0x3
+ 1546 06b5 0A       		.byte	0xa
+ 1547 06b6 124F     		.2byte	0x4f12
+ 1548 06b8 00       		.byte	0
+ 1549 06b9 0D       		.uleb128 0xd
+ 1550 06ba 88010000 		.4byte	.LVL48
+ 1551 06be 500B0000 		.4byte	0xb50
+ 1552 06c2 DA060000 		.4byte	0x6da
+ 1553 06c6 0E       		.uleb128 0xe
+ 1554 06c7 01       		.uleb128 0x1
+ 1555 06c8 50       		.byte	0x50
+ 1556 06c9 02       		.uleb128 0x2
+ 1557 06ca 77       		.byte	0x77
+ 1558 06cb 00       		.sleb128 0
+ 1559 06cc 0E       		.uleb128 0xe
+ 1560 06cd 01       		.uleb128 0x1
+ 1561 06ce 51       		.byte	0x51
+ 1562 06cf 02       		.uleb128 0x2
+ 1563 06d0 74       		.byte	0x74
+ 1564 06d1 04       		.sleb128 4
+ 1565 06d2 0E       		.uleb128 0xe
+ 1566 06d3 01       		.uleb128 0x1
+ 1567 06d4 52       		.byte	0x52
+ 1568 06d5 03       		.uleb128 0x3
+ 1569 06d6 0A       		.byte	0xa
+ 1570 06d7 1C4F     		.2byte	0x4f1c
+ 1571 06d9 00       		.byte	0
+ 1572 06da 0D       		.uleb128 0xd
+ 1573 06db 96010000 		.4byte	.LVL49
+ 1574 06df 500B0000 		.4byte	0xb50
+ 1575 06e3 FB060000 		.4byte	0x6fb
+ 1576 06e7 0E       		.uleb128 0xe
+ 1577 06e8 01       		.uleb128 0x1
+ 1578 06e9 50       		.byte	0x50
+ 1579 06ea 02       		.uleb128 0x2
+ 1580 06eb 76       		.byte	0x76
+ 1581 06ec 00       		.sleb128 0
+ 1582 06ed 0E       		.uleb128 0xe
+ 1583 06ee 01       		.uleb128 0x1
+ 1584 06ef 51       		.byte	0x51
+ 1585 06f0 02       		.uleb128 0x2
+ 1586 06f1 74       		.byte	0x74
+ 1587 06f2 06       		.sleb128 6
+ 1588 06f3 0E       		.uleb128 0xe
+ 1589 06f4 01       		.uleb128 0x1
+ 1590 06f5 52       		.byte	0x52
+ 1591 06f6 03       		.uleb128 0x3
+ 1592 06f7 0A       		.byte	0xa
+ 1593 06f8 1E4F     		.2byte	0x4f1e
+ 1594 06fa 00       		.byte	0
+ 1595 06fb 0D       		.uleb128 0xd
+ 1596 06fc 9E010000 		.4byte	.LVL50
+ 1597 0700 5B0B0000 		.4byte	0xb5b
+ 1598 0704 15070000 		.4byte	0x715
+ 1599 0708 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 32
+
+
+ 1600 0709 01       		.uleb128 0x1
+ 1601 070a 50       		.byte	0x50
+ 1602 070b 02       		.uleb128 0x2
+ 1603 070c 79       		.byte	0x79
+ 1604 070d 00       		.sleb128 0
+ 1605 070e 0E       		.uleb128 0xe
+ 1606 070f 01       		.uleb128 0x1
+ 1607 0710 51       		.byte	0x51
+ 1608 0711 02       		.uleb128 0x2
+ 1609 0712 75       		.byte	0x75
+ 1610 0713 00       		.sleb128 0
+ 1611 0714 00       		.byte	0
+ 1612 0715 0D       		.uleb128 0xd
+ 1613 0716 A6010000 		.4byte	.LVL51
+ 1614 071a 660B0000 		.4byte	0xb66
+ 1615 071e 2E070000 		.4byte	0x72e
+ 1616 0722 0E       		.uleb128 0xe
+ 1617 0723 01       		.uleb128 0x1
+ 1618 0724 50       		.byte	0x50
+ 1619 0725 02       		.uleb128 0x2
+ 1620 0726 79       		.byte	0x79
+ 1621 0727 00       		.sleb128 0
+ 1622 0728 0E       		.uleb128 0xe
+ 1623 0729 01       		.uleb128 0x1
+ 1624 072a 51       		.byte	0x51
+ 1625 072b 01       		.uleb128 0x1
+ 1626 072c 31       		.byte	0x31
+ 1627 072d 00       		.byte	0
+ 1628 072e 0D       		.uleb128 0xd
+ 1629 072f B6010000 		.4byte	.LVL52
+ 1630 0733 9D0B0000 		.4byte	0xb9d
+ 1631 0737 54070000 		.4byte	0x754
+ 1632 073b 0E       		.uleb128 0xe
+ 1633 073c 01       		.uleb128 0x1
+ 1634 073d 50       		.byte	0x50
+ 1635 073e 01       		.uleb128 0x1
+ 1636 073f 34       		.byte	0x34
+ 1637 0740 0E       		.uleb128 0xe
+ 1638 0741 01       		.uleb128 0x1
+ 1639 0742 51       		.byte	0x51
+ 1640 0743 01       		.uleb128 0x1
+ 1641 0744 31       		.byte	0x31
+ 1642 0745 0E       		.uleb128 0xe
+ 1643 0746 01       		.uleb128 0x1
+ 1644 0747 52       		.byte	0x52
+ 1645 0748 03       		.uleb128 0x3
+ 1646 0749 0A       		.byte	0xa
+ 1647 074a FF1F     		.2byte	0x1fff
+ 1648 074c 0E       		.uleb128 0xe
+ 1649 074d 01       		.uleb128 0x1
+ 1650 074e 53       		.byte	0x53
+ 1651 074f 03       		.uleb128 0x3
+ 1652 0750 0A       		.byte	0xa
+ 1653 0751 0040     		.2byte	0x4000
+ 1654 0753 00       		.byte	0
+ 1655 0754 0F       		.uleb128 0xf
+ 1656 0755 BC010000 		.4byte	.LVL54
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 33
+
+
+ 1657 0759 3A0B0000 		.4byte	0xb3a
+ 1658 075d 0F       		.uleb128 0xf
+ 1659 075e C2010000 		.4byte	.LVL56
+ 1660 0762 3A0B0000 		.4byte	0xb3a
+ 1661 0766 0D       		.uleb128 0xd
+ 1662 0767 D0010000 		.4byte	.LVL59
+ 1663 076b 450B0000 		.4byte	0xb45
+ 1664 076f 8B070000 		.4byte	0x78b
+ 1665 0773 0E       		.uleb128 0xe
+ 1666 0774 01       		.uleb128 0x1
+ 1667 0775 50       		.byte	0x50
+ 1668 0776 02       		.uleb128 0x2
+ 1669 0777 75       		.byte	0x75
+ 1670 0778 00       		.sleb128 0
+ 1671 0779 0E       		.uleb128 0xe
+ 1672 077a 01       		.uleb128 0x1
+ 1673 077b 51       		.byte	0x51
+ 1674 077c 01       		.uleb128 0x1
+ 1675 077d 32       		.byte	0x32
+ 1676 077e 0E       		.uleb128 0xe
+ 1677 077f 01       		.uleb128 0x1
+ 1678 0780 52       		.byte	0x52
+ 1679 0781 02       		.uleb128 0x2
+ 1680 0782 76       		.byte	0x76
+ 1681 0783 00       		.sleb128 0
+ 1682 0784 0E       		.uleb128 0xe
+ 1683 0785 01       		.uleb128 0x1
+ 1684 0786 53       		.byte	0x53
+ 1685 0787 02       		.uleb128 0x2
+ 1686 0788 08       		.byte	0x8
+ 1687 0789 20       		.byte	0x20
+ 1688 078a 00       		.byte	0
+ 1689 078b 0D       		.uleb128 0xd
+ 1690 078c DC010000 		.4byte	.LVL60
+ 1691 0790 450B0000 		.4byte	0xb45
+ 1692 0794 AF070000 		.4byte	0x7af
+ 1693 0798 0E       		.uleb128 0xe
+ 1694 0799 01       		.uleb128 0x1
+ 1695 079a 50       		.byte	0x50
+ 1696 079b 02       		.uleb128 0x2
+ 1697 079c 76       		.byte	0x76
+ 1698 079d 00       		.sleb128 0
+ 1699 079e 0E       		.uleb128 0xe
+ 1700 079f 01       		.uleb128 0x1
+ 1701 07a0 51       		.byte	0x51
+ 1702 07a1 01       		.uleb128 0x1
+ 1703 07a2 32       		.byte	0x32
+ 1704 07a3 0E       		.uleb128 0xe
+ 1705 07a4 01       		.uleb128 0x1
+ 1706 07a5 52       		.byte	0x52
+ 1707 07a6 02       		.uleb128 0x2
+ 1708 07a7 75       		.byte	0x75
+ 1709 07a8 00       		.sleb128 0
+ 1710 07a9 0E       		.uleb128 0xe
+ 1711 07aa 01       		.uleb128 0x1
+ 1712 07ab 53       		.byte	0x53
+ 1713 07ac 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 34
+
+
+ 1714 07ad 30       		.byte	0x30
+ 1715 07ae 00       		.byte	0
+ 1716 07af 0D       		.uleb128 0xd
+ 1717 07b0 F0010000 		.4byte	.LVL61
+ 1718 07b4 500B0000 		.4byte	0xb50
+ 1719 07b8 D3070000 		.4byte	0x7d3
+ 1720 07bc 0E       		.uleb128 0xe
+ 1721 07bd 01       		.uleb128 0x1
+ 1722 07be 50       		.byte	0x50
+ 1723 07bf 02       		.uleb128 0x2
+ 1724 07c0 75       		.byte	0x75
+ 1725 07c1 00       		.sleb128 0
+ 1726 07c2 0E       		.uleb128 0xe
+ 1727 07c3 01       		.uleb128 0x1
+ 1728 07c4 51       		.byte	0x51
+ 1729 07c5 05       		.uleb128 0x5
+ 1730 07c6 03       		.byte	0x3
+ 1731 07c7 0A000000 		.4byte	params+10
+ 1732 07cb 0E       		.uleb128 0xe
+ 1733 07cc 01       		.uleb128 0x1
+ 1734 07cd 52       		.byte	0x52
+ 1735 07ce 03       		.uleb128 0x3
+ 1736 07cf 0A       		.byte	0xa
+ 1737 07d0 1C4F     		.2byte	0x4f1c
+ 1738 07d2 00       		.byte	0
+ 1739 07d3 0D       		.uleb128 0xd
+ 1740 07d4 FC010000 		.4byte	.LVL62
+ 1741 07d8 500B0000 		.4byte	0xb50
+ 1742 07dc F4070000 		.4byte	0x7f4
+ 1743 07e0 0E       		.uleb128 0xe
+ 1744 07e1 01       		.uleb128 0x1
+ 1745 07e2 50       		.byte	0x50
+ 1746 07e3 02       		.uleb128 0x2
+ 1747 07e4 76       		.byte	0x76
+ 1748 07e5 00       		.sleb128 0
+ 1749 07e6 0E       		.uleb128 0xe
+ 1750 07e7 01       		.uleb128 0x1
+ 1751 07e8 51       		.byte	0x51
+ 1752 07e9 02       		.uleb128 0x2
+ 1753 07ea 74       		.byte	0x74
+ 1754 07eb 00       		.sleb128 0
+ 1755 07ec 0E       		.uleb128 0xe
+ 1756 07ed 01       		.uleb128 0x1
+ 1757 07ee 52       		.byte	0x52
+ 1758 07ef 03       		.uleb128 0x3
+ 1759 07f0 0A       		.byte	0xa
+ 1760 07f1 1E4F     		.2byte	0x4f1e
+ 1761 07f3 00       		.byte	0
+ 1762 07f4 0D       		.uleb128 0xd
+ 1763 07f5 04020000 		.4byte	.LVL63
+ 1764 07f9 5B0B0000 		.4byte	0xb5b
+ 1765 07fd 0E080000 		.4byte	0x80e
+ 1766 0801 0E       		.uleb128 0xe
+ 1767 0802 01       		.uleb128 0x1
+ 1768 0803 50       		.byte	0x50
+ 1769 0804 02       		.uleb128 0x2
+ 1770 0805 77       		.byte	0x77
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 35
+
+
+ 1771 0806 00       		.sleb128 0
+ 1772 0807 0E       		.uleb128 0xe
+ 1773 0808 01       		.uleb128 0x1
+ 1774 0809 51       		.byte	0x51
+ 1775 080a 02       		.uleb128 0x2
+ 1776 080b 75       		.byte	0x75
+ 1777 080c 00       		.sleb128 0
+ 1778 080d 00       		.byte	0
+ 1779 080e 0D       		.uleb128 0xd
+ 1780 080f 0C020000 		.4byte	.LVL64
+ 1781 0813 660B0000 		.4byte	0xb66
+ 1782 0817 27080000 		.4byte	0x827
+ 1783 081b 0E       		.uleb128 0xe
+ 1784 081c 01       		.uleb128 0x1
+ 1785 081d 50       		.byte	0x50
+ 1786 081e 02       		.uleb128 0x2
+ 1787 081f 77       		.byte	0x77
+ 1788 0820 00       		.sleb128 0
+ 1789 0821 0E       		.uleb128 0xe
+ 1790 0822 01       		.uleb128 0x1
+ 1791 0823 51       		.byte	0x51
+ 1792 0824 01       		.uleb128 0x1
+ 1793 0825 31       		.byte	0x31
+ 1794 0826 00       		.byte	0
+ 1795 0827 0D       		.uleb128 0xd
+ 1796 0828 1C020000 		.4byte	.LVL65
+ 1797 082c A80B0000 		.4byte	0xba8
+ 1798 0830 4D080000 		.4byte	0x84d
+ 1799 0834 0E       		.uleb128 0xe
+ 1800 0835 01       		.uleb128 0x1
+ 1801 0836 50       		.byte	0x50
+ 1802 0837 01       		.uleb128 0x1
+ 1803 0838 32       		.byte	0x32
+ 1804 0839 0E       		.uleb128 0xe
+ 1805 083a 01       		.uleb128 0x1
+ 1806 083b 51       		.byte	0x51
+ 1807 083c 01       		.uleb128 0x1
+ 1808 083d 31       		.byte	0x31
+ 1809 083e 0E       		.uleb128 0xe
+ 1810 083f 01       		.uleb128 0x1
+ 1811 0840 52       		.byte	0x52
+ 1812 0841 03       		.uleb128 0x3
+ 1813 0842 0A       		.byte	0xa
+ 1814 0843 FF1F     		.2byte	0x1fff
+ 1815 0845 0E       		.uleb128 0xe
+ 1816 0846 01       		.uleb128 0x1
+ 1817 0847 53       		.byte	0x53
+ 1818 0848 03       		.uleb128 0x3
+ 1819 0849 0A       		.byte	0xa
+ 1820 084a 0040     		.2byte	0x4000
+ 1821 084c 00       		.byte	0
+ 1822 084d 0F       		.uleb128 0xf
+ 1823 084e 22020000 		.4byte	.LVL67
+ 1824 0852 3A0B0000 		.4byte	0xb3a
+ 1825 0856 0D       		.uleb128 0xd
+ 1826 0857 2E020000 		.4byte	.LVL69
+ 1827 085b 450B0000 		.4byte	0xb45
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 36
+
+
+ 1828 085f 7A080000 		.4byte	0x87a
+ 1829 0863 0E       		.uleb128 0xe
+ 1830 0864 01       		.uleb128 0x1
+ 1831 0865 50       		.byte	0x50
+ 1832 0866 02       		.uleb128 0x2
+ 1833 0867 75       		.byte	0x75
+ 1834 0868 00       		.sleb128 0
+ 1835 0869 0E       		.uleb128 0xe
+ 1836 086a 01       		.uleb128 0x1
+ 1837 086b 51       		.byte	0x51
+ 1838 086c 01       		.uleb128 0x1
+ 1839 086d 32       		.byte	0x32
+ 1840 086e 0E       		.uleb128 0xe
+ 1841 086f 01       		.uleb128 0x1
+ 1842 0870 52       		.byte	0x52
+ 1843 0871 02       		.uleb128 0x2
+ 1844 0872 75       		.byte	0x75
+ 1845 0873 00       		.sleb128 0
+ 1846 0874 0E       		.uleb128 0xe
+ 1847 0875 01       		.uleb128 0x1
+ 1848 0876 53       		.byte	0x53
+ 1849 0877 01       		.uleb128 0x1
+ 1850 0878 34       		.byte	0x34
+ 1851 0879 00       		.byte	0
+ 1852 087a 0D       		.uleb128 0xd
+ 1853 087b 3A020000 		.4byte	.LVL70
+ 1854 087f 500B0000 		.4byte	0xb50
+ 1855 0883 9B080000 		.4byte	0x89b
+ 1856 0887 0E       		.uleb128 0xe
+ 1857 0888 01       		.uleb128 0x1
+ 1858 0889 50       		.byte	0x50
+ 1859 088a 02       		.uleb128 0x2
+ 1860 088b 75       		.byte	0x75
+ 1861 088c 00       		.sleb128 0
+ 1862 088d 0E       		.uleb128 0xe
+ 1863 088e 01       		.uleb128 0x1
+ 1864 088f 51       		.byte	0x51
+ 1865 0890 02       		.uleb128 0x2
+ 1866 0891 74       		.byte	0x74
+ 1867 0892 00       		.sleb128 0
+ 1868 0893 0E       		.uleb128 0xe
+ 1869 0894 01       		.uleb128 0x1
+ 1870 0895 52       		.byte	0x52
+ 1871 0896 03       		.uleb128 0x3
+ 1872 0897 0A       		.byte	0xa
+ 1873 0898 1E4F     		.2byte	0x4f1e
+ 1874 089a 00       		.byte	0
+ 1875 089b 0D       		.uleb128 0xd
+ 1876 089c 42020000 		.4byte	.LVL71
+ 1877 08a0 5B0B0000 		.4byte	0xb5b
+ 1878 08a4 B5080000 		.4byte	0x8b5
+ 1879 08a8 0E       		.uleb128 0xe
+ 1880 08a9 01       		.uleb128 0x1
+ 1881 08aa 50       		.byte	0x50
+ 1882 08ab 02       		.uleb128 0x2
+ 1883 08ac 76       		.byte	0x76
+ 1884 08ad 00       		.sleb128 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 37
+
+
+ 1885 08ae 0E       		.uleb128 0xe
+ 1886 08af 01       		.uleb128 0x1
+ 1887 08b0 51       		.byte	0x51
+ 1888 08b1 02       		.uleb128 0x2
+ 1889 08b2 75       		.byte	0x75
+ 1890 08b3 00       		.sleb128 0
+ 1891 08b4 00       		.byte	0
+ 1892 08b5 0D       		.uleb128 0xd
+ 1893 08b6 4A020000 		.4byte	.LVL72
+ 1894 08ba 660B0000 		.4byte	0xb66
+ 1895 08be CE080000 		.4byte	0x8ce
+ 1896 08c2 0E       		.uleb128 0xe
+ 1897 08c3 01       		.uleb128 0x1
+ 1898 08c4 50       		.byte	0x50
+ 1899 08c5 02       		.uleb128 0x2
+ 1900 08c6 76       		.byte	0x76
+ 1901 08c7 00       		.sleb128 0
+ 1902 08c8 0E       		.uleb128 0xe
+ 1903 08c9 01       		.uleb128 0x1
+ 1904 08ca 51       		.byte	0x51
+ 1905 08cb 01       		.uleb128 0x1
+ 1906 08cc 31       		.byte	0x31
+ 1907 08cd 00       		.byte	0
+ 1908 08ce 0D       		.uleb128 0xd
+ 1909 08cf 5A020000 		.4byte	.LVL73
+ 1910 08d3 B30B0000 		.4byte	0xbb3
+ 1911 08d7 F4080000 		.4byte	0x8f4
+ 1912 08db 0E       		.uleb128 0xe
+ 1913 08dc 01       		.uleb128 0x1
+ 1914 08dd 50       		.byte	0x50
+ 1915 08de 01       		.uleb128 0x1
+ 1916 08df 32       		.byte	0x32
+ 1917 08e0 0E       		.uleb128 0xe
+ 1918 08e1 01       		.uleb128 0x1
+ 1919 08e2 51       		.byte	0x51
+ 1920 08e3 01       		.uleb128 0x1
+ 1921 08e4 31       		.byte	0x31
+ 1922 08e5 0E       		.uleb128 0xe
+ 1923 08e6 01       		.uleb128 0x1
+ 1924 08e7 52       		.byte	0x52
+ 1925 08e8 03       		.uleb128 0x3
+ 1926 08e9 0A       		.byte	0xa
+ 1927 08ea FF1F     		.2byte	0x1fff
+ 1928 08ec 0E       		.uleb128 0xe
+ 1929 08ed 01       		.uleb128 0x1
+ 1930 08ee 53       		.byte	0x53
+ 1931 08ef 03       		.uleb128 0x3
+ 1932 08f0 0A       		.byte	0xa
+ 1933 08f1 0040     		.2byte	0x4000
+ 1934 08f3 00       		.byte	0
+ 1935 08f4 0F       		.uleb128 0xf
+ 1936 08f5 60020000 		.4byte	.LVL75
+ 1937 08f9 3A0B0000 		.4byte	0xb3a
+ 1938 08fd 0F       		.uleb128 0xf
+ 1939 08fe 66020000 		.4byte	.LVL77
+ 1940 0902 3A0B0000 		.4byte	0xb3a
+ 1941 0906 0D       		.uleb128 0xd
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 38
+
+
+ 1942 0907 76020000 		.4byte	.LVL80
+ 1943 090b 450B0000 		.4byte	0xb45
+ 1944 090f 2B090000 		.4byte	0x92b
+ 1945 0913 0E       		.uleb128 0xe
+ 1946 0914 01       		.uleb128 0x1
+ 1947 0915 50       		.byte	0x50
+ 1948 0916 02       		.uleb128 0x2
+ 1949 0917 75       		.byte	0x75
+ 1950 0918 00       		.sleb128 0
+ 1951 0919 0E       		.uleb128 0xe
+ 1952 091a 01       		.uleb128 0x1
+ 1953 091b 51       		.byte	0x51
+ 1954 091c 01       		.uleb128 0x1
+ 1955 091d 31       		.byte	0x31
+ 1956 091e 0E       		.uleb128 0xe
+ 1957 091f 01       		.uleb128 0x1
+ 1958 0920 52       		.byte	0x52
+ 1959 0921 02       		.uleb128 0x2
+ 1960 0922 76       		.byte	0x76
+ 1961 0923 00       		.sleb128 0
+ 1962 0924 0E       		.uleb128 0xe
+ 1963 0925 01       		.uleb128 0x1
+ 1964 0926 53       		.byte	0x53
+ 1965 0927 02       		.uleb128 0x2
+ 1966 0928 08       		.byte	0x8
+ 1967 0929 20       		.byte	0x20
+ 1968 092a 00       		.byte	0
+ 1969 092b 0D       		.uleb128 0xd
+ 1970 092c 86020000 		.4byte	.LVL82
+ 1971 0930 450B0000 		.4byte	0xb45
+ 1972 0934 4F090000 		.4byte	0x94f
+ 1973 0938 0E       		.uleb128 0xe
+ 1974 0939 01       		.uleb128 0x1
+ 1975 093a 50       		.byte	0x50
+ 1976 093b 02       		.uleb128 0x2
+ 1977 093c 76       		.byte	0x76
+ 1978 093d 00       		.sleb128 0
+ 1979 093e 0E       		.uleb128 0xe
+ 1980 093f 01       		.uleb128 0x1
+ 1981 0940 51       		.byte	0x51
+ 1982 0941 01       		.uleb128 0x1
+ 1983 0942 31       		.byte	0x31
+ 1984 0943 0E       		.uleb128 0xe
+ 1985 0944 01       		.uleb128 0x1
+ 1986 0945 52       		.byte	0x52
+ 1987 0946 02       		.uleb128 0x2
+ 1988 0947 75       		.byte	0x75
+ 1989 0948 00       		.sleb128 0
+ 1990 0949 0E       		.uleb128 0xe
+ 1991 094a 01       		.uleb128 0x1
+ 1992 094b 53       		.byte	0x53
+ 1993 094c 01       		.uleb128 0x1
+ 1994 094d 30       		.byte	0x30
+ 1995 094e 00       		.byte	0
+ 1996 094f 0D       		.uleb128 0xd
+ 1997 0950 92020000 		.4byte	.LVL83
+ 1998 0954 500B0000 		.4byte	0xb50
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 39
+
+
+ 1999 0958 70090000 		.4byte	0x970
+ 2000 095c 0E       		.uleb128 0xe
+ 2001 095d 01       		.uleb128 0x1
+ 2002 095e 50       		.byte	0x50
+ 2003 095f 02       		.uleb128 0x2
+ 2004 0960 75       		.byte	0x75
+ 2005 0961 00       		.sleb128 0
+ 2006 0962 0E       		.uleb128 0xe
+ 2007 0963 01       		.uleb128 0x1
+ 2008 0964 51       		.byte	0x51
+ 2009 0965 02       		.uleb128 0x2
+ 2010 0966 78       		.byte	0x78
+ 2011 0967 00       		.sleb128 0
+ 2012 0968 0E       		.uleb128 0xe
+ 2013 0969 01       		.uleb128 0x1
+ 2014 096a 52       		.byte	0x52
+ 2015 096b 03       		.uleb128 0x3
+ 2016 096c 0A       		.byte	0xa
+ 2017 096d 805B     		.2byte	0x5b80
+ 2018 096f 00       		.byte	0
+ 2019 0970 0D       		.uleb128 0xd
+ 2020 0971 9E020000 		.4byte	.LVL84
+ 2021 0975 500B0000 		.4byte	0xb50
+ 2022 0979 91090000 		.4byte	0x991
+ 2023 097d 0E       		.uleb128 0xe
+ 2024 097e 01       		.uleb128 0x1
+ 2025 097f 50       		.byte	0x50
+ 2026 0980 02       		.uleb128 0x2
+ 2027 0981 76       		.byte	0x76
+ 2028 0982 00       		.sleb128 0
+ 2029 0983 0E       		.uleb128 0xe
+ 2030 0984 01       		.uleb128 0x1
+ 2031 0985 51       		.byte	0x51
+ 2032 0986 02       		.uleb128 0x2
+ 2033 0987 78       		.byte	0x78
+ 2034 0988 00       		.sleb128 0
+ 2035 0989 0E       		.uleb128 0xe
+ 2036 098a 01       		.uleb128 0x1
+ 2037 098b 52       		.byte	0x52
+ 2038 098c 03       		.uleb128 0x3
+ 2039 098d 0A       		.byte	0xa
+ 2040 098e 805B     		.2byte	0x5b80
+ 2041 0990 00       		.byte	0
+ 2042 0991 0D       		.uleb128 0xd
+ 2043 0992 A6020000 		.4byte	.LVL85
+ 2044 0996 5B0B0000 		.4byte	0xb5b
+ 2045 099a AB090000 		.4byte	0x9ab
+ 2046 099e 0E       		.uleb128 0xe
+ 2047 099f 01       		.uleb128 0x1
+ 2048 09a0 50       		.byte	0x50
+ 2049 09a1 02       		.uleb128 0x2
+ 2050 09a2 77       		.byte	0x77
+ 2051 09a3 00       		.sleb128 0
+ 2052 09a4 0E       		.uleb128 0xe
+ 2053 09a5 01       		.uleb128 0x1
+ 2054 09a6 51       		.byte	0x51
+ 2055 09a7 02       		.uleb128 0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 40
+
+
+ 2056 09a8 75       		.byte	0x75
+ 2057 09a9 00       		.sleb128 0
+ 2058 09aa 00       		.byte	0
+ 2059 09ab 0D       		.uleb128 0xd
+ 2060 09ac AE020000 		.4byte	.LVL86
+ 2061 09b0 660B0000 		.4byte	0xb66
+ 2062 09b4 C4090000 		.4byte	0x9c4
+ 2063 09b8 0E       		.uleb128 0xe
+ 2064 09b9 01       		.uleb128 0x1
+ 2065 09ba 50       		.byte	0x50
+ 2066 09bb 02       		.uleb128 0x2
+ 2067 09bc 77       		.byte	0x77
+ 2068 09bd 00       		.sleb128 0
+ 2069 09be 0E       		.uleb128 0xe
+ 2070 09bf 01       		.uleb128 0x1
+ 2071 09c0 51       		.byte	0x51
+ 2072 09c1 01       		.uleb128 0x1
+ 2073 09c2 31       		.byte	0x31
+ 2074 09c3 00       		.byte	0
+ 2075 09c4 0D       		.uleb128 0xd
+ 2076 09c5 BE020000 		.4byte	.LVL87
+ 2077 09c9 BE0B0000 		.4byte	0xbbe
+ 2078 09cd EA090000 		.4byte	0x9ea
+ 2079 09d1 0E       		.uleb128 0xe
+ 2080 09d2 01       		.uleb128 0x1
+ 2081 09d3 50       		.byte	0x50
+ 2082 09d4 01       		.uleb128 0x1
+ 2083 09d5 32       		.byte	0x32
+ 2084 09d6 0E       		.uleb128 0xe
+ 2085 09d7 01       		.uleb128 0x1
+ 2086 09d8 51       		.byte	0x51
+ 2087 09d9 01       		.uleb128 0x1
+ 2088 09da 31       		.byte	0x31
+ 2089 09db 0E       		.uleb128 0xe
+ 2090 09dc 01       		.uleb128 0x1
+ 2091 09dd 52       		.byte	0x52
+ 2092 09de 03       		.uleb128 0x3
+ 2093 09df 0A       		.byte	0xa
+ 2094 09e0 FF1F     		.2byte	0x1fff
+ 2095 09e2 0E       		.uleb128 0xe
+ 2096 09e3 01       		.uleb128 0x1
+ 2097 09e4 53       		.byte	0x53
+ 2098 09e5 03       		.uleb128 0x3
+ 2099 09e6 0A       		.byte	0xa
+ 2100 09e7 0040     		.2byte	0x4000
+ 2101 09e9 00       		.byte	0
+ 2102 09ea 0F       		.uleb128 0xf
+ 2103 09eb C4020000 		.4byte	.LVL89
+ 2104 09ef 3A0B0000 		.4byte	0xb3a
+ 2105 09f3 0F       		.uleb128 0xf
+ 2106 09f4 CA020000 		.4byte	.LVL91
+ 2107 09f8 3A0B0000 		.4byte	0xb3a
+ 2108 09fc 0D       		.uleb128 0xd
+ 2109 09fd DA020000 		.4byte	.LVL94
+ 2110 0a01 450B0000 		.4byte	0xb45
+ 2111 0a05 210A0000 		.4byte	0xa21
+ 2112 0a09 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 41
+
+
+ 2113 0a0a 01       		.uleb128 0x1
+ 2114 0a0b 50       		.byte	0x50
+ 2115 0a0c 02       		.uleb128 0x2
+ 2116 0a0d 75       		.byte	0x75
+ 2117 0a0e 00       		.sleb128 0
+ 2118 0a0f 0E       		.uleb128 0xe
+ 2119 0a10 01       		.uleb128 0x1
+ 2120 0a11 51       		.byte	0x51
+ 2121 0a12 01       		.uleb128 0x1
+ 2122 0a13 31       		.byte	0x31
+ 2123 0a14 0E       		.uleb128 0xe
+ 2124 0a15 01       		.uleb128 0x1
+ 2125 0a16 52       		.byte	0x52
+ 2126 0a17 02       		.uleb128 0x2
+ 2127 0a18 76       		.byte	0x76
+ 2128 0a19 00       		.sleb128 0
+ 2129 0a1a 0E       		.uleb128 0xe
+ 2130 0a1b 01       		.uleb128 0x1
+ 2131 0a1c 53       		.byte	0x53
+ 2132 0a1d 02       		.uleb128 0x2
+ 2133 0a1e 08       		.byte	0x8
+ 2134 0a1f 20       		.byte	0x20
+ 2135 0a20 00       		.byte	0
+ 2136 0a21 0D       		.uleb128 0xd
+ 2137 0a22 E8020000 		.4byte	.LVL95
+ 2138 0a26 450B0000 		.4byte	0xb45
+ 2139 0a2a 450A0000 		.4byte	0xa45
+ 2140 0a2e 0E       		.uleb128 0xe
+ 2141 0a2f 01       		.uleb128 0x1
+ 2142 0a30 50       		.byte	0x50
+ 2143 0a31 02       		.uleb128 0x2
+ 2144 0a32 76       		.byte	0x76
+ 2145 0a33 00       		.sleb128 0
+ 2146 0a34 0E       		.uleb128 0xe
+ 2147 0a35 01       		.uleb128 0x1
+ 2148 0a36 51       		.byte	0x51
+ 2149 0a37 01       		.uleb128 0x1
+ 2150 0a38 31       		.byte	0x31
+ 2151 0a39 0E       		.uleb128 0xe
+ 2152 0a3a 01       		.uleb128 0x1
+ 2153 0a3b 52       		.byte	0x52
+ 2154 0a3c 02       		.uleb128 0x2
+ 2155 0a3d 75       		.byte	0x75
+ 2156 0a3e 00       		.sleb128 0
+ 2157 0a3f 0E       		.uleb128 0xe
+ 2158 0a40 01       		.uleb128 0x1
+ 2159 0a41 53       		.byte	0x53
+ 2160 0a42 01       		.uleb128 0x1
+ 2161 0a43 30       		.byte	0x30
+ 2162 0a44 00       		.byte	0
+ 2163 0a45 0D       		.uleb128 0xd
+ 2164 0a46 F4020000 		.4byte	.LVL96
+ 2165 0a4a 500B0000 		.4byte	0xb50
+ 2166 0a4e 660A0000 		.4byte	0xa66
+ 2167 0a52 0E       		.uleb128 0xe
+ 2168 0a53 01       		.uleb128 0x1
+ 2169 0a54 50       		.byte	0x50
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 42
+
+
+ 2170 0a55 02       		.uleb128 0x2
+ 2171 0a56 75       		.byte	0x75
+ 2172 0a57 00       		.sleb128 0
+ 2173 0a58 0E       		.uleb128 0xe
+ 2174 0a59 01       		.uleb128 0x1
+ 2175 0a5a 51       		.byte	0x51
+ 2176 0a5b 02       		.uleb128 0x2
+ 2177 0a5c 74       		.byte	0x74
+ 2178 0a5d 00       		.sleb128 0
+ 2179 0a5e 0E       		.uleb128 0xe
+ 2180 0a5f 01       		.uleb128 0x1
+ 2181 0a60 52       		.byte	0x52
+ 2182 0a61 03       		.uleb128 0x3
+ 2183 0a62 0A       		.byte	0xa
+ 2184 0a63 805B     		.2byte	0x5b80
+ 2185 0a65 00       		.byte	0
+ 2186 0a66 0D       		.uleb128 0xd
+ 2187 0a67 00030000 		.4byte	.LVL97
+ 2188 0a6b 500B0000 		.4byte	0xb50
+ 2189 0a6f 870A0000 		.4byte	0xa87
+ 2190 0a73 0E       		.uleb128 0xe
+ 2191 0a74 01       		.uleb128 0x1
+ 2192 0a75 50       		.byte	0x50
+ 2193 0a76 02       		.uleb128 0x2
+ 2194 0a77 76       		.byte	0x76
+ 2195 0a78 00       		.sleb128 0
+ 2196 0a79 0E       		.uleb128 0xe
+ 2197 0a7a 01       		.uleb128 0x1
+ 2198 0a7b 51       		.byte	0x51
+ 2199 0a7c 02       		.uleb128 0x2
+ 2200 0a7d 74       		.byte	0x74
+ 2201 0a7e 00       		.sleb128 0
+ 2202 0a7f 0E       		.uleb128 0xe
+ 2203 0a80 01       		.uleb128 0x1
+ 2204 0a81 52       		.byte	0x52
+ 2205 0a82 03       		.uleb128 0x3
+ 2206 0a83 0A       		.byte	0xa
+ 2207 0a84 805B     		.2byte	0x5b80
+ 2208 0a86 00       		.byte	0
+ 2209 0a87 0D       		.uleb128 0xd
+ 2210 0a88 08030000 		.4byte	.LVL98
+ 2211 0a8c 5B0B0000 		.4byte	0xb5b
+ 2212 0a90 A10A0000 		.4byte	0xaa1
+ 2213 0a94 0E       		.uleb128 0xe
+ 2214 0a95 01       		.uleb128 0x1
+ 2215 0a96 50       		.byte	0x50
+ 2216 0a97 02       		.uleb128 0x2
+ 2217 0a98 77       		.byte	0x77
+ 2218 0a99 00       		.sleb128 0
+ 2219 0a9a 0E       		.uleb128 0xe
+ 2220 0a9b 01       		.uleb128 0x1
+ 2221 0a9c 51       		.byte	0x51
+ 2222 0a9d 02       		.uleb128 0x2
+ 2223 0a9e 75       		.byte	0x75
+ 2224 0a9f 00       		.sleb128 0
+ 2225 0aa0 00       		.byte	0
+ 2226 0aa1 10       		.uleb128 0x10
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 43
+
+
+ 2227 0aa2 14030000 		.4byte	.LVL100
+ 2228 0aa6 660B0000 		.4byte	0xb66
+ 2229 0aaa 0E       		.uleb128 0xe
+ 2230 0aab 01       		.uleb128 0x1
+ 2231 0aac 51       		.byte	0x51
+ 2232 0aad 01       		.uleb128 0x1
+ 2233 0aae 31       		.byte	0x31
+ 2234 0aaf 00       		.byte	0
+ 2235 0ab0 00       		.byte	0
+ 2236 0ab1 07       		.uleb128 0x7
+ 2237 0ab2 AD000000 		.4byte	0xad
+ 2238 0ab6 C10A0000 		.4byte	0xac1
+ 2239 0aba 08       		.uleb128 0x8
+ 2240 0abb 08010000 		.4byte	0x108
+ 2241 0abf 00       		.byte	0
+ 2242 0ac0 00       		.byte	0
+ 2243 0ac1 07       		.uleb128 0x7
+ 2244 0ac2 AD000000 		.4byte	0xad
+ 2245 0ac6 D10A0000 		.4byte	0xad1
+ 2246 0aca 08       		.uleb128 0x8
+ 2247 0acb 08010000 		.4byte	0x108
+ 2248 0acf 01       		.byte	0x1
+ 2249 0ad0 00       		.byte	0
+ 2250 0ad1 11       		.uleb128 0x11
+ 2251 0ad2 10050000 		.4byte	.LASF57
+ 2252 0ad6 06       		.byte	0x6
+ 2253 0ad7 1207     		.2byte	0x712
+ 2254 0ad9 DD0A0000 		.4byte	0xadd
+ 2255 0add 06       		.uleb128 0x6
+ 2256 0ade A2000000 		.4byte	0xa2
+ 2257 0ae2 12       		.uleb128 0x12
+ 2258 0ae3 B2020000 		.4byte	.LASF58
+ 2259 0ae7 05       		.byte	0x5
+ 2260 0ae8 32       		.byte	0x32
+ 2261 0ae9 F30A0000 		.4byte	0xaf3
+ 2262 0aed 05       		.uleb128 0x5
+ 2263 0aee 03       		.byte	0x3
+ 2264 0aef 00000000 		.4byte	params
+ 2265 0af3 06       		.uleb128 0x6
+ 2266 0af4 D0010000 		.4byte	0x1d0
+ 2267 0af8 13       		.uleb128 0x13
+ 2268 0af9 C7020000 		.4byte	.LASF59
+ 2269 0afd 05       		.byte	0x5
+ 2270 0afe 35       		.byte	0x35
+ 2271 0aff 97000000 		.4byte	0x97
+ 2272 0b03 13       		.uleb128 0x13
+ 2273 0b04 6B030000 		.4byte	.LASF60
+ 2274 0b08 05       		.byte	0x5
+ 2275 0b09 36       		.byte	0x36
+ 2276 0b0a 97000000 		.4byte	0x97
+ 2277 0b0e 07       		.uleb128 0x7
+ 2278 0b0f 8C000000 		.4byte	0x8c
+ 2279 0b13 1E0B0000 		.4byte	0xb1e
+ 2280 0b17 08       		.uleb128 0x8
+ 2281 0b18 08010000 		.4byte	0x108
+ 2282 0b1c 02       		.byte	0x2
+ 2283 0b1d 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 44
+
+
+ 2284 0b1e 12       		.uleb128 0x12
+ 2285 0b1f B8010000 		.4byte	.LASF61
+ 2286 0b23 05       		.byte	0x5
+ 2287 0b24 37       		.byte	0x37
+ 2288 0b25 0E0B0000 		.4byte	0xb0e
+ 2289 0b29 05       		.uleb128 0x5
+ 2290 0b2a 03       		.byte	0x3
+ 2291 0b2b 00000000 		.4byte	ct1_dac_val
+ 2292 0b2f 14       		.uleb128 0x14
+ 2293 0b30 E1030000 		.4byte	.LASF62
+ 2294 0b34 E1030000 		.4byte	.LASF62
+ 2295 0b38 07       		.byte	0x7
+ 2296 0b39 1E       		.byte	0x1e
+ 2297 0b3a 14       		.uleb128 0x14
+ 2298 0b3b 00000000 		.4byte	.LASF63
+ 2299 0b3f 00000000 		.4byte	.LASF63
+ 2300 0b43 08       		.byte	0x8
+ 2301 0b44 38       		.byte	0x38
+ 2302 0b45 14       		.uleb128 0x14
+ 2303 0b46 A4000000 		.4byte	.LASF64
+ 2304 0b4a A4000000 		.4byte	.LASF64
+ 2305 0b4e 08       		.byte	0x8
+ 2306 0b4f 3B       		.byte	0x3b
+ 2307 0b50 14       		.uleb128 0x14
+ 2308 0b51 58000000 		.4byte	.LASF65
+ 2309 0b55 58000000 		.4byte	.LASF65
+ 2310 0b59 08       		.byte	0x8
+ 2311 0b5a 3F       		.byte	0x3f
+ 2312 0b5b 14       		.uleb128 0x14
+ 2313 0b5c E3010000 		.4byte	.LASF66
+ 2314 0b60 E3010000 		.4byte	.LASF66
+ 2315 0b64 08       		.byte	0x8
+ 2316 0b65 2F       		.byte	0x2f
+ 2317 0b66 14       		.uleb128 0x14
+ 2318 0b67 BC000000 		.4byte	.LASF67
+ 2319 0b6b BC000000 		.4byte	.LASF67
+ 2320 0b6f 08       		.byte	0x8
+ 2321 0b70 29       		.byte	0x29
+ 2322 0b71 14       		.uleb128 0x14
+ 2323 0b72 D4020000 		.4byte	.LASF68
+ 2324 0b76 D4020000 		.4byte	.LASF68
+ 2325 0b7a 09       		.byte	0x9
+ 2326 0b7b 1E       		.byte	0x1e
+ 2327 0b7c 14       		.uleb128 0x14
+ 2328 0b7d 4A050000 		.4byte	.LASF69
+ 2329 0b81 4A050000 		.4byte	.LASF69
+ 2330 0b85 0A       		.byte	0xa
+ 2331 0b86 1E       		.byte	0x1e
+ 2332 0b87 14       		.uleb128 0x14
+ 2333 0b88 C4010000 		.4byte	.LASF70
+ 2334 0b8c C4010000 		.4byte	.LASF70
+ 2335 0b90 0B       		.byte	0xb
+ 2336 0b91 1E       		.byte	0x1e
+ 2337 0b92 14       		.uleb128 0x14
+ 2338 0b93 0B040000 		.4byte	.LASF71
+ 2339 0b97 0B040000 		.4byte	.LASF71
+ 2340 0b9b 0C       		.byte	0xc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 45
+
+
+ 2341 0b9c 1E       		.byte	0x1e
+ 2342 0b9d 14       		.uleb128 0x14
+ 2343 0b9e 6E040000 		.4byte	.LASF72
+ 2344 0ba2 6E040000 		.4byte	.LASF72
+ 2345 0ba6 0D       		.byte	0xd
+ 2346 0ba7 1E       		.byte	0x1e
+ 2347 0ba8 14       		.uleb128 0x14
+ 2348 0ba9 4C020000 		.4byte	.LASF73
+ 2349 0bad 4C020000 		.4byte	.LASF73
+ 2350 0bb1 0E       		.byte	0xe
+ 2351 0bb2 1E       		.byte	0x1e
+ 2352 0bb3 14       		.uleb128 0x14
+ 2353 0bb4 10000000 		.4byte	.LASF74
+ 2354 0bb8 10000000 		.4byte	.LASF74
+ 2355 0bbc 0F       		.byte	0xf
+ 2356 0bbd 1E       		.byte	0x1e
+ 2357 0bbe 14       		.uleb128 0x14
+ 2358 0bbf 37040000 		.4byte	.LASF75
+ 2359 0bc3 37040000 		.4byte	.LASF75
+ 2360 0bc7 10       		.byte	0x10
+ 2361 0bc8 1E       		.byte	0x1e
+ 2362 0bc9 00       		.byte	0
+ 2363              		.section	.debug_abbrev,"",%progbits
+ 2364              	.Ldebug_abbrev0:
+ 2365 0000 01       		.uleb128 0x1
+ 2366 0001 11       		.uleb128 0x11
+ 2367 0002 01       		.byte	0x1
+ 2368 0003 25       		.uleb128 0x25
+ 2369 0004 0E       		.uleb128 0xe
+ 2370 0005 13       		.uleb128 0x13
+ 2371 0006 0B       		.uleb128 0xb
+ 2372 0007 03       		.uleb128 0x3
+ 2373 0008 0E       		.uleb128 0xe
+ 2374 0009 1B       		.uleb128 0x1b
+ 2375 000a 0E       		.uleb128 0xe
+ 2376 000b 55       		.uleb128 0x55
+ 2377 000c 17       		.uleb128 0x17
+ 2378 000d 11       		.uleb128 0x11
+ 2379 000e 01       		.uleb128 0x1
+ 2380 000f 10       		.uleb128 0x10
+ 2381 0010 17       		.uleb128 0x17
+ 2382 0011 00       		.byte	0
+ 2383 0012 00       		.byte	0
+ 2384 0013 02       		.uleb128 0x2
+ 2385 0014 24       		.uleb128 0x24
+ 2386 0015 00       		.byte	0
+ 2387 0016 0B       		.uleb128 0xb
+ 2388 0017 0B       		.uleb128 0xb
+ 2389 0018 3E       		.uleb128 0x3e
+ 2390 0019 0B       		.uleb128 0xb
+ 2391 001a 03       		.uleb128 0x3
+ 2392 001b 0E       		.uleb128 0xe
+ 2393 001c 00       		.byte	0
+ 2394 001d 00       		.byte	0
+ 2395 001e 03       		.uleb128 0x3
+ 2396 001f 16       		.uleb128 0x16
+ 2397 0020 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 46
+
+
+ 2398 0021 03       		.uleb128 0x3
+ 2399 0022 0E       		.uleb128 0xe
+ 2400 0023 3A       		.uleb128 0x3a
+ 2401 0024 0B       		.uleb128 0xb
+ 2402 0025 3B       		.uleb128 0x3b
+ 2403 0026 0B       		.uleb128 0xb
+ 2404 0027 49       		.uleb128 0x49
+ 2405 0028 13       		.uleb128 0x13
+ 2406 0029 00       		.byte	0
+ 2407 002a 00       		.byte	0
+ 2408 002b 04       		.uleb128 0x4
+ 2409 002c 24       		.uleb128 0x24
+ 2410 002d 00       		.byte	0
+ 2411 002e 0B       		.uleb128 0xb
+ 2412 002f 0B       		.uleb128 0xb
+ 2413 0030 3E       		.uleb128 0x3e
+ 2414 0031 0B       		.uleb128 0xb
+ 2415 0032 03       		.uleb128 0x3
+ 2416 0033 08       		.uleb128 0x8
+ 2417 0034 00       		.byte	0
+ 2418 0035 00       		.byte	0
+ 2419 0036 05       		.uleb128 0x5
+ 2420 0037 16       		.uleb128 0x16
+ 2421 0038 00       		.byte	0
+ 2422 0039 03       		.uleb128 0x3
+ 2423 003a 0E       		.uleb128 0xe
+ 2424 003b 3A       		.uleb128 0x3a
+ 2425 003c 0B       		.uleb128 0xb
+ 2426 003d 3B       		.uleb128 0x3b
+ 2427 003e 05       		.uleb128 0x5
+ 2428 003f 49       		.uleb128 0x49
+ 2429 0040 13       		.uleb128 0x13
+ 2430 0041 00       		.byte	0
+ 2431 0042 00       		.byte	0
+ 2432 0043 06       		.uleb128 0x6
+ 2433 0044 35       		.uleb128 0x35
+ 2434 0045 00       		.byte	0
+ 2435 0046 49       		.uleb128 0x49
+ 2436 0047 13       		.uleb128 0x13
+ 2437 0048 00       		.byte	0
+ 2438 0049 00       		.byte	0
+ 2439 004a 07       		.uleb128 0x7
+ 2440 004b 01       		.uleb128 0x1
+ 2441 004c 01       		.byte	0x1
+ 2442 004d 49       		.uleb128 0x49
+ 2443 004e 13       		.uleb128 0x13
+ 2444 004f 01       		.uleb128 0x1
+ 2445 0050 13       		.uleb128 0x13
+ 2446 0051 00       		.byte	0
+ 2447 0052 00       		.byte	0
+ 2448 0053 08       		.uleb128 0x8
+ 2449 0054 21       		.uleb128 0x21
+ 2450 0055 00       		.byte	0
+ 2451 0056 49       		.uleb128 0x49
+ 2452 0057 13       		.uleb128 0x13
+ 2453 0058 2F       		.uleb128 0x2f
+ 2454 0059 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 47
+
+
+ 2455 005a 00       		.byte	0
+ 2456 005b 00       		.byte	0
+ 2457 005c 09       		.uleb128 0x9
+ 2458 005d 13       		.uleb128 0x13
+ 2459 005e 01       		.byte	0x1
+ 2460 005f 0B       		.uleb128 0xb
+ 2461 0060 0B       		.uleb128 0xb
+ 2462 0061 3A       		.uleb128 0x3a
+ 2463 0062 0B       		.uleb128 0xb
+ 2464 0063 3B       		.uleb128 0x3b
+ 2465 0064 0B       		.uleb128 0xb
+ 2466 0065 01       		.uleb128 0x1
+ 2467 0066 13       		.uleb128 0x13
+ 2468 0067 00       		.byte	0
+ 2469 0068 00       		.byte	0
+ 2470 0069 0A       		.uleb128 0xa
+ 2471 006a 0D       		.uleb128 0xd
+ 2472 006b 00       		.byte	0
+ 2473 006c 03       		.uleb128 0x3
+ 2474 006d 0E       		.uleb128 0xe
+ 2475 006e 3A       		.uleb128 0x3a
+ 2476 006f 0B       		.uleb128 0xb
+ 2477 0070 3B       		.uleb128 0x3b
+ 2478 0071 0B       		.uleb128 0xb
+ 2479 0072 49       		.uleb128 0x49
+ 2480 0073 13       		.uleb128 0x13
+ 2481 0074 38       		.uleb128 0x38
+ 2482 0075 0B       		.uleb128 0xb
+ 2483 0076 00       		.byte	0
+ 2484 0077 00       		.byte	0
+ 2485 0078 0B       		.uleb128 0xb
+ 2486 0079 2E       		.uleb128 0x2e
+ 2487 007a 01       		.byte	0x1
+ 2488 007b 3F       		.uleb128 0x3f
+ 2489 007c 19       		.uleb128 0x19
+ 2490 007d 03       		.uleb128 0x3
+ 2491 007e 0E       		.uleb128 0xe
+ 2492 007f 3A       		.uleb128 0x3a
+ 2493 0080 0B       		.uleb128 0xb
+ 2494 0081 3B       		.uleb128 0x3b
+ 2495 0082 0B       		.uleb128 0xb
+ 2496 0083 27       		.uleb128 0x27
+ 2497 0084 19       		.uleb128 0x19
+ 2498 0085 11       		.uleb128 0x11
+ 2499 0086 01       		.uleb128 0x1
+ 2500 0087 12       		.uleb128 0x12
+ 2501 0088 06       		.uleb128 0x6
+ 2502 0089 40       		.uleb128 0x40
+ 2503 008a 18       		.uleb128 0x18
+ 2504 008b 9742     		.uleb128 0x2117
+ 2505 008d 19       		.uleb128 0x19
+ 2506 008e 01       		.uleb128 0x1
+ 2507 008f 13       		.uleb128 0x13
+ 2508 0090 00       		.byte	0
+ 2509 0091 00       		.byte	0
+ 2510 0092 0C       		.uleb128 0xc
+ 2511 0093 34       		.uleb128 0x34
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 48
+
+
+ 2512 0094 00       		.byte	0
+ 2513 0095 03       		.uleb128 0x3
+ 2514 0096 0E       		.uleb128 0xe
+ 2515 0097 3A       		.uleb128 0x3a
+ 2516 0098 0B       		.uleb128 0xb
+ 2517 0099 3B       		.uleb128 0x3b
+ 2518 009a 0B       		.uleb128 0xb
+ 2519 009b 49       		.uleb128 0x49
+ 2520 009c 13       		.uleb128 0x13
+ 2521 009d 02       		.uleb128 0x2
+ 2522 009e 17       		.uleb128 0x17
+ 2523 009f 00       		.byte	0
+ 2524 00a0 00       		.byte	0
+ 2525 00a1 0D       		.uleb128 0xd
+ 2526 00a2 898201   		.uleb128 0x4109
+ 2527 00a5 01       		.byte	0x1
+ 2528 00a6 11       		.uleb128 0x11
+ 2529 00a7 01       		.uleb128 0x1
+ 2530 00a8 31       		.uleb128 0x31
+ 2531 00a9 13       		.uleb128 0x13
+ 2532 00aa 01       		.uleb128 0x1
+ 2533 00ab 13       		.uleb128 0x13
+ 2534 00ac 00       		.byte	0
+ 2535 00ad 00       		.byte	0
+ 2536 00ae 0E       		.uleb128 0xe
+ 2537 00af 8A8201   		.uleb128 0x410a
+ 2538 00b2 00       		.byte	0
+ 2539 00b3 02       		.uleb128 0x2
+ 2540 00b4 18       		.uleb128 0x18
+ 2541 00b5 9142     		.uleb128 0x2111
+ 2542 00b7 18       		.uleb128 0x18
+ 2543 00b8 00       		.byte	0
+ 2544 00b9 00       		.byte	0
+ 2545 00ba 0F       		.uleb128 0xf
+ 2546 00bb 898201   		.uleb128 0x4109
+ 2547 00be 00       		.byte	0
+ 2548 00bf 11       		.uleb128 0x11
+ 2549 00c0 01       		.uleb128 0x1
+ 2550 00c1 31       		.uleb128 0x31
+ 2551 00c2 13       		.uleb128 0x13
+ 2552 00c3 00       		.byte	0
+ 2553 00c4 00       		.byte	0
+ 2554 00c5 10       		.uleb128 0x10
+ 2555 00c6 898201   		.uleb128 0x4109
+ 2556 00c9 01       		.byte	0x1
+ 2557 00ca 11       		.uleb128 0x11
+ 2558 00cb 01       		.uleb128 0x1
+ 2559 00cc 9542     		.uleb128 0x2115
+ 2560 00ce 19       		.uleb128 0x19
+ 2561 00cf 31       		.uleb128 0x31
+ 2562 00d0 13       		.uleb128 0x13
+ 2563 00d1 00       		.byte	0
+ 2564 00d2 00       		.byte	0
+ 2565 00d3 11       		.uleb128 0x11
+ 2566 00d4 34       		.uleb128 0x34
+ 2567 00d5 00       		.byte	0
+ 2568 00d6 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 49
+
+
+ 2569 00d7 0E       		.uleb128 0xe
+ 2570 00d8 3A       		.uleb128 0x3a
+ 2571 00d9 0B       		.uleb128 0xb
+ 2572 00da 3B       		.uleb128 0x3b
+ 2573 00db 05       		.uleb128 0x5
+ 2574 00dc 49       		.uleb128 0x49
+ 2575 00dd 13       		.uleb128 0x13
+ 2576 00de 3F       		.uleb128 0x3f
+ 2577 00df 19       		.uleb128 0x19
+ 2578 00e0 3C       		.uleb128 0x3c
+ 2579 00e1 19       		.uleb128 0x19
+ 2580 00e2 00       		.byte	0
+ 2581 00e3 00       		.byte	0
+ 2582 00e4 12       		.uleb128 0x12
+ 2583 00e5 34       		.uleb128 0x34
+ 2584 00e6 00       		.byte	0
+ 2585 00e7 03       		.uleb128 0x3
+ 2586 00e8 0E       		.uleb128 0xe
+ 2587 00e9 3A       		.uleb128 0x3a
+ 2588 00ea 0B       		.uleb128 0xb
+ 2589 00eb 3B       		.uleb128 0x3b
+ 2590 00ec 0B       		.uleb128 0xb
+ 2591 00ed 49       		.uleb128 0x49
+ 2592 00ee 13       		.uleb128 0x13
+ 2593 00ef 3F       		.uleb128 0x3f
+ 2594 00f0 19       		.uleb128 0x19
+ 2595 00f1 02       		.uleb128 0x2
+ 2596 00f2 18       		.uleb128 0x18
+ 2597 00f3 00       		.byte	0
+ 2598 00f4 00       		.byte	0
+ 2599 00f5 13       		.uleb128 0x13
+ 2600 00f6 34       		.uleb128 0x34
+ 2601 00f7 00       		.byte	0
+ 2602 00f8 03       		.uleb128 0x3
+ 2603 00f9 0E       		.uleb128 0xe
+ 2604 00fa 3A       		.uleb128 0x3a
+ 2605 00fb 0B       		.uleb128 0xb
+ 2606 00fc 3B       		.uleb128 0x3b
+ 2607 00fd 0B       		.uleb128 0xb
+ 2608 00fe 49       		.uleb128 0x49
+ 2609 00ff 13       		.uleb128 0x13
+ 2610 0100 3F       		.uleb128 0x3f
+ 2611 0101 19       		.uleb128 0x19
+ 2612 0102 3C       		.uleb128 0x3c
+ 2613 0103 19       		.uleb128 0x19
+ 2614 0104 00       		.byte	0
+ 2615 0105 00       		.byte	0
+ 2616 0106 14       		.uleb128 0x14
+ 2617 0107 2E       		.uleb128 0x2e
+ 2618 0108 00       		.byte	0
+ 2619 0109 3F       		.uleb128 0x3f
+ 2620 010a 19       		.uleb128 0x19
+ 2621 010b 3C       		.uleb128 0x3c
+ 2622 010c 19       		.uleb128 0x19
+ 2623 010d 6E       		.uleb128 0x6e
+ 2624 010e 0E       		.uleb128 0xe
+ 2625 010f 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 50
+
+
+ 2626 0110 0E       		.uleb128 0xe
+ 2627 0111 3A       		.uleb128 0x3a
+ 2628 0112 0B       		.uleb128 0xb
+ 2629 0113 3B       		.uleb128 0x3b
+ 2630 0114 0B       		.uleb128 0xb
+ 2631 0115 00       		.byte	0
+ 2632 0116 00       		.byte	0
+ 2633 0117 00       		.byte	0
+ 2634              		.section	.debug_loc,"",%progbits
+ 2635              	.Ldebug_loc0:
+ 2636              	.LLST0:
+ 2637 0000 16000000 		.4byte	.LVL1
+ 2638 0004 58000000 		.4byte	.LVL9
+ 2639 0008 0100     		.2byte	0x1
+ 2640 000a 56       		.byte	0x56
+ 2641 000b 00000000 		.4byte	0
+ 2642 000f 00000000 		.4byte	0
+ 2643              	.LLST1:
+ 2644 0013 1C000000 		.4byte	.LVL3
+ 2645 0017 29000000 		.4byte	.LVL4-1
+ 2646 001b 0300     		.2byte	0x3
+ 2647 001d 50       		.byte	0x50
+ 2648 001e 93       		.byte	0x93
+ 2649 001f 01       		.uleb128 0x1
+ 2650 0020 00000000 		.4byte	0
+ 2651 0024 00000000 		.4byte	0
+ 2652              	.LLST2:
+ 2653 0028 58000000 		.4byte	.LVL9
+ 2654 002c 96000000 		.4byte	.LVL17
+ 2655 0030 0100     		.2byte	0x1
+ 2656 0032 56       		.byte	0x56
+ 2657 0033 00000000 		.4byte	0
+ 2658 0037 00000000 		.4byte	0
+ 2659              	.LLST3:
+ 2660 003b 5E000000 		.4byte	.LVL11
+ 2661 003f 67000000 		.4byte	.LVL12-1
+ 2662 0043 0300     		.2byte	0x3
+ 2663 0045 50       		.byte	0x50
+ 2664 0046 93       		.byte	0x93
+ 2665 0047 01       		.uleb128 0x1
+ 2666 0048 00000000 		.4byte	0
+ 2667 004c 00000000 		.4byte	0
+ 2668              	.LLST4:
+ 2669 0050 96000000 		.4byte	.LVL17
+ 2670 0054 D8000000 		.4byte	.LVL25
+ 2671 0058 0100     		.2byte	0x1
+ 2672 005a 56       		.byte	0x56
+ 2673 005b 00000000 		.4byte	0
+ 2674 005f 00000000 		.4byte	0
+ 2675              	.LLST5:
+ 2676 0063 9C000000 		.4byte	.LVL19
+ 2677 0067 A9000000 		.4byte	.LVL20-1
+ 2678 006b 0300     		.2byte	0x3
+ 2679 006d 50       		.byte	0x50
+ 2680 006e 93       		.byte	0x93
+ 2681 006f 01       		.uleb128 0x1
+ 2682 0070 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 51
+
+
+ 2683 0074 00000000 		.4byte	0
+ 2684              	.LLST6:
+ 2685 0078 D8000000 		.4byte	.LVL25
+ 2686 007c 2E010000 		.4byte	.LVL41
+ 2687 0080 0100     		.2byte	0x1
+ 2688 0082 56       		.byte	0x56
+ 2689 0083 00000000 		.4byte	0
+ 2690 0087 00000000 		.4byte	0
+ 2691              	.LLST7:
+ 2692 008b DE000000 		.4byte	.LVL27
+ 2693 008f E7000000 		.4byte	.LVL28-1
+ 2694 0093 0300     		.2byte	0x3
+ 2695 0095 50       		.byte	0x50
+ 2696 0096 93       		.byte	0x93
+ 2697 0097 01       		.uleb128 0x1
+ 2698 0098 00000000 		.4byte	0
+ 2699 009c 00000000 		.4byte	0
+ 2700              	.LLST8:
+ 2701 00a0 16010000 		.4byte	.LVL33
+ 2702 00a4 0E030000 		.4byte	.LVL99
+ 2703 00a8 0100     		.2byte	0x1
+ 2704 00aa 59       		.byte	0x59
+ 2705 00ab 00000000 		.4byte	0
+ 2706 00af 00000000 		.4byte	0
+ 2707              	.LLST9:
+ 2708 00b3 1C010000 		.4byte	.LVL35
+ 2709 00b7 22010000 		.4byte	.LVL37
+ 2710 00bb 0500     		.2byte	0x5
+ 2711 00bd 55       		.byte	0x55
+ 2712 00be 93       		.byte	0x93
+ 2713 00bf 01       		.uleb128 0x1
+ 2714 00c0 93       		.byte	0x93
+ 2715 00c1 03       		.uleb128 0x3
+ 2716 00c2 22010000 		.4byte	.LVL37
+ 2717 00c6 28010000 		.4byte	.LVL39
+ 2718 00ca 0800     		.2byte	0x8
+ 2719 00cc 55       		.byte	0x55
+ 2720 00cd 93       		.byte	0x93
+ 2721 00ce 01       		.uleb128 0x1
+ 2722 00cf 58       		.byte	0x58
+ 2723 00d0 93       		.byte	0x93
+ 2724 00d1 01       		.uleb128 0x1
+ 2725 00d2 93       		.byte	0x93
+ 2726 00d3 02       		.uleb128 0x2
+ 2727 00d4 28010000 		.4byte	.LVL39
+ 2728 00d8 2E010000 		.4byte	.LVL41
+ 2729 00dc 0B00     		.2byte	0xb
+ 2730 00de 55       		.byte	0x55
+ 2731 00df 93       		.byte	0x93
+ 2732 00e0 01       		.uleb128 0x1
+ 2733 00e1 58       		.byte	0x58
+ 2734 00e2 93       		.byte	0x93
+ 2735 00e3 01       		.uleb128 0x1
+ 2736 00e4 57       		.byte	0x57
+ 2737 00e5 93       		.byte	0x93
+ 2738 00e6 01       		.uleb128 0x1
+ 2739 00e7 93       		.byte	0x93
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 52
+
+
+ 2740 00e8 01       		.uleb128 0x1
+ 2741 00e9 2E010000 		.4byte	.LVL41
+ 2742 00ed B8010000 		.4byte	.LVL53
+ 2743 00f1 0C00     		.2byte	0xc
+ 2744 00f3 55       		.byte	0x55
+ 2745 00f4 93       		.byte	0x93
+ 2746 00f5 01       		.uleb128 0x1
+ 2747 00f6 58       		.byte	0x58
+ 2748 00f7 93       		.byte	0x93
+ 2749 00f8 01       		.uleb128 0x1
+ 2750 00f9 57       		.byte	0x57
+ 2751 00fa 93       		.byte	0x93
+ 2752 00fb 01       		.uleb128 0x1
+ 2753 00fc 56       		.byte	0x56
+ 2754 00fd 93       		.byte	0x93
+ 2755 00fe 01       		.uleb128 0x1
+ 2756 00ff B8010000 		.4byte	.LVL53
+ 2757 0103 BE010000 		.4byte	.LVL55
+ 2758 0107 0B00     		.2byte	0xb
+ 2759 0109 55       		.byte	0x55
+ 2760 010a 93       		.byte	0x93
+ 2761 010b 01       		.uleb128 0x1
+ 2762 010c 58       		.byte	0x58
+ 2763 010d 93       		.byte	0x93
+ 2764 010e 01       		.uleb128 0x1
+ 2765 010f 93       		.byte	0x93
+ 2766 0110 01       		.uleb128 0x1
+ 2767 0111 56       		.byte	0x56
+ 2768 0112 93       		.byte	0x93
+ 2769 0113 01       		.uleb128 0x1
+ 2770 0114 BE010000 		.4byte	.LVL55
+ 2771 0118 C4010000 		.4byte	.LVL57
+ 2772 011c 0A00     		.2byte	0xa
+ 2773 011e 93       		.byte	0x93
+ 2774 011f 01       		.uleb128 0x1
+ 2775 0120 58       		.byte	0x58
+ 2776 0121 93       		.byte	0x93
+ 2777 0122 01       		.uleb128 0x1
+ 2778 0123 93       		.byte	0x93
+ 2779 0124 01       		.uleb128 0x1
+ 2780 0125 56       		.byte	0x56
+ 2781 0126 93       		.byte	0x93
+ 2782 0127 01       		.uleb128 0x1
+ 2783 0128 C4010000 		.4byte	.LVL57
+ 2784 012c 7A020000 		.4byte	.LVL81
+ 2785 0130 0700     		.2byte	0x7
+ 2786 0132 93       		.byte	0x93
+ 2787 0133 01       		.uleb128 0x1
+ 2788 0134 58       		.byte	0x58
+ 2789 0135 93       		.byte	0x93
+ 2790 0136 01       		.uleb128 0x1
+ 2791 0137 93       		.byte	0x93
+ 2792 0138 02       		.uleb128 0x2
+ 2793 0139 00000000 		.4byte	0
+ 2794 013d 00000000 		.4byte	0
+ 2795              	.LLST10:
+ 2796 0141 B8010000 		.4byte	.LVL53
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 53
+
+
+ 2797 0145 5C020000 		.4byte	.LVL74
+ 2798 0149 0100     		.2byte	0x1
+ 2799 014b 57       		.byte	0x57
+ 2800 014c 00000000 		.4byte	0
+ 2801 0150 00000000 		.4byte	0
+ 2802              	.LLST11:
+ 2803 0154 BE010000 		.4byte	.LVL55
+ 2804 0158 C4010000 		.4byte	.LVL57
+ 2805 015c 0500     		.2byte	0x5
+ 2806 015e 55       		.byte	0x55
+ 2807 015f 93       		.byte	0x93
+ 2808 0160 01       		.uleb128 0x1
+ 2809 0161 93       		.byte	0x93
+ 2810 0162 01       		.uleb128 0x1
+ 2811 0163 C4010000 		.4byte	.LVL57
+ 2812 0167 CC010000 		.4byte	.LVL58
+ 2813 016b 0600     		.2byte	0x6
+ 2814 016d 55       		.byte	0x55
+ 2815 016e 93       		.byte	0x93
+ 2816 016f 01       		.uleb128 0x1
+ 2817 0170 50       		.byte	0x50
+ 2818 0171 93       		.byte	0x93
+ 2819 0172 01       		.uleb128 0x1
+ 2820 0173 CC010000 		.4byte	.LVL58
+ 2821 0177 24020000 		.4byte	.LVL68
+ 2822 017b 0500     		.2byte	0x5
+ 2823 017d 55       		.byte	0x55
+ 2824 017e 93       		.byte	0x93
+ 2825 017f 01       		.uleb128 0x1
+ 2826 0180 93       		.byte	0x93
+ 2827 0181 01       		.uleb128 0x1
+ 2828 0182 00000000 		.4byte	0
+ 2829 0186 00000000 		.4byte	0
+ 2830              	.LLST12:
+ 2831 018a 1E020000 		.4byte	.LVL66
+ 2832 018e 68020000 		.4byte	.LVL78
+ 2833 0192 0100     		.2byte	0x1
+ 2834 0194 56       		.byte	0x56
+ 2835 0195 00000000 		.4byte	0
+ 2836 0199 00000000 		.4byte	0
+ 2837              	.LLST13:
+ 2838 019d 24020000 		.4byte	.LVL68
+ 2839 01a1 2D020000 		.4byte	.LVL69-1
+ 2840 01a5 0300     		.2byte	0x3
+ 2841 01a7 50       		.byte	0x50
+ 2842 01a8 93       		.byte	0x93
+ 2843 01a9 01       		.uleb128 0x1
+ 2844 01aa 00000000 		.4byte	0
+ 2845 01ae 00000000 		.4byte	0
+ 2846              	.LLST14:
+ 2847 01b2 5C020000 		.4byte	.LVL74
+ 2848 01b6 C0020000 		.4byte	.LVL88
+ 2849 01ba 0100     		.2byte	0x1
+ 2850 01bc 57       		.byte	0x57
+ 2851 01bd 00000000 		.4byte	0
+ 2852 01c1 00000000 		.4byte	0
+ 2853              	.LLST15:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 54
+
+
+ 2854 01c5 62020000 		.4byte	.LVL76
+ 2855 01c9 68020000 		.4byte	.LVL78
+ 2856 01cd 0500     		.2byte	0x5
+ 2857 01cf 55       		.byte	0x55
+ 2858 01d0 93       		.byte	0x93
+ 2859 01d1 01       		.uleb128 0x1
+ 2860 01d2 93       		.byte	0x93
+ 2861 01d3 01       		.uleb128 0x1
+ 2862 01d4 68020000 		.4byte	.LVL78
+ 2863 01d8 72020000 		.4byte	.LVL79
+ 2864 01dc 0600     		.2byte	0x6
+ 2865 01de 55       		.byte	0x55
+ 2866 01df 93       		.byte	0x93
+ 2867 01e0 01       		.uleb128 0x1
+ 2868 01e1 50       		.byte	0x50
+ 2869 01e2 93       		.byte	0x93
+ 2870 01e3 01       		.uleb128 0x1
+ 2871 01e4 72020000 		.4byte	.LVL79
+ 2872 01e8 C6020000 		.4byte	.LVL90
+ 2873 01ec 0500     		.2byte	0x5
+ 2874 01ee 55       		.byte	0x55
+ 2875 01ef 93       		.byte	0x93
+ 2876 01f0 01       		.uleb128 0x1
+ 2877 01f1 93       		.byte	0x93
+ 2878 01f2 01       		.uleb128 0x1
+ 2879 01f3 00000000 		.4byte	0
+ 2880 01f7 00000000 		.4byte	0
+ 2881              	.LLST16:
+ 2882 01fb C0020000 		.4byte	.LVL88
+ 2883 01ff 0E030000 		.4byte	.LVL99
+ 2884 0203 0100     		.2byte	0x1
+ 2885 0205 57       		.byte	0x57
+ 2886 0206 00000000 		.4byte	0
+ 2887 020a 00000000 		.4byte	0
+ 2888              	.LLST17:
+ 2889 020e C6020000 		.4byte	.LVL90
+ 2890 0212 CC020000 		.4byte	.LVL92
+ 2891 0216 0500     		.2byte	0x5
+ 2892 0218 55       		.byte	0x55
+ 2893 0219 93       		.byte	0x93
+ 2894 021a 01       		.uleb128 0x1
+ 2895 021b 93       		.byte	0x93
+ 2896 021c 01       		.uleb128 0x1
+ 2897 021d CC020000 		.4byte	.LVL92
+ 2898 0221 D4020000 		.4byte	.LVL93
+ 2899 0225 0600     		.2byte	0x6
+ 2900 0227 55       		.byte	0x55
+ 2901 0228 93       		.byte	0x93
+ 2902 0229 01       		.uleb128 0x1
+ 2903 022a 50       		.byte	0x50
+ 2904 022b 93       		.byte	0x93
+ 2905 022c 01       		.uleb128 0x1
+ 2906 022d D4020000 		.4byte	.LVL93
+ 2907 0231 0E030000 		.4byte	.LVL99
+ 2908 0235 0500     		.2byte	0x5
+ 2909 0237 55       		.byte	0x55
+ 2910 0238 93       		.byte	0x93
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 55
+
+
+ 2911 0239 01       		.uleb128 0x1
+ 2912 023a 93       		.byte	0x93
+ 2913 023b 01       		.uleb128 0x1
+ 2914 023c 00000000 		.4byte	0
+ 2915 0240 00000000 		.4byte	0
+ 2916              		.section	.debug_aranges,"",%progbits
+ 2917 0000 1C000000 		.4byte	0x1c
+ 2918 0004 0200     		.2byte	0x2
+ 2919 0006 00000000 		.4byte	.Ldebug_info0
+ 2920 000a 04       		.byte	0x4
+ 2921 000b 00       		.byte	0
+ 2922 000c 0000     		.2byte	0
+ 2923 000e 0000     		.2byte	0
+ 2924 0010 00000000 		.4byte	.LFB63
+ 2925 0014 24030000 		.4byte	.LFE63-.LFB63
+ 2926 0018 00000000 		.4byte	0
+ 2927 001c 00000000 		.4byte	0
+ 2928              		.section	.debug_ranges,"",%progbits
+ 2929              	.Ldebug_ranges0:
+ 2930 0000 00000000 		.4byte	.LFB63
+ 2931 0004 24030000 		.4byte	.LFE63
+ 2932 0008 00000000 		.4byte	0
+ 2933 000c 00000000 		.4byte	0
+ 2934              		.section	.debug_line,"",%progbits
+ 2935              	.Ldebug_line0:
+ 2936 0000 B7020000 		.section	.debug_str,"MS",%progbits,1
+ 2936      02004A02 
+ 2936      00000201 
+ 2936      FB0E0D00 
+ 2936      01010101 
+ 2937              	.LASF63:
+ 2938 0000 4379446D 		.ascii	"CyDmaTdAllocate\000"
+ 2938      61546441 
+ 2938      6C6C6F63 
+ 2938      61746500 
+ 2939              	.LASF74:
+ 2940 0010 5143575F 		.ascii	"QCW_CL_DMA_DmaInitialize\000"
+ 2940      434C5F44 
+ 2940      4D415F44 
+ 2940      6D61496E 
+ 2940      69746961 
+ 2941              	.LASF38:
+ 2942 0029 70617261 		.ascii	"parameters\000"
+ 2942      6D657465 
+ 2942      727300
+ 2943              	.LASF40:
+ 2944 0034 4642435F 		.ascii	"FBC_to_ram_DMA_TD\000"
+ 2944      746F5F72 
+ 2944      616D5F44 
+ 2944      4D415F54 
+ 2944      4400
+ 2945              	.LASF51:
+ 2946 0046 50574D42 		.ascii	"PWMB_PSB_DMA_Chan\000"
+ 2946      5F505342 
+ 2946      5F444D41 
+ 2946      5F436861 
+ 2946      6E00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 56
+
+
+ 2947              	.LASF65:
+ 2948 0058 4379446D 		.ascii	"CyDmaTdSetAddress\000"
+ 2948      61546453 
+ 2948      65744164 
+ 2948      64726573 
+ 2948      7300
+ 2949              	.LASF19:
+ 2950 006a 646F7562 		.ascii	"double\000"
+ 2950      6C6500
+ 2951              	.LASF25:
+ 2952 0071 70776D61 		.ascii	"pwma_start_prd\000"
+ 2952      5F737461 
+ 2952      72745F70 
+ 2952      726400
+ 2953              	.LASF22:
+ 2954 0080 72656731 		.ascii	"reg16\000"
+ 2954      3600
+ 2955              	.LASF46:
+ 2956 0086 6672616D 		.ascii	"fram_to_PWMA_DMA_TD\000"
+ 2956      5F746F5F 
+ 2956      50574D41 
+ 2956      5F444D41 
+ 2956      5F544400 
+ 2957              	.LASF2:
+ 2958 009a 73686F72 		.ascii	"short int\000"
+ 2958      7420696E 
+ 2958      7400
+ 2959              	.LASF64:
+ 2960 00a4 4379446D 		.ascii	"CyDmaTdSetConfiguration\000"
+ 2960      61546453 
+ 2960      6574436F 
+ 2960      6E666967 
+ 2960      75726174 
+ 2961              	.LASF67:
+ 2962 00bc 4379446D 		.ascii	"CyDmaChEnable\000"
+ 2962      61436845 
+ 2962      6E61626C 
+ 2962      6500
+ 2963              	.LASF23:
+ 2964 00ca 73697A65 		.ascii	"sizetype\000"
+ 2964      74797065 
+ 2964      00
+ 2965              	.LASF34:
+ 2966 00d3 6D696E5F 		.ascii	"min_tr_cl_dac_val\000"
+ 2966      74725F63 
+ 2966      6C5F6461 
+ 2966      635F7661 
+ 2966      6C00
+ 2967              	.LASF4:
+ 2968 00e5 5F5F7569 		.ascii	"__uint16_t\000"
+ 2968      6E743136 
+ 2968      5F7400
+ 2969              	.LASF76:
+ 2970 00f0 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2970      43393920 
+ 2970      352E342E 
+ 2970      31203230 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 57
+
+
+ 2970      31363036 
+ 2971 0123 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2971      20726576 
+ 2971      6973696F 
+ 2971      6E203233 
+ 2971      37373135 
+ 2972 0156 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 2972      74643D67 
+ 2972      6E753939 
+ 2972      202D6666 
+ 2972      756E6374 
+ 2973              	.LASF28:
+ 2974 0189 70776D62 		.ascii	"pwmb_start_cmp\000"
+ 2974      5F737461 
+ 2974      72745F63 
+ 2974      6D7000
+ 2975              	.LASF48:
+ 2976 0198 50574D41 		.ascii	"PWMA_init_DMA_TD\000"
+ 2976      5F696E69 
+ 2976      745F444D 
+ 2976      415F5444 
+ 2976      00
+ 2977              	.LASF27:
+ 2978 01a9 70776D62 		.ascii	"pwmb_start_prd\000"
+ 2978      5F737461 
+ 2978      72745F70 
+ 2978      726400
+ 2979              	.LASF61:
+ 2980 01b8 6374315F 		.ascii	"ct1_dac_val\000"
+ 2980      6461635F 
+ 2980      76616C00 
+ 2981              	.LASF70:
+ 2982 01c4 6672616D 		.ascii	"fram_to_PWMA_DMA_DmaInitialize\000"
+ 2982      5F746F5F 
+ 2982      50574D41 
+ 2982      5F444D41 
+ 2982      5F446D61 
+ 2983              	.LASF66:
+ 2984 01e3 4379446D 		.ascii	"CyDmaChSetInitialTd\000"
+ 2984      61436853 
+ 2984      6574496E 
+ 2984      69746961 
+ 2984      6C546400 
+ 2985              	.LASF16:
+ 2986 01f7 75696E74 		.ascii	"uint16\000"
+ 2986      313600
+ 2987              	.LASF12:
+ 2988 01fe 75696E74 		.ascii	"uint8_t\000"
+ 2988      385F7400 
+ 2989              	.LASF15:
+ 2990 0206 75696E74 		.ascii	"uint8\000"
+ 2990      3800
+ 2991              	.LASF50:
+ 2992 020c 50534249 		.ascii	"PSBINIT_DMA_TD\000"
+ 2992      4E49545F 
+ 2992      444D415F 
+ 2992      544400
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 58
+
+
+ 2993              	.LASF26:
+ 2994 021b 70776D61 		.ascii	"pwma_start_cmp\000"
+ 2994      5F737461 
+ 2994      72745F63 
+ 2994      6D7000
+ 2995              	.LASF49:
+ 2996 022a 50534249 		.ascii	"PSBINIT_DMA_Chan\000"
+ 2996      4E49545F 
+ 2996      444D415F 
+ 2996      4368616E 
+ 2996      00
+ 2997              	.LASF33:
+ 2998 023b 6D696E5F 		.ascii	"min_tr_prd\000"
+ 2998      74725F70 
+ 2998      726400
+ 2999              	.LASF18:
+ 3000 0246 666C6F61 		.ascii	"float\000"
+ 3000      7400
+ 3001              	.LASF73:
+ 3002 024c 50574D42 		.ascii	"PWMB_PSB_DMA_DmaInitialize\000"
+ 3002      5F505342 
+ 3002      5F444D41 
+ 3002      5F446D61 
+ 3002      496E6974 
+ 3003              	.LASF9:
+ 3004 0267 6C6F6E67 		.ascii	"long long int\000"
+ 3004      206C6F6E 
+ 3004      6720696E 
+ 3004      7400
+ 3005              	.LASF44:
+ 3006 0275 66696C74 		.ascii	"filter_to_fram_DMA_TD\000"
+ 3006      65725F74 
+ 3006      6F5F6672 
+ 3006      616D5F44 
+ 3006      4D415F54 
+ 3007              	.LASF20:
+ 3008 028b 63686172 		.ascii	"char\000"
+ 3008      00
+ 3009              	.LASF7:
+ 3010 0290 6C6F6E67 		.ascii	"long int\000"
+ 3010      20696E74 
+ 3010      00
+ 3011              	.LASF3:
+ 3012 0299 5F5F7569 		.ascii	"__uint8_t\000"
+ 3012      6E74385F 
+ 3012      7400
+ 3013              	.LASF79:
+ 3014 02a3 696E6974 		.ascii	"initialize_DMA\000"
+ 3014      69616C69 
+ 3014      7A655F44 
+ 3014      4D4100
+ 3015              	.LASF58:
+ 3016 02b2 70617261 		.ascii	"params\000"
+ 3016      6D7300
+ 3017              	.LASF56:
+ 3018 02b9 5452315F 		.ascii	"TR1_CL_DMA_TD\000"
+ 3018      434C5F44 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 59
+
+
+ 3018      4D415F54 
+ 3018      4400
+ 3019              	.LASF59:
+ 3020 02c7 66625F66 		.ascii	"fb_filter_in\000"
+ 3020      696C7465 
+ 3020      725F696E 
+ 3020      00
+ 3021              	.LASF68:
+ 3022 02d4 72616D5F 		.ascii	"ram_to_filter_DMA_DmaInitialize\000"
+ 3022      746F5F66 
+ 3022      696C7465 
+ 3022      725F444D 
+ 3022      415F446D 
+ 3023              	.LASF54:
+ 3024 02f4 5143575F 		.ascii	"QCW_CL_DMA_TD\000"
+ 3024      434C5F44 
+ 3024      4D415F54 
+ 3024      4400
+ 3025              	.LASF24:
+ 3026 0302 6D61785F 		.ascii	"max_tr_cl_dac_val\000"
+ 3026      74725F63 
+ 3026      6C5F6461 
+ 3026      635F7661 
+ 3026      6C00
+ 3027              	.LASF1:
+ 3028 0314 756E7369 		.ascii	"unsigned char\000"
+ 3028      676E6564 
+ 3028      20636861 
+ 3028      7200
+ 3029              	.LASF0:
+ 3030 0322 7369676E 		.ascii	"signed char\000"
+ 3030      65642063 
+ 3030      68617200 
+ 3031              	.LASF10:
+ 3032 032e 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 3032      206C6F6E 
+ 3032      6720756E 
+ 3032      7369676E 
+ 3032      65642069 
+ 3033              	.LASF11:
+ 3034 0345 756E7369 		.ascii	"unsigned int\000"
+ 3034      676E6564 
+ 3034      20696E74 
+ 3034      00
+ 3035              	.LASF13:
+ 3036 0352 75696E74 		.ascii	"uint16_t\000"
+ 3036      31365F74 
+ 3036      00
+ 3037              	.LASF52:
+ 3038 035b 50574D42 		.ascii	"PWMB_PSB_DMA_TD\000"
+ 3038      5F505342 
+ 3038      5F444D41 
+ 3038      5F544400 
+ 3039              	.LASF60:
+ 3040 036b 66625F66 		.ascii	"fb_filter_out\000"
+ 3040      696C7465 
+ 3040      725F6F75 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 60
+
+
+ 3040      7400
+ 3041              	.LASF36:
+ 3042 0379 6964635F 		.ascii	"idc_ma_count\000"
+ 3042      6D615F63 
+ 3042      6F756E74 
+ 3042      00
+ 3043              	.LASF47:
+ 3044 0386 50574D41 		.ascii	"PWMA_init_DMA_Chan\000"
+ 3044      5F696E69 
+ 3044      745F444D 
+ 3044      415F4368 
+ 3044      616E00
+ 3045              	.LASF5:
+ 3046 0399 73686F72 		.ascii	"short unsigned int\000"
+ 3046      7420756E 
+ 3046      7369676E 
+ 3046      65642069 
+ 3046      6E7400
+ 3047              	.LASF41:
+ 3048 03ac 72616D5F 		.ascii	"ram_to_filter_DMA_Chan\000"
+ 3048      746F5F66 
+ 3048      696C7465 
+ 3048      725F444D 
+ 3048      415F4368 
+ 3049              	.LASF45:
+ 3050 03c3 6672616D 		.ascii	"fram_to_PWMA_DMA_Chan\000"
+ 3050      5F746F5F 
+ 3050      50574D41 
+ 3050      5F444D41 
+ 3050      5F436861 
+ 3051              	.LASF14:
+ 3052 03d9 696E7433 		.ascii	"int32_t\000"
+ 3052      325F7400 
+ 3053              	.LASF62:
+ 3054 03e1 4642435F 		.ascii	"FBC_to_ram_DMA_DmaInitialize\000"
+ 3054      746F5F72 
+ 3054      616D5F44 
+ 3054      4D415F44 
+ 3054      6D61496E 
+ 3055              	.LASF31:
+ 3056 03fe 70776D62 		.ascii	"pwmb_psb_val\000"
+ 3056      5F707362 
+ 3056      5F76616C 
+ 3056      00
+ 3057              	.LASF71:
+ 3058 040b 50574D41 		.ascii	"PWMA_init_DMA_DmaInitialize\000"
+ 3058      5F696E69 
+ 3058      745F444D 
+ 3058      415F446D 
+ 3058      61496E69 
+ 3059              	.LASF55:
+ 3060 0427 5452315F 		.ascii	"TR1_CL_DMA_Chan\000"
+ 3060      434C5F44 
+ 3060      4D415F43 
+ 3060      68616E00 
+ 3061              	.LASF75:
+ 3062 0437 5452315F 		.ascii	"TR1_CL_DMA_DmaInitialize\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 61
+
+
+ 3062      434C5F44 
+ 3062      4D415F44 
+ 3062      6D61496E 
+ 3062      69746961 
+ 3063              	.LASF21:
+ 3064 0450 72656738 		.ascii	"reg8\000"
+ 3064      00
+ 3065              	.LASF8:
+ 3066 0455 6C6F6E67 		.ascii	"long unsigned int\000"
+ 3066      20756E73 
+ 3066      69676E65 
+ 3066      6420696E 
+ 3066      7400
+ 3067              	.LASF17:
+ 3068 0467 75696E74 		.ascii	"uint32\000"
+ 3068      333200
+ 3069              	.LASF72:
+ 3070 046e 50534249 		.ascii	"PSBINIT_DMA_DmaInitialize\000"
+ 3070      4E49545F 
+ 3070      444D415F 
+ 3070      446D6149 
+ 3070      6E697469 
+ 3071              	.LASF53:
+ 3072 0488 5143575F 		.ascii	"QCW_CL_DMA_Chan\000"
+ 3072      434C5F44 
+ 3072      4D415F43 
+ 3072      68616E00 
+ 3073              	.LASF35:
+ 3074 0498 64696666 		.ascii	"diff_tr_cl_dac_val\000"
+ 3074      5F74725F 
+ 3074      636C5F64 
+ 3074      61635F76 
+ 3074      616C00
+ 3075              	.LASF6:
+ 3076 04ab 5F5F696E 		.ascii	"__int32_t\000"
+ 3076      7433325F 
+ 3076      7400
+ 3077              	.LASF37:
+ 3078 04b5 6374325F 		.ascii	"ct2_offset_cnt\000"
+ 3078      6F666673 
+ 3078      65745F63 
+ 3078      6E7400
+ 3079              	.LASF32:
+ 3080 04c4 70776D62 		.ascii	"pwmb_start_psb_val\000"
+ 3080      5F737461 
+ 3080      72745F70 
+ 3080      73625F76 
+ 3080      616C00
+ 3081              	.LASF30:
+ 3082 04d7 70776D62 		.ascii	"pwmb_psb_prd\000"
+ 3082      5F707362 
+ 3082      5F707264 
+ 3082      00
+ 3083              	.LASF39:
+ 3084 04e4 4642435F 		.ascii	"FBC_to_ram_DMA_Chan\000"
+ 3084      746F5F72 
+ 3084      616D5F44 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cco4J00m.s 			page 62
+
+
+ 3084      4D415F43 
+ 3084      68616E00 
+ 3085              	.LASF43:
+ 3086 04f8 66696C74 		.ascii	"filter_to_fram_DMA_Chan\000"
+ 3086      65725F74 
+ 3086      6F5F6672 
+ 3086      616D5F44 
+ 3086      4D415F43 
+ 3087              	.LASF57:
+ 3088 0510 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 3088      52784275 
+ 3088      66666572 
+ 3088      00
+ 3089              	.LASF78:
+ 3090 051d 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 3090      73657273 
+ 3090      5C636865 
+ 3090      6D695C55 
+ 3090      44335F51 
+ 3091              	.LASF29:
+ 3092 0542 70776D5F 		.ascii	"pwm_top\000"
+ 3092      746F7000 
+ 3093              	.LASF69:
+ 3094 054a 66696C74 		.ascii	"filter_to_fram_DMA_DmaInitialize\000"
+ 3094      65725F74 
+ 3094      6F5F6672 
+ 3094      616D5F44 
+ 3094      4D415F44 
+ 3095              	.LASF77:
+ 3096 056b 2E2E5C63 		.ascii	"..\\common\\ud3core\\DMA.c\000"
+ 3096      6F6D6D6F 
+ 3096      6E5C7564 
+ 3096      33636F72 
+ 3096      655C444D 
+ 3097              	.LASF42:
+ 3098 0583 72616D5F 		.ascii	"ram_to_filter_DMA_TD\000"
+ 3098      746F5F66 
+ 3098      696C7465 
+ 3098      725F444D 
+ 3098      415F5444 
+ 3099              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

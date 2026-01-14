@@ -1,0 +1,3256 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"UART_BOOT.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.UART_CyBtldrCommStart,"ax",%progbits
+  20              		.align	1
+  21              		.global	UART_CyBtldrCommStart
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	UART_CyBtldrCommStart, %function
+  25              	UART_CyBtldrCommStart:
+  26              	.LFB63:
+  27              		.file 1 "..\\common\\uart_ldr\\UART_BOOT.c"
+   1:..\common\uart_ldr/UART_BOOT.c **** /*******************************************************************************
+   2:..\common\uart_ldr/UART_BOOT.c **** * File Name: UART_BOOT.c
+   3:..\common\uart_ldr/UART_BOOT.c **** * Version 2.50
+   4:..\common\uart_ldr/UART_BOOT.c **** *
+   5:..\common\uart_ldr/UART_BOOT.c **** * Description:
+   6:..\common\uart_ldr/UART_BOOT.c **** *  This file provides the source code of bootloader communication APIs for the
+   7:..\common\uart_ldr/UART_BOOT.c **** *  UART component.
+   8:..\common\uart_ldr/UART_BOOT.c **** *
+   9:..\common\uart_ldr/UART_BOOT.c **** * Note:
+  10:..\common\uart_ldr/UART_BOOT.c **** *
+  11:..\common\uart_ldr/UART_BOOT.c **** ********************************************************************************
+  12:..\common\uart_ldr/UART_BOOT.c **** * Copyright 2008-2015, Cypress Semiconductor Corporation.  All rights reserved.
+  13:..\common\uart_ldr/UART_BOOT.c **** * You may use this file only in accordance with the license, terms, conditions,
+  14:..\common\uart_ldr/UART_BOOT.c **** * disclaimers, and limitations in the end user license agreement accompanying
+  15:..\common\uart_ldr/UART_BOOT.c **** * the software package with which this file was provided.
+  16:..\common\uart_ldr/UART_BOOT.c **** *******************************************************************************/
+  17:..\common\uart_ldr/UART_BOOT.c **** 
+  18:..\common\uart_ldr/UART_BOOT.c **** #include "UART.h"
+  19:..\common\uart_ldr/UART_BOOT.c **** #include <project.h>
+  20:..\common\uart_ldr/UART_BOOT.c **** #include "cli_basic.h"
+  21:..\common\uart_ldr/UART_BOOT.c **** #include "Bootloader.h"
+  22:..\common\uart_ldr/UART_BOOT.c **** 
+  23:..\common\uart_ldr/UART_BOOT.c **** #if defined(CYDEV_BOOTLOADER_IO_COMP) && (0u != ((CYDEV_BOOTLOADER_IO_COMP == CyBtldr_UART) || \
+  24:..\common\uart_ldr/UART_BOOT.c ****                                           (CYDEV_BOOTLOADER_IO_COMP == CyBtldr_Custom_Interface)))
+  25:..\common\uart_ldr/UART_BOOT.c ****  
+  26:..\common\uart_ldr/UART_BOOT.c **** static uint8  USBUART_started = 0u;
+  27:..\common\uart_ldr/UART_BOOT.c **** 
+  28:..\common\uart_ldr/UART_BOOT.c **** /*******************************************************************************
+  29:..\common\uart_ldr/UART_BOOT.c **** * Function Name: UART_CyBtldrCommStart
+  30:..\common\uart_ldr/UART_BOOT.c **** ********************************************************************************
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 2
+
+
+  31:..\common\uart_ldr/UART_BOOT.c **** *
+  32:..\common\uart_ldr/UART_BOOT.c **** * Summary:
+  33:..\common\uart_ldr/UART_BOOT.c **** *  Starts the UART communication component.
+  34:..\common\uart_ldr/UART_BOOT.c **** *
+  35:..\common\uart_ldr/UART_BOOT.c **** * Parameters:
+  36:..\common\uart_ldr/UART_BOOT.c **** *  None
+  37:..\common\uart_ldr/UART_BOOT.c **** *
+  38:..\common\uart_ldr/UART_BOOT.c **** * Return:
+  39:..\common\uart_ldr/UART_BOOT.c **** *  None
+  40:..\common\uart_ldr/UART_BOOT.c **** *
+  41:..\common\uart_ldr/UART_BOOT.c **** * Side Effects:
+  42:..\common\uart_ldr/UART_BOOT.c **** *  This component automatically enables global interrupt.
+  43:..\common\uart_ldr/UART_BOOT.c **** *
+  44:..\common\uart_ldr/UART_BOOT.c **** *******************************************************************************/
+  45:..\common\uart_ldr/UART_BOOT.c **** 
+  46:..\common\uart_ldr/UART_BOOT.c ****     
+  47:..\common\uart_ldr/UART_BOOT.c **** void UART_CyBtldrCommStart(void) CYSMALL 
+  48:..\common\uart_ldr/UART_BOOT.c **** {
+  28              		.loc 1 48 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 10B5     		push	{r4, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 4, -8
+  35              		.cfi_offset 14, -4
+  49:..\common\uart_ldr/UART_BOOT.c ****     
+  50:..\common\uart_ldr/UART_BOOT.c ****     CyGlobalIntEnable;      /* Enable Global Interrupts */
+  36              		.loc 1 50 0
+  37              		.syntax unified
+  38              	@ 50 "..\common\uart_ldr\UART_BOOT.c" 1
+  39 0002 62B6     		CPSIE   i
+  40              	@ 0 "" 2
+  51:..\common\uart_ldr/UART_BOOT.c **** 
+  52:..\common\uart_ldr/UART_BOOT.c ****     /*Start USB Operation/device 0 and with 5V or 3V operation depend on Voltage Configuration in D
+  53:..\common\uart_ldr/UART_BOOT.c ****     USBUART_Start(0u, USBUART_DWR_VDDD_OPERATION);
+  54:..\common\uart_ldr/UART_BOOT.c **** 
+  55:..\common\uart_ldr/UART_BOOT.c ****     /* USB component started, the correct enumeration will be checked in first Read operation */
+  56:..\common\uart_ldr/UART_BOOT.c ****     USBUART_started = 1u;
+  57:..\common\uart_ldr/UART_BOOT.c ****     uint16_t timeoutMs = 2000;
+  58:..\common\uart_ldr/UART_BOOT.c ****     
+  59:..\common\uart_ldr/UART_BOOT.c **** 
+  60:..\common\uart_ldr/UART_BOOT.c ****         /* Wait for Device to enumerate */
+  61:..\common\uart_ldr/UART_BOOT.c ****         while ((0u ==USBUART_GetConfiguration()) && (0u != timeoutMs))
+  41              		.loc 1 61 0
+  42              		.thumb
+  43              		.syntax unified
+  44 0004 40F2D174 		movw	r4, #2001
+  53:..\common\uart_ldr/UART_BOOT.c **** 
+  45              		.loc 1 53 0
+  46 0008 0221     		movs	r1, #2
+  47 000a 0020     		movs	r0, #0
+  48 000c FFF7FEFF 		bl	USBUART_Start
+  49              	.LVL0:
+  56:..\common\uart_ldr/UART_BOOT.c ****     uint16_t timeoutMs = 2000;
+  50              		.loc 1 56 0
+  51 0010 0A4B     		ldr	r3, .L6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 3
+
+
+  52 0012 0122     		movs	r2, #1
+  53 0014 1A70     		strb	r2, [r3]
+  54              	.LVL1:
+  55              	.L2:
+  56              		.loc 1 61 0
+  57 0016 FFF7FEFF 		bl	USBUART_GetConfiguration
+  58              	.LVL2:
+  59 001a 30B9     		cbnz	r0, .L3
+  60 001c 013C     		subs	r4, r4, #1
+  61              	.LVL3:
+  62 001e A4B2     		uxth	r4, r4
+  63              		.loc 1 61 0 is_stmt 0 discriminator 1
+  64 0020 1CB1     		cbz	r4, .L3
+  62:..\common\uart_ldr/UART_BOOT.c ****         {
+  63:..\common\uart_ldr/UART_BOOT.c ****             CyDelay(1);
+  65              		.loc 1 63 0 is_stmt 1
+  66 0022 0120     		movs	r0, #1
+  67 0024 FFF7FEFF 		bl	CyDelay
+  68              	.LVL4:
+  69 0028 F5E7     		b	.L2
+  70              	.LVL5:
+  71              	.L3:
+  64:..\common\uart_ldr/UART_BOOT.c ****             timeoutMs--;
+  65:..\common\uart_ldr/UART_BOOT.c ****         }
+  66:..\common\uart_ldr/UART_BOOT.c ****    //if(timeoutMs>0) com_type = USB;
+  67:..\common\uart_ldr/UART_BOOT.c ****     
+  68:..\common\uart_ldr/UART_BOOT.c ****     /* Start UART component and clear the Tx,Rx buffers */
+  69:..\common\uart_ldr/UART_BOOT.c ****     UART_Start();
+  72              		.loc 1 69 0
+  73 002a FFF7FEFF 		bl	UART_Start
+  74              	.LVL6:
+  70:..\common\uart_ldr/UART_BOOT.c ****     UART_ClearRxBuffer();
+  75              		.loc 1 70 0
+  76 002e FFF7FEFF 		bl	UART_ClearRxBuffer
+  77              	.LVL7:
+  71:..\common\uart_ldr/UART_BOOT.c ****     UART_ClearTxBuffer();
+  72:..\common\uart_ldr/UART_BOOT.c **** }
+  78              		.loc 1 72 0
+  79 0032 BDE81040 		pop	{r4, lr}
+  80              		.cfi_restore 14
+  81              		.cfi_restore 4
+  82              		.cfi_def_cfa_offset 0
+  71:..\common\uart_ldr/UART_BOOT.c ****     UART_ClearTxBuffer();
+  83              		.loc 1 71 0
+  84 0036 FFF7FEBF 		b	UART_ClearTxBuffer
+  85              	.LVL8:
+  86              	.L7:
+  87 003a 00BF     		.align	2
+  88              	.L6:
+  89 003c 00000000 		.word	.LANCHOR0
+  90              		.cfi_endproc
+  91              	.LFE63:
+  92              		.size	UART_CyBtldrCommStart, .-UART_CyBtldrCommStart
+  93              		.section	.text.UART_CyBtldrCommStop,"ax",%progbits
+  94              		.align	1
+  95              		.global	UART_CyBtldrCommStop
+  96              		.thumb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 4
+
+
+  97              		.thumb_func
+  98              		.type	UART_CyBtldrCommStop, %function
+  99              	UART_CyBtldrCommStop:
+ 100              	.LFB64:
+  73:..\common\uart_ldr/UART_BOOT.c **** 
+  74:..\common\uart_ldr/UART_BOOT.c **** /*******************************************************************************
+  75:..\common\uart_ldr/UART_BOOT.c **** * Function Name: UART_CyBtldrCommStop
+  76:..\common\uart_ldr/UART_BOOT.c **** ********************************************************************************
+  77:..\common\uart_ldr/UART_BOOT.c **** *
+  78:..\common\uart_ldr/UART_BOOT.c **** * Summary:
+  79:..\common\uart_ldr/UART_BOOT.c **** *  Disables the communication component and disables the interrupt.
+  80:..\common\uart_ldr/UART_BOOT.c **** *
+  81:..\common\uart_ldr/UART_BOOT.c **** * Parameters:
+  82:..\common\uart_ldr/UART_BOOT.c **** *  None
+  83:..\common\uart_ldr/UART_BOOT.c **** *
+  84:..\common\uart_ldr/UART_BOOT.c **** * Return:
+  85:..\common\uart_ldr/UART_BOOT.c **** *  None
+  86:..\common\uart_ldr/UART_BOOT.c **** *
+  87:..\common\uart_ldr/UART_BOOT.c **** *******************************************************************************/
+  88:..\common\uart_ldr/UART_BOOT.c **** void UART_CyBtldrCommStop(void) CYSMALL 
+  89:..\common\uart_ldr/UART_BOOT.c **** {
+ 101              		.loc 1 89 0
+ 102              		.cfi_startproc
+ 103              		@ args = 0, pretend = 0, frame = 0
+ 104              		@ frame_needed = 0, uses_anonymous_args = 0
+ 105 0000 08B5     		push	{r3, lr}
+ 106              		.cfi_def_cfa_offset 8
+ 107              		.cfi_offset 3, -8
+ 108              		.cfi_offset 14, -4
+  90:..\common\uart_ldr/UART_BOOT.c ****     /* Stop UART component */
+  91:..\common\uart_ldr/UART_BOOT.c ****     UART_Stop();
+ 109              		.loc 1 91 0
+ 110 0002 FFF7FEFF 		bl	UART_Stop
+ 111              	.LVL9:
+  92:..\common\uart_ldr/UART_BOOT.c ****     USBUART_Stop();
+  93:..\common\uart_ldr/UART_BOOT.c **** }
+ 112              		.loc 1 93 0
+ 113 0006 BDE80840 		pop	{r3, lr}
+ 114              		.cfi_restore 14
+ 115              		.cfi_restore 3
+ 116              		.cfi_def_cfa_offset 0
+  92:..\common\uart_ldr/UART_BOOT.c ****     USBUART_Stop();
+ 117              		.loc 1 92 0
+ 118 000a FFF7FEBF 		b	USBUART_Stop
+ 119              	.LVL10:
+ 120              		.cfi_endproc
+ 121              	.LFE64:
+ 122              		.size	UART_CyBtldrCommStop, .-UART_CyBtldrCommStop
+ 123              		.section	.text.UART_CyBtldrCommReset,"ax",%progbits
+ 124              		.align	1
+ 125              		.global	UART_CyBtldrCommReset
+ 126              		.thumb
+ 127              		.thumb_func
+ 128              		.type	UART_CyBtldrCommReset, %function
+ 129              	UART_CyBtldrCommReset:
+ 130              	.LFB65:
+  94:..\common\uart_ldr/UART_BOOT.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 5
+
+
+  95:..\common\uart_ldr/UART_BOOT.c **** 
+  96:..\common\uart_ldr/UART_BOOT.c **** /*******************************************************************************
+  97:..\common\uart_ldr/UART_BOOT.c **** * Function Name: UART_CyBtldrCommReset
+  98:..\common\uart_ldr/UART_BOOT.c **** ********************************************************************************
+  99:..\common\uart_ldr/UART_BOOT.c **** *
+ 100:..\common\uart_ldr/UART_BOOT.c **** * Summary:
+ 101:..\common\uart_ldr/UART_BOOT.c **** *  Resets the receive and transmit communication Buffers.
+ 102:..\common\uart_ldr/UART_BOOT.c **** *
+ 103:..\common\uart_ldr/UART_BOOT.c **** * Parameters:
+ 104:..\common\uart_ldr/UART_BOOT.c **** *  None
+ 105:..\common\uart_ldr/UART_BOOT.c **** *
+ 106:..\common\uart_ldr/UART_BOOT.c **** * Return:
+ 107:..\common\uart_ldr/UART_BOOT.c **** *  None
+ 108:..\common\uart_ldr/UART_BOOT.c **** *
+ 109:..\common\uart_ldr/UART_BOOT.c **** *******************************************************************************/
+ 110:..\common\uart_ldr/UART_BOOT.c **** void UART_CyBtldrCommReset(void) CYSMALL 
+ 111:..\common\uart_ldr/UART_BOOT.c **** {
+ 131              		.loc 1 111 0
+ 132              		.cfi_startproc
+ 133              		@ args = 0, pretend = 0, frame = 0
+ 134              		@ frame_needed = 0, uses_anonymous_args = 0
+ 135 0000 08B5     		push	{r3, lr}
+ 136              		.cfi_def_cfa_offset 8
+ 137              		.cfi_offset 3, -8
+ 138              		.cfi_offset 14, -4
+ 112:..\common\uart_ldr/UART_BOOT.c ****     /* Clear RX and TX buffers */
+ 113:..\common\uart_ldr/UART_BOOT.c ****     UART_ClearRxBuffer();
+ 139              		.loc 1 113 0
+ 140 0002 FFF7FEFF 		bl	UART_ClearRxBuffer
+ 141              	.LVL11:
+ 114:..\common\uart_ldr/UART_BOOT.c ****     UART_ClearTxBuffer();
+ 142              		.loc 1 114 0
+ 143 0006 FFF7FEFF 		bl	UART_ClearTxBuffer
+ 144              	.LVL12:
+ 115:..\common\uart_ldr/UART_BOOT.c ****     USBUART_CDC_Init();
+ 116:..\common\uart_ldr/UART_BOOT.c **** }
+ 145              		.loc 1 116 0
+ 146 000a BDE80840 		pop	{r3, lr}
+ 147              		.cfi_restore 14
+ 148              		.cfi_restore 3
+ 149              		.cfi_def_cfa_offset 0
+ 115:..\common\uart_ldr/UART_BOOT.c ****     USBUART_CDC_Init();
+ 150              		.loc 1 115 0
+ 151 000e FFF7FEBF 		b	USBUART_CDC_Init
+ 152              	.LVL13:
+ 153              		.cfi_endproc
+ 154              	.LFE65:
+ 155              		.size	UART_CyBtldrCommReset, .-UART_CyBtldrCommReset
+ 156              		.section	.text.UART_CyBtldrCommWrite,"ax",%progbits
+ 157              		.align	1
+ 158              		.global	UART_CyBtldrCommWrite
+ 159              		.thumb
+ 160              		.thumb_func
+ 161              		.type	UART_CyBtldrCommWrite, %function
+ 162              	UART_CyBtldrCommWrite:
+ 163              	.LFB66:
+ 117:..\common\uart_ldr/UART_BOOT.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 6
+
+
+ 118:..\common\uart_ldr/UART_BOOT.c **** 
+ 119:..\common\uart_ldr/UART_BOOT.c **** /*******************************************************************************
+ 120:..\common\uart_ldr/UART_BOOT.c **** * Function Name: UART_CyBtldrCommWrite
+ 121:..\common\uart_ldr/UART_BOOT.c **** ********************************************************************************
+ 122:..\common\uart_ldr/UART_BOOT.c **** *
+ 123:..\common\uart_ldr/UART_BOOT.c **** * Summary:
+ 124:..\common\uart_ldr/UART_BOOT.c **** *  Allows the caller to write data to the boot loader host. This function uses
+ 125:..\common\uart_ldr/UART_BOOT.c **** * a blocking write function for writing data using UART communication component.
+ 126:..\common\uart_ldr/UART_BOOT.c **** *
+ 127:..\common\uart_ldr/UART_BOOT.c **** * Parameters:
+ 128:..\common\uart_ldr/UART_BOOT.c **** *  pData:    A pointer to the block of data to send to the device
+ 129:..\common\uart_ldr/UART_BOOT.c **** *  size:     The number of bytes to write.
+ 130:..\common\uart_ldr/UART_BOOT.c **** *  count:    Pointer to an unsigned short variable to write the number of
+ 131:..\common\uart_ldr/UART_BOOT.c **** *             bytes actually written.
+ 132:..\common\uart_ldr/UART_BOOT.c **** *  timeOut:  Number of units to wait before returning because of a timeout.
+ 133:..\common\uart_ldr/UART_BOOT.c **** *
+ 134:..\common\uart_ldr/UART_BOOT.c **** * Return:
+ 135:..\common\uart_ldr/UART_BOOT.c **** *   cystatus: This function will return CYRET_SUCCESS if data is sent
+ 136:..\common\uart_ldr/UART_BOOT.c **** *             successfully.
+ 137:..\common\uart_ldr/UART_BOOT.c **** *
+ 138:..\common\uart_ldr/UART_BOOT.c **** * Side Effects:
+ 139:..\common\uart_ldr/UART_BOOT.c **** *  This function should be called after command was received .
+ 140:..\common\uart_ldr/UART_BOOT.c **** *
+ 141:..\common\uart_ldr/UART_BOOT.c **** *******************************************************************************/
+ 142:..\common\uart_ldr/UART_BOOT.c **** 
+ 143:..\common\uart_ldr/UART_BOOT.c **** cystatus UART_CyBtldrCommWrite(const uint8 pData[], uint16 size, uint16 * count, uint8 timeOut) CYS
+ 144:..\common\uart_ldr/UART_BOOT.c ****          
+ 145:..\common\uart_ldr/UART_BOOT.c **** {
+ 164              		.loc 1 145 0
+ 165              		.cfi_startproc
+ 166              		@ args = 0, pretend = 0, frame = 0
+ 167              		@ frame_needed = 0, uses_anonymous_args = 0
+ 168              	.LVL14:
+ 169 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 170              		.cfi_def_cfa_offset 24
+ 171              		.cfi_offset 3, -24
+ 172              		.cfi_offset 4, -20
+ 173              		.cfi_offset 5, -16
+ 174              		.cfi_offset 6, -12
+ 175              		.cfi_offset 7, -8
+ 176              		.cfi_offset 14, -4
+ 177              		.loc 1 145 0
+ 178 0002 0E46     		mov	r6, r1
+ 179 0004 0446     		mov	r4, r0
+ 180 0006 1746     		mov	r7, r2
+ 146:..\common\uart_ldr/UART_BOOT.c ****     uint16 bufIndex = 0u;
+ 147:..\common\uart_ldr/UART_BOOT.c **** 
+ 148:..\common\uart_ldr/UART_BOOT.c ****     if(0u != timeOut)
+ 149:..\common\uart_ldr/UART_BOOT.c ****     {
+ 150:..\common\uart_ldr/UART_BOOT.c ****         /* Suppress compiler warning */
+ 151:..\common\uart_ldr/UART_BOOT.c ****     }
+ 152:..\common\uart_ldr/UART_BOOT.c **** 
+ 153:..\common\uart_ldr/UART_BOOT.c ****     /* Clear receive buffers */
+ 154:..\common\uart_ldr/UART_BOOT.c ****     UART_ClearRxBuffer();
+ 181              		.loc 1 154 0
+ 182 0008 FFF7FEFF 		bl	UART_ClearRxBuffer
+ 183              	.LVL15:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 7
+
+
+ 184 000c 731E     		subs	r3, r6, #1
+ 185 000e 651E     		subs	r5, r4, #1
+ 186 0010 1C44     		add	r4, r4, r3
+ 187              	.LVL16:
+ 188              	.L11:
+ 155:..\common\uart_ldr/UART_BOOT.c **** 
+ 156:..\common\uart_ldr/UART_BOOT.c ****     /* Write TX data using blocking function */
+ 157:..\common\uart_ldr/UART_BOOT.c ****     while(bufIndex < size)
+ 189              		.loc 1 157 0
+ 190 0012 A542     		cmp	r5, r4
+ 191 0014 04D0     		beq	.L13
+ 158:..\common\uart_ldr/UART_BOOT.c ****     {
+ 159:..\common\uart_ldr/UART_BOOT.c ****         UART_PutChar(pData[bufIndex]);
+ 192              		.loc 1 159 0
+ 193 0016 15F8010F 		ldrb	r0, [r5, #1]!	@ zero_extendqisi2
+ 194              	.LVL17:
+ 195 001a FFF7FEFF 		bl	UART_PutChar
+ 196              	.LVL18:
+ 197 001e F8E7     		b	.L11
+ 198              	.L13:
+ 160:..\common\uart_ldr/UART_BOOT.c ****         bufIndex++;
+ 161:..\common\uart_ldr/UART_BOOT.c ****     }
+ 162:..\common\uart_ldr/UART_BOOT.c **** 
+ 163:..\common\uart_ldr/UART_BOOT.c ****     /* Return success code */
+ 164:..\common\uart_ldr/UART_BOOT.c ****     *count = size;
+ 199              		.loc 1 164 0
+ 200 0020 3E80     		strh	r6, [r7]	@ movhi
+ 165:..\common\uart_ldr/UART_BOOT.c **** 
+ 166:..\common\uart_ldr/UART_BOOT.c ****     return (CYRET_SUCCESS);
+ 167:..\common\uart_ldr/UART_BOOT.c **** }
+ 201              		.loc 1 167 0
+ 202 0022 0020     		movs	r0, #0
+ 203 0024 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 204              		.cfi_endproc
+ 205              	.LFE66:
+ 206              		.size	UART_CyBtldrCommWrite, .-UART_CyBtldrCommWrite
+ 207              		.section	.text.UART_CyBtldrCommRead,"ax",%progbits
+ 208              		.align	1
+ 209              		.global	UART_CyBtldrCommRead
+ 210              		.thumb
+ 211              		.thumb_func
+ 212              		.type	UART_CyBtldrCommRead, %function
+ 213              	UART_CyBtldrCommRead:
+ 214              	.LFB67:
+ 168:..\common\uart_ldr/UART_BOOT.c **** 
+ 169:..\common\uart_ldr/UART_BOOT.c **** 
+ 170:..\common\uart_ldr/UART_BOOT.c **** /*******************************************************************************
+ 171:..\common\uart_ldr/UART_BOOT.c **** * Function Name: UART_CyBtldrCommRead
+ 172:..\common\uart_ldr/UART_BOOT.c **** ********************************************************************************
+ 173:..\common\uart_ldr/UART_BOOT.c **** *
+ 174:..\common\uart_ldr/UART_BOOT.c **** * Summary:
+ 175:..\common\uart_ldr/UART_BOOT.c **** *  Receives the command.
+ 176:..\common\uart_ldr/UART_BOOT.c **** *
+ 177:..\common\uart_ldr/UART_BOOT.c **** * Parameters:
+ 178:..\common\uart_ldr/UART_BOOT.c **** *  pData:    A pointer to the area to store the block of data received
+ 179:..\common\uart_ldr/UART_BOOT.c **** *             from the device.
+ 180:..\common\uart_ldr/UART_BOOT.c **** *  size:     Maximum size of the read buffer
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 8
+
+
+ 181:..\common\uart_ldr/UART_BOOT.c **** *  count:    Pointer to an unsigned short variable to write the number
+ 182:..\common\uart_ldr/UART_BOOT.c **** *             of bytes actually read.
+ 183:..\common\uart_ldr/UART_BOOT.c **** *  timeOut:  Number of units to wait before returning because of a timeOut.
+ 184:..\common\uart_ldr/UART_BOOT.c **** *            Time out is measured in 10s of ms.
+ 185:..\common\uart_ldr/UART_BOOT.c **** *
+ 186:..\common\uart_ldr/UART_BOOT.c **** * Return:
+ 187:..\common\uart_ldr/UART_BOOT.c **** *  cystatus: This function will return CYRET_SUCCESS if at least one byte is
+ 188:..\common\uart_ldr/UART_BOOT.c **** *            received successfully within the time out interval. If no data is
+ 189:..\common\uart_ldr/UART_BOOT.c **** *            received  this function will return CYRET_EMPTY.
+ 190:..\common\uart_ldr/UART_BOOT.c **** *
+ 191:..\common\uart_ldr/UART_BOOT.c **** *  BYTE2BYTE_TIME_OUT is used for detecting time out marking end of block data
+ 192:..\common\uart_ldr/UART_BOOT.c **** *  from host. This has to be set to a value which is greater than the expected
+ 193:..\common\uart_ldr/UART_BOOT.c **** *  maximum delay between two bytes during a block/packet transmission from the
+ 194:..\common\uart_ldr/UART_BOOT.c **** *  host. You have to account for the delay in hardware converters while
+ 195:..\common\uart_ldr/UART_BOOT.c **** *  calculating this value, if you are using any USB-UART bridges.
+ 196:..\common\uart_ldr/UART_BOOT.c **** *******************************************************************************/
+ 197:..\common\uart_ldr/UART_BOOT.c **** cystatus UART_CyBtldrCommRead(uint8 pData[], uint16 size, uint16 * count, uint8 timeOut) CYSMALL
+ 198:..\common\uart_ldr/UART_BOOT.c ****          
+ 199:..\common\uart_ldr/UART_BOOT.c **** {
+ 215              		.loc 1 199 0
+ 216              		.cfi_startproc
+ 217              		@ args = 0, pretend = 0, frame = 0
+ 218              		@ frame_needed = 0, uses_anonymous_args = 0
+ 219              	.LVL19:
+ 220 0000 2DE9F84F 		push	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 221              		.cfi_def_cfa_offset 40
+ 222              		.cfi_offset 3, -40
+ 223              		.cfi_offset 4, -36
+ 224              		.cfi_offset 5, -32
+ 225              		.cfi_offset 6, -28
+ 226              		.cfi_offset 7, -24
+ 227              		.cfi_offset 8, -20
+ 228              		.cfi_offset 9, -16
+ 229              		.cfi_offset 10, -12
+ 230              		.cfi_offset 11, -8
+ 231              		.cfi_offset 14, -4
+ 232              		.loc 1 199 0
+ 233 0004 8046     		mov	r8, r0
+ 234 0006 8946     		mov	r9, r1
+ 235 0008 1646     		mov	r6, r2
+ 200:..\common\uart_ldr/UART_BOOT.c ****     uint16 iCntr;
+ 201:..\common\uart_ldr/UART_BOOT.c ****     uint16 dataIndexCntr;
+ 202:..\common\uart_ldr/UART_BOOT.c ****     uint16 tempCount;
+ 203:..\common\uart_ldr/UART_BOOT.c ****     uint16 oldDataCount;
+ 204:..\common\uart_ldr/UART_BOOT.c **** 
+ 205:..\common\uart_ldr/UART_BOOT.c ****     cystatus status = CYRET_EMPTY;
+ 206:..\common\uart_ldr/UART_BOOT.c **** 
+ 207:..\common\uart_ldr/UART_BOOT.c ****     /* Check whether data is received within the time out period.
+ 208:..\common\uart_ldr/UART_BOOT.c ****     *  Time out period is in units of 10ms.
+ 209:..\common\uart_ldr/UART_BOOT.c ****     *  If at least one byte is received within the time out interval, wait for more data */
+ 210:..\common\uart_ldr/UART_BOOT.c ****     for (iCntr = 0u; iCntr < ((uint16)10u * timeOut); iCntr++)
+ 236              		.loc 1 210 0
+ 237 000a 0A24     		movs	r4, #10
+ 238 000c 5C43     		muls	r4, r3, r4
+ 239 000e 0025     		movs	r5, #0
+ 240              	.LVL20:
+ 241              	.L15:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 9
+
+
+ 242              		.loc 1 210 0 is_stmt 0 discriminator 1
+ 243 0010 ABB2     		uxth	r3, r5
+ 244              	.LVL21:
+ 245 0012 A342     		cmp	r3, r4
+ 246 0014 13DA     		bge	.L32
+ 211:..\common\uart_ldr/UART_BOOT.c ****     {
+ 212:..\common\uart_ldr/UART_BOOT.c ****         /* If at least one byte is received within the timeout interval
+ 213:..\common\uart_ldr/UART_BOOT.c ****         *  enter the next loop waiting for more data reception
+ 214:..\common\uart_ldr/UART_BOOT.c ****         */
+ 215:..\common\uart_ldr/UART_BOOT.c ****         if(0u != UART_GetRxBufferSize())
+ 247              		.loc 1 215 0 is_stmt 1
+ 248 0016 FFF7FEFF 		bl	UART_GetRxBufferSize
+ 249              	.LVL22:
+ 250 001a 0135     		adds	r5, r5, #1
+ 251              	.LVL23:
+ 252 001c 58B1     		cbz	r0, .L16
+ 253              	.L29:
+ 216:..\common\uart_ldr/UART_BOOT.c ****         {
+ 217:..\common\uart_ldr/UART_BOOT.c ****             /* Wait for more data until 25ms byte to byte time out interval.
+ 218:..\common\uart_ldr/UART_BOOT.c ****             * If no data is received during the last 25 ms(BYTE2BYTE_TIME_OUT)
+ 219:..\common\uart_ldr/UART_BOOT.c ****             * then it is considered as end of transmitted data block(packet)
+ 220:..\common\uart_ldr/UART_BOOT.c ****             * from the host and the program execution will break from the
+ 221:..\common\uart_ldr/UART_BOOT.c ****             * data awaiting loop with status=CYRET_SUCCESS
+ 222:..\common\uart_ldr/UART_BOOT.c ****             */
+ 223:..\common\uart_ldr/UART_BOOT.c ****             do
+ 224:..\common\uart_ldr/UART_BOOT.c ****             {
+ 225:..\common\uart_ldr/UART_BOOT.c ****                 oldDataCount = UART_GetRxBufferSize();
+ 254              		.loc 1 225 0 discriminator 1
+ 255 001e FFF7FEFF 		bl	UART_GetRxBufferSize
+ 256              	.LVL24:
+ 257 0022 0446     		mov	r4, r0
+ 258              	.LVL25:
+ 226:..\common\uart_ldr/UART_BOOT.c ****                 CyDelayUs(UART_BYTE2BYTE_TIME_OUT);
+ 259              		.loc 1 226 0 discriminator 1
+ 260 0024 6420     		movs	r0, #100
+ 261 0026 FFF7FEFF 		bl	CyDelayUs
+ 262              	.LVL26:
+ 227:..\common\uart_ldr/UART_BOOT.c ****                 //CyDelay(UART_BYTE2BYTE_TIME_OUT);
+ 228:..\common\uart_ldr/UART_BOOT.c ****             }
+ 229:..\common\uart_ldr/UART_BOOT.c ****             while(UART_GetRxBufferSize() > oldDataCount);
+ 263              		.loc 1 229 0 discriminator 1
+ 264 002a FFF7FEFF 		bl	UART_GetRxBufferSize
+ 265              	.LVL27:
+ 266 002e 8442     		cmp	r4, r0
+ 267 0030 F5D3     		bcc	.L29
+ 230:..\common\uart_ldr/UART_BOOT.c **** 
+ 231:..\common\uart_ldr/UART_BOOT.c ****             status = CYRET_SUCCESS;
+ 268              		.loc 1 231 0
+ 269 0032 0027     		movs	r7, #0
+ 270 0034 04E0     		b	.L18
+ 271              	.LVL28:
+ 272              	.L16:
+ 232:..\common\uart_ldr/UART_BOOT.c ****             break;
+ 233:..\common\uart_ldr/UART_BOOT.c ****         }
+ 234:..\common\uart_ldr/UART_BOOT.c ****         /* If the data is not received, give a delay of 
+ 235:..\common\uart_ldr/UART_BOOT.c ****         *  UART_BL_CHK_DELAY_MS and check again until the timeOut specified.
+ 236:..\common\uart_ldr/UART_BOOT.c ****         */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 10
+
+
+ 237:..\common\uart_ldr/UART_BOOT.c ****         else
+ 238:..\common\uart_ldr/UART_BOOT.c ****         {
+ 239:..\common\uart_ldr/UART_BOOT.c ****             CyDelay(UART_BL_CHK_DELAY_MS);
+ 273              		.loc 1 239 0 discriminator 2
+ 274 0036 0120     		movs	r0, #1
+ 275 0038 FFF7FEFF 		bl	CyDelay
+ 276              	.LVL29:
+ 277 003c E8E7     		b	.L15
+ 278              	.LVL30:
+ 279              	.L32:
+ 205:..\common\uart_ldr/UART_BOOT.c **** 
+ 280              		.loc 1 205 0
+ 281 003e 0527     		movs	r7, #5
+ 282              	.LVL31:
+ 283              	.L18:
+ 240:..\common\uart_ldr/UART_BOOT.c ****         }
+ 241:..\common\uart_ldr/UART_BOOT.c ****     }
+ 242:..\common\uart_ldr/UART_BOOT.c **** 
+ 243:..\common\uart_ldr/UART_BOOT.c ****     /* Initialize the data read indexes and Count value */
+ 244:..\common\uart_ldr/UART_BOOT.c ****     *count = 0u;
+ 284              		.loc 1 244 0
+ 285 0040 0024     		movs	r4, #0
+ 286 0042 3480     		strh	r4, [r6]	@ movhi
+ 287              	.LVL32:
+ 288              	.L20:
+ 245:..\common\uart_ldr/UART_BOOT.c ****     dataIndexCntr = 0u;
+ 246:..\common\uart_ldr/UART_BOOT.c **** 
+ 247:..\common\uart_ldr/UART_BOOT.c ****     /* If GetRxBufferSize()>0 , move the received data to the pData buffer */
+ 248:..\common\uart_ldr/UART_BOOT.c ****     while(UART_GetRxBufferSize() > 0u)
+ 289              		.loc 1 248 0
+ 290 0044 FFF7FEFF 		bl	UART_GetRxBufferSize
+ 291              	.LVL33:
+ 292 0048 30B3     		cbz	r0, .L25
+ 249:..\common\uart_ldr/UART_BOOT.c ****     {
+ 250:..\common\uart_ldr/UART_BOOT.c ****         tempCount = UART_GetRxBufferSize();
+ 293              		.loc 1 250 0
+ 294 004a FFF7FEFF 		bl	UART_GetRxBufferSize
+ 295              	.LVL34:
+ 251:..\common\uart_ldr/UART_BOOT.c ****         *count  =(*count) + tempCount;
+ 296              		.loc 1 251 0
+ 297 004e 3288     		ldrh	r2, [r6]
+ 250:..\common\uart_ldr/UART_BOOT.c ****         *count  =(*count) + tempCount;
+ 298              		.loc 1 250 0
+ 299 0050 85B2     		uxth	r5, r0
+ 300              	.LVL35:
+ 301              		.loc 1 251 0
+ 302 0052 AB18     		adds	r3, r5, r2
+ 303 0054 9BB2     		uxth	r3, r3
+ 252:..\common\uart_ldr/UART_BOOT.c **** 
+ 253:..\common\uart_ldr/UART_BOOT.c ****         /* Check if buffer overflow will occur before moving the data */
+ 254:..\common\uart_ldr/UART_BOOT.c ****         if(*count < size)
+ 304              		.loc 1 254 0
+ 305 0056 4B45     		cmp	r3, r9
+ 251:..\common\uart_ldr/UART_BOOT.c **** 
+ 306              		.loc 1 251 0
+ 307 0058 3380     		strh	r3, [r6]	@ movhi
+ 308              		.loc 1 254 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 11
+
+
+ 309 005a 1CD2     		bcs	.L21
+ 310 005c 4FF0000B 		mov	fp, #0
+ 311              	.LVL36:
+ 312              	.L22:
+ 313 0060 1FFA8BF3 		uxth	r3, fp
+ 314 0064 04EB030A 		add	r10, r4, r3
+ 255:..\common\uart_ldr/UART_BOOT.c ****         {
+ 256:..\common\uart_ldr/UART_BOOT.c ****             for (iCntr = 0u; iCntr < tempCount; iCntr++)
+ 315              		.loc 1 256 0 discriminator 1
+ 316 0068 9D42     		cmp	r5, r3
+ 317 006a 1FFA8AFA 		uxth	r10, r10
+ 318              	.LVL37:
+ 319 006e 06D9     		bls	.L33
+ 257:..\common\uart_ldr/UART_BOOT.c ****             {
+ 258:..\common\uart_ldr/UART_BOOT.c ****                 /* Read the data and move it to the pData buffer */
+ 259:..\common\uart_ldr/UART_BOOT.c ****                 pData[dataIndexCntr] = UART_ReadRxData();
+ 320              		.loc 1 259 0 discriminator 3
+ 321 0070 FFF7FEFF 		bl	UART_ReadRxData
+ 322              	.LVL38:
+ 323 0074 0BF1010B 		add	fp, fp, #1
+ 324              	.LVL39:
+ 325 0078 08F80A00 		strb	r0, [r8, r10]
+ 326              	.LVL40:
+ 327 007c F0E7     		b	.L22
+ 328              	.LVL41:
+ 329              	.L33:
+ 330 007e 2C44     		add	r4, r4, r5
+ 331 0080 A4B2     		uxth	r4, r4
+ 260:..\common\uart_ldr/UART_BOOT.c ****                 dataIndexCntr++;
+ 261:..\common\uart_ldr/UART_BOOT.c ****             }
+ 262:..\common\uart_ldr/UART_BOOT.c **** 
+ 263:..\common\uart_ldr/UART_BOOT.c ****             /* Check if the last received byte is end of packet defined by bootloader
+ 264:..\common\uart_ldr/UART_BOOT.c ****             *  If not wait for additional UART_WAIT_EOP_DELAY ms.
+ 265:..\common\uart_ldr/UART_BOOT.c ****             */
+ 266:..\common\uart_ldr/UART_BOOT.c ****             if(pData[dataIndexCntr - 1u] != UART_PACKET_EOP)
+ 332              		.loc 1 266 0
+ 333 0082 08EB0403 		add	r3, r8, r4
+ 334 0086 13F8013C 		ldrb	r3, [r3, #-1]	@ zero_extendqisi2
+ 335 008a 172B     		cmp	r3, #23
+ 336 008c DAD0     		beq	.L20
+ 267:..\common\uart_ldr/UART_BOOT.c ****             {
+ 268:..\common\uart_ldr/UART_BOOT.c ****                 CyDelay(UART_WAIT_EOP_DELAY);
+ 337              		.loc 1 268 0
+ 338 008e 0120     		movs	r0, #1
+ 339 0090 FFF7FEFF 		bl	CyDelay
+ 340              	.LVL42:
+ 341 0094 D6E7     		b	.L20
+ 342              	.LVL43:
+ 343              	.L21:
+ 269:..\common\uart_ldr/UART_BOOT.c ****             }
+ 270:..\common\uart_ldr/UART_BOOT.c ****         }
+ 271:..\common\uart_ldr/UART_BOOT.c ****         /* If there is no space to move data, break from the loop */
+ 272:..\common\uart_ldr/UART_BOOT.c ****         else
+ 273:..\common\uart_ldr/UART_BOOT.c ****         {
+ 274:..\common\uart_ldr/UART_BOOT.c ****             *count = (*count) - tempCount;
+ 344              		.loc 1 274 0
+ 345 0096 3280     		strh	r2, [r6]	@ movhi
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 12
+
+
+ 346              	.LVL44:
+ 347              	.L25:
+ 275:..\common\uart_ldr/UART_BOOT.c ****             break;
+ 276:..\common\uart_ldr/UART_BOOT.c ****         }
+ 277:..\common\uart_ldr/UART_BOOT.c ****     }
+ 278:..\common\uart_ldr/UART_BOOT.c **** 
+ 279:..\common\uart_ldr/UART_BOOT.c ****     return (status);
+ 280:..\common\uart_ldr/UART_BOOT.c **** }
+ 348              		.loc 1 280 0
+ 349 0098 3846     		mov	r0, r7
+ 350 009a BDE8F88F 		pop	{r3, r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 351              		.cfi_endproc
+ 352              	.LFE67:
+ 353              		.size	UART_CyBtldrCommRead, .-UART_CyBtldrCommRead
+ 354              		.section	.text.USB_CyBtldrCommWrite,"ax",%progbits
+ 355              		.align	1
+ 356              		.global	USB_CyBtldrCommWrite
+ 357              		.thumb
+ 358              		.thumb_func
+ 359              		.type	USB_CyBtldrCommWrite, %function
+ 360              	USB_CyBtldrCommWrite:
+ 361              	.LFB68:
+ 281:..\common\uart_ldr/UART_BOOT.c **** 
+ 282:..\common\uart_ldr/UART_BOOT.c **** /***************************************
+ 283:..\common\uart_ldr/UART_BOOT.c **** *    Bootloader Variables
+ 284:..\common\uart_ldr/UART_BOOT.c **** ***************************************/
+ 285:..\common\uart_ldr/UART_BOOT.c **** #define USBUART_BTLDR_OUT_EP_1 0x03
+ 286:..\common\uart_ldr/UART_BOOT.c **** #define USBUART_BTLDR_IN_EP_1  0x02
+ 287:..\common\uart_ldr/UART_BOOT.c **** 
+ 288:..\common\uart_ldr/UART_BOOT.c **** 
+ 289:..\common\uart_ldr/UART_BOOT.c **** 
+ 290:..\common\uart_ldr/UART_BOOT.c **** 
+ 291:..\common\uart_ldr/UART_BOOT.c **** 
+ 292:..\common\uart_ldr/UART_BOOT.c **** /*******************************************************************************
+ 293:..\common\uart_ldr/UART_BOOT.c **** * Function Name: CyBtldrCommWrite.
+ 294:..\common\uart_ldr/UART_BOOT.c **** ********************************************************************************
+ 295:..\common\uart_ldr/UART_BOOT.c **** *
+ 296:..\common\uart_ldr/UART_BOOT.c **** * Summary:
+ 297:..\common\uart_ldr/UART_BOOT.c **** *  Allows the caller to write data to the boot loader host. The function will
+ 298:..\common\uart_ldr/UART_BOOT.c **** *  handle polling to allow a block of data to be completely sent to the host
+ 299:..\common\uart_ldr/UART_BOOT.c **** *  device.
+ 300:..\common\uart_ldr/UART_BOOT.c **** *
+ 301:..\common\uart_ldr/UART_BOOT.c **** * Parameters:
+ 302:..\common\uart_ldr/UART_BOOT.c **** *  pData:    A pointer to the block of data to send to the device
+ 303:..\common\uart_ldr/UART_BOOT.c **** *  size:     The number of bytes to write.
+ 304:..\common\uart_ldr/UART_BOOT.c **** *  count:    Pointer to an unsigned short variable to write the number of
+ 305:..\common\uart_ldr/UART_BOOT.c **** *             bytes actually written.
+ 306:..\common\uart_ldr/UART_BOOT.c **** *  timeOut:  Number of units to wait before returning because of a timeout.
+ 307:..\common\uart_ldr/UART_BOOT.c **** *
+ 308:..\common\uart_ldr/UART_BOOT.c **** * Return:
+ 309:..\common\uart_ldr/UART_BOOT.c **** *  Returns the value that best describes the problem.
+ 310:..\common\uart_ldr/UART_BOOT.c **** *
+ 311:..\common\uart_ldr/UART_BOOT.c **** * Reentrant:
+ 312:..\common\uart_ldr/UART_BOOT.c **** *  No
+ 313:..\common\uart_ldr/UART_BOOT.c **** *
+ 314:..\common\uart_ldr/UART_BOOT.c **** *******************************************************************************/
+ 315:..\common\uart_ldr/UART_BOOT.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 13
+
+
+ 316:..\common\uart_ldr/UART_BOOT.c **** #define USBUART_BTLDR_SIZEOF_WRITE_BUFFER  (64u)   /* Endpoint 1 (OUT) buffer size. */
+ 317:..\common\uart_ldr/UART_BOOT.c **** #define USBUART_BTLDR_SIZEOF_READ_BUFFER   (64u)   /* Endpoint 2 (IN)  buffer size. */
+ 318:..\common\uart_ldr/UART_BOOT.c **** 
+ 319:..\common\uart_ldr/UART_BOOT.c **** cystatus USB_CyBtldrCommWrite(const uint8 pData[], uint16 size, uint16 * count, uint8 timeOut) CYSM
+ 320:..\common\uart_ldr/UART_BOOT.c **** {
+ 362              		.loc 1 320 0
+ 363              		.cfi_startproc
+ 364              		@ args = 0, pretend = 0, frame = 0
+ 365              		@ frame_needed = 0, uses_anonymous_args = 0
+ 366              	.LVL45:
+ 367 0000 2DE9F843 		push	{r3, r4, r5, r6, r7, r8, r9, lr}
+ 368              		.cfi_def_cfa_offset 32
+ 369              		.cfi_offset 3, -32
+ 370              		.cfi_offset 4, -28
+ 371              		.cfi_offset 5, -24
+ 372              		.cfi_offset 6, -20
+ 373              		.cfi_offset 7, -16
+ 374              		.cfi_offset 8, -12
+ 375              		.cfi_offset 9, -8
+ 376              		.cfi_offset 14, -4
+ 321:..\common\uart_ldr/UART_BOOT.c ****     cystatus retCode;
+ 322:..\common\uart_ldr/UART_BOOT.c ****     uint16 timeoutMs;
+ 323:..\common\uart_ldr/UART_BOOT.c **** 	uint16 bufIndex = 0;
+ 324:..\common\uart_ldr/UART_BOOT.c **** 	uint8 transfer_Size;
+ 325:..\common\uart_ldr/UART_BOOT.c **** 	*count = 0;
+ 377              		.loc 1 325 0
+ 378 0004 0024     		movs	r4, #0
+ 320:..\common\uart_ldr/UART_BOOT.c ****     cystatus retCode;
+ 379              		.loc 1 320 0
+ 380 0006 8046     		mov	r8, r0
+ 381 0008 0F46     		mov	r7, r1
+ 382 000a 1646     		mov	r6, r2
+ 323:..\common\uart_ldr/UART_BOOT.c **** 	uint8 transfer_Size;
+ 383              		.loc 1 323 0
+ 384 000c A146     		mov	r9, r4
+ 326:..\common\uart_ldr/UART_BOOT.c ****     timeoutMs = ((uint16) 10u * timeOut);  /* Convert from 10mS check to number 1mS checks */
+ 385              		.loc 1 326 0
+ 386 000e 03EB8303 		add	r3, r3, r3, lsl #2
+ 387              	.LVL46:
+ 325:..\common\uart_ldr/UART_BOOT.c ****     timeoutMs = ((uint16) 10u * timeOut);  /* Convert from 10mS check to number 1mS checks */
+ 388              		.loc 1 325 0
+ 389 0012 1480     		strh	r4, [r2]	@ movhi
+ 390              		.loc 1 326 0
+ 391 0014 5D00     		lsls	r5, r3, #1
+ 392              	.LVL47:
+ 393              	.L35:
+ 327:..\common\uart_ldr/UART_BOOT.c ****     while(bufIndex < size)
+ 394              		.loc 1 327 0
+ 395 0016 B945     		cmp	r9, r7
+ 396 0018 22D2     		bcs	.L44
+ 328:..\common\uart_ldr/UART_BOOT.c **** 	{
+ 329:..\common\uart_ldr/UART_BOOT.c **** 		if ((size -bufIndex) >  USBUART_BTLDR_SIZEOF_READ_BUFFER)
+ 397              		.loc 1 329 0
+ 398 001a C9EB0702 		rsb	r2, r9, r7
+ 399 001e 402A     		cmp	r2, #64
+ 330:..\common\uart_ldr/UART_BOOT.c **** 		{
+ 331:..\common\uart_ldr/UART_BOOT.c **** 			transfer_Size = USBUART_BTLDR_SIZEOF_READ_BUFFER;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 14
+
+
+ 332:..\common\uart_ldr/UART_BOOT.c **** 		}
+ 333:..\common\uart_ldr/UART_BOOT.c **** 		else 
+ 334:..\common\uart_ldr/UART_BOOT.c **** 		{
+ 335:..\common\uart_ldr/UART_BOOT.c **** 			transfer_Size = (size -bufIndex);
+ 400              		.loc 1 335 0
+ 401 0020 94BF     		ite	ls
+ 402 0022 D2B2     		uxtbls	r2, r2
+ 403              	.LVL48:
+ 331:..\common\uart_ldr/UART_BOOT.c **** 		}
+ 404              		.loc 1 331 0
+ 405 0024 4022     		movhi	r2, #64
+ 406              	.LVL49:
+ 336:..\common\uart_ldr/UART_BOOT.c **** 		}
+ 337:..\common\uart_ldr/UART_BOOT.c **** 		/* Enable IN transfer */
+ 338:..\common\uart_ldr/UART_BOOT.c ****     	USBUART_LoadInEP(USBUART_BTLDR_IN_EP_1, &pData[bufIndex], transfer_Size);
+ 407              		.loc 1 338 0
+ 408 0026 94B2     		uxth	r4, r2
+ 409 0028 2246     		mov	r2, r4
+ 410              	.LVL50:
+ 411 002a 08EB0901 		add	r1, r8, r9
+ 412 002e 0220     		movs	r0, #2
+ 413 0030 FFF7FEFF 		bl	USBUART_LoadInEP
+ 414              	.LVL51:
+ 415              	.L37:
+ 339:..\common\uart_ldr/UART_BOOT.c **** 		/* Wait for the master to read it. */
+ 340:..\common\uart_ldr/UART_BOOT.c ****    		while ((USBUART_GetEPState(USBUART_BTLDR_IN_EP_1) == USBUART_IN_BUFFER_FULL) &&
+ 416              		.loc 1 340 0
+ 417 0034 0220     		movs	r0, #2
+ 418 0036 FFF7FEFF 		bl	USBUART_GetEPState
+ 419              	.LVL52:
+ 420 003a 30B9     		cbnz	r0, .L38
+ 421              		.loc 1 340 0 is_stmt 0 discriminator 1
+ 422 003c 2DB1     		cbz	r5, .L38
+ 341:..\common\uart_ldr/UART_BOOT.c ****            (0u != timeoutMs))
+ 342:..\common\uart_ldr/UART_BOOT.c ****     	{
+ 343:..\common\uart_ldr/UART_BOOT.c ****         	CyDelay(1);
+ 423              		.loc 1 343 0 is_stmt 1
+ 424 003e 0120     		movs	r0, #1
+ 344:..\common\uart_ldr/UART_BOOT.c ****         	timeoutMs--;
+ 425              		.loc 1 344 0
+ 426 0040 013D     		subs	r5, r5, #1
+ 427              	.LVL53:
+ 343:..\common\uart_ldr/UART_BOOT.c ****         	timeoutMs--;
+ 428              		.loc 1 343 0
+ 429 0042 FFF7FEFF 		bl	CyDelay
+ 430              	.LVL54:
+ 431              		.loc 1 344 0
+ 432 0046 ADB2     		uxth	r5, r5
+ 433              	.LVL55:
+ 434 0048 F4E7     		b	.L37
+ 435              	.L38:
+ 345:..\common\uart_ldr/UART_BOOT.c ****     	}
+ 346:..\common\uart_ldr/UART_BOOT.c **** 		if (USBUART_GetEPState(USBUART_BTLDR_IN_EP_1) == USBUART_IN_BUFFER_FULL)
+ 436              		.loc 1 346 0
+ 437 004a 0220     		movs	r0, #2
+ 438 004c FFF7FEFF 		bl	USBUART_GetEPState
+ 439              	.LVL56:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 15
+
+
+ 440 0050 48B1     		cbz	r0, .L43
+ 347:..\common\uart_ldr/UART_BOOT.c ****     	{
+ 348:..\common\uart_ldr/UART_BOOT.c ****         	retCode = CYRET_TIMEOUT;
+ 349:..\common\uart_ldr/UART_BOOT.c **** 			break; 
+ 350:..\common\uart_ldr/UART_BOOT.c ****     	}
+ 351:..\common\uart_ldr/UART_BOOT.c **** 	    else
+ 352:..\common\uart_ldr/UART_BOOT.c **** 	    {
+ 353:..\common\uart_ldr/UART_BOOT.c **** 	        *count += transfer_Size;
+ 441              		.loc 1 353 0
+ 442 0052 3388     		ldrh	r3, [r6]
+ 443 0054 2344     		add	r3, r3, r4
+ 354:..\common\uart_ldr/UART_BOOT.c **** 	        retCode = CYRET_SUCCESS;
+ 355:..\common\uart_ldr/UART_BOOT.c **** 			bufIndex  += transfer_Size;
+ 444              		.loc 1 355 0
+ 445 0056 4C44     		add	r4, r4, r9
+ 353:..\common\uart_ldr/UART_BOOT.c **** 	        retCode = CYRET_SUCCESS;
+ 446              		.loc 1 353 0
+ 447 0058 3380     		strh	r3, [r6]	@ movhi
+ 448              		.loc 1 355 0
+ 449 005a 1FFA84F9 		uxth	r9, r4
+ 450              	.LVL57:
+ 451 005e DAE7     		b	.L35
+ 452              	.L44:
+ 453 0060 0020     		movs	r0, #0
+ 454 0062 BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 455              	.LVL58:
+ 456              	.L43:
+ 348:..\common\uart_ldr/UART_BOOT.c **** 			break; 
+ 457              		.loc 1 348 0
+ 458 0066 1020     		movs	r0, #16
+ 459              	.LVL59:
+ 356:..\common\uart_ldr/UART_BOOT.c **** 	    }
+ 357:..\common\uart_ldr/UART_BOOT.c **** 	}
+ 358:..\common\uart_ldr/UART_BOOT.c **** 		
+ 359:..\common\uart_ldr/UART_BOOT.c ****     return(retCode);
+ 360:..\common\uart_ldr/UART_BOOT.c **** }
+ 460              		.loc 1 360 0
+ 461 0068 BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 462              		.cfi_endproc
+ 463              	.LFE68:
+ 464              		.size	USB_CyBtldrCommWrite, .-USB_CyBtldrCommWrite
+ 465              		.section	.text.USB_CyBtldrCommRead,"ax",%progbits
+ 466              		.align	1
+ 467              		.global	USB_CyBtldrCommRead
+ 468              		.thumb
+ 469              		.thumb_func
+ 470              		.type	USB_CyBtldrCommRead, %function
+ 471              	USB_CyBtldrCommRead:
+ 472              	.LFB69:
+ 361:..\common\uart_ldr/UART_BOOT.c **** 
+ 362:..\common\uart_ldr/UART_BOOT.c **** /*******************************************************************************
+ 363:..\common\uart_ldr/UART_BOOT.c **** * Function Name: CyBtldrCommRead.
+ 364:..\common\uart_ldr/UART_BOOT.c **** ********************************************************************************
+ 365:..\common\uart_ldr/UART_BOOT.c **** *
+ 366:..\common\uart_ldr/UART_BOOT.c **** * Summary:
+ 367:..\common\uart_ldr/UART_BOOT.c **** *  Allows the caller to read data from the boot loader host. The function will
+ 368:..\common\uart_ldr/UART_BOOT.c **** *  handle polling to allow a block of data to be completely received from the
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 16
+
+
+ 369:..\common\uart_ldr/UART_BOOT.c **** *  host device.
+ 370:..\common\uart_ldr/UART_BOOT.c **** *
+ 371:..\common\uart_ldr/UART_BOOT.c **** * Parameters:
+ 372:..\common\uart_ldr/UART_BOOT.c **** *  pData:    A pointer to the area to store the block of data received
+ 373:..\common\uart_ldr/UART_BOOT.c **** *             from the device.
+ 374:..\common\uart_ldr/UART_BOOT.c **** *  size:     The number of bytes to read.
+ 375:..\common\uart_ldr/UART_BOOT.c **** *  count:    Pointer to an unsigned short variable to write the number
+ 376:..\common\uart_ldr/UART_BOOT.c **** *             of bytes actually read.
+ 377:..\common\uart_ldr/UART_BOOT.c **** *  timeOut:  Number of units to wait before returning because of a timeOut.
+ 378:..\common\uart_ldr/UART_BOOT.c **** *            Timeout is measured in 10s of ms.
+ 379:..\common\uart_ldr/UART_BOOT.c **** *
+ 380:..\common\uart_ldr/UART_BOOT.c **** * Return:
+ 381:..\common\uart_ldr/UART_BOOT.c **** *  Returns the value that best describes the problem.
+ 382:..\common\uart_ldr/UART_BOOT.c **** *
+ 383:..\common\uart_ldr/UART_BOOT.c **** * Reentrant:
+ 384:..\common\uart_ldr/UART_BOOT.c **** *  No
+ 385:..\common\uart_ldr/UART_BOOT.c **** *
+ 386:..\common\uart_ldr/UART_BOOT.c **** *******************************************************************************/
+ 387:..\common\uart_ldr/UART_BOOT.c **** cystatus USB_CyBtldrCommRead(uint8 pData[], uint16 size, uint16 * count, uint8 timeOut) CYSMALL    
+ 388:..\common\uart_ldr/UART_BOOT.c **** {
+ 473              		.loc 1 388 0
+ 474              		.cfi_startproc
+ 475              		@ args = 0, pretend = 0, frame = 0
+ 476              		@ frame_needed = 0, uses_anonymous_args = 0
+ 477              	.LVL60:
+ 478 0000 2DE9F843 		push	{r3, r4, r5, r6, r7, r8, r9, lr}
+ 479              		.cfi_def_cfa_offset 32
+ 480              		.cfi_offset 3, -32
+ 481              		.cfi_offset 4, -28
+ 482              		.cfi_offset 5, -24
+ 483              		.cfi_offset 6, -20
+ 484              		.cfi_offset 7, -16
+ 485              		.cfi_offset 8, -12
+ 486              		.cfi_offset 9, -8
+ 487              		.cfi_offset 14, -4
+ 389:..\common\uart_ldr/UART_BOOT.c ****     cystatus retCode;
+ 390:..\common\uart_ldr/UART_BOOT.c ****     uint16 timeoutMs;
+ 391:..\common\uart_ldr/UART_BOOT.c **** 
+ 392:..\common\uart_ldr/UART_BOOT.c ****     timeoutMs = ((uint16) 10u * timeOut);  /* Convert from 10mS check to number 1mS checks */
+ 488              		.loc 1 392 0
+ 489 0004 03EB8303 		add	r3, r3, r3, lsl #2
+ 490              	.LVL61:
+ 491 0008 5C00     		lsls	r4, r3, #1
+ 492              	.LVL62:
+ 393:..\common\uart_ldr/UART_BOOT.c ****     
+ 394:..\common\uart_ldr/UART_BOOT.c ****     if (size > USBUART_BTLDR_SIZEOF_WRITE_BUFFER)
+ 395:..\common\uart_ldr/UART_BOOT.c ****     {
+ 396:..\common\uart_ldr/UART_BOOT.c ****         size = USBUART_BTLDR_SIZEOF_WRITE_BUFFER;
+ 397:..\common\uart_ldr/UART_BOOT.c ****     }
+ 398:..\common\uart_ldr/UART_BOOT.c **** 
+ 399:..\common\uart_ldr/UART_BOOT.c ****     /* Wait on enumeration in first time */
+ 400:..\common\uart_ldr/UART_BOOT.c ****     if (0u != USBUART_started)
+ 493              		.loc 1 400 0
+ 494 000a 234B     		ldr	r3, .L68
+ 388:..\common\uart_ldr/UART_BOOT.c ****     cystatus retCode;
+ 495              		.loc 1 388 0
+ 496 000c 1746     		mov	r7, r2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 17
+
+
+ 497              		.loc 1 400 0
+ 498 000e 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 499              	.LVL63:
+ 388:..\common\uart_ldr/UART_BOOT.c ****     cystatus retCode;
+ 500              		.loc 1 388 0
+ 501 0010 8046     		mov	r8, r0
+ 502 0012 8946     		mov	r9, r1
+ 503              	.LVL64:
+ 504 0014 1E46     		mov	r6, r3
+ 505              		.loc 1 400 0
+ 506 0016 A2B1     		cbz	r2, .L46
+ 507 0018 2546     		mov	r5, r4
+ 508              	.LVL65:
+ 509              	.L47:
+ 401:..\common\uart_ldr/UART_BOOT.c ****     {
+ 402:..\common\uart_ldr/UART_BOOT.c ****         /* Wait for Device to enumerate */
+ 403:..\common\uart_ldr/UART_BOOT.c ****         while ((0u ==USBUART_GetConfiguration()) && (0u != timeoutMs))
+ 510              		.loc 1 403 0
+ 511 001a FFF7FEFF 		bl	USBUART_GetConfiguration
+ 512              	.LVL66:
+ 513 001e 30B9     		cbnz	r0, .L48
+ 514              		.loc 1 403 0 is_stmt 0 discriminator 1
+ 515 0020 2DB1     		cbz	r5, .L48
+ 404:..\common\uart_ldr/UART_BOOT.c ****         {
+ 405:..\common\uart_ldr/UART_BOOT.c ****             CyDelay(1);
+ 516              		.loc 1 405 0 is_stmt 1
+ 517 0022 0120     		movs	r0, #1
+ 406:..\common\uart_ldr/UART_BOOT.c ****             timeoutMs--;
+ 518              		.loc 1 406 0
+ 519 0024 013D     		subs	r5, r5, #1
+ 520              	.LVL67:
+ 405:..\common\uart_ldr/UART_BOOT.c ****             timeoutMs--;
+ 521              		.loc 1 405 0
+ 522 0026 FFF7FEFF 		bl	CyDelay
+ 523              	.LVL68:
+ 524              		.loc 1 406 0
+ 525 002a ADB2     		uxth	r5, r5
+ 526              	.LVL69:
+ 527 002c F5E7     		b	.L47
+ 528              	.L48:
+ 407:..\common\uart_ldr/UART_BOOT.c ****         }
+ 408:..\common\uart_ldr/UART_BOOT.c ****         
+ 409:..\common\uart_ldr/UART_BOOT.c ****         /* Enable first OUT, if enumeration complete */
+ 410:..\common\uart_ldr/UART_BOOT.c ****         if (0u != USBUART_GetConfiguration())
+ 529              		.loc 1 410 0
+ 530 002e FFF7FEFF 		bl	USBUART_GetConfiguration
+ 531              	.LVL70:
+ 532 0032 A8B1     		cbz	r0, .L52
+ 411:..\common\uart_ldr/UART_BOOT.c ****         {
+ 412:..\common\uart_ldr/UART_BOOT.c ****             (void) USBUART_IsConfigurationChanged();  /* Clear configuration changes state status *
+ 533              		.loc 1 412 0
+ 534 0034 FFF7FEFF 		bl	USBUART_IsConfigurationChanged
+ 535              	.LVL71:
+ 413:..\common\uart_ldr/UART_BOOT.c ****             CyBtldrCommReset();
+ 536              		.loc 1 413 0
+ 537 0038 FFF7FEFF 		bl	UART_CyBtldrCommReset
+ 538              	.LVL72:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 18
+
+
+ 414:..\common\uart_ldr/UART_BOOT.c ****             USBUART_started = 0u;
+ 539              		.loc 1 414 0
+ 540 003c 0023     		movs	r3, #0
+ 541 003e 3370     		strb	r3, [r6]
+ 542 0040 0EE0     		b	.L52
+ 543              	.LVL73:
+ 544              	.L46:
+ 415:..\common\uart_ldr/UART_BOOT.c ****         }
+ 416:..\common\uart_ldr/UART_BOOT.c ****     }
+ 417:..\common\uart_ldr/UART_BOOT.c ****     else /* Check for configuration changes, has been done by Host */
+ 418:..\common\uart_ldr/UART_BOOT.c ****     {
+ 419:..\common\uart_ldr/UART_BOOT.c ****         if (0u != USBUART_IsConfigurationChanged()) /* Host could send double SET_INTERFACE request
+ 545              		.loc 1 419 0
+ 546 0042 FFF7FEFF 		bl	USBUART_IsConfigurationChanged
+ 547              	.LVL74:
+ 548 0046 58B1     		cbz	r0, .L52
+ 420:..\common\uart_ldr/UART_BOOT.c ****         {
+ 421:..\common\uart_ldr/UART_BOOT.c ****             if (0u != USBUART_GetConfiguration())   /* Init OUT endpoints when device reconfigured 
+ 549              		.loc 1 421 0
+ 550 0048 FFF7FEFF 		bl	USBUART_GetConfiguration
+ 551              	.LVL75:
+ 552 004c 40B1     		cbz	r0, .L52
+ 422:..\common\uart_ldr/UART_BOOT.c ****             {
+ 423:..\common\uart_ldr/UART_BOOT.c ****                 CyBtldrCommReset();
+ 553              		.loc 1 423 0
+ 554 004e FFF7FEFF 		bl	UART_CyBtldrCommReset
+ 555              	.LVL76:
+ 556 0052 05E0     		b	.L52
+ 557              	.L67:
+ 424:..\common\uart_ldr/UART_BOOT.c ****             }
+ 425:..\common\uart_ldr/UART_BOOT.c ****         }
+ 426:..\common\uart_ldr/UART_BOOT.c ****     }
+ 427:..\common\uart_ldr/UART_BOOT.c ****     
+ 428:..\common\uart_ldr/UART_BOOT.c ****     timeoutMs = ((uint16) 10u * timeOut); /* Re-arm timeout */
+ 429:..\common\uart_ldr/UART_BOOT.c ****     
+ 430:..\common\uart_ldr/UART_BOOT.c ****     /* Wait on next packet */
+ 431:..\common\uart_ldr/UART_BOOT.c ****     while((USBUART_GetEPState(USBUART_BTLDR_OUT_EP_1) != USBUART_OUT_BUFFER_FULL) && \
+ 558              		.loc 1 431 0 discriminator 1
+ 559 0054 4CB1     		cbz	r4, .L54
+ 432:..\common\uart_ldr/UART_BOOT.c ****           (0u != timeoutMs))
+ 433:..\common\uart_ldr/UART_BOOT.c ****     {
+ 434:..\common\uart_ldr/UART_BOOT.c ****         CyDelay(1);
+ 560              		.loc 1 434 0
+ 561 0056 0120     		movs	r0, #1
+ 562 0058 FFF7FEFF 		bl	CyDelay
+ 563              	.LVL77:
+ 435:..\common\uart_ldr/UART_BOOT.c ****         timeoutMs--;
+ 564              		.loc 1 435 0
+ 565 005c 013C     		subs	r4, r4, #1
+ 566              	.LVL78:
+ 567 005e A4B2     		uxth	r4, r4
+ 568              	.LVL79:
+ 569              	.L52:
+ 431:..\common\uart_ldr/UART_BOOT.c ****           (0u != timeoutMs))
+ 570              		.loc 1 431 0
+ 571 0060 0320     		movs	r0, #3
+ 572 0062 FFF7FEFF 		bl	USBUART_GetEPState
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 19
+
+
+ 573              	.LVL80:
+ 574 0066 0128     		cmp	r0, #1
+ 575 0068 F4D1     		bne	.L67
+ 576              	.L54:
+ 436:..\common\uart_ldr/UART_BOOT.c ****     }
+ 437:..\common\uart_ldr/UART_BOOT.c **** 
+ 438:..\common\uart_ldr/UART_BOOT.c ****     /* OUT EP has completed */
+ 439:..\common\uart_ldr/UART_BOOT.c ****     if (USBUART_GetEPState(USBUART_BTLDR_OUT_EP_1) == USBUART_OUT_BUFFER_FULL)
+ 577              		.loc 1 439 0
+ 578 006a 0320     		movs	r0, #3
+ 579 006c FFF7FEFF 		bl	USBUART_GetEPState
+ 580              	.LVL81:
+ 581 0070 0128     		cmp	r0, #1
+ 582 0072 0BD1     		bne	.L56
+ 440:..\common\uart_ldr/UART_BOOT.c ****     {
+ 441:..\common\uart_ldr/UART_BOOT.c ****         *count = USBUART_ReadOutEP(USBUART_BTLDR_OUT_EP_1, pData, size);
+ 583              		.loc 1 441 0
+ 584 0074 4A46     		mov	r2, r9
+ 585 0076 402A     		cmp	r2, #64
+ 586 0078 28BF     		it	cs
+ 587 007a 4022     		movcs	r2, #64
+ 588 007c 4146     		mov	r1, r8
+ 589 007e 0320     		movs	r0, #3
+ 590 0080 FFF7FEFF 		bl	USBUART_ReadOutEP
+ 591              	.LVL82:
+ 592 0084 3880     		strh	r0, [r7]	@ movhi
+ 593              	.LVL83:
+ 442:..\common\uart_ldr/UART_BOOT.c ****         retCode = CYRET_SUCCESS;
+ 594              		.loc 1 442 0
+ 595 0086 0020     		movs	r0, #0
+ 596 0088 BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 597              	.LVL84:
+ 598              	.L56:
+ 443:..\common\uart_ldr/UART_BOOT.c ****     }
+ 444:..\common\uart_ldr/UART_BOOT.c ****     else
+ 445:..\common\uart_ldr/UART_BOOT.c ****     {
+ 446:..\common\uart_ldr/UART_BOOT.c ****         *count = 0u;
+ 599              		.loc 1 446 0
+ 600 008c 0023     		movs	r3, #0
+ 601 008e 3B80     		strh	r3, [r7]	@ movhi
+ 602              	.LVL85:
+ 447:..\common\uart_ldr/UART_BOOT.c ****         retCode = CYRET_TIMEOUT;
+ 603              		.loc 1 447 0
+ 604 0090 1020     		movs	r0, #16
+ 605              	.LVL86:
+ 448:..\common\uart_ldr/UART_BOOT.c ****     }
+ 449:..\common\uart_ldr/UART_BOOT.c ****     
+ 450:..\common\uart_ldr/UART_BOOT.c ****     return(retCode);
+ 451:..\common\uart_ldr/UART_BOOT.c **** }
+ 606              		.loc 1 451 0
+ 607 0092 BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+ 608              	.LVL87:
+ 609              	.L69:
+ 610 0096 00BF     		.align	2
+ 611              	.L68:
+ 612 0098 00000000 		.word	.LANCHOR0
+ 613              		.cfi_endproc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 20
+
+
+ 614              	.LFE69:
+ 615              		.size	USB_CyBtldrCommRead, .-USB_CyBtldrCommRead
+ 616              		.bss
+ 617              		.set	.LANCHOR0,. + 0
+ 618              		.type	USBUART_started, %object
+ 619              		.size	USBUART_started, 1
+ 620              	USBUART_started:
+ 621 0000 00       		.space	1
+ 622              		.text
+ 623              	.Letext0:
+ 624              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 625              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 626              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 627              		.file 5 "Generated_Source\\PSoC5/USBUART.h"
+ 628              		.file 6 "Generated_Source\\PSoC5/CyLib.h"
+ 629              		.file 7 "..\\common\\uart_ldr\\UART.h"
+ 630              		.file 8 "Generated_Source\\PSoC5/USBUART_cdc.h"
+ 631              		.file 9 "Generated_Source\\PSoC5/core_cm3.h"
+ 632              		.section	.debug_info,"",%progbits
+ 633              	.Ldebug_info0:
+ 634 0000 4D060000 		.4byte	0x64d
+ 635 0004 0400     		.2byte	0x4
+ 636 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 637 000a 04       		.byte	0x4
+ 638 000b 01       		.uleb128 0x1
+ 639 000c 28030000 		.4byte	.LASF59
+ 640 0010 0C       		.byte	0xc
+ 641 0011 AF000000 		.4byte	.LASF60
+ 642 0015 25000000 		.4byte	.LASF61
+ 643 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 644 001d 00000000 		.4byte	0
+ 645 0021 00000000 		.4byte	.Ldebug_line0
+ 646 0025 02       		.uleb128 0x2
+ 647 0026 01       		.byte	0x1
+ 648 0027 06       		.byte	0x6
+ 649 0028 A1010000 		.4byte	.LASF0
+ 650 002c 02       		.uleb128 0x2
+ 651 002d 01       		.byte	0x1
+ 652 002e 08       		.byte	0x8
+ 653 002f 6E010000 		.4byte	.LASF1
+ 654 0033 02       		.uleb128 0x2
+ 655 0034 02       		.byte	0x2
+ 656 0035 05       		.byte	0x5
+ 657 0036 7B000000 		.4byte	.LASF2
+ 658 003a 03       		.uleb128 0x3
+ 659 003b 70000000 		.4byte	.LASF4
+ 660 003f 02       		.byte	0x2
+ 661 0040 2B       		.byte	0x2b
+ 662 0041 45000000 		.4byte	0x45
+ 663 0045 02       		.uleb128 0x2
+ 664 0046 02       		.byte	0x2
+ 665 0047 07       		.byte	0x7
+ 666 0048 F8010000 		.4byte	.LASF3
+ 667 004c 03       		.uleb128 0x3
+ 668 004d E3020000 		.4byte	.LASF5
+ 669 0051 02       		.byte	0x2
+ 670 0052 3F       		.byte	0x3f
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 21
+
+
+ 671 0053 57000000 		.4byte	0x57
+ 672 0057 02       		.uleb128 0x2
+ 673 0058 04       		.byte	0x4
+ 674 0059 05       		.byte	0x5
+ 675 005a 14010000 		.4byte	.LASF6
+ 676 005e 02       		.uleb128 0x2
+ 677 005f 04       		.byte	0x4
+ 678 0060 07       		.byte	0x7
+ 679 0061 A9020000 		.4byte	.LASF7
+ 680 0065 02       		.uleb128 0x2
+ 681 0066 08       		.byte	0x8
+ 682 0067 05       		.byte	0x5
+ 683 0068 F3000000 		.4byte	.LASF8
+ 684 006c 02       		.uleb128 0x2
+ 685 006d 08       		.byte	0x8
+ 686 006e 07       		.byte	0x7
+ 687 006f AD010000 		.4byte	.LASF9
+ 688 0073 04       		.uleb128 0x4
+ 689 0074 04       		.byte	0x4
+ 690 0075 05       		.byte	0x5
+ 691 0076 696E7400 		.ascii	"int\000"
+ 692 007a 02       		.uleb128 0x2
+ 693 007b 04       		.byte	0x4
+ 694 007c 07       		.byte	0x7
+ 695 007d D2010000 		.4byte	.LASF10
+ 696 0081 03       		.uleb128 0x3
+ 697 0082 DF010000 		.4byte	.LASF11
+ 698 0086 03       		.byte	0x3
+ 699 0087 24       		.byte	0x24
+ 700 0088 3A000000 		.4byte	0x3a
+ 701 008c 03       		.uleb128 0x3
+ 702 008d 5D020000 		.4byte	.LASF12
+ 703 0091 03       		.byte	0x3
+ 704 0092 2C       		.byte	0x2c
+ 705 0093 4C000000 		.4byte	0x4c
+ 706 0097 05       		.uleb128 0x5
+ 707 0098 CE000000 		.4byte	.LASF13
+ 708 009c 04       		.byte	0x4
+ 709 009d 9201     		.2byte	0x192
+ 710 009f 2C000000 		.4byte	0x2c
+ 711 00a3 05       		.uleb128 0x5
+ 712 00a4 A8000000 		.4byte	.LASF14
+ 713 00a8 04       		.byte	0x4
+ 714 00a9 9301     		.2byte	0x193
+ 715 00ab 45000000 		.4byte	0x45
+ 716 00af 02       		.uleb128 0x2
+ 717 00b0 04       		.byte	0x4
+ 718 00b1 04       		.byte	0x4
+ 719 00b2 D4000000 		.4byte	.LASF15
+ 720 00b6 02       		.uleb128 0x2
+ 721 00b7 08       		.byte	0x8
+ 722 00b8 04       		.byte	0x4
+ 723 00b9 BB020000 		.4byte	.LASF16
+ 724 00bd 02       		.uleb128 0x2
+ 725 00be 01       		.byte	0x1
+ 726 00bf 08       		.byte	0x8
+ 727 00c0 23020000 		.4byte	.LASF17
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 22
+
+
+ 728 00c4 05       		.uleb128 0x5
+ 729 00c5 36020000 		.4byte	.LASF18
+ 730 00c9 04       		.byte	0x4
+ 731 00ca 3402     		.2byte	0x234
+ 732 00cc 5E000000 		.4byte	0x5e
+ 733 00d0 02       		.uleb128 0x2
+ 734 00d1 08       		.byte	0x8
+ 735 00d2 04       		.byte	0x4
+ 736 00d3 50010000 		.4byte	.LASF19
+ 737 00d7 02       		.uleb128 0x2
+ 738 00d8 04       		.byte	0x4
+ 739 00d9 07       		.byte	0x7
+ 740 00da 53000000 		.4byte	.LASF20
+ 741 00de 06       		.uleb128 0x6
+ 742 00df 04       		.byte	0x4
+ 743 00e0 97000000 		.4byte	0x97
+ 744 00e4 07       		.uleb128 0x7
+ 745 00e5 CD020000 		.4byte	.LASF21
+ 746 00e9 01       		.byte	0x1
+ 747 00ea 2F       		.byte	0x2f
+ 748 00eb 00000000 		.4byte	.LFB63
+ 749 00ef 40000000 		.4byte	.LFE63-.LFB63
+ 750 00f3 01       		.uleb128 0x1
+ 751 00f4 9C       		.byte	0x9c
+ 752 00f5 58010000 		.4byte	0x158
+ 753 00f9 08       		.uleb128 0x8
+ 754 00fa 66000000 		.4byte	.LASF28
+ 755 00fe 01       		.byte	0x1
+ 756 00ff 39       		.byte	0x39
+ 757 0100 81000000 		.4byte	0x81
+ 758 0104 00000000 		.4byte	.LLST0
+ 759 0108 09       		.uleb128 0x9
+ 760 0109 10000000 		.4byte	.LVL0
+ 761 010d 8E050000 		.4byte	0x58e
+ 762 0111 20010000 		.4byte	0x120
+ 763 0115 0A       		.uleb128 0xa
+ 764 0116 01       		.uleb128 0x1
+ 765 0117 50       		.byte	0x50
+ 766 0118 01       		.uleb128 0x1
+ 767 0119 30       		.byte	0x30
+ 768 011a 0A       		.uleb128 0xa
+ 769 011b 01       		.uleb128 0x1
+ 770 011c 51       		.byte	0x51
+ 771 011d 01       		.uleb128 0x1
+ 772 011e 32       		.byte	0x32
+ 773 011f 00       		.byte	0
+ 774 0120 0B       		.uleb128 0xb
+ 775 0121 1A000000 		.4byte	.LVL2
+ 776 0125 9A050000 		.4byte	0x59a
+ 777 0129 09       		.uleb128 0x9
+ 778 012a 28000000 		.4byte	.LVL4
+ 779 012e A6050000 		.4byte	0x5a6
+ 780 0132 3C010000 		.4byte	0x13c
+ 781 0136 0A       		.uleb128 0xa
+ 782 0137 01       		.uleb128 0x1
+ 783 0138 50       		.byte	0x50
+ 784 0139 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 23
+
+
+ 785 013a 31       		.byte	0x31
+ 786 013b 00       		.byte	0
+ 787 013c 0B       		.uleb128 0xb
+ 788 013d 2E000000 		.4byte	.LVL6
+ 789 0141 B1050000 		.4byte	0x5b1
+ 790 0145 0B       		.uleb128 0xb
+ 791 0146 32000000 		.4byte	.LVL7
+ 792 014a BC050000 		.4byte	0x5bc
+ 793 014e 0C       		.uleb128 0xc
+ 794 014f 3A000000 		.4byte	.LVL8
+ 795 0153 C7050000 		.4byte	0x5c7
+ 796 0157 00       		.byte	0
+ 797 0158 07       		.uleb128 0x7
+ 798 0159 E3030000 		.4byte	.LASF22
+ 799 015d 01       		.byte	0x1
+ 800 015e 58       		.byte	0x58
+ 801 015f 00000000 		.4byte	.LFB64
+ 802 0163 0E000000 		.4byte	.LFE64-.LFB64
+ 803 0167 01       		.uleb128 0x1
+ 804 0168 9C       		.byte	0x9c
+ 805 0169 80010000 		.4byte	0x180
+ 806 016d 0B       		.uleb128 0xb
+ 807 016e 06000000 		.4byte	.LVL9
+ 808 0172 D2050000 		.4byte	0x5d2
+ 809 0176 0C       		.uleb128 0xc
+ 810 0177 0E000000 		.4byte	.LVL10
+ 811 017b DD050000 		.4byte	0x5dd
+ 812 017f 00       		.byte	0
+ 813 0180 07       		.uleb128 0x7
+ 814 0181 82020000 		.4byte	.LASF23
+ 815 0185 01       		.byte	0x1
+ 816 0186 6E       		.byte	0x6e
+ 817 0187 00000000 		.4byte	.LFB65
+ 818 018b 12000000 		.4byte	.LFE65-.LFB65
+ 819 018f 01       		.uleb128 0x1
+ 820 0190 9C       		.byte	0x9c
+ 821 0191 B1010000 		.4byte	0x1b1
+ 822 0195 0B       		.uleb128 0xb
+ 823 0196 06000000 		.4byte	.LVL11
+ 824 019a BC050000 		.4byte	0x5bc
+ 825 019e 0B       		.uleb128 0xb
+ 826 019f 0A000000 		.4byte	.LVL12
+ 827 01a3 C7050000 		.4byte	0x5c7
+ 828 01a7 0C       		.uleb128 0xc
+ 829 01a8 12000000 		.4byte	.LVL13
+ 830 01ac E9050000 		.4byte	0x5e9
+ 831 01b0 00       		.byte	0
+ 832 01b1 0D       		.uleb128 0xd
+ 833 01b2 ED020000 		.4byte	.LASF30
+ 834 01b6 01       		.byte	0x1
+ 835 01b7 8F       		.byte	0x8f
+ 836 01b8 C4000000 		.4byte	0xc4
+ 837 01bc 00000000 		.4byte	.LFB66
+ 838 01c0 26000000 		.4byte	.LFE66-.LFB66
+ 839 01c4 01       		.uleb128 0x1
+ 840 01c5 9C       		.byte	0x9c
+ 841 01c6 28020000 		.4byte	0x228
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 24
+
+
+ 842 01ca 0E       		.uleb128 0xe
+ 843 01cb 1F000000 		.4byte	.LASF24
+ 844 01cf 01       		.byte	0x1
+ 845 01d0 8F       		.byte	0x8f
+ 846 01d1 28020000 		.4byte	0x228
+ 847 01d5 22000000 		.4byte	.LLST1
+ 848 01d9 0E       		.uleb128 0xe
+ 849 01da C2020000 		.4byte	.LASF25
+ 850 01de 01       		.byte	0x1
+ 851 01df 8F       		.byte	0x8f
+ 852 01e0 A3000000 		.4byte	0xa3
+ 853 01e4 4E000000 		.4byte	.LLST2
+ 854 01e8 0E       		.uleb128 0xe
+ 855 01e9 C7020000 		.4byte	.LASF26
+ 856 01ed 01       		.byte	0x1
+ 857 01ee 8F       		.byte	0x8f
+ 858 01ef 33020000 		.4byte	0x233
+ 859 01f3 6F000000 		.4byte	.LLST3
+ 860 01f7 0E       		.uleb128 0xe
+ 861 01f8 65020000 		.4byte	.LASF27
+ 862 01fc 01       		.byte	0x1
+ 863 01fd 8F       		.byte	0x8f
+ 864 01fe 97000000 		.4byte	0x97
+ 865 0202 8D000000 		.4byte	.LLST4
+ 866 0206 08       		.uleb128 0x8
+ 867 0207 4A000000 		.4byte	.LASF29
+ 868 020b 01       		.byte	0x1
+ 869 020c 92       		.byte	0x92
+ 870 020d A3000000 		.4byte	0xa3
+ 871 0211 AE000000 		.4byte	.LLST5
+ 872 0215 0B       		.uleb128 0xb
+ 873 0216 0C000000 		.4byte	.LVL15
+ 874 021a BC050000 		.4byte	0x5bc
+ 875 021e 0B       		.uleb128 0xb
+ 876 021f 1E000000 		.4byte	.LVL18
+ 877 0223 F4050000 		.4byte	0x5f4
+ 878 0227 00       		.byte	0
+ 879 0228 06       		.uleb128 0x6
+ 880 0229 04       		.byte	0x4
+ 881 022a 2E020000 		.4byte	0x22e
+ 882 022e 0F       		.uleb128 0xf
+ 883 022f 97000000 		.4byte	0x97
+ 884 0233 06       		.uleb128 0x6
+ 885 0234 04       		.byte	0x4
+ 886 0235 A3000000 		.4byte	0xa3
+ 887 0239 0D       		.uleb128 0xd
+ 888 023a 6D020000 		.4byte	.LASF31
+ 889 023e 01       		.byte	0x1
+ 890 023f C5       		.byte	0xc5
+ 891 0240 C4000000 		.4byte	0xc4
+ 892 0244 00000000 		.4byte	.LFB67
+ 893 0248 9E000000 		.4byte	.LFE67-.LFB67
+ 894 024c 01       		.uleb128 0x1
+ 895 024d 9C       		.byte	0x9c
+ 896 024e 46030000 		.4byte	0x346
+ 897 0252 0E       		.uleb128 0xe
+ 898 0253 1F000000 		.4byte	.LASF24
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 25
+
+
+ 899 0257 01       		.byte	0x1
+ 900 0258 C5       		.byte	0xc5
+ 901 0259 DE000000 		.4byte	0xde
+ 902 025d E8000000 		.4byte	.LLST6
+ 903 0261 0E       		.uleb128 0xe
+ 904 0262 C2020000 		.4byte	.LASF25
+ 905 0266 01       		.byte	0x1
+ 906 0267 C5       		.byte	0xc5
+ 907 0268 A3000000 		.4byte	0xa3
+ 908 026c 06010000 		.4byte	.LLST7
+ 909 0270 0E       		.uleb128 0xe
+ 910 0271 C7020000 		.4byte	.LASF26
+ 911 0275 01       		.byte	0x1
+ 912 0276 C5       		.byte	0xc5
+ 913 0277 33020000 		.4byte	0x233
+ 914 027b 27010000 		.4byte	.LLST8
+ 915 027f 0E       		.uleb128 0xe
+ 916 0280 65020000 		.4byte	.LASF27
+ 917 0284 01       		.byte	0x1
+ 918 0285 C5       		.byte	0xc5
+ 919 0286 97000000 		.4byte	0x97
+ 920 028a 45010000 		.4byte	.LLST9
+ 921 028e 08       		.uleb128 0x8
+ 922 028f 0D030000 		.4byte	.LASF32
+ 923 0293 01       		.byte	0x1
+ 924 0294 C8       		.byte	0xc8
+ 925 0295 A3000000 		.4byte	0xa3
+ 926 0299 66010000 		.4byte	.LLST10
+ 927 029d 08       		.uleb128 0x8
+ 928 029e C4010000 		.4byte	.LASF33
+ 929 02a2 01       		.byte	0x1
+ 930 02a3 C9       		.byte	0xc9
+ 931 02a4 A3000000 		.4byte	0xa3
+ 932 02a8 C7010000 		.4byte	.LLST11
+ 933 02ac 08       		.uleb128 0x8
+ 934 02ad 03030000 		.4byte	.LASF34
+ 935 02b1 01       		.byte	0x1
+ 936 02b2 CA       		.byte	0xca
+ 937 02b3 A3000000 		.4byte	0xa3
+ 938 02b7 FB010000 		.4byte	.LLST12
+ 939 02bb 08       		.uleb128 0x8
+ 940 02bc 1D010000 		.4byte	.LASF35
+ 941 02c0 01       		.byte	0x1
+ 942 02c1 CB       		.byte	0xcb
+ 943 02c2 A3000000 		.4byte	0xa3
+ 944 02c6 0E020000 		.4byte	.LLST13
+ 945 02ca 08       		.uleb128 0x8
+ 946 02cb 0B020000 		.4byte	.LASF36
+ 947 02cf 01       		.byte	0x1
+ 948 02d0 CD       		.byte	0xcd
+ 949 02d1 C4000000 		.4byte	0xc4
+ 950 02d5 26020000 		.4byte	.LLST14
+ 951 02d9 0B       		.uleb128 0xb
+ 952 02da 1A000000 		.4byte	.LVL22
+ 953 02de FF050000 		.4byte	0x5ff
+ 954 02e2 0B       		.uleb128 0xb
+ 955 02e3 22000000 		.4byte	.LVL24
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 26
+
+
+ 956 02e7 FF050000 		.4byte	0x5ff
+ 957 02eb 09       		.uleb128 0x9
+ 958 02ec 2A000000 		.4byte	.LVL26
+ 959 02f0 0A060000 		.4byte	0x60a
+ 960 02f4 FF020000 		.4byte	0x2ff
+ 961 02f8 0A       		.uleb128 0xa
+ 962 02f9 01       		.uleb128 0x1
+ 963 02fa 50       		.byte	0x50
+ 964 02fb 02       		.uleb128 0x2
+ 965 02fc 08       		.byte	0x8
+ 966 02fd 64       		.byte	0x64
+ 967 02fe 00       		.byte	0
+ 968 02ff 0B       		.uleb128 0xb
+ 969 0300 2E000000 		.4byte	.LVL27
+ 970 0304 FF050000 		.4byte	0x5ff
+ 971 0308 09       		.uleb128 0x9
+ 972 0309 3C000000 		.4byte	.LVL29
+ 973 030d A6050000 		.4byte	0x5a6
+ 974 0311 1B030000 		.4byte	0x31b
+ 975 0315 0A       		.uleb128 0xa
+ 976 0316 01       		.uleb128 0x1
+ 977 0317 50       		.byte	0x50
+ 978 0318 01       		.uleb128 0x1
+ 979 0319 31       		.byte	0x31
+ 980 031a 00       		.byte	0
+ 981 031b 0B       		.uleb128 0xb
+ 982 031c 48000000 		.4byte	.LVL33
+ 983 0320 FF050000 		.4byte	0x5ff
+ 984 0324 0B       		.uleb128 0xb
+ 985 0325 4E000000 		.4byte	.LVL34
+ 986 0329 FF050000 		.4byte	0x5ff
+ 987 032d 0B       		.uleb128 0xb
+ 988 032e 74000000 		.4byte	.LVL38
+ 989 0332 15060000 		.4byte	0x615
+ 990 0336 10       		.uleb128 0x10
+ 991 0337 94000000 		.4byte	.LVL42
+ 992 033b A6050000 		.4byte	0x5a6
+ 993 033f 0A       		.uleb128 0xa
+ 994 0340 01       		.uleb128 0x1
+ 995 0341 50       		.byte	0x50
+ 996 0342 01       		.uleb128 0x1
+ 997 0343 31       		.byte	0x31
+ 998 0344 00       		.byte	0
+ 999 0345 00       		.byte	0
+ 1000 0346 11       		.uleb128 0x11
+ 1001 0347 93000000 		.4byte	.LASF37
+ 1002 034b 01       		.byte	0x1
+ 1003 034c 3F01     		.2byte	0x13f
+ 1004 034e C4000000 		.4byte	0xc4
+ 1005 0352 00000000 		.4byte	.LFB68
+ 1006 0356 6C000000 		.4byte	.LFE68-.LFB68
+ 1007 035a 01       		.uleb128 0x1
+ 1008 035b 9C       		.byte	0x9c
+ 1009 035c 38040000 		.4byte	0x438
+ 1010 0360 12       		.uleb128 0x12
+ 1011 0361 1F000000 		.4byte	.LASF24
+ 1012 0365 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 27
+
+
+ 1013 0366 3F01     		.2byte	0x13f
+ 1014 0368 28020000 		.4byte	0x228
+ 1015 036c 45020000 		.4byte	.LLST15
+ 1016 0370 12       		.uleb128 0x12
+ 1017 0371 C2020000 		.4byte	.LASF25
+ 1018 0375 01       		.byte	0x1
+ 1019 0376 3F01     		.2byte	0x13f
+ 1020 0378 A3000000 		.4byte	0xa3
+ 1021 037c 63020000 		.4byte	.LLST16
+ 1022 0380 12       		.uleb128 0x12
+ 1023 0381 C7020000 		.4byte	.LASF26
+ 1024 0385 01       		.byte	0x1
+ 1025 0386 3F01     		.2byte	0x13f
+ 1026 0388 33020000 		.4byte	0x233
+ 1027 038c 84020000 		.4byte	.LLST17
+ 1028 0390 12       		.uleb128 0x12
+ 1029 0391 65020000 		.4byte	.LASF27
+ 1030 0395 01       		.byte	0x1
+ 1031 0396 3F01     		.2byte	0x13f
+ 1032 0398 97000000 		.4byte	0x97
+ 1033 039c A2020000 		.4byte	.LLST18
+ 1034 03a0 13       		.uleb128 0x13
+ 1035 03a1 5C010000 		.4byte	.LASF38
+ 1036 03a5 01       		.byte	0x1
+ 1037 03a6 4101     		.2byte	0x141
+ 1038 03a8 C4000000 		.4byte	0xc4
+ 1039 03ac C3020000 		.4byte	.LLST19
+ 1040 03b0 13       		.uleb128 0x13
+ 1041 03b1 66000000 		.4byte	.LASF28
+ 1042 03b5 01       		.byte	0x1
+ 1043 03b6 4201     		.2byte	0x142
+ 1044 03b8 A3000000 		.4byte	0xa3
+ 1045 03bc E2020000 		.4byte	.LLST20
+ 1046 03c0 13       		.uleb128 0x13
+ 1047 03c1 4A000000 		.4byte	.LASF29
+ 1048 03c5 01       		.byte	0x1
+ 1049 03c6 4301     		.2byte	0x143
+ 1050 03c8 A3000000 		.4byte	0xa3
+ 1051 03cc 00030000 		.4byte	.LLST21
+ 1052 03d0 13       		.uleb128 0x13
+ 1053 03d1 28020000 		.4byte	.LASF39
+ 1054 03d5 01       		.byte	0x1
+ 1055 03d6 4401     		.2byte	0x144
+ 1056 03d8 97000000 		.4byte	0x97
+ 1057 03dc 1F030000 		.4byte	.LLST22
+ 1058 03e0 09       		.uleb128 0x9
+ 1059 03e1 34000000 		.4byte	.LVL51
+ 1060 03e5 20060000 		.4byte	0x620
+ 1061 03e9 02040000 		.4byte	0x402
+ 1062 03ed 0A       		.uleb128 0xa
+ 1063 03ee 01       		.uleb128 0x1
+ 1064 03ef 50       		.byte	0x50
+ 1065 03f0 01       		.uleb128 0x1
+ 1066 03f1 32       		.byte	0x32
+ 1067 03f2 0A       		.uleb128 0xa
+ 1068 03f3 01       		.uleb128 0x1
+ 1069 03f4 51       		.byte	0x51
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 28
+
+
+ 1070 03f5 05       		.uleb128 0x5
+ 1071 03f6 78       		.byte	0x78
+ 1072 03f7 00       		.sleb128 0
+ 1073 03f8 79       		.byte	0x79
+ 1074 03f9 00       		.sleb128 0
+ 1075 03fa 22       		.byte	0x22
+ 1076 03fb 0A       		.uleb128 0xa
+ 1077 03fc 01       		.uleb128 0x1
+ 1078 03fd 52       		.byte	0x52
+ 1079 03fe 02       		.uleb128 0x2
+ 1080 03ff 74       		.byte	0x74
+ 1081 0400 00       		.sleb128 0
+ 1082 0401 00       		.byte	0
+ 1083 0402 09       		.uleb128 0x9
+ 1084 0403 3A000000 		.4byte	.LVL52
+ 1085 0407 2C060000 		.4byte	0x62c
+ 1086 040b 15040000 		.4byte	0x415
+ 1087 040f 0A       		.uleb128 0xa
+ 1088 0410 01       		.uleb128 0x1
+ 1089 0411 50       		.byte	0x50
+ 1090 0412 01       		.uleb128 0x1
+ 1091 0413 32       		.byte	0x32
+ 1092 0414 00       		.byte	0
+ 1093 0415 09       		.uleb128 0x9
+ 1094 0416 46000000 		.4byte	.LVL54
+ 1095 041a A6050000 		.4byte	0x5a6
+ 1096 041e 28040000 		.4byte	0x428
+ 1097 0422 0A       		.uleb128 0xa
+ 1098 0423 01       		.uleb128 0x1
+ 1099 0424 50       		.byte	0x50
+ 1100 0425 01       		.uleb128 0x1
+ 1101 0426 31       		.byte	0x31
+ 1102 0427 00       		.byte	0
+ 1103 0428 10       		.uleb128 0x10
+ 1104 0429 50000000 		.4byte	.LVL56
+ 1105 042d 2C060000 		.4byte	0x62c
+ 1106 0431 0A       		.uleb128 0xa
+ 1107 0432 01       		.uleb128 0x1
+ 1108 0433 50       		.byte	0x50
+ 1109 0434 01       		.uleb128 0x1
+ 1110 0435 32       		.byte	0x32
+ 1111 0436 00       		.byte	0
+ 1112 0437 00       		.byte	0
+ 1113 0438 11       		.uleb128 0x11
+ 1114 0439 3C010000 		.4byte	.LASF40
+ 1115 043d 01       		.byte	0x1
+ 1116 043e 8301     		.2byte	0x183
+ 1117 0440 C4000000 		.4byte	0xc4
+ 1118 0444 00000000 		.4byte	.LFB69
+ 1119 0448 9C000000 		.4byte	.LFE69-.LFB69
+ 1120 044c 01       		.uleb128 0x1
+ 1121 044d 9C       		.byte	0x9c
+ 1122 044e 6C050000 		.4byte	0x56c
+ 1123 0452 12       		.uleb128 0x12
+ 1124 0453 1F000000 		.4byte	.LASF24
+ 1125 0457 01       		.byte	0x1
+ 1126 0458 8301     		.2byte	0x183
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 29
+
+
+ 1127 045a DE000000 		.4byte	0xde
+ 1128 045e B6030000 		.4byte	.LLST23
+ 1129 0462 12       		.uleb128 0x12
+ 1130 0463 C2020000 		.4byte	.LASF25
+ 1131 0467 01       		.byte	0x1
+ 1132 0468 8301     		.2byte	0x183
+ 1133 046a A3000000 		.4byte	0xa3
+ 1134 046e F8030000 		.4byte	.LLST24
+ 1135 0472 12       		.uleb128 0x12
+ 1136 0473 C7020000 		.4byte	.LASF26
+ 1137 0477 01       		.byte	0x1
+ 1138 0478 8301     		.2byte	0x183
+ 1139 047a 33020000 		.4byte	0x233
+ 1140 047e 2B040000 		.4byte	.LLST25
+ 1141 0482 12       		.uleb128 0x12
+ 1142 0483 65020000 		.4byte	.LASF27
+ 1143 0487 01       		.byte	0x1
+ 1144 0488 8301     		.2byte	0x183
+ 1145 048a 97000000 		.4byte	0x97
+ 1146 048e 57040000 		.4byte	.LLST26
+ 1147 0492 13       		.uleb128 0x13
+ 1148 0493 5C010000 		.4byte	.LASF38
+ 1149 0497 01       		.byte	0x1
+ 1150 0498 8501     		.2byte	0x185
+ 1151 049a C4000000 		.4byte	0xc4
+ 1152 049e 78040000 		.4byte	.LLST27
+ 1153 04a2 13       		.uleb128 0x13
+ 1154 04a3 66000000 		.4byte	.LASF28
+ 1155 04a7 01       		.byte	0x1
+ 1156 04a8 8601     		.2byte	0x186
+ 1157 04aa A3000000 		.4byte	0xa3
+ 1158 04ae A3040000 		.4byte	.LLST28
+ 1159 04b2 0B       		.uleb128 0xb
+ 1160 04b3 1E000000 		.4byte	.LVL66
+ 1161 04b7 9A050000 		.4byte	0x59a
+ 1162 04bb 09       		.uleb128 0x9
+ 1163 04bc 2A000000 		.4byte	.LVL68
+ 1164 04c0 A6050000 		.4byte	0x5a6
+ 1165 04c4 CE040000 		.4byte	0x4ce
+ 1166 04c8 0A       		.uleb128 0xa
+ 1167 04c9 01       		.uleb128 0x1
+ 1168 04ca 50       		.byte	0x50
+ 1169 04cb 01       		.uleb128 0x1
+ 1170 04cc 31       		.byte	0x31
+ 1171 04cd 00       		.byte	0
+ 1172 04ce 0B       		.uleb128 0xb
+ 1173 04cf 32000000 		.4byte	.LVL70
+ 1174 04d3 9A050000 		.4byte	0x59a
+ 1175 04d7 0B       		.uleb128 0xb
+ 1176 04d8 38000000 		.4byte	.LVL71
+ 1177 04dc 38060000 		.4byte	0x638
+ 1178 04e0 0B       		.uleb128 0xb
+ 1179 04e1 3C000000 		.4byte	.LVL72
+ 1180 04e5 80010000 		.4byte	0x180
+ 1181 04e9 0B       		.uleb128 0xb
+ 1182 04ea 46000000 		.4byte	.LVL74
+ 1183 04ee 38060000 		.4byte	0x638
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 30
+
+
+ 1184 04f2 0B       		.uleb128 0xb
+ 1185 04f3 4C000000 		.4byte	.LVL75
+ 1186 04f7 9A050000 		.4byte	0x59a
+ 1187 04fb 0B       		.uleb128 0xb
+ 1188 04fc 52000000 		.4byte	.LVL76
+ 1189 0500 80010000 		.4byte	0x180
+ 1190 0504 09       		.uleb128 0x9
+ 1191 0505 5C000000 		.4byte	.LVL77
+ 1192 0509 A6050000 		.4byte	0x5a6
+ 1193 050d 17050000 		.4byte	0x517
+ 1194 0511 0A       		.uleb128 0xa
+ 1195 0512 01       		.uleb128 0x1
+ 1196 0513 50       		.byte	0x50
+ 1197 0514 01       		.uleb128 0x1
+ 1198 0515 31       		.byte	0x31
+ 1199 0516 00       		.byte	0
+ 1200 0517 09       		.uleb128 0x9
+ 1201 0518 66000000 		.4byte	.LVL80
+ 1202 051c 2C060000 		.4byte	0x62c
+ 1203 0520 2A050000 		.4byte	0x52a
+ 1204 0524 0A       		.uleb128 0xa
+ 1205 0525 01       		.uleb128 0x1
+ 1206 0526 50       		.byte	0x50
+ 1207 0527 01       		.uleb128 0x1
+ 1208 0528 33       		.byte	0x33
+ 1209 0529 00       		.byte	0
+ 1210 052a 09       		.uleb128 0x9
+ 1211 052b 70000000 		.4byte	.LVL81
+ 1212 052f 2C060000 		.4byte	0x62c
+ 1213 0533 3D050000 		.4byte	0x53d
+ 1214 0537 0A       		.uleb128 0xa
+ 1215 0538 01       		.uleb128 0x1
+ 1216 0539 50       		.byte	0x50
+ 1217 053a 01       		.uleb128 0x1
+ 1218 053b 33       		.byte	0x33
+ 1219 053c 00       		.byte	0
+ 1220 053d 10       		.uleb128 0x10
+ 1221 053e 84000000 		.4byte	.LVL82
+ 1222 0542 44060000 		.4byte	0x644
+ 1223 0546 0A       		.uleb128 0xa
+ 1224 0547 01       		.uleb128 0x1
+ 1225 0548 50       		.byte	0x50
+ 1226 0549 01       		.uleb128 0x1
+ 1227 054a 33       		.byte	0x33
+ 1228 054b 0A       		.uleb128 0xa
+ 1229 054c 01       		.uleb128 0x1
+ 1230 054d 51       		.byte	0x51
+ 1231 054e 02       		.uleb128 0x2
+ 1232 054f 78       		.byte	0x78
+ 1233 0550 00       		.sleb128 0
+ 1234 0551 0A       		.uleb128 0xa
+ 1235 0552 01       		.uleb128 0x1
+ 1236 0553 52       		.byte	0x52
+ 1237 0554 15       		.uleb128 0x15
+ 1238 0555 08       		.byte	0x8
+ 1239 0556 40       		.byte	0x40
+ 1240 0557 79       		.byte	0x79
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 31
+
+
+ 1241 0558 00       		.sleb128 0
+ 1242 0559 79       		.byte	0x79
+ 1243 055a 00       		.sleb128 0
+ 1244 055b 40       		.byte	0x40
+ 1245 055c 4B       		.byte	0x4b
+ 1246 055d 24       		.byte	0x24
+ 1247 055e 22       		.byte	0x22
+ 1248 055f 0C       		.byte	0xc
+ 1249 0560 40000080 		.4byte	0x80000040
+ 1250 0564 2A       		.byte	0x2a
+ 1251 0565 28       		.byte	0x28
+ 1252 0566 0100     		.2byte	0x1
+ 1253 0568 16       		.byte	0x16
+ 1254 0569 13       		.byte	0x13
+ 1255 056a 00       		.byte	0
+ 1256 056b 00       		.byte	0
+ 1257 056c 14       		.uleb128 0x14
+ 1258 056d E8010000 		.4byte	.LASF41
+ 1259 0571 01       		.byte	0x1
+ 1260 0572 1A       		.byte	0x1a
+ 1261 0573 97000000 		.4byte	0x97
+ 1262 0577 05       		.uleb128 0x5
+ 1263 0578 03       		.byte	0x3
+ 1264 0579 00000000 		.4byte	USBUART_started
+ 1265 057d 15       		.uleb128 0x15
+ 1266 057e 13030000 		.4byte	.LASF62
+ 1267 0582 09       		.byte	0x9
+ 1268 0583 1207     		.2byte	0x712
+ 1269 0585 89050000 		.4byte	0x589
+ 1270 0589 16       		.uleb128 0x16
+ 1271 058a 8C000000 		.4byte	0x8c
+ 1272 058e 17       		.uleb128 0x17
+ 1273 058f 85000000 		.4byte	.LASF42
+ 1274 0593 85000000 		.4byte	.LASF42
+ 1275 0597 05       		.byte	0x5
+ 1276 0598 2B01     		.2byte	0x12b
+ 1277 059a 17       		.uleb128 0x17
+ 1278 059b DA000000 		.4byte	.LASF43
+ 1279 059f DA000000 		.4byte	.LASF43
+ 1280 05a3 05       		.byte	0x5
+ 1281 05a4 2E01     		.2byte	0x12e
+ 1282 05a6 18       		.uleb128 0x18
+ 1283 05a7 20030000 		.4byte	.LASF44
+ 1284 05ab 20030000 		.4byte	.LASF44
+ 1285 05af 06       		.byte	0x6
+ 1286 05b0 76       		.byte	0x76
+ 1287 05b1 18       		.uleb128 0x18
+ 1288 05b2 52020000 		.4byte	.LASF45
+ 1289 05b6 52020000 		.4byte	.LASF45
+ 1290 05ba 07       		.byte	0x7
+ 1291 05bb 54       		.byte	0x54
+ 1292 05bc 18       		.uleb128 0x18
+ 1293 05bd 3F020000 		.4byte	.LASF46
+ 1294 05c1 3F020000 		.4byte	.LASF46
+ 1295 05c5 07       		.byte	0x7
+ 1296 05c6 75       		.byte	0x75
+ 1297 05c7 18       		.uleb128 0x18
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 32
+
+
+ 1298 05c8 01010000 		.4byte	.LASF47
+ 1299 05cc 01010000 		.4byte	.LASF47
+ 1300 05d0 07       		.byte	0x7
+ 1301 05d1 8F       		.byte	0x8f
+ 1302 05d2 18       		.uleb128 0x18
+ 1303 05d3 5C000000 		.4byte	.LASF48
+ 1304 05d7 5C000000 		.4byte	.LASF48
+ 1305 05db 07       		.byte	0x7
+ 1306 05dc 55       		.byte	0x55
+ 1307 05dd 17       		.uleb128 0x17
+ 1308 05de B6030000 		.4byte	.LASF49
+ 1309 05e2 B6030000 		.4byte	.LASF49
+ 1310 05e6 05       		.byte	0x5
+ 1311 05e7 2D01     		.2byte	0x12d
+ 1312 05e9 18       		.uleb128 0x18
+ 1313 05ea 98020000 		.4byte	.LASF50
+ 1314 05ee 98020000 		.4byte	.LASF50
+ 1315 05f2 08       		.byte	0x8
+ 1316 05f3 22       		.byte	0x22
+ 1317 05f4 18       		.uleb128 0x18
+ 1318 05f5 C3030000 		.4byte	.LASF51
+ 1319 05f9 C3030000 		.4byte	.LASF51
+ 1320 05fd 07       		.byte	0x7
+ 1321 05fe 8A       		.byte	0x8a
+ 1322 05ff 18       		.uleb128 0x18
+ 1323 0600 8C010000 		.4byte	.LASF52
+ 1324 0604 8C010000 		.4byte	.LASF52
+ 1325 0608 07       		.byte	0x7
+ 1326 0609 73       		.byte	0x73
+ 1327 060a 18       		.uleb128 0x18
+ 1328 060b 64010000 		.4byte	.LASF53
+ 1329 060f 64010000 		.4byte	.LASF53
+ 1330 0613 06       		.byte	0x6
+ 1331 0614 77       		.byte	0x77
+ 1332 0615 18       		.uleb128 0x18
+ 1333 0616 7C010000 		.4byte	.LASF54
+ 1334 061a 7C010000 		.4byte	.LASF54
+ 1335 061e 07       		.byte	0x7
+ 1336 061f 6F       		.byte	0x6f
+ 1337 0620 17       		.uleb128 0x17
+ 1338 0621 12020000 		.4byte	.LASF55
+ 1339 0625 12020000 		.4byte	.LASF55
+ 1340 0629 05       		.byte	0x5
+ 1341 062a 3301     		.2byte	0x133
+ 1342 062c 17       		.uleb128 0x17
+ 1343 062d D0030000 		.4byte	.LASF56
+ 1344 0631 D0030000 		.4byte	.LASF56
+ 1345 0635 05       		.byte	0x5
+ 1346 0636 3101     		.2byte	0x131
+ 1347 0638 17       		.uleb128 0x17
+ 1348 0639 00000000 		.4byte	.LASF57
+ 1349 063d 00000000 		.4byte	.LASF57
+ 1350 0641 05       		.byte	0x5
+ 1351 0642 2F01     		.2byte	0x12f
+ 1352 0644 17       		.uleb128 0x17
+ 1353 0645 2A010000 		.4byte	.LASF58
+ 1354 0649 2A010000 		.4byte	.LASF58
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 33
+
+
+ 1355 064d 05       		.byte	0x5
+ 1356 064e 3501     		.2byte	0x135
+ 1357 0650 00       		.byte	0
+ 1358              		.section	.debug_abbrev,"",%progbits
+ 1359              	.Ldebug_abbrev0:
+ 1360 0000 01       		.uleb128 0x1
+ 1361 0001 11       		.uleb128 0x11
+ 1362 0002 01       		.byte	0x1
+ 1363 0003 25       		.uleb128 0x25
+ 1364 0004 0E       		.uleb128 0xe
+ 1365 0005 13       		.uleb128 0x13
+ 1366 0006 0B       		.uleb128 0xb
+ 1367 0007 03       		.uleb128 0x3
+ 1368 0008 0E       		.uleb128 0xe
+ 1369 0009 1B       		.uleb128 0x1b
+ 1370 000a 0E       		.uleb128 0xe
+ 1371 000b 55       		.uleb128 0x55
+ 1372 000c 17       		.uleb128 0x17
+ 1373 000d 11       		.uleb128 0x11
+ 1374 000e 01       		.uleb128 0x1
+ 1375 000f 10       		.uleb128 0x10
+ 1376 0010 17       		.uleb128 0x17
+ 1377 0011 00       		.byte	0
+ 1378 0012 00       		.byte	0
+ 1379 0013 02       		.uleb128 0x2
+ 1380 0014 24       		.uleb128 0x24
+ 1381 0015 00       		.byte	0
+ 1382 0016 0B       		.uleb128 0xb
+ 1383 0017 0B       		.uleb128 0xb
+ 1384 0018 3E       		.uleb128 0x3e
+ 1385 0019 0B       		.uleb128 0xb
+ 1386 001a 03       		.uleb128 0x3
+ 1387 001b 0E       		.uleb128 0xe
+ 1388 001c 00       		.byte	0
+ 1389 001d 00       		.byte	0
+ 1390 001e 03       		.uleb128 0x3
+ 1391 001f 16       		.uleb128 0x16
+ 1392 0020 00       		.byte	0
+ 1393 0021 03       		.uleb128 0x3
+ 1394 0022 0E       		.uleb128 0xe
+ 1395 0023 3A       		.uleb128 0x3a
+ 1396 0024 0B       		.uleb128 0xb
+ 1397 0025 3B       		.uleb128 0x3b
+ 1398 0026 0B       		.uleb128 0xb
+ 1399 0027 49       		.uleb128 0x49
+ 1400 0028 13       		.uleb128 0x13
+ 1401 0029 00       		.byte	0
+ 1402 002a 00       		.byte	0
+ 1403 002b 04       		.uleb128 0x4
+ 1404 002c 24       		.uleb128 0x24
+ 1405 002d 00       		.byte	0
+ 1406 002e 0B       		.uleb128 0xb
+ 1407 002f 0B       		.uleb128 0xb
+ 1408 0030 3E       		.uleb128 0x3e
+ 1409 0031 0B       		.uleb128 0xb
+ 1410 0032 03       		.uleb128 0x3
+ 1411 0033 08       		.uleb128 0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 34
+
+
+ 1412 0034 00       		.byte	0
+ 1413 0035 00       		.byte	0
+ 1414 0036 05       		.uleb128 0x5
+ 1415 0037 16       		.uleb128 0x16
+ 1416 0038 00       		.byte	0
+ 1417 0039 03       		.uleb128 0x3
+ 1418 003a 0E       		.uleb128 0xe
+ 1419 003b 3A       		.uleb128 0x3a
+ 1420 003c 0B       		.uleb128 0xb
+ 1421 003d 3B       		.uleb128 0x3b
+ 1422 003e 05       		.uleb128 0x5
+ 1423 003f 49       		.uleb128 0x49
+ 1424 0040 13       		.uleb128 0x13
+ 1425 0041 00       		.byte	0
+ 1426 0042 00       		.byte	0
+ 1427 0043 06       		.uleb128 0x6
+ 1428 0044 0F       		.uleb128 0xf
+ 1429 0045 00       		.byte	0
+ 1430 0046 0B       		.uleb128 0xb
+ 1431 0047 0B       		.uleb128 0xb
+ 1432 0048 49       		.uleb128 0x49
+ 1433 0049 13       		.uleb128 0x13
+ 1434 004a 00       		.byte	0
+ 1435 004b 00       		.byte	0
+ 1436 004c 07       		.uleb128 0x7
+ 1437 004d 2E       		.uleb128 0x2e
+ 1438 004e 01       		.byte	0x1
+ 1439 004f 3F       		.uleb128 0x3f
+ 1440 0050 19       		.uleb128 0x19
+ 1441 0051 03       		.uleb128 0x3
+ 1442 0052 0E       		.uleb128 0xe
+ 1443 0053 3A       		.uleb128 0x3a
+ 1444 0054 0B       		.uleb128 0xb
+ 1445 0055 3B       		.uleb128 0x3b
+ 1446 0056 0B       		.uleb128 0xb
+ 1447 0057 27       		.uleb128 0x27
+ 1448 0058 19       		.uleb128 0x19
+ 1449 0059 11       		.uleb128 0x11
+ 1450 005a 01       		.uleb128 0x1
+ 1451 005b 12       		.uleb128 0x12
+ 1452 005c 06       		.uleb128 0x6
+ 1453 005d 40       		.uleb128 0x40
+ 1454 005e 18       		.uleb128 0x18
+ 1455 005f 9742     		.uleb128 0x2117
+ 1456 0061 19       		.uleb128 0x19
+ 1457 0062 01       		.uleb128 0x1
+ 1458 0063 13       		.uleb128 0x13
+ 1459 0064 00       		.byte	0
+ 1460 0065 00       		.byte	0
+ 1461 0066 08       		.uleb128 0x8
+ 1462 0067 34       		.uleb128 0x34
+ 1463 0068 00       		.byte	0
+ 1464 0069 03       		.uleb128 0x3
+ 1465 006a 0E       		.uleb128 0xe
+ 1466 006b 3A       		.uleb128 0x3a
+ 1467 006c 0B       		.uleb128 0xb
+ 1468 006d 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 35
+
+
+ 1469 006e 0B       		.uleb128 0xb
+ 1470 006f 49       		.uleb128 0x49
+ 1471 0070 13       		.uleb128 0x13
+ 1472 0071 02       		.uleb128 0x2
+ 1473 0072 17       		.uleb128 0x17
+ 1474 0073 00       		.byte	0
+ 1475 0074 00       		.byte	0
+ 1476 0075 09       		.uleb128 0x9
+ 1477 0076 898201   		.uleb128 0x4109
+ 1478 0079 01       		.byte	0x1
+ 1479 007a 11       		.uleb128 0x11
+ 1480 007b 01       		.uleb128 0x1
+ 1481 007c 31       		.uleb128 0x31
+ 1482 007d 13       		.uleb128 0x13
+ 1483 007e 01       		.uleb128 0x1
+ 1484 007f 13       		.uleb128 0x13
+ 1485 0080 00       		.byte	0
+ 1486 0081 00       		.byte	0
+ 1487 0082 0A       		.uleb128 0xa
+ 1488 0083 8A8201   		.uleb128 0x410a
+ 1489 0086 00       		.byte	0
+ 1490 0087 02       		.uleb128 0x2
+ 1491 0088 18       		.uleb128 0x18
+ 1492 0089 9142     		.uleb128 0x2111
+ 1493 008b 18       		.uleb128 0x18
+ 1494 008c 00       		.byte	0
+ 1495 008d 00       		.byte	0
+ 1496 008e 0B       		.uleb128 0xb
+ 1497 008f 898201   		.uleb128 0x4109
+ 1498 0092 00       		.byte	0
+ 1499 0093 11       		.uleb128 0x11
+ 1500 0094 01       		.uleb128 0x1
+ 1501 0095 31       		.uleb128 0x31
+ 1502 0096 13       		.uleb128 0x13
+ 1503 0097 00       		.byte	0
+ 1504 0098 00       		.byte	0
+ 1505 0099 0C       		.uleb128 0xc
+ 1506 009a 898201   		.uleb128 0x4109
+ 1507 009d 00       		.byte	0
+ 1508 009e 11       		.uleb128 0x11
+ 1509 009f 01       		.uleb128 0x1
+ 1510 00a0 9542     		.uleb128 0x2115
+ 1511 00a2 19       		.uleb128 0x19
+ 1512 00a3 31       		.uleb128 0x31
+ 1513 00a4 13       		.uleb128 0x13
+ 1514 00a5 00       		.byte	0
+ 1515 00a6 00       		.byte	0
+ 1516 00a7 0D       		.uleb128 0xd
+ 1517 00a8 2E       		.uleb128 0x2e
+ 1518 00a9 01       		.byte	0x1
+ 1519 00aa 3F       		.uleb128 0x3f
+ 1520 00ab 19       		.uleb128 0x19
+ 1521 00ac 03       		.uleb128 0x3
+ 1522 00ad 0E       		.uleb128 0xe
+ 1523 00ae 3A       		.uleb128 0x3a
+ 1524 00af 0B       		.uleb128 0xb
+ 1525 00b0 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 36
+
+
+ 1526 00b1 0B       		.uleb128 0xb
+ 1527 00b2 27       		.uleb128 0x27
+ 1528 00b3 19       		.uleb128 0x19
+ 1529 00b4 49       		.uleb128 0x49
+ 1530 00b5 13       		.uleb128 0x13
+ 1531 00b6 11       		.uleb128 0x11
+ 1532 00b7 01       		.uleb128 0x1
+ 1533 00b8 12       		.uleb128 0x12
+ 1534 00b9 06       		.uleb128 0x6
+ 1535 00ba 40       		.uleb128 0x40
+ 1536 00bb 18       		.uleb128 0x18
+ 1537 00bc 9742     		.uleb128 0x2117
+ 1538 00be 19       		.uleb128 0x19
+ 1539 00bf 01       		.uleb128 0x1
+ 1540 00c0 13       		.uleb128 0x13
+ 1541 00c1 00       		.byte	0
+ 1542 00c2 00       		.byte	0
+ 1543 00c3 0E       		.uleb128 0xe
+ 1544 00c4 05       		.uleb128 0x5
+ 1545 00c5 00       		.byte	0
+ 1546 00c6 03       		.uleb128 0x3
+ 1547 00c7 0E       		.uleb128 0xe
+ 1548 00c8 3A       		.uleb128 0x3a
+ 1549 00c9 0B       		.uleb128 0xb
+ 1550 00ca 3B       		.uleb128 0x3b
+ 1551 00cb 0B       		.uleb128 0xb
+ 1552 00cc 49       		.uleb128 0x49
+ 1553 00cd 13       		.uleb128 0x13
+ 1554 00ce 02       		.uleb128 0x2
+ 1555 00cf 17       		.uleb128 0x17
+ 1556 00d0 00       		.byte	0
+ 1557 00d1 00       		.byte	0
+ 1558 00d2 0F       		.uleb128 0xf
+ 1559 00d3 26       		.uleb128 0x26
+ 1560 00d4 00       		.byte	0
+ 1561 00d5 49       		.uleb128 0x49
+ 1562 00d6 13       		.uleb128 0x13
+ 1563 00d7 00       		.byte	0
+ 1564 00d8 00       		.byte	0
+ 1565 00d9 10       		.uleb128 0x10
+ 1566 00da 898201   		.uleb128 0x4109
+ 1567 00dd 01       		.byte	0x1
+ 1568 00de 11       		.uleb128 0x11
+ 1569 00df 01       		.uleb128 0x1
+ 1570 00e0 31       		.uleb128 0x31
+ 1571 00e1 13       		.uleb128 0x13
+ 1572 00e2 00       		.byte	0
+ 1573 00e3 00       		.byte	0
+ 1574 00e4 11       		.uleb128 0x11
+ 1575 00e5 2E       		.uleb128 0x2e
+ 1576 00e6 01       		.byte	0x1
+ 1577 00e7 3F       		.uleb128 0x3f
+ 1578 00e8 19       		.uleb128 0x19
+ 1579 00e9 03       		.uleb128 0x3
+ 1580 00ea 0E       		.uleb128 0xe
+ 1581 00eb 3A       		.uleb128 0x3a
+ 1582 00ec 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 37
+
+
+ 1583 00ed 3B       		.uleb128 0x3b
+ 1584 00ee 05       		.uleb128 0x5
+ 1585 00ef 27       		.uleb128 0x27
+ 1586 00f0 19       		.uleb128 0x19
+ 1587 00f1 49       		.uleb128 0x49
+ 1588 00f2 13       		.uleb128 0x13
+ 1589 00f3 11       		.uleb128 0x11
+ 1590 00f4 01       		.uleb128 0x1
+ 1591 00f5 12       		.uleb128 0x12
+ 1592 00f6 06       		.uleb128 0x6
+ 1593 00f7 40       		.uleb128 0x40
+ 1594 00f8 18       		.uleb128 0x18
+ 1595 00f9 9742     		.uleb128 0x2117
+ 1596 00fb 19       		.uleb128 0x19
+ 1597 00fc 01       		.uleb128 0x1
+ 1598 00fd 13       		.uleb128 0x13
+ 1599 00fe 00       		.byte	0
+ 1600 00ff 00       		.byte	0
+ 1601 0100 12       		.uleb128 0x12
+ 1602 0101 05       		.uleb128 0x5
+ 1603 0102 00       		.byte	0
+ 1604 0103 03       		.uleb128 0x3
+ 1605 0104 0E       		.uleb128 0xe
+ 1606 0105 3A       		.uleb128 0x3a
+ 1607 0106 0B       		.uleb128 0xb
+ 1608 0107 3B       		.uleb128 0x3b
+ 1609 0108 05       		.uleb128 0x5
+ 1610 0109 49       		.uleb128 0x49
+ 1611 010a 13       		.uleb128 0x13
+ 1612 010b 02       		.uleb128 0x2
+ 1613 010c 17       		.uleb128 0x17
+ 1614 010d 00       		.byte	0
+ 1615 010e 00       		.byte	0
+ 1616 010f 13       		.uleb128 0x13
+ 1617 0110 34       		.uleb128 0x34
+ 1618 0111 00       		.byte	0
+ 1619 0112 03       		.uleb128 0x3
+ 1620 0113 0E       		.uleb128 0xe
+ 1621 0114 3A       		.uleb128 0x3a
+ 1622 0115 0B       		.uleb128 0xb
+ 1623 0116 3B       		.uleb128 0x3b
+ 1624 0117 05       		.uleb128 0x5
+ 1625 0118 49       		.uleb128 0x49
+ 1626 0119 13       		.uleb128 0x13
+ 1627 011a 02       		.uleb128 0x2
+ 1628 011b 17       		.uleb128 0x17
+ 1629 011c 00       		.byte	0
+ 1630 011d 00       		.byte	0
+ 1631 011e 14       		.uleb128 0x14
+ 1632 011f 34       		.uleb128 0x34
+ 1633 0120 00       		.byte	0
+ 1634 0121 03       		.uleb128 0x3
+ 1635 0122 0E       		.uleb128 0xe
+ 1636 0123 3A       		.uleb128 0x3a
+ 1637 0124 0B       		.uleb128 0xb
+ 1638 0125 3B       		.uleb128 0x3b
+ 1639 0126 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 38
+
+
+ 1640 0127 49       		.uleb128 0x49
+ 1641 0128 13       		.uleb128 0x13
+ 1642 0129 02       		.uleb128 0x2
+ 1643 012a 18       		.uleb128 0x18
+ 1644 012b 00       		.byte	0
+ 1645 012c 00       		.byte	0
+ 1646 012d 15       		.uleb128 0x15
+ 1647 012e 34       		.uleb128 0x34
+ 1648 012f 00       		.byte	0
+ 1649 0130 03       		.uleb128 0x3
+ 1650 0131 0E       		.uleb128 0xe
+ 1651 0132 3A       		.uleb128 0x3a
+ 1652 0133 0B       		.uleb128 0xb
+ 1653 0134 3B       		.uleb128 0x3b
+ 1654 0135 05       		.uleb128 0x5
+ 1655 0136 49       		.uleb128 0x49
+ 1656 0137 13       		.uleb128 0x13
+ 1657 0138 3F       		.uleb128 0x3f
+ 1658 0139 19       		.uleb128 0x19
+ 1659 013a 3C       		.uleb128 0x3c
+ 1660 013b 19       		.uleb128 0x19
+ 1661 013c 00       		.byte	0
+ 1662 013d 00       		.byte	0
+ 1663 013e 16       		.uleb128 0x16
+ 1664 013f 35       		.uleb128 0x35
+ 1665 0140 00       		.byte	0
+ 1666 0141 49       		.uleb128 0x49
+ 1667 0142 13       		.uleb128 0x13
+ 1668 0143 00       		.byte	0
+ 1669 0144 00       		.byte	0
+ 1670 0145 17       		.uleb128 0x17
+ 1671 0146 2E       		.uleb128 0x2e
+ 1672 0147 00       		.byte	0
+ 1673 0148 3F       		.uleb128 0x3f
+ 1674 0149 19       		.uleb128 0x19
+ 1675 014a 3C       		.uleb128 0x3c
+ 1676 014b 19       		.uleb128 0x19
+ 1677 014c 6E       		.uleb128 0x6e
+ 1678 014d 0E       		.uleb128 0xe
+ 1679 014e 03       		.uleb128 0x3
+ 1680 014f 0E       		.uleb128 0xe
+ 1681 0150 3A       		.uleb128 0x3a
+ 1682 0151 0B       		.uleb128 0xb
+ 1683 0152 3B       		.uleb128 0x3b
+ 1684 0153 05       		.uleb128 0x5
+ 1685 0154 00       		.byte	0
+ 1686 0155 00       		.byte	0
+ 1687 0156 18       		.uleb128 0x18
+ 1688 0157 2E       		.uleb128 0x2e
+ 1689 0158 00       		.byte	0
+ 1690 0159 3F       		.uleb128 0x3f
+ 1691 015a 19       		.uleb128 0x19
+ 1692 015b 3C       		.uleb128 0x3c
+ 1693 015c 19       		.uleb128 0x19
+ 1694 015d 6E       		.uleb128 0x6e
+ 1695 015e 0E       		.uleb128 0xe
+ 1696 015f 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 39
+
+
+ 1697 0160 0E       		.uleb128 0xe
+ 1698 0161 3A       		.uleb128 0x3a
+ 1699 0162 0B       		.uleb128 0xb
+ 1700 0163 3B       		.uleb128 0x3b
+ 1701 0164 0B       		.uleb128 0xb
+ 1702 0165 00       		.byte	0
+ 1703 0166 00       		.byte	0
+ 1704 0167 00       		.byte	0
+ 1705              		.section	.debug_loc,"",%progbits
+ 1706              	.Ldebug_loc0:
+ 1707              	.LLST0:
+ 1708 0000 16000000 		.4byte	.LVL1
+ 1709 0004 1E000000 		.4byte	.LVL3
+ 1710 0008 0300     		.2byte	0x3
+ 1711 000a 74       		.byte	0x74
+ 1712 000b 7F       		.sleb128 -1
+ 1713 000c 9F       		.byte	0x9f
+ 1714 000d 28000000 		.4byte	.LVL4
+ 1715 0011 2A000000 		.4byte	.LVL5
+ 1716 0015 0300     		.2byte	0x3
+ 1717 0017 74       		.byte	0x74
+ 1718 0018 7F       		.sleb128 -1
+ 1719 0019 9F       		.byte	0x9f
+ 1720 001a 00000000 		.4byte	0
+ 1721 001e 00000000 		.4byte	0
+ 1722              	.LLST1:
+ 1723 0022 00000000 		.4byte	.LVL14
+ 1724 0026 0B000000 		.4byte	.LVL15-1
+ 1725 002a 0100     		.2byte	0x1
+ 1726 002c 50       		.byte	0x50
+ 1727 002d 0B000000 		.4byte	.LVL15-1
+ 1728 0031 12000000 		.4byte	.LVL16
+ 1729 0035 0100     		.2byte	0x1
+ 1730 0037 54       		.byte	0x54
+ 1731 0038 12000000 		.4byte	.LVL16
+ 1732 003c 26000000 		.4byte	.LFE66
+ 1733 0040 0400     		.2byte	0x4
+ 1734 0042 F3       		.byte	0xf3
+ 1735 0043 01       		.uleb128 0x1
+ 1736 0044 50       		.byte	0x50
+ 1737 0045 9F       		.byte	0x9f
+ 1738 0046 00000000 		.4byte	0
+ 1739 004a 00000000 		.4byte	0
+ 1740              	.LLST2:
+ 1741 004e 00000000 		.4byte	.LVL14
+ 1742 0052 0B000000 		.4byte	.LVL15-1
+ 1743 0056 0100     		.2byte	0x1
+ 1744 0058 51       		.byte	0x51
+ 1745 0059 0B000000 		.4byte	.LVL15-1
+ 1746 005d 26000000 		.4byte	.LFE66
+ 1747 0061 0400     		.2byte	0x4
+ 1748 0063 F3       		.byte	0xf3
+ 1749 0064 01       		.uleb128 0x1
+ 1750 0065 51       		.byte	0x51
+ 1751 0066 9F       		.byte	0x9f
+ 1752 0067 00000000 		.4byte	0
+ 1753 006b 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 40
+
+
+ 1754              	.LLST3:
+ 1755 006f 00000000 		.4byte	.LVL14
+ 1756 0073 0B000000 		.4byte	.LVL15-1
+ 1757 0077 0100     		.2byte	0x1
+ 1758 0079 52       		.byte	0x52
+ 1759 007a 0B000000 		.4byte	.LVL15-1
+ 1760 007e 26000000 		.4byte	.LFE66
+ 1761 0082 0100     		.2byte	0x1
+ 1762 0084 57       		.byte	0x57
+ 1763 0085 00000000 		.4byte	0
+ 1764 0089 00000000 		.4byte	0
+ 1765              	.LLST4:
+ 1766 008d 00000000 		.4byte	.LVL14
+ 1767 0091 0B000000 		.4byte	.LVL15-1
+ 1768 0095 0100     		.2byte	0x1
+ 1769 0097 53       		.byte	0x53
+ 1770 0098 0B000000 		.4byte	.LVL15-1
+ 1771 009c 26000000 		.4byte	.LFE66
+ 1772 00a0 0400     		.2byte	0x4
+ 1773 00a2 F3       		.byte	0xf3
+ 1774 00a3 01       		.uleb128 0x1
+ 1775 00a4 53       		.byte	0x53
+ 1776 00a5 9F       		.byte	0x9f
+ 1777 00a6 00000000 		.4byte	0
+ 1778 00aa 00000000 		.4byte	0
+ 1779              	.LLST5:
+ 1780 00ae 00000000 		.4byte	.LVL14
+ 1781 00b2 12000000 		.4byte	.LVL16
+ 1782 00b6 0200     		.2byte	0x2
+ 1783 00b8 30       		.byte	0x30
+ 1784 00b9 9F       		.byte	0x9f
+ 1785 00ba 12000000 		.4byte	.LVL16
+ 1786 00be 1A000000 		.4byte	.LVL17
+ 1787 00c2 0900     		.2byte	0x9
+ 1788 00c4 75       		.byte	0x75
+ 1789 00c5 00       		.sleb128 0
+ 1790 00c6 F3       		.byte	0xf3
+ 1791 00c7 01       		.uleb128 0x1
+ 1792 00c8 50       		.byte	0x50
+ 1793 00c9 31       		.byte	0x31
+ 1794 00ca 1C       		.byte	0x1c
+ 1795 00cb 1C       		.byte	0x1c
+ 1796 00cc 9F       		.byte	0x9f
+ 1797 00cd 1E000000 		.4byte	.LVL18
+ 1798 00d1 26000000 		.4byte	.LFE66
+ 1799 00d5 0900     		.2byte	0x9
+ 1800 00d7 75       		.byte	0x75
+ 1801 00d8 00       		.sleb128 0
+ 1802 00d9 F3       		.byte	0xf3
+ 1803 00da 01       		.uleb128 0x1
+ 1804 00db 50       		.byte	0x50
+ 1805 00dc 31       		.byte	0x31
+ 1806 00dd 1C       		.byte	0x1c
+ 1807 00de 1C       		.byte	0x1c
+ 1808 00df 9F       		.byte	0x9f
+ 1809 00e0 00000000 		.4byte	0
+ 1810 00e4 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 41
+
+
+ 1811              	.LLST6:
+ 1812 00e8 00000000 		.4byte	.LVL19
+ 1813 00ec 10000000 		.4byte	.LVL20
+ 1814 00f0 0100     		.2byte	0x1
+ 1815 00f2 50       		.byte	0x50
+ 1816 00f3 10000000 		.4byte	.LVL20
+ 1817 00f7 9E000000 		.4byte	.LFE67
+ 1818 00fb 0100     		.2byte	0x1
+ 1819 00fd 58       		.byte	0x58
+ 1820 00fe 00000000 		.4byte	0
+ 1821 0102 00000000 		.4byte	0
+ 1822              	.LLST7:
+ 1823 0106 00000000 		.4byte	.LVL19
+ 1824 010a 10000000 		.4byte	.LVL20
+ 1825 010e 0100     		.2byte	0x1
+ 1826 0110 51       		.byte	0x51
+ 1827 0111 10000000 		.4byte	.LVL20
+ 1828 0115 9E000000 		.4byte	.LFE67
+ 1829 0119 0400     		.2byte	0x4
+ 1830 011b F3       		.byte	0xf3
+ 1831 011c 01       		.uleb128 0x1
+ 1832 011d 51       		.byte	0x51
+ 1833 011e 9F       		.byte	0x9f
+ 1834 011f 00000000 		.4byte	0
+ 1835 0123 00000000 		.4byte	0
+ 1836              	.LLST8:
+ 1837 0127 00000000 		.4byte	.LVL19
+ 1838 012b 10000000 		.4byte	.LVL20
+ 1839 012f 0100     		.2byte	0x1
+ 1840 0131 52       		.byte	0x52
+ 1841 0132 10000000 		.4byte	.LVL20
+ 1842 0136 9E000000 		.4byte	.LFE67
+ 1843 013a 0100     		.2byte	0x1
+ 1844 013c 56       		.byte	0x56
+ 1845 013d 00000000 		.4byte	0
+ 1846 0141 00000000 		.4byte	0
+ 1847              	.LLST9:
+ 1848 0145 00000000 		.4byte	.LVL19
+ 1849 0149 10000000 		.4byte	.LVL20
+ 1850 014d 0100     		.2byte	0x1
+ 1851 014f 53       		.byte	0x53
+ 1852 0150 10000000 		.4byte	.LVL20
+ 1853 0154 9E000000 		.4byte	.LFE67
+ 1854 0158 0400     		.2byte	0x4
+ 1855 015a F3       		.byte	0xf3
+ 1856 015b 01       		.uleb128 0x1
+ 1857 015c 53       		.byte	0x53
+ 1858 015d 9F       		.byte	0x9f
+ 1859 015e 00000000 		.4byte	0
+ 1860 0162 00000000 		.4byte	0
+ 1861              	.LLST10:
+ 1862 0166 00000000 		.4byte	.LVL19
+ 1863 016a 10000000 		.4byte	.LVL20
+ 1864 016e 0200     		.2byte	0x2
+ 1865 0170 30       		.byte	0x30
+ 1866 0171 9F       		.byte	0x9f
+ 1867 0172 10000000 		.4byte	.LVL20
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 42
+
+
+ 1868 0176 12000000 		.4byte	.LVL21
+ 1869 017a 0100     		.2byte	0x1
+ 1870 017c 55       		.byte	0x55
+ 1871 017d 12000000 		.4byte	.LVL21
+ 1872 0181 19000000 		.4byte	.LVL22-1
+ 1873 0185 0100     		.2byte	0x1
+ 1874 0187 53       		.byte	0x53
+ 1875 0188 19000000 		.4byte	.LVL22-1
+ 1876 018c 1C000000 		.4byte	.LVL23
+ 1877 0190 0100     		.2byte	0x1
+ 1878 0192 55       		.byte	0x55
+ 1879 0193 3C000000 		.4byte	.LVL29
+ 1880 0197 3E000000 		.4byte	.LVL30
+ 1881 019b 0100     		.2byte	0x1
+ 1882 019d 55       		.byte	0x55
+ 1883 019e 3E000000 		.4byte	.LVL30
+ 1884 01a2 40000000 		.4byte	.LVL31
+ 1885 01a6 0100     		.2byte	0x1
+ 1886 01a8 53       		.byte	0x53
+ 1887 01a9 6E000000 		.4byte	.LVL37
+ 1888 01ad 78000000 		.4byte	.LVL39
+ 1889 01b1 0100     		.2byte	0x1
+ 1890 01b3 5B       		.byte	0x5b
+ 1891 01b4 7E000000 		.4byte	.LVL41
+ 1892 01b8 96000000 		.4byte	.LVL43
+ 1893 01bc 0100     		.2byte	0x1
+ 1894 01be 5B       		.byte	0x5b
+ 1895 01bf 00000000 		.4byte	0
+ 1896 01c3 00000000 		.4byte	0
+ 1897              	.LLST11:
+ 1898 01c7 44000000 		.4byte	.LVL32
+ 1899 01cb 60000000 		.4byte	.LVL36
+ 1900 01cf 0100     		.2byte	0x1
+ 1901 01d1 54       		.byte	0x54
+ 1902 01d2 6E000000 		.4byte	.LVL37
+ 1903 01d6 7C000000 		.4byte	.LVL40
+ 1904 01da 0100     		.2byte	0x1
+ 1905 01dc 5A       		.byte	0x5a
+ 1906 01dd 7E000000 		.4byte	.LVL41
+ 1907 01e1 96000000 		.4byte	.LVL43
+ 1908 01e5 0100     		.2byte	0x1
+ 1909 01e7 5A       		.byte	0x5a
+ 1910 01e8 96000000 		.4byte	.LVL43
+ 1911 01ec 9E000000 		.4byte	.LFE67
+ 1912 01f0 0100     		.2byte	0x1
+ 1913 01f2 54       		.byte	0x54
+ 1914 01f3 00000000 		.4byte	0
+ 1915 01f7 00000000 		.4byte	0
+ 1916              	.LLST12:
+ 1917 01fb 52000000 		.4byte	.LVL35
+ 1918 01ff 98000000 		.4byte	.LVL44
+ 1919 0203 0100     		.2byte	0x1
+ 1920 0205 55       		.byte	0x55
+ 1921 0206 00000000 		.4byte	0
+ 1922 020a 00000000 		.4byte	0
+ 1923              	.LLST13:
+ 1924 020e 24000000 		.4byte	.LVL25
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 43
+
+
+ 1925 0212 36000000 		.4byte	.LVL28
+ 1926 0216 0600     		.2byte	0x6
+ 1927 0218 74       		.byte	0x74
+ 1928 0219 00       		.sleb128 0
+ 1929 021a 08       		.byte	0x8
+ 1930 021b FF       		.byte	0xff
+ 1931 021c 1A       		.byte	0x1a
+ 1932 021d 9F       		.byte	0x9f
+ 1933 021e 00000000 		.4byte	0
+ 1934 0222 00000000 		.4byte	0
+ 1935              	.LLST14:
+ 1936 0226 00000000 		.4byte	.LVL19
+ 1937 022a 40000000 		.4byte	.LVL31
+ 1938 022e 0200     		.2byte	0x2
+ 1939 0230 35       		.byte	0x35
+ 1940 0231 9F       		.byte	0x9f
+ 1941 0232 40000000 		.4byte	.LVL31
+ 1942 0236 9E000000 		.4byte	.LFE67
+ 1943 023a 0100     		.2byte	0x1
+ 1944 023c 57       		.byte	0x57
+ 1945 023d 00000000 		.4byte	0
+ 1946 0241 00000000 		.4byte	0
+ 1947              	.LLST15:
+ 1948 0245 00000000 		.4byte	.LVL45
+ 1949 0249 16000000 		.4byte	.LVL47
+ 1950 024d 0100     		.2byte	0x1
+ 1951 024f 50       		.byte	0x50
+ 1952 0250 16000000 		.4byte	.LVL47
+ 1953 0254 6C000000 		.4byte	.LFE68
+ 1954 0258 0100     		.2byte	0x1
+ 1955 025a 58       		.byte	0x58
+ 1956 025b 00000000 		.4byte	0
+ 1957 025f 00000000 		.4byte	0
+ 1958              	.LLST16:
+ 1959 0263 00000000 		.4byte	.LVL45
+ 1960 0267 16000000 		.4byte	.LVL47
+ 1961 026b 0100     		.2byte	0x1
+ 1962 026d 51       		.byte	0x51
+ 1963 026e 16000000 		.4byte	.LVL47
+ 1964 0272 6C000000 		.4byte	.LFE68
+ 1965 0276 0400     		.2byte	0x4
+ 1966 0278 F3       		.byte	0xf3
+ 1967 0279 01       		.uleb128 0x1
+ 1968 027a 51       		.byte	0x51
+ 1969 027b 9F       		.byte	0x9f
+ 1970 027c 00000000 		.4byte	0
+ 1971 0280 00000000 		.4byte	0
+ 1972              	.LLST17:
+ 1973 0284 00000000 		.4byte	.LVL45
+ 1974 0288 16000000 		.4byte	.LVL47
+ 1975 028c 0100     		.2byte	0x1
+ 1976 028e 52       		.byte	0x52
+ 1977 028f 16000000 		.4byte	.LVL47
+ 1978 0293 6C000000 		.4byte	.LFE68
+ 1979 0297 0100     		.2byte	0x1
+ 1980 0299 56       		.byte	0x56
+ 1981 029a 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 44
+
+
+ 1982 029e 00000000 		.4byte	0
+ 1983              	.LLST18:
+ 1984 02a2 00000000 		.4byte	.LVL45
+ 1985 02a6 12000000 		.4byte	.LVL46
+ 1986 02aa 0100     		.2byte	0x1
+ 1987 02ac 53       		.byte	0x53
+ 1988 02ad 12000000 		.4byte	.LVL46
+ 1989 02b1 6C000000 		.4byte	.LFE68
+ 1990 02b5 0400     		.2byte	0x4
+ 1991 02b7 F3       		.byte	0xf3
+ 1992 02b8 01       		.uleb128 0x1
+ 1993 02b9 53       		.byte	0x53
+ 1994 02ba 9F       		.byte	0x9f
+ 1995 02bb 00000000 		.4byte	0
+ 1996 02bf 00000000 		.4byte	0
+ 1997              	.LLST19:
+ 1998 02c3 16000000 		.4byte	.LVL47
+ 1999 02c7 68000000 		.4byte	.LVL59
+ 2000 02cb 0200     		.2byte	0x2
+ 2001 02cd 30       		.byte	0x30
+ 2002 02ce 9F       		.byte	0x9f
+ 2003 02cf 68000000 		.4byte	.LVL59
+ 2004 02d3 6C000000 		.4byte	.LFE68
+ 2005 02d7 0100     		.2byte	0x1
+ 2006 02d9 50       		.byte	0x50
+ 2007 02da 00000000 		.4byte	0
+ 2008 02de 00000000 		.4byte	0
+ 2009              	.LLST20:
+ 2010 02e2 16000000 		.4byte	.LVL47
+ 2011 02e6 42000000 		.4byte	.LVL53
+ 2012 02ea 0100     		.2byte	0x1
+ 2013 02ec 55       		.byte	0x55
+ 2014 02ed 48000000 		.4byte	.LVL55
+ 2015 02f1 6C000000 		.4byte	.LFE68
+ 2016 02f5 0100     		.2byte	0x1
+ 2017 02f7 55       		.byte	0x55
+ 2018 02f8 00000000 		.4byte	0
+ 2019 02fc 00000000 		.4byte	0
+ 2020              	.LLST21:
+ 2021 0300 00000000 		.4byte	.LVL45
+ 2022 0304 16000000 		.4byte	.LVL47
+ 2023 0308 0200     		.2byte	0x2
+ 2024 030a 30       		.byte	0x30
+ 2025 030b 9F       		.byte	0x9f
+ 2026 030c 16000000 		.4byte	.LVL47
+ 2027 0310 6C000000 		.4byte	.LFE68
+ 2028 0314 0100     		.2byte	0x1
+ 2029 0316 59       		.byte	0x59
+ 2030 0317 00000000 		.4byte	0
+ 2031 031b 00000000 		.4byte	0
+ 2032              	.LLST22:
+ 2033 031f 24000000 		.4byte	.LVL48
+ 2034 0323 2A000000 		.4byte	.LVL50
+ 2035 0327 0100     		.2byte	0x1
+ 2036 0329 52       		.byte	0x52
+ 2037 032a 33000000 		.4byte	.LVL51-1
+ 2038 032e 5E000000 		.4byte	.LVL57
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 45
+
+
+ 2039 0332 3800     		.2byte	0x38
+ 2040 0334 08       		.byte	0x8
+ 2041 0335 40       		.byte	0x40
+ 2042 0336 77       		.byte	0x77
+ 2043 0337 00       		.sleb128 0
+ 2044 0338 79       		.byte	0x79
+ 2045 0339 00       		.sleb128 0
+ 2046 033a 1C       		.byte	0x1c
+ 2047 033b 08       		.byte	0x8
+ 2048 033c FF       		.byte	0xff
+ 2049 033d 1A       		.byte	0x1a
+ 2050 033e 77       		.byte	0x77
+ 2051 033f 00       		.sleb128 0
+ 2052 0340 79       		.byte	0x79
+ 2053 0341 00       		.sleb128 0
+ 2054 0342 1C       		.byte	0x1c
+ 2055 0343 77       		.byte	0x77
+ 2056 0344 00       		.sleb128 0
+ 2057 0345 79       		.byte	0x79
+ 2058 0346 00       		.sleb128 0
+ 2059 0347 1C       		.byte	0x1c
+ 2060 0348 40       		.byte	0x40
+ 2061 0349 4B       		.byte	0x4b
+ 2062 034a 24       		.byte	0x24
+ 2063 034b 22       		.byte	0x22
+ 2064 034c 0C       		.byte	0xc
+ 2065 034d 40000080 		.4byte	0x80000040
+ 2066 0351 2C       		.byte	0x2c
+ 2067 0352 28       		.byte	0x28
+ 2068 0353 0100     		.2byte	0x1
+ 2069 0355 16       		.byte	0x16
+ 2070 0356 13       		.byte	0x13
+ 2071 0357 77       		.byte	0x77
+ 2072 0358 00       		.sleb128 0
+ 2073 0359 79       		.byte	0x79
+ 2074 035a 00       		.sleb128 0
+ 2075 035b 1C       		.byte	0x1c
+ 2076 035c 40       		.byte	0x40
+ 2077 035d 4B       		.byte	0x4b
+ 2078 035e 24       		.byte	0x24
+ 2079 035f 22       		.byte	0x22
+ 2080 0360 0C       		.byte	0xc
+ 2081 0361 40000080 		.4byte	0x80000040
+ 2082 0365 2B       		.byte	0x2b
+ 2083 0366 28       		.byte	0x28
+ 2084 0367 0100     		.2byte	0x1
+ 2085 0369 16       		.byte	0x16
+ 2086 036a 13       		.byte	0x13
+ 2087 036b 9F       		.byte	0x9f
+ 2088 036c 66000000 		.4byte	.LVL58
+ 2089 0370 6C000000 		.4byte	.LFE68
+ 2090 0374 3800     		.2byte	0x38
+ 2091 0376 08       		.byte	0x8
+ 2092 0377 40       		.byte	0x40
+ 2093 0378 77       		.byte	0x77
+ 2094 0379 00       		.sleb128 0
+ 2095 037a 79       		.byte	0x79
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 46
+
+
+ 2096 037b 00       		.sleb128 0
+ 2097 037c 1C       		.byte	0x1c
+ 2098 037d 08       		.byte	0x8
+ 2099 037e FF       		.byte	0xff
+ 2100 037f 1A       		.byte	0x1a
+ 2101 0380 77       		.byte	0x77
+ 2102 0381 00       		.sleb128 0
+ 2103 0382 79       		.byte	0x79
+ 2104 0383 00       		.sleb128 0
+ 2105 0384 1C       		.byte	0x1c
+ 2106 0385 77       		.byte	0x77
+ 2107 0386 00       		.sleb128 0
+ 2108 0387 79       		.byte	0x79
+ 2109 0388 00       		.sleb128 0
+ 2110 0389 1C       		.byte	0x1c
+ 2111 038a 40       		.byte	0x40
+ 2112 038b 4B       		.byte	0x4b
+ 2113 038c 24       		.byte	0x24
+ 2114 038d 22       		.byte	0x22
+ 2115 038e 0C       		.byte	0xc
+ 2116 038f 40000080 		.4byte	0x80000040
+ 2117 0393 2C       		.byte	0x2c
+ 2118 0394 28       		.byte	0x28
+ 2119 0395 0100     		.2byte	0x1
+ 2120 0397 16       		.byte	0x16
+ 2121 0398 13       		.byte	0x13
+ 2122 0399 77       		.byte	0x77
+ 2123 039a 00       		.sleb128 0
+ 2124 039b 79       		.byte	0x79
+ 2125 039c 00       		.sleb128 0
+ 2126 039d 1C       		.byte	0x1c
+ 2127 039e 40       		.byte	0x40
+ 2128 039f 4B       		.byte	0x4b
+ 2129 03a0 24       		.byte	0x24
+ 2130 03a1 22       		.byte	0x22
+ 2131 03a2 0C       		.byte	0xc
+ 2132 03a3 40000080 		.4byte	0x80000040
+ 2133 03a7 2B       		.byte	0x2b
+ 2134 03a8 28       		.byte	0x28
+ 2135 03a9 0100     		.2byte	0x1
+ 2136 03ab 16       		.byte	0x16
+ 2137 03ac 13       		.byte	0x13
+ 2138 03ad 9F       		.byte	0x9f
+ 2139 03ae 00000000 		.4byte	0
+ 2140 03b2 00000000 		.4byte	0
+ 2141              	.LLST23:
+ 2142 03b6 00000000 		.4byte	.LVL60
+ 2143 03ba 1A000000 		.4byte	.LVL65
+ 2144 03be 0100     		.2byte	0x1
+ 2145 03c0 50       		.byte	0x50
+ 2146 03c1 1A000000 		.4byte	.LVL65
+ 2147 03c5 42000000 		.4byte	.LVL73
+ 2148 03c9 0100     		.2byte	0x1
+ 2149 03cb 58       		.byte	0x58
+ 2150 03cc 42000000 		.4byte	.LVL73
+ 2151 03d0 45000000 		.4byte	.LVL74-1
+ 2152 03d4 0100     		.2byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 47
+
+
+ 2153 03d6 50       		.byte	0x50
+ 2154 03d7 45000000 		.4byte	.LVL74-1
+ 2155 03db 96000000 		.4byte	.LVL87
+ 2156 03df 0100     		.2byte	0x1
+ 2157 03e1 58       		.byte	0x58
+ 2158 03e2 96000000 		.4byte	.LVL87
+ 2159 03e6 9C000000 		.4byte	.LFE69
+ 2160 03ea 0400     		.2byte	0x4
+ 2161 03ec F3       		.byte	0xf3
+ 2162 03ed 01       		.uleb128 0x1
+ 2163 03ee 50       		.byte	0x50
+ 2164 03ef 9F       		.byte	0x9f
+ 2165 03f0 00000000 		.4byte	0
+ 2166 03f4 00000000 		.4byte	0
+ 2167              	.LLST24:
+ 2168 03f8 00000000 		.4byte	.LVL60
+ 2169 03fc 14000000 		.4byte	.LVL64
+ 2170 0400 0100     		.2byte	0x1
+ 2171 0402 51       		.byte	0x51
+ 2172 0403 14000000 		.4byte	.LVL64
+ 2173 0407 96000000 		.4byte	.LVL87
+ 2174 040b 1600     		.2byte	0x16
+ 2175 040d 79       		.byte	0x79
+ 2176 040e 00       		.sleb128 0
+ 2177 040f 12       		.byte	0x12
+ 2178 0410 0A       		.byte	0xa
+ 2179 0411 FFFF     		.2byte	0xffff
+ 2180 0413 1A       		.byte	0x1a
+ 2181 0414 08       		.byte	0x8
+ 2182 0415 40       		.byte	0x40
+ 2183 0416 16       		.byte	0x16
+ 2184 0417 14       		.byte	0x14
+ 2185 0418 0A       		.byte	0xa
+ 2186 0419 FFFF     		.2byte	0xffff
+ 2187 041b 1A       		.byte	0x1a
+ 2188 041c 2D       		.byte	0x2d
+ 2189 041d 28       		.byte	0x28
+ 2190 041e 0100     		.2byte	0x1
+ 2191 0420 16       		.byte	0x16
+ 2192 0421 13       		.byte	0x13
+ 2193 0422 9F       		.byte	0x9f
+ 2194 0423 00000000 		.4byte	0
+ 2195 0427 00000000 		.4byte	0
+ 2196              	.LLST25:
+ 2197 042b 00000000 		.4byte	.LVL60
+ 2198 042f 10000000 		.4byte	.LVL63
+ 2199 0433 0100     		.2byte	0x1
+ 2200 0435 52       		.byte	0x52
+ 2201 0436 10000000 		.4byte	.LVL63
+ 2202 043a 96000000 		.4byte	.LVL87
+ 2203 043e 0100     		.2byte	0x1
+ 2204 0440 57       		.byte	0x57
+ 2205 0441 96000000 		.4byte	.LVL87
+ 2206 0445 9C000000 		.4byte	.LFE69
+ 2207 0449 0400     		.2byte	0x4
+ 2208 044b F3       		.byte	0xf3
+ 2209 044c 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 48
+
+
+ 2210 044d 52       		.byte	0x52
+ 2211 044e 9F       		.byte	0x9f
+ 2212 044f 00000000 		.4byte	0
+ 2213 0453 00000000 		.4byte	0
+ 2214              	.LLST26:
+ 2215 0457 00000000 		.4byte	.LVL60
+ 2216 045b 08000000 		.4byte	.LVL61
+ 2217 045f 0100     		.2byte	0x1
+ 2218 0461 53       		.byte	0x53
+ 2219 0462 08000000 		.4byte	.LVL61
+ 2220 0466 9C000000 		.4byte	.LFE69
+ 2221 046a 0400     		.2byte	0x4
+ 2222 046c F3       		.byte	0xf3
+ 2223 046d 01       		.uleb128 0x1
+ 2224 046e 53       		.byte	0x53
+ 2225 046f 9F       		.byte	0x9f
+ 2226 0470 00000000 		.4byte	0
+ 2227 0474 00000000 		.4byte	0
+ 2228              	.LLST27:
+ 2229 0478 86000000 		.4byte	.LVL83
+ 2230 047c 8C000000 		.4byte	.LVL84
+ 2231 0480 0200     		.2byte	0x2
+ 2232 0482 30       		.byte	0x30
+ 2233 0483 9F       		.byte	0x9f
+ 2234 0484 90000000 		.4byte	.LVL85
+ 2235 0488 92000000 		.4byte	.LVL86
+ 2236 048c 0200     		.2byte	0x2
+ 2237 048e 40       		.byte	0x40
+ 2238 048f 9F       		.byte	0x9f
+ 2239 0490 92000000 		.4byte	.LVL86
+ 2240 0494 9C000000 		.4byte	.LFE69
+ 2241 0498 0100     		.2byte	0x1
+ 2242 049a 50       		.byte	0x50
+ 2243 049b 00000000 		.4byte	0
+ 2244 049f 00000000 		.4byte	0
+ 2245              	.LLST28:
+ 2246 04a3 0A000000 		.4byte	.LVL62
+ 2247 04a7 1A000000 		.4byte	.LVL65
+ 2248 04ab 0100     		.2byte	0x1
+ 2249 04ad 54       		.byte	0x54
+ 2250 04ae 1A000000 		.4byte	.LVL65
+ 2251 04b2 26000000 		.4byte	.LVL67
+ 2252 04b6 0100     		.2byte	0x1
+ 2253 04b8 55       		.byte	0x55
+ 2254 04b9 2C000000 		.4byte	.LVL69
+ 2255 04bd 42000000 		.4byte	.LVL73
+ 2256 04c1 0100     		.2byte	0x1
+ 2257 04c3 55       		.byte	0x55
+ 2258 04c4 42000000 		.4byte	.LVL73
+ 2259 04c8 5E000000 		.4byte	.LVL78
+ 2260 04cc 0100     		.2byte	0x1
+ 2261 04ce 54       		.byte	0x54
+ 2262 04cf 60000000 		.4byte	.LVL79
+ 2263 04d3 96000000 		.4byte	.LVL87
+ 2264 04d7 0100     		.2byte	0x1
+ 2265 04d9 54       		.byte	0x54
+ 2266 04da 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 49
+
+
+ 2267 04de 00000000 		.4byte	0
+ 2268              		.section	.debug_aranges,"",%progbits
+ 2269 0000 4C000000 		.4byte	0x4c
+ 2270 0004 0200     		.2byte	0x2
+ 2271 0006 00000000 		.4byte	.Ldebug_info0
+ 2272 000a 04       		.byte	0x4
+ 2273 000b 00       		.byte	0
+ 2274 000c 0000     		.2byte	0
+ 2275 000e 0000     		.2byte	0
+ 2276 0010 00000000 		.4byte	.LFB63
+ 2277 0014 40000000 		.4byte	.LFE63-.LFB63
+ 2278 0018 00000000 		.4byte	.LFB64
+ 2279 001c 0E000000 		.4byte	.LFE64-.LFB64
+ 2280 0020 00000000 		.4byte	.LFB65
+ 2281 0024 12000000 		.4byte	.LFE65-.LFB65
+ 2282 0028 00000000 		.4byte	.LFB66
+ 2283 002c 26000000 		.4byte	.LFE66-.LFB66
+ 2284 0030 00000000 		.4byte	.LFB67
+ 2285 0034 9E000000 		.4byte	.LFE67-.LFB67
+ 2286 0038 00000000 		.4byte	.LFB68
+ 2287 003c 6C000000 		.4byte	.LFE68-.LFB68
+ 2288 0040 00000000 		.4byte	.LFB69
+ 2289 0044 9C000000 		.4byte	.LFE69-.LFB69
+ 2290 0048 00000000 		.4byte	0
+ 2291 004c 00000000 		.4byte	0
+ 2292              		.section	.debug_ranges,"",%progbits
+ 2293              	.Ldebug_ranges0:
+ 2294 0000 00000000 		.4byte	.LFB63
+ 2295 0004 40000000 		.4byte	.LFE63
+ 2296 0008 00000000 		.4byte	.LFB64
+ 2297 000c 0E000000 		.4byte	.LFE64
+ 2298 0010 00000000 		.4byte	.LFB65
+ 2299 0014 12000000 		.4byte	.LFE65
+ 2300 0018 00000000 		.4byte	.LFB66
+ 2301 001c 26000000 		.4byte	.LFE66
+ 2302 0020 00000000 		.4byte	.LFB67
+ 2303 0024 9E000000 		.4byte	.LFE67
+ 2304 0028 00000000 		.4byte	.LFB68
+ 2305 002c 6C000000 		.4byte	.LFE68
+ 2306 0030 00000000 		.4byte	.LFB69
+ 2307 0034 9C000000 		.4byte	.LFE69
+ 2308 0038 00000000 		.4byte	0
+ 2309 003c 00000000 		.4byte	0
+ 2310              		.section	.debug_line,"",%progbits
+ 2311              	.Ldebug_line0:
+ 2312 0000 C0020000 		.section	.debug_str,"MS",%progbits,1
+ 2312      02009701 
+ 2312      00000201 
+ 2312      FB0E0D00 
+ 2312      01010101 
+ 2313              	.LASF57:
+ 2314 0000 55534255 		.ascii	"USBUART_IsConfigurationChanged\000"
+ 2314      4152545F 
+ 2314      4973436F 
+ 2314      6E666967 
+ 2314      75726174 
+ 2315              	.LASF24:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 50
+
+
+ 2316 001f 70446174 		.ascii	"pData\000"
+ 2316      6100
+ 2317              	.LASF61:
+ 2318 0025 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3\\UARTldr_QFN.cydsn\000"
+ 2318      73657273 
+ 2318      5C636865 
+ 2318      6D695C55 
+ 2318      44335C55 
+ 2319              	.LASF29:
+ 2320 004a 62756649 		.ascii	"bufIndex\000"
+ 2320      6E646578 
+ 2320      00
+ 2321              	.LASF20:
+ 2322 0053 73697A65 		.ascii	"sizetype\000"
+ 2322      74797065 
+ 2322      00
+ 2323              	.LASF48:
+ 2324 005c 55415254 		.ascii	"UART_Stop\000"
+ 2324      5F53746F 
+ 2324      7000
+ 2325              	.LASF28:
+ 2326 0066 74696D65 		.ascii	"timeoutMs\000"
+ 2326      6F75744D 
+ 2326      7300
+ 2327              	.LASF4:
+ 2328 0070 5F5F7569 		.ascii	"__uint16_t\000"
+ 2328      6E743136 
+ 2328      5F7400
+ 2329              	.LASF2:
+ 2330 007b 73686F72 		.ascii	"short int\000"
+ 2330      7420696E 
+ 2330      7400
+ 2331              	.LASF42:
+ 2332 0085 55534255 		.ascii	"USBUART_Start\000"
+ 2332      4152545F 
+ 2332      53746172 
+ 2332      7400
+ 2333              	.LASF37:
+ 2334 0093 5553425F 		.ascii	"USB_CyBtldrCommWrite\000"
+ 2334      43794274 
+ 2334      6C647243 
+ 2334      6F6D6D57 
+ 2334      72697465 
+ 2335              	.LASF14:
+ 2336 00a8 75696E74 		.ascii	"uint16\000"
+ 2336      313600
+ 2337              	.LASF60:
+ 2338 00af 2E2E5C63 		.ascii	"..\\common\\uart_ldr\\UART_BOOT.c\000"
+ 2338      6F6D6D6F 
+ 2338      6E5C7561 
+ 2338      72745F6C 
+ 2338      64725C55 
+ 2339              	.LASF13:
+ 2340 00ce 75696E74 		.ascii	"uint8\000"
+ 2340      3800
+ 2341              	.LASF15:
+ 2342 00d4 666C6F61 		.ascii	"float\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 51
+
+
+ 2342      7400
+ 2343              	.LASF43:
+ 2344 00da 55534255 		.ascii	"USBUART_GetConfiguration\000"
+ 2344      4152545F 
+ 2344      47657443 
+ 2344      6F6E6669 
+ 2344      67757261 
+ 2345              	.LASF8:
+ 2346 00f3 6C6F6E67 		.ascii	"long long int\000"
+ 2346      206C6F6E 
+ 2346      6720696E 
+ 2346      7400
+ 2347              	.LASF47:
+ 2348 0101 55415254 		.ascii	"UART_ClearTxBuffer\000"
+ 2348      5F436C65 
+ 2348      61725478 
+ 2348      42756666 
+ 2348      657200
+ 2349              	.LASF6:
+ 2350 0114 6C6F6E67 		.ascii	"long int\000"
+ 2350      20696E74 
+ 2350      00
+ 2351              	.LASF35:
+ 2352 011d 6F6C6444 		.ascii	"oldDataCount\000"
+ 2352      61746143 
+ 2352      6F756E74 
+ 2352      00
+ 2353              	.LASF58:
+ 2354 012a 55534255 		.ascii	"USBUART_ReadOutEP\000"
+ 2354      4152545F 
+ 2354      52656164 
+ 2354      4F757445 
+ 2354      5000
+ 2355              	.LASF40:
+ 2356 013c 5553425F 		.ascii	"USB_CyBtldrCommRead\000"
+ 2356      43794274 
+ 2356      6C647243 
+ 2356      6F6D6D52 
+ 2356      65616400 
+ 2357              	.LASF19:
+ 2358 0150 6C6F6E67 		.ascii	"long double\000"
+ 2358      20646F75 
+ 2358      626C6500 
+ 2359              	.LASF38:
+ 2360 015c 72657443 		.ascii	"retCode\000"
+ 2360      6F646500 
+ 2361              	.LASF53:
+ 2362 0164 43794465 		.ascii	"CyDelayUs\000"
+ 2362      6C617955 
+ 2362      7300
+ 2363              	.LASF1:
+ 2364 016e 756E7369 		.ascii	"unsigned char\000"
+ 2364      676E6564 
+ 2364      20636861 
+ 2364      7200
+ 2365              	.LASF54:
+ 2366 017c 55415254 		.ascii	"UART_ReadRxData\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 52
+
+
+ 2366      5F526561 
+ 2366      64527844 
+ 2366      61746100 
+ 2367              	.LASF52:
+ 2368 018c 55415254 		.ascii	"UART_GetRxBufferSize\000"
+ 2368      5F476574 
+ 2368      52784275 
+ 2368      66666572 
+ 2368      53697A65 
+ 2369              	.LASF0:
+ 2370 01a1 7369676E 		.ascii	"signed char\000"
+ 2370      65642063 
+ 2370      68617200 
+ 2371              	.LASF9:
+ 2372 01ad 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2372      206C6F6E 
+ 2372      6720756E 
+ 2372      7369676E 
+ 2372      65642069 
+ 2373              	.LASF33:
+ 2374 01c4 64617461 		.ascii	"dataIndexCntr\000"
+ 2374      496E6465 
+ 2374      78436E74 
+ 2374      7200
+ 2375              	.LASF10:
+ 2376 01d2 756E7369 		.ascii	"unsigned int\000"
+ 2376      676E6564 
+ 2376      20696E74 
+ 2376      00
+ 2377              	.LASF11:
+ 2378 01df 75696E74 		.ascii	"uint16_t\000"
+ 2378      31365F74 
+ 2378      00
+ 2379              	.LASF41:
+ 2380 01e8 55534255 		.ascii	"USBUART_started\000"
+ 2380      4152545F 
+ 2380      73746172 
+ 2380      74656400 
+ 2381              	.LASF3:
+ 2382 01f8 73686F72 		.ascii	"short unsigned int\000"
+ 2382      7420756E 
+ 2382      7369676E 
+ 2382      65642069 
+ 2382      6E7400
+ 2383              	.LASF36:
+ 2384 020b 73746174 		.ascii	"status\000"
+ 2384      757300
+ 2385              	.LASF55:
+ 2386 0212 55534255 		.ascii	"USBUART_LoadInEP\000"
+ 2386      4152545F 
+ 2386      4C6F6164 
+ 2386      496E4550 
+ 2386      00
+ 2387              	.LASF17:
+ 2388 0223 63686172 		.ascii	"char\000"
+ 2388      00
+ 2389              	.LASF39:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 53
+
+
+ 2390 0228 7472616E 		.ascii	"transfer_Size\000"
+ 2390      73666572 
+ 2390      5F53697A 
+ 2390      6500
+ 2391              	.LASF18:
+ 2392 0236 63797374 		.ascii	"cystatus\000"
+ 2392      61747573 
+ 2392      00
+ 2393              	.LASF46:
+ 2394 023f 55415254 		.ascii	"UART_ClearRxBuffer\000"
+ 2394      5F436C65 
+ 2394      61725278 
+ 2394      42756666 
+ 2394      657200
+ 2395              	.LASF45:
+ 2396 0252 55415254 		.ascii	"UART_Start\000"
+ 2396      5F537461 
+ 2396      727400
+ 2397              	.LASF12:
+ 2398 025d 696E7433 		.ascii	"int32_t\000"
+ 2398      325F7400 
+ 2399              	.LASF27:
+ 2400 0265 74696D65 		.ascii	"timeOut\000"
+ 2400      4F757400 
+ 2401              	.LASF31:
+ 2402 026d 55415254 		.ascii	"UART_CyBtldrCommRead\000"
+ 2402      5F437942 
+ 2402      746C6472 
+ 2402      436F6D6D 
+ 2402      52656164 
+ 2403              	.LASF23:
+ 2404 0282 55415254 		.ascii	"UART_CyBtldrCommReset\000"
+ 2404      5F437942 
+ 2404      746C6472 
+ 2404      436F6D6D 
+ 2404      52657365 
+ 2405              	.LASF50:
+ 2406 0298 55534255 		.ascii	"USBUART_CDC_Init\000"
+ 2406      4152545F 
+ 2406      4344435F 
+ 2406      496E6974 
+ 2406      00
+ 2407              	.LASF7:
+ 2408 02a9 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2408      20756E73 
+ 2408      69676E65 
+ 2408      6420696E 
+ 2408      7400
+ 2409              	.LASF16:
+ 2410 02bb 646F7562 		.ascii	"double\000"
+ 2410      6C6500
+ 2411              	.LASF25:
+ 2412 02c2 73697A65 		.ascii	"size\000"
+ 2412      00
+ 2413              	.LASF26:
+ 2414 02c7 636F756E 		.ascii	"count\000"
+ 2414      7400
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 54
+
+
+ 2415              	.LASF21:
+ 2416 02cd 55415254 		.ascii	"UART_CyBtldrCommStart\000"
+ 2416      5F437942 
+ 2416      746C6472 
+ 2416      436F6D6D 
+ 2416      53746172 
+ 2417              	.LASF5:
+ 2418 02e3 5F5F696E 		.ascii	"__int32_t\000"
+ 2418      7433325F 
+ 2418      7400
+ 2419              	.LASF30:
+ 2420 02ed 55415254 		.ascii	"UART_CyBtldrCommWrite\000"
+ 2420      5F437942 
+ 2420      746C6472 
+ 2420      436F6D6D 
+ 2420      57726974 
+ 2421              	.LASF34:
+ 2422 0303 74656D70 		.ascii	"tempCount\000"
+ 2422      436F756E 
+ 2422      7400
+ 2423              	.LASF32:
+ 2424 030d 69436E74 		.ascii	"iCntr\000"
+ 2424      7200
+ 2425              	.LASF62:
+ 2426 0313 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 2426      52784275 
+ 2426      66666572 
+ 2426      00
+ 2427              	.LASF44:
+ 2428 0320 43794465 		.ascii	"CyDelay\000"
+ 2428      6C617900 
+ 2429              	.LASF59:
+ 2430 0328 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2430      43313120 
+ 2430      352E342E 
+ 2430      31203230 
+ 2430      31363036 
+ 2431 035b 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2431      20726576 
+ 2431      6973696F 
+ 2431      6E203233 
+ 2431      37373135 
+ 2432 038e 73202D66 		.ascii	"s -ffunction-sections -ffat-lto-objects\000"
+ 2432      66756E63 
+ 2432      74696F6E 
+ 2432      2D736563 
+ 2432      74696F6E 
+ 2433              	.LASF49:
+ 2434 03b6 55534255 		.ascii	"USBUART_Stop\000"
+ 2434      4152545F 
+ 2434      53746F70 
+ 2434      00
+ 2435              	.LASF51:
+ 2436 03c3 55415254 		.ascii	"UART_PutChar\000"
+ 2436      5F507574 
+ 2436      43686172 
+ 2436      00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccCZgJ1d.s 			page 55
+
+
+ 2437              	.LASF56:
+ 2438 03d0 55534255 		.ascii	"USBUART_GetEPState\000"
+ 2438      4152545F 
+ 2438      47657445 
+ 2438      50537461 
+ 2438      746500
+ 2439              	.LASF22:
+ 2440 03e3 55415254 		.ascii	"UART_CyBtldrCommStop\000"
+ 2440      5F437942 
+ 2440      746C6472 
+ 2440      436F6D6D 
+ 2440      53746F70 
+ 2441              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

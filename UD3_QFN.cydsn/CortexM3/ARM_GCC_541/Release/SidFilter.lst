@@ -1,0 +1,2536 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"SidFilter.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.SidFilter_updateVoice,"ax",%progbits
+  20              		.align	1
+  21              		.global	SidFilter_updateVoice
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	SidFilter_updateVoice, %function
+  25              	SidFilter_updateVoice:
+  26              	.LFB68:
+  27              		.file 1 "..\\common\\vms\\SidFilter.c"
+   1:..\common\vms/SidFilter.c **** /*
+   2:..\common\vms/SidFilter.c ****  * File:   MidiFilter.c
+   3:..\common\vms/SidFilter.c ****  * Author: Thorb
+   4:..\common\vms/SidFilter.c ****  *
+   5:..\common\vms/SidFilter.c ****  * Created on 12 September 2023, 23:15
+   6:..\common\vms/SidFilter.c ****  */
+   7:..\common\vms/SidFilter.c **** 
+   8:..\common\vms/SidFilter.c **** #include "NoteMapper.h"
+   9:..\common\vms/SidFilter.c **** #include "MidiFilter.h"
+  10:..\common\vms/SidFilter.c **** #include "TTerm.h"
+  11:..\common\vms/SidFilter.c **** #include "SidProcessor.h"
+  12:..\common\vms/SidFilter.c **** #include "tasks/tsk_sid.h"
+  13:..\common\vms/SidFilter.c **** #include "interrupter.h"
+  14:..\common\vms/SidFilter.c **** #include "cli_common.h"
+  15:..\common\vms/SidFilter.c **** 
+  16:..\common\vms/SidFilter.c **** SIDFilterData_t SID_filterData = {
+  17:..\common\vms/SidFilter.c ****     .channelVolume = {[0 ... N_SIDCHANNEL-1] = MAX_VOL},
+  18:..\common\vms/SidFilter.c ****     .hpvEnabled = {[0 ... N_SIDCHANNEL-1] = 1},
+  19:..\common\vms/SidFilter.c ****     .flags = 0,
+  20:..\common\vms/SidFilter.c ****     .noiseVolume = 10000, //set to 20% = (6553 >> 15) as a default
+  21:..\common\vms/SidFilter.c ****     .hpvEnabledGlobally = 0
+  22:..\common\vms/SidFilter.c **** };
+  23:..\common\vms/SidFilter.c **** 
+  24:..\common\vms/SidFilter.c **** //test if selected wave is sqare and noise is off
+  25:..\common\vms/SidFilter.c **** #define SID_IS_HPV_AVAILABLE(FLAGS) ((FLAGS & SID_FRAME_FLAG_SQUARE) && !(FLAGS & SID_FRAME_FLAG_NO
+  26:..\common\vms/SidFilter.c **** 
+  27:..\common\vms/SidFilter.c **** void SidFilter_updateVoice(uint32_t channel, SIDChannelData_t * channelData){
+  28              		.loc 1 27 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 2
+
+
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  28:..\common\vms/SidFilter.c ****     
+  29:..\common\vms/SidFilter.c ****     //is this voice even on?
+  30:..\common\vms/SidFilter.c ****     if(    channelData->currentEnvelopeVolume != 0      //adsr volume > 0?
+  33              		.loc 1 30 0
+  34 0000 0B6A     		ldr	r3, [r1, #32]
+  27:..\common\vms/SidFilter.c ****     
+  35              		.loc 1 27 0
+  36 0002 2DE9F341 		push	{r0, r1, r4, r5, r6, r7, r8, lr}
+  37              		.cfi_def_cfa_offset 32
+  38              		.cfi_offset 4, -24
+  39              		.cfi_offset 5, -20
+  40              		.cfi_offset 6, -16
+  41              		.cfi_offset 7, -12
+  42              		.cfi_offset 8, -8
+  43              		.cfi_offset 14, -4
+  27:..\common\vms/SidFilter.c ****     
+  44              		.loc 1 27 0
+  45 0006 0446     		mov	r4, r0
+  46              		.loc 1 30 0
+  47 0008 002B     		cmp	r3, #0
+  48 000a 57D0     		beq	.L2
+  31:..\common\vms/SidFilter.c ****         && channelData->frequency_dHz != 0              //frequency not set to 0 (done when resetti
+  49              		.loc 1 31 0
+  50 000c 0869     		ldr	r0, [r1, #16]
+  51              	.LVL1:
+  52 000e 0028     		cmp	r0, #0
+  53 0010 54D0     		beq	.L2
+  32:..\common\vms/SidFilter.c ****         && !(channelData->flags & SID_FRAME_FLAG_TEST)  //test bit not set, that would have the sid
+  54              		.loc 1 32 0
+  55 0012 4A68     		ldr	r2, [r1, #4]
+  56 0014 D606     		lsls	r6, r2, #27
+  57 0016 51D4     		bmi	.L2
+  33:..\common\vms/SidFilter.c ****         && SID_filterData.channelVolume[channel] != 0   //master volume for the channel > 0?
+  58              		.loc 1 33 0
+  59 0018 2E4E     		ldr	r6, .L27
+  60 001a 56F824E0 		ldr	lr, [r6, r4, lsl #2]
+  61 001e BEF1000F 		cmp	lr, #0
+  62 0022 4BD0     		beq	.L2
+  34:..\common\vms/SidFilter.c ****         && (channel != 2 || !(channelData->flags & SID_FRAME_FLAG_CH3OFF))  //check for ch3off bit,
+  63              		.loc 1 34 0
+  64 0024 022C     		cmp	r4, #2
+  65 0026 01D1     		bne	.L3
+  66              		.loc 1 34 0 is_stmt 0 discriminator 1
+  67 0028 D505     		lsls	r5, r2, #23
+  68 002a 47D4     		bmi	.L2
+  69              	.L3:
+  70              	.LBB2:
+  35:..\common\vms/SidFilter.c ****     ){
+  36:..\common\vms/SidFilter.c ****         //yes
+  37:..\common\vms/SidFilter.c ****         
+  38:..\common\vms/SidFilter.c ****         //calculate ontime 
+  39:..\common\vms/SidFilter.c ****             uint32_t ontime = param.pw;
+  40:..\common\vms/SidFilter.c ****         
+  41:..\common\vms/SidFilter.c ****         //calculate frequency
+  42:..\common\vms/SidFilter.c ****             uint32_t frequency_dHz = channelData->frequency_dHz; //not much to calc :)
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 3
+
+
+  43:..\common\vms/SidFilter.c ****     
+  44:..\common\vms/SidFilter.c ****         //calculate volume. Starting from max and scaling down with every parameter we have
+  45:..\common\vms/SidFilter.c ****             uint32_t totalVolume = MAX_VOL;
+  46:..\common\vms/SidFilter.c ****             
+  47:..\common\vms/SidFilter.c ****             //channel ADSR
+  48:..\common\vms/SidFilter.c ****             if(channelData->currentEnvelopeVolume != MAX_VOL) totalVolume = (totalVolume * channelD
+  71              		.loc 1 48 0 is_stmt 1
+  72 002c 47F6FF77 		movw	r7, #32767
+  73 0030 BB42     		cmp	r3, r7
+  74 0032 1ABF     		itte	ne
+  75 0034 C3EBC333 		rsbne	r3, r3, r3, lsl #15
+  76 0038 DB0B     		lsrne	r3, r3, #15
+  45:..\common\vms/SidFilter.c ****             
+  77              		.loc 1 45 0
+  78 003a 3B46     		moveq	r3, r7
+  49:..\common\vms/SidFilter.c ****             
+  50:..\common\vms/SidFilter.c ****             //channel filter and master volume
+  51:..\common\vms/SidFilter.c ****             if(SID_filterData.channelVolume[channel] != MAX_VOL) totalVolume = (totalVolume * SID_f
+  79              		.loc 1 51 0
+  80 003c BE45     		cmp	lr, r7
+  81 003e 18BF     		it	ne
+  82 0040 0EFB03F3 		mulne	r3, lr, r3
+  39:..\common\vms/SidFilter.c ****         
+  83              		.loc 1 39 0
+  84 0044 244D     		ldr	r5, .L27+4
+  85              		.loc 1 51 0
+  86 0046 18BF     		it	ne
+  87 0048 DB0B     		lsrne	r3, r3, #15
+  52:..\common\vms/SidFilter.c ****             
+  53:..\common\vms/SidFilter.c ****             //noise volume (if noise is on)
+  54:..\common\vms/SidFilter.c ****             if((channelData->flags & SID_FRAME_FLAG_NOISE) && (SID_filterData.noiseVolume != MAX_VO
+  88              		.loc 1 54 0
+  89 004a 12F00102 		ands	r2, r2, #1
+  39:..\common\vms/SidFilter.c ****         
+  90              		.loc 1 39 0
+  91 004e 2D88     		ldrh	r5, [r5]
+  92              	.LVL2:
+  93              		.loc 1 54 0
+  94 0050 06D0     		beq	.L6
+  95              		.loc 1 54 0 is_stmt 0 discriminator 1
+  96 0052 47F6FF7E 		movw	lr, #32767
+  97 0056 F769     		ldr	r7, [r6, #28]
+  98 0058 7745     		cmp	r7, lr
+  99 005a 1CBF     		itt	ne
+ 100 005c 7B43     		mulne	r3, r7, r3
+ 101              	.LVL3:
+ 102 005e DB0B     		lsrne	r3, r3, #15
+ 103              	.LVL4:
+ 104              	.L6:
+ 105 0060 47F6FF77 		movw	r7, #32767
+  55:..\common\vms/SidFilter.c ****             
+  56:..\common\vms/SidFilter.c ****             totalVolume += (channelData->frequency_dHz>>3);
+ 106              		.loc 1 56 0 is_stmt 1
+ 107 0064 03EBD003 		add	r3, r3, r0, lsr #3
+ 108              	.LVL5:
+ 109 0068 9F42     		cmp	r7, r3
+ 110 006a 28BF     		it	cs
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 4
+
+
+ 111 006c 1F46     		movcs	r7, r3
+ 112              	.LVL6:
+  57:..\common\vms/SidFilter.c ****             if(totalVolume > MAX_VOL) totalVolume = MAX_VOL;
+  58:..\common\vms/SidFilter.c ****             
+  59:..\common\vms/SidFilter.c ****             //half volume scale for hpv is done in hpv calc code
+  60:..\common\vms/SidFilter.c ****    
+  61:..\common\vms/SidFilter.c ****         //calculate hpv stuff
+  62:..\common\vms/SidFilter.c ****             uint32_t hpvCount = 0;
+  63:..\common\vms/SidFilter.c ****             uint32_t hpvPhase = 0;
+  64:..\common\vms/SidFilter.c ****             uint32_t hpvVolume = totalVolume;
+  65:..\common\vms/SidFilter.c ****             
+  66:..\common\vms/SidFilter.c ****             //is hpv even required?
+  67:..\common\vms/SidFilter.c ****             //TODO evaluate having a hpv enable for every voice
+  68:..\common\vms/SidFilter.c ****             if(SID_IS_HPV_AVAILABLE(channelData->flags)){ // && (SID_filterData.hpvEnabled[channel]
+ 113              		.loc 1 68 0
+ 114 006e 4B68     		ldr	r3, [r1, #4]
+ 115 0070 03F00703 		and	r3, r3, #7
+ 116 0074 022B     		cmp	r3, #2
+ 117 0076 06D1     		bne	.L11
+ 118              		.loc 1 68 0 is_stmt 0 discriminator 1
+ 119 0078 366A     		ldr	r6, [r6, #32]
+ 120 007a 2EB1     		cbz	r6, .L12
+ 121              	.LVL7:
+  69:..\common\vms/SidFilter.c ****                 //yes => enable and calc phase
+  70:..\common\vms/SidFilter.c ****                 hpvCount = 1; 
+  71:..\common\vms/SidFilter.c ****                 hpvPhase = channelData->pulsewidth >> 4;
+ 122              		.loc 1 71 0 is_stmt 1
+ 123 007c 4E69     		ldr	r6, [r1, #20]
+  70:..\common\vms/SidFilter.c ****                 hpvPhase = channelData->pulsewidth >> 4;
+ 124              		.loc 1 70 0
+ 125 007e 4FF00108 		mov	r8, #1
+ 126              		.loc 1 71 0
+ 127 0082 3609     		lsrs	r6, r6, #4
+ 128              	.LVL8:
+ 129 0084 01E0     		b	.L7
+ 130              	.LVL9:
+ 131              	.L11:
+  63:..\common\vms/SidFilter.c ****             uint32_t hpvVolume = totalVolume;
+ 132              		.loc 1 63 0
+ 133 0086 0026     		movs	r6, #0
+ 134              	.L12:
+  62:..\common\vms/SidFilter.c ****             uint32_t hpvPhase = 0;
+ 135              		.loc 1 62 0
+ 136 0088 B046     		mov	r8, r6
+ 137              	.LVL10:
+ 138              	.L7:
+  72:..\common\vms/SidFilter.c ****                 
+  73:..\common\vms/SidFilter.c ****                 //also scale volume down by half
+  74:..\common\vms/SidFilter.c ****                 //TODO evaluate how good this actually sounds
+  75:..\common\vms/SidFilter.c ****                 //totalVolume = totalVolume >> 1;
+  76:..\common\vms/SidFilter.c ****                 //ontime = ontime >> 1;
+  77:..\common\vms/SidFilter.c ****                 
+  78:..\common\vms/SidFilter.c ****                 
+  79:..\common\vms/SidFilter.c ****                 //start scaling down the volume starting from 1kHz to 1,8192kHz. Above 1,8192kHz HP
+  80:..\common\vms/SidFilter.c ****                 if(channelData->frequency_dHz > 10000){
+  81:..\common\vms/SidFilter.c ****                     hpvVolume = (hpvVolume * (18192 - channelData->frequency_dHz)) >> 13;
+  82:..\common\vms/SidFilter.c ****                 }else if(channelData->frequency_dHz >= 18192){
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 5
+
+
+  83:..\common\vms/SidFilter.c ****                     hpvVolume = 0;
+  84:..\common\vms/SidFilter.c ****                 }
+  85:..\common\vms/SidFilter.c ****             }
+  86:..\common\vms/SidFilter.c ****             
+  87:..\common\vms/SidFilter.c ****         //is noise required?
+  88:..\common\vms/SidFilter.c ****             uint32_t noiseAmplitude = 0;
+  89:..\common\vms/SidFilter.c ****             
+  90:..\common\vms/SidFilter.c ****             if(channelData->flags & SID_FRAME_FLAG_NOISE){
+ 139              		.loc 1 90 0
+ 140 008a 3AB1     		cbz	r2, .L8
+ 141              	.LVL11:
+  91:..\common\vms/SidFilter.c ****                 //yes => set noise target
+  92:..\common\vms/SidFilter.c ****                 noiseAmplitude = 80;
+  93:..\common\vms/SidFilter.c ****                 
+  94:..\common\vms/SidFilter.c ****                 /*
+  95:..\common\vms/SidFilter.c ****                     we will want to scale the frequency back a little too
+  96:..\common\vms/SidFilter.c ****                 
+  97:..\common\vms/SidFilter.c ****                 
+  98:..\common\vms/SidFilter.c ****                     how the frequency is scaled:
+  99:..\common\vms/SidFilter.c ****                     
+ 100:..\common\vms/SidFilter.c ****                     in the earlier code we used the function newFreq = sqrt(freq*2) * 40; whis is p
+ 101:..\common\vms/SidFilter.c ****                 
+ 102:..\common\vms/SidFilter.c ****                     now however I don't, so we will approximate linearly. The graph looks kinda lik
+ 103:..\common\vms/SidFilter.c ****                 
+ 104:..\common\vms/SidFilter.c ****                     y = m*x + b;
+ 105:..\common\vms/SidFilter.c ****                 
+ 106:..\common\vms/SidFilter.c ****                     b = 2000;
+ 107:..\common\vms/SidFilter.c ****                     m = 3000Hz / 20000Hz = 0.15 = 2458 / 16384 = 2458 >> 14
+ 108:..\common\vms/SidFilter.c ****                 
+ 109:..\common\vms/SidFilter.c ****                     and then everything needs to be x10 due ti the frequency being in dHz
+ 110:..\common\vms/SidFilter.c ****                         
+ 111:..\common\vms/SidFilter.c ****                     //TODO actually evaluate how this sounds
+ 112:..\common\vms/SidFilter.c ****                 */
+ 113:..\common\vms/SidFilter.c ****                 
+ 114:..\common\vms/SidFilter.c ****                 frequency_dHz = 20000 + ((frequency_dHz * 24576) >> 14);
+ 142              		.loc 1 114 0
+ 143 008c 4FF4C043 		mov	r3, #24576
+ 144 0090 5843     		muls	r0, r3, r0
+ 145              	.LVL12:
+ 146 0092 800B     		lsrs	r0, r0, #14
+ 147 0094 00F59C40 		add	r0, r0, #19968
+ 148 0098 2030     		adds	r0, r0, #32
+ 149              	.LVL13:
+  92:..\common\vms/SidFilter.c ****                 
+ 150              		.loc 1 92 0
+ 151 009a 5022     		movs	r2, #80
+ 152              	.LVL14:
+ 153              	.L8:
+ 115:..\common\vms/SidFilter.c ****                 
+ 116:..\common\vms/SidFilter.c ****                 
+ 117:..\common\vms/SidFilter.c ****             }
+ 118:..\common\vms/SidFilter.c ****             
+ 119:..\common\vms/SidFilter.c ****         //and finally update siggen
+ 120:..\common\vms/SidFilter.c ****             SigGen_setVoiceSID(channel, 1, ontime, totalVolume, frequency_dHz, noiseAmplitude);
+ 154              		.loc 1 120 0
+ 155 009c 8DE80500 		stmia	sp, {r0, r2}
+ 156 00a0 3B46     		mov	r3, r7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 6
+
+
+ 157 00a2 2A46     		mov	r2, r5
+ 158              	.LVL15:
+ 159 00a4 2046     		mov	r0, r4
+ 160              	.LVL16:
+ 161 00a6 0121     		movs	r1, #1
+ 162              	.LVL17:
+ 163 00a8 FFF7FEFF 		bl	SigGen_setVoiceSID
+ 164              	.LVL18:
+ 121:..\common\vms/SidFilter.c ****             SigGen_setHyperVoiceSID(channel, hpvCount, ontime, totalVolume, hpvPhase);
+ 165              		.loc 1 121 0
+ 166 00ac 0096     		str	r6, [sp]
+ 167 00ae 3B46     		mov	r3, r7
+ 168 00b0 2A46     		mov	r2, r5
+ 169 00b2 4146     		mov	r1, r8
+ 170 00b4 2046     		mov	r0, r4
+ 171 00b6 FFF7FEFF 		bl	SigGen_setHyperVoiceSID
+ 172              	.LVL19:
+ 173              	.LBE2:
+  35:..\common\vms/SidFilter.c ****         //yes
+ 174              		.loc 1 35 0
+ 175 00ba 07E0     		b	.L1
+ 176              	.LVL20:
+ 177              	.L2:
+ 122:..\common\vms/SidFilter.c ****             
+ 123:..\common\vms/SidFilter.c ****     }else{
+ 124:..\common\vms/SidFilter.c ****         //no, channel muted. Just switch it off in siggen
+ 125:..\common\vms/SidFilter.c ****         SigGen_setVoiceSID(channel, 0, 0, 0, 0, 0);
+ 178              		.loc 1 125 0
+ 179 00bc 0023     		movs	r3, #0
+ 180 00be 0193     		str	r3, [sp, #4]
+ 181 00c0 0093     		str	r3, [sp]
+ 182 00c2 1A46     		mov	r2, r3
+ 183 00c4 1946     		mov	r1, r3
+ 184              	.LVL21:
+ 185 00c6 2046     		mov	r0, r4
+ 186 00c8 FFF7FEFF 		bl	SigGen_setVoiceSID
+ 187              	.LVL22:
+ 188              	.L1:
+ 126:..\common\vms/SidFilter.c ****     }
+ 127:..\common\vms/SidFilter.c ****     
+ 128:..\common\vms/SidFilter.c **** }...
+ 189              		.loc 1 128 0
+ 190 00cc 02B0     		add	sp, sp, #8
+ 191              		.cfi_def_cfa_offset 24
+ 192              		@ sp needed
+ 193 00ce BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 194              	.LVL23:
+ 195              	.L28:
+ 196 00d2 00BF     		.align	2
+ 197              	.L27:
+ 198 00d4 00000000 		.word	.LANCHOR0
+ 199 00d8 00000000 		.word	param
+ 200              		.cfi_endproc
+ 201              	.LFE68:
+ 202              		.size	SidFilter_updateVoice, .-SidFilter_updateVoice
+ 203              		.global	SID_filterData
+ 204              		.comm	interrupter,12,4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 7
+
+
+ 205              		.data
+ 206              		.align	2
+ 207              		.set	.LANCHOR0,. + 0
+ 208              		.type	SID_filterData, %object
+ 209              		.size	SID_filterData, 36
+ 210              	SID_filterData:
+ 211 0000 FF7F0000 		.word	32767
+ 212 0004 FF7F0000 		.word	32767
+ 213 0008 FF7F0000 		.word	32767
+ 214 000c 01000000 		.word	1
+ 215 0010 01000000 		.word	1
+ 216 0014 01000000 		.word	1
+ 217 0018 00000000 		.word	0
+ 218 001c 10270000 		.word	10000
+ 219 0020 00000000 		.word	0
+ 220              		.text
+ 221              	.Letext0:
+ 222              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 223              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 224              		.file 4 "..\\common\\ud3core/tasks/tsk_sid.h"
+ 225              		.file 5 "..\\common\\rtos\\include/timers.h"
+ 226              		.file 6 "..\\common\\ud3core/interrupter.h"
+ 227              		.file 7 "..\\common\\ud3core/cli_common.h"
+ 228              		.file 8 "Generated_Source\\PSoC5/core_cm3.h"
+ 229              		.file 9 "..\\common\\ud3core/SignalGenerator.h"
+ 230              		.section	.debug_info,"",%progbits
+ 231              	.Ldebug_info0:
+ 232 0000 7A050000 		.4byte	0x57a
+ 233 0004 0400     		.2byte	0x4
+ 234 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 235 000a 04       		.byte	0x4
+ 236 000b 01       		.uleb128 0x1
+ 237 000c CD000000 		.4byte	.LASF94
+ 238 0010 0C       		.byte	0xc
+ 239 0011 25020000 		.4byte	.LASF95
+ 240 0015 34050000 		.4byte	.LASF96
+ 241 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 242 001d 00000000 		.4byte	0
+ 243 0021 00000000 		.4byte	.Ldebug_line0
+ 244 0025 02       		.uleb128 0x2
+ 245 0026 01       		.byte	0x1
+ 246 0027 06       		.byte	0x6
+ 247 0028 23030000 		.4byte	.LASF0
+ 248 002c 03       		.uleb128 0x3
+ 249 002d 79020000 		.4byte	.LASF3
+ 250 0031 02       		.byte	0x2
+ 251 0032 1D       		.byte	0x1d
+ 252 0033 37000000 		.4byte	0x37
+ 253 0037 02       		.uleb128 0x2
+ 254 0038 01       		.byte	0x1
+ 255 0039 08       		.byte	0x8
+ 256 003a E7020000 		.4byte	.LASF1
+ 257 003e 02       		.uleb128 0x2
+ 258 003f 02       		.byte	0x2
+ 259 0040 05       		.byte	0x5
+ 260 0041 75000000 		.4byte	.LASF2
+ 261 0045 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 8
+
+
+ 262 0046 88010000 		.4byte	.LASF4
+ 263 004a 02       		.byte	0x2
+ 264 004b 2B       		.byte	0x2b
+ 265 004c 50000000 		.4byte	0x50
+ 266 0050 02       		.uleb128 0x2
+ 267 0051 02       		.byte	0x2
+ 268 0052 07       		.byte	0x7
+ 269 0053 B1030000 		.4byte	.LASF5
+ 270 0057 03       		.uleb128 0x3
+ 271 0058 A5040000 		.4byte	.LASF6
+ 272 005c 02       		.byte	0x2
+ 273 005d 3F       		.byte	0x3f
+ 274 005e 62000000 		.4byte	0x62
+ 275 0062 02       		.uleb128 0x2
+ 276 0063 04       		.byte	0x4
+ 277 0064 05       		.byte	0x5
+ 278 0065 66020000 		.4byte	.LASF7
+ 279 0069 03       		.uleb128 0x3
+ 280 006a 7E040000 		.4byte	.LASF8
+ 281 006e 02       		.byte	0x2
+ 282 006f 41       		.byte	0x41
+ 283 0070 74000000 		.4byte	0x74
+ 284 0074 02       		.uleb128 0x2
+ 285 0075 04       		.byte	0x4
+ 286 0076 07       		.byte	0x7
+ 287 0077 3F040000 		.4byte	.LASF9
+ 288 007b 02       		.uleb128 0x2
+ 289 007c 08       		.byte	0x8
+ 290 007d 05       		.byte	0x5
+ 291 007e B3000000 		.4byte	.LASF10
+ 292 0082 02       		.uleb128 0x2
+ 293 0083 08       		.byte	0x8
+ 294 0084 07       		.byte	0x7
+ 295 0085 9C000000 		.4byte	.LASF11
+ 296 0089 04       		.uleb128 0x4
+ 297 008a 04       		.byte	0x4
+ 298 008b 05       		.byte	0x5
+ 299 008c 696E7400 		.ascii	"int\000"
+ 300 0090 02       		.uleb128 0x2
+ 301 0091 04       		.byte	0x4
+ 302 0092 07       		.byte	0x7
+ 303 0093 51030000 		.4byte	.LASF12
+ 304 0097 03       		.uleb128 0x3
+ 305 0098 E9010000 		.4byte	.LASF13
+ 306 009c 03       		.byte	0x3
+ 307 009d 18       		.byte	0x18
+ 308 009e 2C000000 		.4byte	0x2c
+ 309 00a2 03       		.uleb128 0x3
+ 310 00a3 75030000 		.4byte	.LASF14
+ 311 00a7 03       		.byte	0x3
+ 312 00a8 24       		.byte	0x24
+ 313 00a9 45000000 		.4byte	0x45
+ 314 00ad 03       		.uleb128 0x3
+ 315 00ae E8030000 		.4byte	.LASF15
+ 316 00b2 03       		.byte	0x3
+ 317 00b3 2C       		.byte	0x2c
+ 318 00b4 57000000 		.4byte	0x57
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 9
+
+
+ 319 00b8 03       		.uleb128 0x3
+ 320 00b9 48030000 		.4byte	.LASF16
+ 321 00bd 03       		.byte	0x3
+ 322 00be 30       		.byte	0x30
+ 323 00bf 69000000 		.4byte	0x69
+ 324 00c3 02       		.uleb128 0x2
+ 325 00c4 04       		.byte	0x4
+ 326 00c5 07       		.byte	0x7
+ 327 00c6 93000000 		.4byte	.LASF17
+ 328 00ca 02       		.uleb128 0x2
+ 329 00cb 01       		.byte	0x1
+ 330 00cc 08       		.byte	0x8
+ 331 00cd E3030000 		.4byte	.LASF18
+ 332 00d1 02       		.uleb128 0x2
+ 333 00d2 04       		.byte	0x4
+ 334 00d3 04       		.byte	0x4
+ 335 00d4 4C020000 		.4byte	.LASF19
+ 336 00d8 02       		.uleb128 0x2
+ 337 00d9 08       		.byte	0x8
+ 338 00da 04       		.byte	0x4
+ 339 00db 18050000 		.4byte	.LASF20
+ 340 00df 05       		.uleb128 0x5
+ 341 00e0 AD000000 		.4byte	0xad
+ 342 00e4 06       		.uleb128 0x6
+ 343 00e5 01       		.byte	0x1
+ 344 00e6 37000000 		.4byte	0x37
+ 345 00ea 04       		.byte	0x4
+ 346 00eb 40       		.byte	0x40
+ 347 00ec 0F010000 		.4byte	0x10f
+ 348 00f0 07       		.uleb128 0x7
+ 349 00f1 CC010000 		.4byte	.LASF21
+ 350 00f5 00       		.byte	0
+ 351 00f6 07       		.uleb128 0x7
+ 352 00f7 D7030000 		.4byte	.LASF22
+ 353 00fb 01       		.byte	0x1
+ 354 00fc 07       		.uleb128 0x7
+ 355 00fd 52020000 		.4byte	.LASF23
+ 356 0101 02       		.byte	0x2
+ 357 0102 07       		.uleb128 0x7
+ 358 0103 3F020000 		.4byte	.LASF24
+ 359 0107 03       		.byte	0x3
+ 360 0108 07       		.uleb128 0x7
+ 361 0109 BD040000 		.4byte	.LASF25
+ 362 010d 04       		.byte	0x4
+ 363 010e 00       		.byte	0
+ 364 010f 03       		.uleb128 0x3
+ 365 0110 13040000 		.4byte	.LASF26
+ 366 0114 04       		.byte	0x4
+ 367 0115 40       		.byte	0x40
+ 368 0116 E4000000 		.4byte	0xe4
+ 369 011a 08       		.uleb128 0x8
+ 370 011b B8000000 		.4byte	0xb8
+ 371 011f 2A010000 		.4byte	0x12a
+ 372 0123 09       		.uleb128 0x9
+ 373 0124 C3000000 		.4byte	0xc3
+ 374 0128 02       		.byte	0x2
+ 375 0129 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 10
+
+
+ 376 012a 0A       		.uleb128 0xa
+ 377 012b 24       		.byte	0x24
+ 378 012c 04       		.byte	0x4
+ 379 012d 55       		.byte	0x55
+ 380 012e B7010000 		.4byte	0x1b7
+ 381 0132 0B       		.uleb128 0xb
+ 382 0133 6F020000 		.4byte	.LASF27
+ 383 0137 04       		.byte	0x4
+ 384 0138 56       		.byte	0x56
+ 385 0139 0F010000 		.4byte	0x10f
+ 386 013d 00       		.byte	0
+ 387 013e 0B       		.uleb128 0xb
+ 388 013f BE020000 		.4byte	.LASF28
+ 389 0143 04       		.byte	0x4
+ 390 0144 58       		.byte	0x58
+ 391 0145 B8000000 		.4byte	0xb8
+ 392 0149 04       		.byte	0x4
+ 393 014a 0B       		.uleb128 0xb
+ 394 014b 16000000 		.4byte	.LASF29
+ 395 014f 04       		.byte	0x4
+ 396 0150 5A       		.byte	0x5a
+ 397 0151 A2000000 		.4byte	0xa2
+ 398 0155 08       		.byte	0x8
+ 399 0156 0B       		.uleb128 0xb
+ 400 0157 BE010000 		.4byte	.LASF30
+ 401 015b 04       		.byte	0x4
+ 402 015c 5B       		.byte	0x5b
+ 403 015d A2000000 		.4byte	0xa2
+ 404 0161 0A       		.byte	0xa
+ 405 0162 0B       		.uleb128 0xb
+ 406 0163 AF040000 		.4byte	.LASF31
+ 407 0167 04       		.byte	0x4
+ 408 0168 5C       		.byte	0x5c
+ 409 0169 A2000000 		.4byte	0xa2
+ 410 016d 0C       		.byte	0xc
+ 411 016e 0B       		.uleb128 0xb
+ 412 016f C4020000 		.4byte	.LASF32
+ 413 0173 04       		.byte	0x4
+ 414 0174 5D       		.byte	0x5d
+ 415 0175 A2000000 		.4byte	0xa2
+ 416 0179 0E       		.byte	0xe
+ 417 017a 0B       		.uleb128 0xb
+ 418 017b D9020000 		.4byte	.LASF33
+ 419 017f 04       		.byte	0x4
+ 420 0180 5F       		.byte	0x5f
+ 421 0181 B8000000 		.4byte	0xb8
+ 422 0185 10       		.byte	0x10
+ 423 0186 0B       		.uleb128 0xb
+ 424 0187 67050000 		.4byte	.LASF34
+ 425 018b 04       		.byte	0x4
+ 426 018c 60       		.byte	0x60
+ 427 018d B8000000 		.4byte	0xb8
+ 428 0191 14       		.byte	0x14
+ 429 0192 0B       		.uleb128 0xb
+ 430 0193 90030000 		.4byte	.LASF35
+ 431 0197 04       		.byte	0x4
+ 432 0198 62       		.byte	0x62
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 11
+
+
+ 433 0199 B8000000 		.4byte	0xb8
+ 434 019d 18       		.byte	0x18
+ 435 019e 0B       		.uleb128 0xb
+ 436 019f 83020000 		.4byte	.LASF36
+ 437 01a3 04       		.byte	0x4
+ 438 01a4 63       		.byte	0x63
+ 439 01a5 B8000000 		.4byte	0xb8
+ 440 01a9 1C       		.byte	0x1c
+ 441 01aa 0B       		.uleb128 0xb
+ 442 01ab 9D020000 		.4byte	.LASF37
+ 443 01af 04       		.byte	0x4
+ 444 01b0 64       		.byte	0x64
+ 445 01b1 B8000000 		.4byte	0xb8
+ 446 01b5 20       		.byte	0x20
+ 447 01b6 00       		.byte	0
+ 448 01b7 03       		.uleb128 0x3
+ 449 01b8 12030000 		.4byte	.LASF38
+ 450 01bc 04       		.byte	0x4
+ 451 01bd 65       		.byte	0x65
+ 452 01be 2A010000 		.4byte	0x12a
+ 453 01c2 0A       		.uleb128 0xa
+ 454 01c3 24       		.byte	0x24
+ 455 01c4 04       		.byte	0x4
+ 456 01c5 68       		.byte	0x68
+ 457 01c6 07020000 		.4byte	0x207
+ 458 01ca 0B       		.uleb128 0xb
+ 459 01cb 59050000 		.4byte	.LASF39
+ 460 01cf 04       		.byte	0x4
+ 461 01d0 6A       		.byte	0x6a
+ 462 01d1 1A010000 		.4byte	0x11a
+ 463 01d5 00       		.byte	0
+ 464 01d6 0B       		.uleb128 0xb
+ 465 01d7 37000000 		.4byte	.LASF40
+ 466 01db 04       		.byte	0x4
+ 467 01dc 6B       		.byte	0x6b
+ 468 01dd 1A010000 		.4byte	0x11a
+ 469 01e1 0C       		.byte	0xc
+ 470 01e2 0B       		.uleb128 0xb
+ 471 01e3 BE020000 		.4byte	.LASF28
+ 472 01e7 04       		.byte	0x4
+ 473 01e8 6E       		.byte	0x6e
+ 474 01e9 B8000000 		.4byte	0xb8
+ 475 01ed 18       		.byte	0x18
+ 476 01ee 0B       		.uleb128 0xb
+ 477 01ef 7E030000 		.4byte	.LASF41
+ 478 01f3 04       		.byte	0x4
+ 479 01f4 70       		.byte	0x70
+ 480 01f5 B8000000 		.4byte	0xb8
+ 481 01f9 1C       		.byte	0x1c
+ 482 01fa 0B       		.uleb128 0xb
+ 483 01fb D6010000 		.4byte	.LASF42
+ 484 01ff 04       		.byte	0x4
+ 485 0200 71       		.byte	0x71
+ 486 0201 B8000000 		.4byte	0xb8
+ 487 0205 20       		.byte	0x20
+ 488 0206 00       		.byte	0
+ 489 0207 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 12
+
+
+ 490 0208 27000000 		.4byte	.LASF43
+ 491 020c 04       		.byte	0x4
+ 492 020d 72       		.byte	0x72
+ 493 020e C2010000 		.4byte	0x1c2
+ 494 0212 03       		.uleb128 0x3
+ 495 0213 67000000 		.4byte	.LASF44
+ 496 0217 05       		.byte	0x5
+ 497 0218 4E       		.byte	0x4e
+ 498 0219 1D020000 		.4byte	0x21d
+ 499 021d 0C       		.uleb128 0xc
+ 500 021e 04       		.byte	0x4
+ 501 021f 23020000 		.4byte	0x223
+ 502 0223 0D       		.uleb128 0xd
+ 503 0224 95040000 		.4byte	.LASF97
+ 504 0228 0E       		.uleb128 0xe
+ 505 0229 93010000 		.4byte	.LASF47
+ 506 022d 01       		.byte	0x1
+ 507 022e 37000000 		.4byte	0x37
+ 508 0232 06       		.byte	0x6
+ 509 0233 38       		.byte	0x38
+ 510 0234 45020000 		.4byte	0x245
+ 511 0238 07       		.uleb128 0x7
+ 512 0239 89040000 		.4byte	.LASF45
+ 513 023d 00       		.byte	0
+ 514 023e 07       		.uleb128 0x7
+ 515 023f 72050000 		.4byte	.LASF46
+ 516 0243 01       		.byte	0x1
+ 517 0244 00       		.byte	0
+ 518 0245 0E       		.uleb128 0xe
+ 519 0246 14020000 		.4byte	.LASF48
+ 520 024a 01       		.byte	0x1
+ 521 024b 37000000 		.4byte	0x37
+ 522 024f 06       		.byte	0x6
+ 523 0250 3D       		.byte	0x3d
+ 524 0251 68020000 		.4byte	0x268
+ 525 0255 07       		.uleb128 0x7
+ 526 0256 3A030000 		.4byte	.LASF49
+ 527 025a 00       		.byte	0
+ 528 025b 07       		.uleb128 0x7
+ 529 025c CC020000 		.4byte	.LASF50
+ 530 0260 01       		.byte	0x1
+ 531 0261 07       		.uleb128 0x7
+ 532 0262 AC010000 		.4byte	.LASF51
+ 533 0266 02       		.byte	0x2
+ 534 0267 00       		.byte	0
+ 535 0268 0E       		.uleb128 0xe
+ 536 0269 FA010000 		.4byte	.LASF52
+ 537 026d 01       		.byte	0x1
+ 538 026e 37000000 		.4byte	0x37
+ 539 0272 06       		.byte	0x6
+ 540 0273 43       		.byte	0x43
+ 541 0274 85020000 		.4byte	0x285
+ 542 0278 07       		.uleb128 0x7
+ 543 0279 A3010000 		.4byte	.LASF53
+ 544 027d 00       		.byte	0
+ 545 027e 07       		.uleb128 0x7
+ 546 027f 1D000000 		.4byte	.LASF54
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 13
+
+
+ 547 0283 01       		.byte	0x1
+ 548 0284 00       		.byte	0
+ 549 0285 0E       		.uleb128 0xe
+ 550 0286 5E030000 		.4byte	.LASF55
+ 551 028a 01       		.byte	0x1
+ 552 028b 37000000 		.4byte	0x37
+ 553 028f 06       		.byte	0x6
+ 554 0290 49       		.byte	0x49
+ 555 0291 A2020000 		.4byte	0x2a2
+ 556 0295 07       		.uleb128 0x7
+ 557 0296 51040000 		.4byte	.LASF56
+ 558 029a 00       		.byte	0
+ 559 029b 07       		.uleb128 0x7
+ 560 029c 42000000 		.4byte	.LASF57
+ 561 02a0 01       		.byte	0x1
+ 562 02a1 00       		.byte	0
+ 563 02a2 0A       		.uleb128 0xa
+ 564 02a3 0C       		.byte	0xc
+ 565 02a4 06       		.byte	0x6
+ 566 02a5 4E       		.byte	0x4e
+ 567 02a6 FE020000 		.4byte	0x2fe
+ 568 02aa 0F       		.uleb128 0xf
+ 569 02ab 707700   		.ascii	"pw\000"
+ 570 02ae 06       		.byte	0x6
+ 571 02af 50       		.byte	0x50
+ 572 02b0 A2000000 		.4byte	0xa2
+ 573 02b4 00       		.byte	0
+ 574 02b5 0F       		.uleb128 0xf
+ 575 02b6 70726400 		.ascii	"prd\000"
+ 576 02ba 06       		.byte	0x6
+ 577 02bb 51       		.byte	0x51
+ 578 02bc A2000000 		.4byte	0xa2
+ 579 02c0 02       		.byte	0x2
+ 580 02c1 0B       		.uleb128 0xb
+ 581 02c2 1F040000 		.4byte	.LASF58
+ 582 02c6 06       		.byte	0x6
+ 583 02c7 52       		.byte	0x52
+ 584 02c8 45020000 		.4byte	0x245
+ 585 02cc 04       		.byte	0x4
+ 586 02cd 0B       		.uleb128 0xb
+ 587 02ce 7F000000 		.4byte	.LASF59
+ 588 02d2 06       		.byte	0x6
+ 589 02d3 53       		.byte	0x53
+ 590 02d4 68020000 		.4byte	0x268
+ 591 02d8 05       		.byte	0x5
+ 592 02d9 0F       		.uleb128 0xf
+ 593 02da 6D6F6400 		.ascii	"mod\000"
+ 594 02de 06       		.byte	0x6
+ 595 02df 54       		.byte	0x54
+ 596 02e0 85020000 		.4byte	0x285
+ 597 02e4 06       		.byte	0x6
+ 598 02e5 0B       		.uleb128 0xb
+ 599 02e6 5D020000 		.4byte	.LASF60
+ 600 02ea 06       		.byte	0x6
+ 601 02eb 55       		.byte	0x55
+ 602 02ec 28020000 		.4byte	0x228
+ 603 02f0 07       		.byte	0x7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 14
+
+
+ 604 02f1 0B       		.uleb128 0xb
+ 605 02f2 32040000 		.4byte	.LASF61
+ 606 02f6 06       		.byte	0x6
+ 607 02f7 56       		.byte	0x56
+ 608 02f8 12020000 		.4byte	0x212
+ 609 02fc 08       		.byte	0x8
+ 610 02fd 00       		.byte	0
+ 611 02fe 03       		.uleb128 0x3
+ 612 02ff C4030000 		.4byte	.LASF62
+ 613 0303 06       		.byte	0x6
+ 614 0304 57       		.byte	0x57
+ 615 0305 A2020000 		.4byte	0x2a2
+ 616 0309 10       		.uleb128 0x10
+ 617 030a CA040000 		.4byte	.LASF98
+ 618 030e 24       		.byte	0x24
+ 619 030f 07       		.byte	0x7
+ 620 0310 8A       		.byte	0x8a
+ 621 0311 F9030000 		.4byte	0x3f9
+ 622 0315 0F       		.uleb128 0xf
+ 623 0316 707700   		.ascii	"pw\000"
+ 624 0319 07       		.byte	0x7
+ 625 031a 8B       		.byte	0x8b
+ 626 031b A2000000 		.4byte	0xa2
+ 627 031f 00       		.byte	0
+ 628 0320 0F       		.uleb128 0xf
+ 629 0321 70776400 		.ascii	"pwd\000"
+ 630 0325 07       		.byte	0x7
+ 631 0326 8C       		.byte	0x8c
+ 632 0327 A2000000 		.4byte	0xa2
+ 633 032b 02       		.byte	0x2
+ 634 032c 0F       		.uleb128 0xf
+ 635 032d 766F6C00 		.ascii	"vol\000"
+ 636 0331 07       		.byte	0x7
+ 637 0332 8D       		.byte	0x8d
+ 638 0333 A2000000 		.4byte	0xa2
+ 639 0337 04       		.byte	0x4
+ 640 0338 0B       		.uleb128 0xb
+ 641 0339 2F030000 		.4byte	.LASF63
+ 642 033d 07       		.byte	0x7
+ 643 033e 8E       		.byte	0x8e
+ 644 033f A2000000 		.4byte	0xa2
+ 645 0343 06       		.byte	0x6
+ 646 0344 0B       		.uleb128 0xb
+ 647 0345 EC040000 		.4byte	.LASF64
+ 648 0349 07       		.byte	0x7
+ 649 034a 8F       		.byte	0x8f
+ 650 034b A2000000 		.4byte	0xa2
+ 651 034f 08       		.byte	0x8
+ 652 0350 0B       		.uleb128 0xb
+ 653 0351 69040000 		.4byte	.LASF65
+ 654 0355 07       		.byte	0x7
+ 655 0356 90       		.byte	0x90
+ 656 0357 A2000000 		.4byte	0xa2
+ 657 035b 0A       		.byte	0xa
+ 658 035c 0B       		.uleb128 0xb
+ 659 035d A6030000 		.4byte	.LASF66
+ 660 0361 07       		.byte	0x7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 15
+
+
+ 661 0362 91       		.byte	0x91
+ 662 0363 A2000000 		.4byte	0xa2
+ 663 0367 0C       		.byte	0xc
+ 664 0368 0B       		.uleb128 0xb
+ 665 0369 C4010000 		.4byte	.LASF67
+ 666 036d 07       		.byte	0x7
+ 667 036e 92       		.byte	0x92
+ 668 036f A2000000 		.4byte	0xa2
+ 669 0373 0E       		.byte	0xe
+ 670 0374 0B       		.uleb128 0xb
+ 671 0375 5E000000 		.4byte	.LASF68
+ 672 0379 07       		.byte	0x7
+ 673 037a 93       		.byte	0x93
+ 674 037b A2000000 		.4byte	0xa2
+ 675 037f 10       		.byte	0x10
+ 676 0380 0B       		.uleb128 0xb
+ 677 0381 C1000000 		.4byte	.LASF69
+ 678 0385 07       		.byte	0x7
+ 679 0386 94       		.byte	0x94
+ 680 0387 97000000 		.4byte	0x97
+ 681 038b 12       		.byte	0x12
+ 682 038c 0B       		.uleb128 0xb
+ 683 038d 08040000 		.4byte	.LASF70
+ 684 0391 07       		.byte	0x7
+ 685 0392 95       		.byte	0x95
+ 686 0393 97000000 		.4byte	0x97
+ 687 0397 13       		.byte	0x13
+ 688 0398 0B       		.uleb128 0xb
+ 689 0399 0C020000 		.4byte	.LASF71
+ 690 039d 07       		.byte	0x7
+ 691 039e 96       		.byte	0x96
+ 692 039f 97000000 		.4byte	0x97
+ 693 03a3 14       		.byte	0x14
+ 694 03a4 0B       		.uleb128 0xb
+ 695 03a5 B3020000 		.4byte	.LASF72
+ 696 03a9 07       		.byte	0x7
+ 697 03aa 97       		.byte	0x97
+ 698 03ab A2000000 		.4byte	0xa2
+ 699 03af 16       		.byte	0x16
+ 700 03b0 0B       		.uleb128 0xb
+ 701 03b1 E3040000 		.4byte	.LASF73
+ 702 03b5 07       		.byte	0x7
+ 703 03b6 98       		.byte	0x98
+ 704 03b7 A2000000 		.4byte	0xa2
+ 705 03bb 18       		.byte	0x18
+ 706 03bc 0B       		.uleb128 0xb
+ 707 03bd DB040000 		.4byte	.LASF74
+ 708 03c1 07       		.byte	0x7
+ 709 03c2 99       		.byte	0x99
+ 710 03c3 97000000 		.4byte	0x97
+ 711 03c7 1A       		.byte	0x1a
+ 712 03c8 0B       		.uleb128 0xb
+ 713 03c9 09030000 		.4byte	.LASF75
+ 714 03cd 07       		.byte	0x7
+ 715 03ce 9A       		.byte	0x9a
+ 716 03cf A2000000 		.4byte	0xa2
+ 717 03d3 1C       		.byte	0x1c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 16
+
+
+ 718 03d4 0B       		.uleb128 0xb
+ 719 03d5 FF020000 		.4byte	.LASF76
+ 720 03d9 07       		.byte	0x7
+ 721 03da 9B       		.byte	0x9b
+ 722 03db A2000000 		.4byte	0xa2
+ 723 03df 1E       		.byte	0x1e
+ 724 03e0 0B       		.uleb128 0xb
+ 725 03e1 F5040000 		.4byte	.LASF77
+ 726 03e5 07       		.byte	0x7
+ 727 03e6 9C       		.byte	0x9c
+ 728 03e7 97000000 		.4byte	0x97
+ 729 03eb 20       		.byte	0x20
+ 730 03ec 0B       		.uleb128 0xb
+ 731 03ed F5020000 		.4byte	.LASF78
+ 732 03f1 07       		.byte	0x7
+ 733 03f2 9D       		.byte	0x9d
+ 734 03f3 A2000000 		.4byte	0xa2
+ 735 03f7 22       		.byte	0x22
+ 736 03f8 00       		.byte	0
+ 737 03f9 03       		.uleb128 0x3
+ 738 03fa 24040000 		.4byte	.LASF79
+ 739 03fe 07       		.byte	0x7
+ 740 03ff 9F       		.byte	0x9f
+ 741 0400 09030000 		.4byte	0x309
+ 742 0404 11       		.uleb128 0x11
+ 743 0405 66010000 		.4byte	.LASF99
+ 744 0409 01       		.byte	0x1
+ 745 040a 1B       		.byte	0x1b
+ 746 040b 00000000 		.4byte	.LFB68
+ 747 040f DC000000 		.4byte	.LFE68-.LFB68
+ 748 0413 01       		.uleb128 0x1
+ 749 0414 9C       		.byte	0x9c
+ 750 0415 28050000 		.4byte	0x528
+ 751 0419 12       		.uleb128 0x12
+ 752 041a 8B000000 		.4byte	.LASF80
+ 753 041e 01       		.byte	0x1
+ 754 041f 1B       		.byte	0x1b
+ 755 0420 B8000000 		.4byte	0xb8
+ 756 0424 00000000 		.4byte	.LLST0
+ 757 0428 12       		.uleb128 0x12
+ 758 0429 5D040000 		.4byte	.LASF81
+ 759 042d 01       		.byte	0x1
+ 760 042e 1B       		.byte	0x1b
+ 761 042f 28050000 		.4byte	0x528
+ 762 0433 2C000000 		.4byte	.LLST1
+ 763 0437 13       		.uleb128 0x13
+ 764 0438 2C000000 		.4byte	.LBB2
+ 765 043c 8E000000 		.4byte	.LBE2-.LBB2
+ 766 0440 FC040000 		.4byte	0x4fc
+ 767 0444 14       		.uleb128 0x14
+ 768 0445 00000000 		.4byte	.LASF82
+ 769 0449 01       		.byte	0x1
+ 770 044a 27       		.byte	0x27
+ 771 044b B8000000 		.4byte	0xb8
+ 772 044f 66000000 		.4byte	.LLST2
+ 773 0453 14       		.uleb128 0x14
+ 774 0454 D9020000 		.4byte	.LASF33
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 17
+
+
+ 775 0458 01       		.byte	0x1
+ 776 0459 2A       		.byte	0x2a
+ 777 045a B8000000 		.4byte	0xb8
+ 778 045e 79000000 		.4byte	.LLST3
+ 779 0462 14       		.uleb128 0x14
+ 780 0463 1F050000 		.4byte	.LASF83
+ 781 0467 01       		.byte	0x1
+ 782 0468 2D       		.byte	0x2d
+ 783 0469 B8000000 		.4byte	0xb8
+ 784 046d AF000000 		.4byte	.LLST4
+ 785 0471 14       		.uleb128 0x14
+ 786 0472 2B050000 		.4byte	.LASF84
+ 787 0476 01       		.byte	0x1
+ 788 0477 3E       		.byte	0x3e
+ 789 0478 B8000000 		.4byte	0xb8
+ 790 047c 37020000 		.4byte	.LLST5
+ 791 0480 14       		.uleb128 0x14
+ 792 0481 F1010000 		.4byte	.LASF85
+ 793 0485 01       		.byte	0x1
+ 794 0486 3F       		.byte	0x3f
+ 795 0487 B8000000 		.4byte	0xb8
+ 796 048b 6E020000 		.4byte	.LLST6
+ 797 048f 14       		.uleb128 0x14
+ 798 0490 FB040000 		.4byte	.LASF86
+ 799 0494 01       		.byte	0x1
+ 800 0495 40       		.byte	0x40
+ 801 0496 B8000000 		.4byte	0xb8
+ 802 049a A4020000 		.4byte	.LLST7
+ 803 049e 14       		.uleb128 0x14
+ 804 049f 07000000 		.4byte	.LASF87
+ 805 04a3 01       		.byte	0x1
+ 806 04a4 58       		.byte	0x58
+ 807 04a5 B8000000 		.4byte	0xb8
+ 808 04a9 B7020000 		.4byte	.LLST8
+ 809 04ad 15       		.uleb128 0x15
+ 810 04ae AC000000 		.4byte	.LVL18
+ 811 04b2 67050000 		.4byte	0x567
+ 812 04b6 D2040000 		.4byte	0x4d2
+ 813 04ba 16       		.uleb128 0x16
+ 814 04bb 01       		.uleb128 0x1
+ 815 04bc 50       		.byte	0x50
+ 816 04bd 02       		.uleb128 0x2
+ 817 04be 74       		.byte	0x74
+ 818 04bf 00       		.sleb128 0
+ 819 04c0 16       		.uleb128 0x16
+ 820 04c1 01       		.uleb128 0x1
+ 821 04c2 51       		.byte	0x51
+ 822 04c3 01       		.uleb128 0x1
+ 823 04c4 31       		.byte	0x31
+ 824 04c5 16       		.uleb128 0x16
+ 825 04c6 01       		.uleb128 0x1
+ 826 04c7 52       		.byte	0x52
+ 827 04c8 02       		.uleb128 0x2
+ 828 04c9 75       		.byte	0x75
+ 829 04ca 00       		.sleb128 0
+ 830 04cb 16       		.uleb128 0x16
+ 831 04cc 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 18
+
+
+ 832 04cd 53       		.byte	0x53
+ 833 04ce 02       		.uleb128 0x2
+ 834 04cf 77       		.byte	0x77
+ 835 04d0 00       		.sleb128 0
+ 836 04d1 00       		.byte	0
+ 837 04d2 17       		.uleb128 0x17
+ 838 04d3 BA000000 		.4byte	.LVL19
+ 839 04d7 72050000 		.4byte	0x572
+ 840 04db 16       		.uleb128 0x16
+ 841 04dc 01       		.uleb128 0x1
+ 842 04dd 50       		.byte	0x50
+ 843 04de 02       		.uleb128 0x2
+ 844 04df 74       		.byte	0x74
+ 845 04e0 00       		.sleb128 0
+ 846 04e1 16       		.uleb128 0x16
+ 847 04e2 01       		.uleb128 0x1
+ 848 04e3 51       		.byte	0x51
+ 849 04e4 02       		.uleb128 0x2
+ 850 04e5 78       		.byte	0x78
+ 851 04e6 00       		.sleb128 0
+ 852 04e7 16       		.uleb128 0x16
+ 853 04e8 01       		.uleb128 0x1
+ 854 04e9 52       		.byte	0x52
+ 855 04ea 02       		.uleb128 0x2
+ 856 04eb 75       		.byte	0x75
+ 857 04ec 00       		.sleb128 0
+ 858 04ed 16       		.uleb128 0x16
+ 859 04ee 01       		.uleb128 0x1
+ 860 04ef 53       		.byte	0x53
+ 861 04f0 02       		.uleb128 0x2
+ 862 04f1 77       		.byte	0x77
+ 863 04f2 00       		.sleb128 0
+ 864 04f3 16       		.uleb128 0x16
+ 865 04f4 02       		.uleb128 0x2
+ 866 04f5 7D       		.byte	0x7d
+ 867 04f6 00       		.sleb128 0
+ 868 04f7 02       		.uleb128 0x2
+ 869 04f8 76       		.byte	0x76
+ 870 04f9 00       		.sleb128 0
+ 871 04fa 00       		.byte	0
+ 872 04fb 00       		.byte	0
+ 873 04fc 17       		.uleb128 0x17
+ 874 04fd CC000000 		.4byte	.LVL22
+ 875 0501 67050000 		.4byte	0x567
+ 876 0505 16       		.uleb128 0x16
+ 877 0506 01       		.uleb128 0x1
+ 878 0507 50       		.byte	0x50
+ 879 0508 02       		.uleb128 0x2
+ 880 0509 74       		.byte	0x74
+ 881 050a 00       		.sleb128 0
+ 882 050b 16       		.uleb128 0x16
+ 883 050c 01       		.uleb128 0x1
+ 884 050d 51       		.byte	0x51
+ 885 050e 01       		.uleb128 0x1
+ 886 050f 30       		.byte	0x30
+ 887 0510 16       		.uleb128 0x16
+ 888 0511 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 19
+
+
+ 889 0512 52       		.byte	0x52
+ 890 0513 01       		.uleb128 0x1
+ 891 0514 30       		.byte	0x30
+ 892 0515 16       		.uleb128 0x16
+ 893 0516 01       		.uleb128 0x1
+ 894 0517 53       		.byte	0x53
+ 895 0518 01       		.uleb128 0x1
+ 896 0519 30       		.byte	0x30
+ 897 051a 16       		.uleb128 0x16
+ 898 051b 02       		.uleb128 0x2
+ 899 051c 7D       		.byte	0x7d
+ 900 051d 00       		.sleb128 0
+ 901 051e 01       		.uleb128 0x1
+ 902 051f 30       		.byte	0x30
+ 903 0520 16       		.uleb128 0x16
+ 904 0521 02       		.uleb128 0x2
+ 905 0522 7D       		.byte	0x7d
+ 906 0523 04       		.sleb128 4
+ 907 0524 01       		.uleb128 0x1
+ 908 0525 30       		.byte	0x30
+ 909 0526 00       		.byte	0
+ 910 0527 00       		.byte	0
+ 911 0528 0C       		.uleb128 0xc
+ 912 0529 04       		.byte	0x4
+ 913 052a B7010000 		.4byte	0x1b7
+ 914 052e 18       		.uleb128 0x18
+ 915 052f 71040000 		.4byte	.LASF88
+ 916 0533 08       		.byte	0x8
+ 917 0534 1207     		.2byte	0x712
+ 918 0536 DF000000 		.4byte	0xdf
+ 919 053a 19       		.uleb128 0x19
+ 920 053b 4F000000 		.4byte	.LASF89
+ 921 053f 01       		.byte	0x1
+ 922 0540 10       		.byte	0x10
+ 923 0541 07020000 		.4byte	0x207
+ 924 0545 05       		.uleb128 0x5
+ 925 0546 03       		.byte	0x3
+ 926 0547 00000000 		.4byte	SID_filterData
+ 927 054b 19       		.uleb128 0x19
+ 928 054c 7C010000 		.4byte	.LASF90
+ 929 0550 06       		.byte	0x6
+ 930 0551 59       		.byte	0x59
+ 931 0552 FE020000 		.4byte	0x2fe
+ 932 0556 05       		.uleb128 0x5
+ 933 0557 03       		.byte	0x3
+ 934 0558 00000000 		.4byte	interrupter
+ 935 055c 1A       		.uleb128 0x1a
+ 936 055d 8A030000 		.4byte	.LASF91
+ 937 0561 07       		.byte	0x7
+ 938 0562 A2       		.byte	0xa2
+ 939 0563 F9030000 		.4byte	0x3f9
+ 940 0567 1B       		.uleb128 0x1b
+ 941 0568 05050000 		.4byte	.LASF92
+ 942 056c 05050000 		.4byte	.LASF92
+ 943 0570 09       		.byte	0x9
+ 944 0571 95       		.byte	0x95
+ 945 0572 1B       		.uleb128 0x1b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 20
+
+
+ 946 0573 F0030000 		.4byte	.LASF93
+ 947 0577 F0030000 		.4byte	.LASF93
+ 948 057b 09       		.byte	0x9
+ 949 057c 94       		.byte	0x94
+ 950 057d 00       		.byte	0
+ 951              		.section	.debug_abbrev,"",%progbits
+ 952              	.Ldebug_abbrev0:
+ 953 0000 01       		.uleb128 0x1
+ 954 0001 11       		.uleb128 0x11
+ 955 0002 01       		.byte	0x1
+ 956 0003 25       		.uleb128 0x25
+ 957 0004 0E       		.uleb128 0xe
+ 958 0005 13       		.uleb128 0x13
+ 959 0006 0B       		.uleb128 0xb
+ 960 0007 03       		.uleb128 0x3
+ 961 0008 0E       		.uleb128 0xe
+ 962 0009 1B       		.uleb128 0x1b
+ 963 000a 0E       		.uleb128 0xe
+ 964 000b 55       		.uleb128 0x55
+ 965 000c 17       		.uleb128 0x17
+ 966 000d 11       		.uleb128 0x11
+ 967 000e 01       		.uleb128 0x1
+ 968 000f 10       		.uleb128 0x10
+ 969 0010 17       		.uleb128 0x17
+ 970 0011 00       		.byte	0
+ 971 0012 00       		.byte	0
+ 972 0013 02       		.uleb128 0x2
+ 973 0014 24       		.uleb128 0x24
+ 974 0015 00       		.byte	0
+ 975 0016 0B       		.uleb128 0xb
+ 976 0017 0B       		.uleb128 0xb
+ 977 0018 3E       		.uleb128 0x3e
+ 978 0019 0B       		.uleb128 0xb
+ 979 001a 03       		.uleb128 0x3
+ 980 001b 0E       		.uleb128 0xe
+ 981 001c 00       		.byte	0
+ 982 001d 00       		.byte	0
+ 983 001e 03       		.uleb128 0x3
+ 984 001f 16       		.uleb128 0x16
+ 985 0020 00       		.byte	0
+ 986 0021 03       		.uleb128 0x3
+ 987 0022 0E       		.uleb128 0xe
+ 988 0023 3A       		.uleb128 0x3a
+ 989 0024 0B       		.uleb128 0xb
+ 990 0025 3B       		.uleb128 0x3b
+ 991 0026 0B       		.uleb128 0xb
+ 992 0027 49       		.uleb128 0x49
+ 993 0028 13       		.uleb128 0x13
+ 994 0029 00       		.byte	0
+ 995 002a 00       		.byte	0
+ 996 002b 04       		.uleb128 0x4
+ 997 002c 24       		.uleb128 0x24
+ 998 002d 00       		.byte	0
+ 999 002e 0B       		.uleb128 0xb
+ 1000 002f 0B       		.uleb128 0xb
+ 1001 0030 3E       		.uleb128 0x3e
+ 1002 0031 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 21
+
+
+ 1003 0032 03       		.uleb128 0x3
+ 1004 0033 08       		.uleb128 0x8
+ 1005 0034 00       		.byte	0
+ 1006 0035 00       		.byte	0
+ 1007 0036 05       		.uleb128 0x5
+ 1008 0037 35       		.uleb128 0x35
+ 1009 0038 00       		.byte	0
+ 1010 0039 49       		.uleb128 0x49
+ 1011 003a 13       		.uleb128 0x13
+ 1012 003b 00       		.byte	0
+ 1013 003c 00       		.byte	0
+ 1014 003d 06       		.uleb128 0x6
+ 1015 003e 04       		.uleb128 0x4
+ 1016 003f 01       		.byte	0x1
+ 1017 0040 0B       		.uleb128 0xb
+ 1018 0041 0B       		.uleb128 0xb
+ 1019 0042 49       		.uleb128 0x49
+ 1020 0043 13       		.uleb128 0x13
+ 1021 0044 3A       		.uleb128 0x3a
+ 1022 0045 0B       		.uleb128 0xb
+ 1023 0046 3B       		.uleb128 0x3b
+ 1024 0047 0B       		.uleb128 0xb
+ 1025 0048 01       		.uleb128 0x1
+ 1026 0049 13       		.uleb128 0x13
+ 1027 004a 00       		.byte	0
+ 1028 004b 00       		.byte	0
+ 1029 004c 07       		.uleb128 0x7
+ 1030 004d 28       		.uleb128 0x28
+ 1031 004e 00       		.byte	0
+ 1032 004f 03       		.uleb128 0x3
+ 1033 0050 0E       		.uleb128 0xe
+ 1034 0051 1C       		.uleb128 0x1c
+ 1035 0052 0B       		.uleb128 0xb
+ 1036 0053 00       		.byte	0
+ 1037 0054 00       		.byte	0
+ 1038 0055 08       		.uleb128 0x8
+ 1039 0056 01       		.uleb128 0x1
+ 1040 0057 01       		.byte	0x1
+ 1041 0058 49       		.uleb128 0x49
+ 1042 0059 13       		.uleb128 0x13
+ 1043 005a 01       		.uleb128 0x1
+ 1044 005b 13       		.uleb128 0x13
+ 1045 005c 00       		.byte	0
+ 1046 005d 00       		.byte	0
+ 1047 005e 09       		.uleb128 0x9
+ 1048 005f 21       		.uleb128 0x21
+ 1049 0060 00       		.byte	0
+ 1050 0061 49       		.uleb128 0x49
+ 1051 0062 13       		.uleb128 0x13
+ 1052 0063 2F       		.uleb128 0x2f
+ 1053 0064 0B       		.uleb128 0xb
+ 1054 0065 00       		.byte	0
+ 1055 0066 00       		.byte	0
+ 1056 0067 0A       		.uleb128 0xa
+ 1057 0068 13       		.uleb128 0x13
+ 1058 0069 01       		.byte	0x1
+ 1059 006a 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 22
+
+
+ 1060 006b 0B       		.uleb128 0xb
+ 1061 006c 3A       		.uleb128 0x3a
+ 1062 006d 0B       		.uleb128 0xb
+ 1063 006e 3B       		.uleb128 0x3b
+ 1064 006f 0B       		.uleb128 0xb
+ 1065 0070 01       		.uleb128 0x1
+ 1066 0071 13       		.uleb128 0x13
+ 1067 0072 00       		.byte	0
+ 1068 0073 00       		.byte	0
+ 1069 0074 0B       		.uleb128 0xb
+ 1070 0075 0D       		.uleb128 0xd
+ 1071 0076 00       		.byte	0
+ 1072 0077 03       		.uleb128 0x3
+ 1073 0078 0E       		.uleb128 0xe
+ 1074 0079 3A       		.uleb128 0x3a
+ 1075 007a 0B       		.uleb128 0xb
+ 1076 007b 3B       		.uleb128 0x3b
+ 1077 007c 0B       		.uleb128 0xb
+ 1078 007d 49       		.uleb128 0x49
+ 1079 007e 13       		.uleb128 0x13
+ 1080 007f 38       		.uleb128 0x38
+ 1081 0080 0B       		.uleb128 0xb
+ 1082 0081 00       		.byte	0
+ 1083 0082 00       		.byte	0
+ 1084 0083 0C       		.uleb128 0xc
+ 1085 0084 0F       		.uleb128 0xf
+ 1086 0085 00       		.byte	0
+ 1087 0086 0B       		.uleb128 0xb
+ 1088 0087 0B       		.uleb128 0xb
+ 1089 0088 49       		.uleb128 0x49
+ 1090 0089 13       		.uleb128 0x13
+ 1091 008a 00       		.byte	0
+ 1092 008b 00       		.byte	0
+ 1093 008c 0D       		.uleb128 0xd
+ 1094 008d 13       		.uleb128 0x13
+ 1095 008e 00       		.byte	0
+ 1096 008f 03       		.uleb128 0x3
+ 1097 0090 0E       		.uleb128 0xe
+ 1098 0091 3C       		.uleb128 0x3c
+ 1099 0092 19       		.uleb128 0x19
+ 1100 0093 00       		.byte	0
+ 1101 0094 00       		.byte	0
+ 1102 0095 0E       		.uleb128 0xe
+ 1103 0096 04       		.uleb128 0x4
+ 1104 0097 01       		.byte	0x1
+ 1105 0098 03       		.uleb128 0x3
+ 1106 0099 0E       		.uleb128 0xe
+ 1107 009a 0B       		.uleb128 0xb
+ 1108 009b 0B       		.uleb128 0xb
+ 1109 009c 49       		.uleb128 0x49
+ 1110 009d 13       		.uleb128 0x13
+ 1111 009e 3A       		.uleb128 0x3a
+ 1112 009f 0B       		.uleb128 0xb
+ 1113 00a0 3B       		.uleb128 0x3b
+ 1114 00a1 0B       		.uleb128 0xb
+ 1115 00a2 01       		.uleb128 0x1
+ 1116 00a3 13       		.uleb128 0x13
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 23
+
+
+ 1117 00a4 00       		.byte	0
+ 1118 00a5 00       		.byte	0
+ 1119 00a6 0F       		.uleb128 0xf
+ 1120 00a7 0D       		.uleb128 0xd
+ 1121 00a8 00       		.byte	0
+ 1122 00a9 03       		.uleb128 0x3
+ 1123 00aa 08       		.uleb128 0x8
+ 1124 00ab 3A       		.uleb128 0x3a
+ 1125 00ac 0B       		.uleb128 0xb
+ 1126 00ad 3B       		.uleb128 0x3b
+ 1127 00ae 0B       		.uleb128 0xb
+ 1128 00af 49       		.uleb128 0x49
+ 1129 00b0 13       		.uleb128 0x13
+ 1130 00b1 38       		.uleb128 0x38
+ 1131 00b2 0B       		.uleb128 0xb
+ 1132 00b3 00       		.byte	0
+ 1133 00b4 00       		.byte	0
+ 1134 00b5 10       		.uleb128 0x10
+ 1135 00b6 13       		.uleb128 0x13
+ 1136 00b7 01       		.byte	0x1
+ 1137 00b8 03       		.uleb128 0x3
+ 1138 00b9 0E       		.uleb128 0xe
+ 1139 00ba 0B       		.uleb128 0xb
+ 1140 00bb 0B       		.uleb128 0xb
+ 1141 00bc 3A       		.uleb128 0x3a
+ 1142 00bd 0B       		.uleb128 0xb
+ 1143 00be 3B       		.uleb128 0x3b
+ 1144 00bf 0B       		.uleb128 0xb
+ 1145 00c0 01       		.uleb128 0x1
+ 1146 00c1 13       		.uleb128 0x13
+ 1147 00c2 00       		.byte	0
+ 1148 00c3 00       		.byte	0
+ 1149 00c4 11       		.uleb128 0x11
+ 1150 00c5 2E       		.uleb128 0x2e
+ 1151 00c6 01       		.byte	0x1
+ 1152 00c7 3F       		.uleb128 0x3f
+ 1153 00c8 19       		.uleb128 0x19
+ 1154 00c9 03       		.uleb128 0x3
+ 1155 00ca 0E       		.uleb128 0xe
+ 1156 00cb 3A       		.uleb128 0x3a
+ 1157 00cc 0B       		.uleb128 0xb
+ 1158 00cd 3B       		.uleb128 0x3b
+ 1159 00ce 0B       		.uleb128 0xb
+ 1160 00cf 27       		.uleb128 0x27
+ 1161 00d0 19       		.uleb128 0x19
+ 1162 00d1 11       		.uleb128 0x11
+ 1163 00d2 01       		.uleb128 0x1
+ 1164 00d3 12       		.uleb128 0x12
+ 1165 00d4 06       		.uleb128 0x6
+ 1166 00d5 40       		.uleb128 0x40
+ 1167 00d6 18       		.uleb128 0x18
+ 1168 00d7 9742     		.uleb128 0x2117
+ 1169 00d9 19       		.uleb128 0x19
+ 1170 00da 01       		.uleb128 0x1
+ 1171 00db 13       		.uleb128 0x13
+ 1172 00dc 00       		.byte	0
+ 1173 00dd 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 24
+
+
+ 1174 00de 12       		.uleb128 0x12
+ 1175 00df 05       		.uleb128 0x5
+ 1176 00e0 00       		.byte	0
+ 1177 00e1 03       		.uleb128 0x3
+ 1178 00e2 0E       		.uleb128 0xe
+ 1179 00e3 3A       		.uleb128 0x3a
+ 1180 00e4 0B       		.uleb128 0xb
+ 1181 00e5 3B       		.uleb128 0x3b
+ 1182 00e6 0B       		.uleb128 0xb
+ 1183 00e7 49       		.uleb128 0x49
+ 1184 00e8 13       		.uleb128 0x13
+ 1185 00e9 02       		.uleb128 0x2
+ 1186 00ea 17       		.uleb128 0x17
+ 1187 00eb 00       		.byte	0
+ 1188 00ec 00       		.byte	0
+ 1189 00ed 13       		.uleb128 0x13
+ 1190 00ee 0B       		.uleb128 0xb
+ 1191 00ef 01       		.byte	0x1
+ 1192 00f0 11       		.uleb128 0x11
+ 1193 00f1 01       		.uleb128 0x1
+ 1194 00f2 12       		.uleb128 0x12
+ 1195 00f3 06       		.uleb128 0x6
+ 1196 00f4 01       		.uleb128 0x1
+ 1197 00f5 13       		.uleb128 0x13
+ 1198 00f6 00       		.byte	0
+ 1199 00f7 00       		.byte	0
+ 1200 00f8 14       		.uleb128 0x14
+ 1201 00f9 34       		.uleb128 0x34
+ 1202 00fa 00       		.byte	0
+ 1203 00fb 03       		.uleb128 0x3
+ 1204 00fc 0E       		.uleb128 0xe
+ 1205 00fd 3A       		.uleb128 0x3a
+ 1206 00fe 0B       		.uleb128 0xb
+ 1207 00ff 3B       		.uleb128 0x3b
+ 1208 0100 0B       		.uleb128 0xb
+ 1209 0101 49       		.uleb128 0x49
+ 1210 0102 13       		.uleb128 0x13
+ 1211 0103 02       		.uleb128 0x2
+ 1212 0104 17       		.uleb128 0x17
+ 1213 0105 00       		.byte	0
+ 1214 0106 00       		.byte	0
+ 1215 0107 15       		.uleb128 0x15
+ 1216 0108 898201   		.uleb128 0x4109
+ 1217 010b 01       		.byte	0x1
+ 1218 010c 11       		.uleb128 0x11
+ 1219 010d 01       		.uleb128 0x1
+ 1220 010e 31       		.uleb128 0x31
+ 1221 010f 13       		.uleb128 0x13
+ 1222 0110 01       		.uleb128 0x1
+ 1223 0111 13       		.uleb128 0x13
+ 1224 0112 00       		.byte	0
+ 1225 0113 00       		.byte	0
+ 1226 0114 16       		.uleb128 0x16
+ 1227 0115 8A8201   		.uleb128 0x410a
+ 1228 0118 00       		.byte	0
+ 1229 0119 02       		.uleb128 0x2
+ 1230 011a 18       		.uleb128 0x18
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 25
+
+
+ 1231 011b 9142     		.uleb128 0x2111
+ 1232 011d 18       		.uleb128 0x18
+ 1233 011e 00       		.byte	0
+ 1234 011f 00       		.byte	0
+ 1235 0120 17       		.uleb128 0x17
+ 1236 0121 898201   		.uleb128 0x4109
+ 1237 0124 01       		.byte	0x1
+ 1238 0125 11       		.uleb128 0x11
+ 1239 0126 01       		.uleb128 0x1
+ 1240 0127 31       		.uleb128 0x31
+ 1241 0128 13       		.uleb128 0x13
+ 1242 0129 00       		.byte	0
+ 1243 012a 00       		.byte	0
+ 1244 012b 18       		.uleb128 0x18
+ 1245 012c 34       		.uleb128 0x34
+ 1246 012d 00       		.byte	0
+ 1247 012e 03       		.uleb128 0x3
+ 1248 012f 0E       		.uleb128 0xe
+ 1249 0130 3A       		.uleb128 0x3a
+ 1250 0131 0B       		.uleb128 0xb
+ 1251 0132 3B       		.uleb128 0x3b
+ 1252 0133 05       		.uleb128 0x5
+ 1253 0134 49       		.uleb128 0x49
+ 1254 0135 13       		.uleb128 0x13
+ 1255 0136 3F       		.uleb128 0x3f
+ 1256 0137 19       		.uleb128 0x19
+ 1257 0138 3C       		.uleb128 0x3c
+ 1258 0139 19       		.uleb128 0x19
+ 1259 013a 00       		.byte	0
+ 1260 013b 00       		.byte	0
+ 1261 013c 19       		.uleb128 0x19
+ 1262 013d 34       		.uleb128 0x34
+ 1263 013e 00       		.byte	0
+ 1264 013f 03       		.uleb128 0x3
+ 1265 0140 0E       		.uleb128 0xe
+ 1266 0141 3A       		.uleb128 0x3a
+ 1267 0142 0B       		.uleb128 0xb
+ 1268 0143 3B       		.uleb128 0x3b
+ 1269 0144 0B       		.uleb128 0xb
+ 1270 0145 49       		.uleb128 0x49
+ 1271 0146 13       		.uleb128 0x13
+ 1272 0147 3F       		.uleb128 0x3f
+ 1273 0148 19       		.uleb128 0x19
+ 1274 0149 02       		.uleb128 0x2
+ 1275 014a 18       		.uleb128 0x18
+ 1276 014b 00       		.byte	0
+ 1277 014c 00       		.byte	0
+ 1278 014d 1A       		.uleb128 0x1a
+ 1279 014e 34       		.uleb128 0x34
+ 1280 014f 00       		.byte	0
+ 1281 0150 03       		.uleb128 0x3
+ 1282 0151 0E       		.uleb128 0xe
+ 1283 0152 3A       		.uleb128 0x3a
+ 1284 0153 0B       		.uleb128 0xb
+ 1285 0154 3B       		.uleb128 0x3b
+ 1286 0155 0B       		.uleb128 0xb
+ 1287 0156 49       		.uleb128 0x49
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 26
+
+
+ 1288 0157 13       		.uleb128 0x13
+ 1289 0158 3F       		.uleb128 0x3f
+ 1290 0159 19       		.uleb128 0x19
+ 1291 015a 3C       		.uleb128 0x3c
+ 1292 015b 19       		.uleb128 0x19
+ 1293 015c 00       		.byte	0
+ 1294 015d 00       		.byte	0
+ 1295 015e 1B       		.uleb128 0x1b
+ 1296 015f 2E       		.uleb128 0x2e
+ 1297 0160 00       		.byte	0
+ 1298 0161 3F       		.uleb128 0x3f
+ 1299 0162 19       		.uleb128 0x19
+ 1300 0163 3C       		.uleb128 0x3c
+ 1301 0164 19       		.uleb128 0x19
+ 1302 0165 6E       		.uleb128 0x6e
+ 1303 0166 0E       		.uleb128 0xe
+ 1304 0167 03       		.uleb128 0x3
+ 1305 0168 0E       		.uleb128 0xe
+ 1306 0169 3A       		.uleb128 0x3a
+ 1307 016a 0B       		.uleb128 0xb
+ 1308 016b 3B       		.uleb128 0x3b
+ 1309 016c 0B       		.uleb128 0xb
+ 1310 016d 00       		.byte	0
+ 1311 016e 00       		.byte	0
+ 1312 016f 00       		.byte	0
+ 1313              		.section	.debug_loc,"",%progbits
+ 1314              	.Ldebug_loc0:
+ 1315              	.LLST0:
+ 1316 0000 00000000 		.4byte	.LVL0
+ 1317 0004 0E000000 		.4byte	.LVL1
+ 1318 0008 0100     		.2byte	0x1
+ 1319 000a 50       		.byte	0x50
+ 1320 000b 0E000000 		.4byte	.LVL1
+ 1321 000f D2000000 		.4byte	.LVL23
+ 1322 0013 0100     		.2byte	0x1
+ 1323 0015 54       		.byte	0x54
+ 1324 0016 D2000000 		.4byte	.LVL23
+ 1325 001a DC000000 		.4byte	.LFE68
+ 1326 001e 0400     		.2byte	0x4
+ 1327 0020 F3       		.byte	0xf3
+ 1328 0021 01       		.uleb128 0x1
+ 1329 0022 50       		.byte	0x50
+ 1330 0023 9F       		.byte	0x9f
+ 1331 0024 00000000 		.4byte	0
+ 1332 0028 00000000 		.4byte	0
+ 1333              	.LLST1:
+ 1334 002c 00000000 		.4byte	.LVL0
+ 1335 0030 A8000000 		.4byte	.LVL17
+ 1336 0034 0100     		.2byte	0x1
+ 1337 0036 51       		.byte	0x51
+ 1338 0037 A8000000 		.4byte	.LVL17
+ 1339 003b BC000000 		.4byte	.LVL20
+ 1340 003f 0400     		.2byte	0x4
+ 1341 0041 F3       		.byte	0xf3
+ 1342 0042 01       		.uleb128 0x1
+ 1343 0043 51       		.byte	0x51
+ 1344 0044 9F       		.byte	0x9f
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 27
+
+
+ 1345 0045 BC000000 		.4byte	.LVL20
+ 1346 0049 C6000000 		.4byte	.LVL21
+ 1347 004d 0100     		.2byte	0x1
+ 1348 004f 51       		.byte	0x51
+ 1349 0050 C6000000 		.4byte	.LVL21
+ 1350 0054 DC000000 		.4byte	.LFE68
+ 1351 0058 0400     		.2byte	0x4
+ 1352 005a F3       		.byte	0xf3
+ 1353 005b 01       		.uleb128 0x1
+ 1354 005c 51       		.byte	0x51
+ 1355 005d 9F       		.byte	0x9f
+ 1356 005e 00000000 		.4byte	0
+ 1357 0062 00000000 		.4byte	0
+ 1358              	.LLST2:
+ 1359 0066 50000000 		.4byte	.LVL2
+ 1360 006a BC000000 		.4byte	.LVL20
+ 1361 006e 0100     		.2byte	0x1
+ 1362 0070 55       		.byte	0x55
+ 1363 0071 00000000 		.4byte	0
+ 1364 0075 00000000 		.4byte	0
+ 1365              	.LLST3:
+ 1366 0079 50000000 		.4byte	.LVL2
+ 1367 007d 92000000 		.4byte	.LVL12
+ 1368 0081 0100     		.2byte	0x1
+ 1369 0083 50       		.byte	0x50
+ 1370 0084 92000000 		.4byte	.LVL12
+ 1371 0088 9A000000 		.4byte	.LVL13
+ 1372 008c 0200     		.2byte	0x2
+ 1373 008e 71       		.byte	0x71
+ 1374 008f 10       		.sleb128 16
+ 1375 0090 9A000000 		.4byte	.LVL13
+ 1376 0094 A6000000 		.4byte	.LVL16
+ 1377 0098 0100     		.2byte	0x1
+ 1378 009a 50       		.byte	0x50
+ 1379 009b A6000000 		.4byte	.LVL16
+ 1380 009f AB000000 		.4byte	.LVL18-1
+ 1381 00a3 0200     		.2byte	0x2
+ 1382 00a5 7D       		.byte	0x7d
+ 1383 00a6 00       		.sleb128 0
+ 1384 00a7 00000000 		.4byte	0
+ 1385 00ab 00000000 		.4byte	0
+ 1386              	.LLST4:
+ 1387 00af 50000000 		.4byte	.LVL2
+ 1388 00b3 5E000000 		.4byte	.LVL3
+ 1389 00b7 0100     		.2byte	0x1
+ 1390 00b9 53       		.byte	0x53
+ 1391 00ba 5E000000 		.4byte	.LVL3
+ 1392 00be 60000000 		.4byte	.LVL4
+ 1393 00c2 5501     		.2byte	0x155
+ 1394 00c4 7E       		.byte	0x7e
+ 1395 00c5 00       		.sleb128 0
+ 1396 00c6 71       		.byte	0x71
+ 1397 00c7 20       		.sleb128 32
+ 1398 00c8 06       		.byte	0x6
+ 1399 00c9 0A       		.byte	0xa
+ 1400 00ca FF7F     		.2byte	0x7fff
+ 1401 00cc 1E       		.byte	0x1e
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 28
+
+
+ 1402 00cd 71       		.byte	0x71
+ 1403 00ce 20       		.sleb128 32
+ 1404 00cf 06       		.byte	0x6
+ 1405 00d0 71       		.byte	0x71
+ 1406 00d1 20       		.sleb128 32
+ 1407 00d2 06       		.byte	0x6
+ 1408 00d3 7E       		.byte	0x7e
+ 1409 00d4 00       		.sleb128 0
+ 1410 00d5 2E       		.byte	0x2e
+ 1411 00d6 28       		.byte	0x28
+ 1412 00d7 0100     		.2byte	0x1
+ 1413 00d9 16       		.byte	0x16
+ 1414 00da 13       		.byte	0x13
+ 1415 00db 3F       		.byte	0x3f
+ 1416 00dc 25       		.byte	0x25
+ 1417 00dd 71       		.byte	0x71
+ 1418 00de 20       		.sleb128 32
+ 1419 00df 06       		.byte	0x6
+ 1420 00e0 0A       		.byte	0xa
+ 1421 00e1 FF7F     		.2byte	0x7fff
+ 1422 00e3 1E       		.byte	0x1e
+ 1423 00e4 71       		.byte	0x71
+ 1424 00e5 20       		.sleb128 32
+ 1425 00e6 06       		.byte	0x6
+ 1426 00e7 71       		.byte	0x71
+ 1427 00e8 20       		.sleb128 32
+ 1428 00e9 06       		.byte	0x6
+ 1429 00ea 7E       		.byte	0x7e
+ 1430 00eb 00       		.sleb128 0
+ 1431 00ec 2E       		.byte	0x2e
+ 1432 00ed 28       		.byte	0x28
+ 1433 00ee 0100     		.2byte	0x1
+ 1434 00f0 16       		.byte	0x16
+ 1435 00f1 13       		.byte	0x13
+ 1436 00f2 71       		.byte	0x71
+ 1437 00f3 20       		.sleb128 32
+ 1438 00f4 06       		.byte	0x6
+ 1439 00f5 7E       		.byte	0x7e
+ 1440 00f6 00       		.sleb128 0
+ 1441 00f7 2E       		.byte	0x2e
+ 1442 00f8 28       		.byte	0x28
+ 1443 00f9 0100     		.2byte	0x1
+ 1444 00fb 16       		.byte	0x16
+ 1445 00fc 13       		.byte	0x13
+ 1446 00fd 71       		.byte	0x71
+ 1447 00fe 20       		.sleb128 32
+ 1448 00ff 06       		.byte	0x6
+ 1449 0100 7E       		.byte	0x7e
+ 1450 0101 00       		.sleb128 0
+ 1451 0102 29       		.byte	0x29
+ 1452 0103 28       		.byte	0x28
+ 1453 0104 0100     		.2byte	0x1
+ 1454 0106 16       		.byte	0x16
+ 1455 0107 13       		.byte	0x13
+ 1456 0108 74       		.byte	0x74
+ 1457 0109 00       		.sleb128 0
+ 1458 010a 32       		.byte	0x32
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 29
+
+
+ 1459 010b 24       		.byte	0x24
+ 1460 010c 76       		.byte	0x76
+ 1461 010d 00       		.sleb128 0
+ 1462 010e 22       		.byte	0x22
+ 1463 010f 06       		.byte	0x6
+ 1464 0110 1E       		.byte	0x1e
+ 1465 0111 7E       		.byte	0x7e
+ 1466 0112 00       		.sleb128 0
+ 1467 0113 71       		.byte	0x71
+ 1468 0114 20       		.sleb128 32
+ 1469 0115 06       		.byte	0x6
+ 1470 0116 0A       		.byte	0xa
+ 1471 0117 FF7F     		.2byte	0x7fff
+ 1472 0119 1E       		.byte	0x1e
+ 1473 011a 71       		.byte	0x71
+ 1474 011b 20       		.sleb128 32
+ 1475 011c 06       		.byte	0x6
+ 1476 011d 71       		.byte	0x71
+ 1477 011e 20       		.sleb128 32
+ 1478 011f 06       		.byte	0x6
+ 1479 0120 7E       		.byte	0x7e
+ 1480 0121 00       		.sleb128 0
+ 1481 0122 2E       		.byte	0x2e
+ 1482 0123 28       		.byte	0x28
+ 1483 0124 0100     		.2byte	0x1
+ 1484 0126 16       		.byte	0x16
+ 1485 0127 13       		.byte	0x13
+ 1486 0128 3F       		.byte	0x3f
+ 1487 0129 25       		.byte	0x25
+ 1488 012a 71       		.byte	0x71
+ 1489 012b 20       		.sleb128 32
+ 1490 012c 06       		.byte	0x6
+ 1491 012d 0A       		.byte	0xa
+ 1492 012e FF7F     		.2byte	0x7fff
+ 1493 0130 1E       		.byte	0x1e
+ 1494 0131 71       		.byte	0x71
+ 1495 0132 20       		.sleb128 32
+ 1496 0133 06       		.byte	0x6
+ 1497 0134 71       		.byte	0x71
+ 1498 0135 20       		.sleb128 32
+ 1499 0136 06       		.byte	0x6
+ 1500 0137 7E       		.byte	0x7e
+ 1501 0138 00       		.sleb128 0
+ 1502 0139 2E       		.byte	0x2e
+ 1503 013a 28       		.byte	0x28
+ 1504 013b 0100     		.2byte	0x1
+ 1505 013d 16       		.byte	0x16
+ 1506 013e 13       		.byte	0x13
+ 1507 013f 71       		.byte	0x71
+ 1508 0140 20       		.sleb128 32
+ 1509 0141 06       		.byte	0x6
+ 1510 0142 7E       		.byte	0x7e
+ 1511 0143 00       		.sleb128 0
+ 1512 0144 2E       		.byte	0x2e
+ 1513 0145 28       		.byte	0x28
+ 1514 0146 0100     		.2byte	0x1
+ 1515 0148 16       		.byte	0x16
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 30
+
+
+ 1516 0149 13       		.byte	0x13
+ 1517 014a 71       		.byte	0x71
+ 1518 014b 20       		.sleb128 32
+ 1519 014c 06       		.byte	0x6
+ 1520 014d 7E       		.byte	0x7e
+ 1521 014e 00       		.sleb128 0
+ 1522 014f 29       		.byte	0x29
+ 1523 0150 28       		.byte	0x28
+ 1524 0151 0100     		.2byte	0x1
+ 1525 0153 16       		.byte	0x16
+ 1526 0154 13       		.byte	0x13
+ 1527 0155 74       		.byte	0x74
+ 1528 0156 00       		.sleb128 0
+ 1529 0157 32       		.byte	0x32
+ 1530 0158 24       		.byte	0x24
+ 1531 0159 76       		.byte	0x76
+ 1532 015a 00       		.sleb128 0
+ 1533 015b 22       		.byte	0x22
+ 1534 015c 06       		.byte	0x6
+ 1535 015d 7E       		.byte	0x7e
+ 1536 015e 00       		.sleb128 0
+ 1537 015f 2E       		.byte	0x2e
+ 1538 0160 28       		.byte	0x28
+ 1539 0161 0100     		.2byte	0x1
+ 1540 0163 16       		.byte	0x16
+ 1541 0164 13       		.byte	0x13
+ 1542 0165 3F       		.byte	0x3f
+ 1543 0166 25       		.byte	0x25
+ 1544 0167 7E       		.byte	0x7e
+ 1545 0168 00       		.sleb128 0
+ 1546 0169 71       		.byte	0x71
+ 1547 016a 20       		.sleb128 32
+ 1548 016b 06       		.byte	0x6
+ 1549 016c 0A       		.byte	0xa
+ 1550 016d FF7F     		.2byte	0x7fff
+ 1551 016f 1E       		.byte	0x1e
+ 1552 0170 71       		.byte	0x71
+ 1553 0171 20       		.sleb128 32
+ 1554 0172 06       		.byte	0x6
+ 1555 0173 71       		.byte	0x71
+ 1556 0174 20       		.sleb128 32
+ 1557 0175 06       		.byte	0x6
+ 1558 0176 7E       		.byte	0x7e
+ 1559 0177 00       		.sleb128 0
+ 1560 0178 2E       		.byte	0x2e
+ 1561 0179 28       		.byte	0x28
+ 1562 017a 0100     		.2byte	0x1
+ 1563 017c 16       		.byte	0x16
+ 1564 017d 13       		.byte	0x13
+ 1565 017e 3F       		.byte	0x3f
+ 1566 017f 25       		.byte	0x25
+ 1567 0180 71       		.byte	0x71
+ 1568 0181 20       		.sleb128 32
+ 1569 0182 06       		.byte	0x6
+ 1570 0183 0A       		.byte	0xa
+ 1571 0184 FF7F     		.2byte	0x7fff
+ 1572 0186 1E       		.byte	0x1e
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 31
+
+
+ 1573 0187 71       		.byte	0x71
+ 1574 0188 20       		.sleb128 32
+ 1575 0189 06       		.byte	0x6
+ 1576 018a 71       		.byte	0x71
+ 1577 018b 20       		.sleb128 32
+ 1578 018c 06       		.byte	0x6
+ 1579 018d 7E       		.byte	0x7e
+ 1580 018e 00       		.sleb128 0
+ 1581 018f 2E       		.byte	0x2e
+ 1582 0190 28       		.byte	0x28
+ 1583 0191 0100     		.2byte	0x1
+ 1584 0193 16       		.byte	0x16
+ 1585 0194 13       		.byte	0x13
+ 1586 0195 71       		.byte	0x71
+ 1587 0196 20       		.sleb128 32
+ 1588 0197 06       		.byte	0x6
+ 1589 0198 7E       		.byte	0x7e
+ 1590 0199 00       		.sleb128 0
+ 1591 019a 2E       		.byte	0x2e
+ 1592 019b 28       		.byte	0x28
+ 1593 019c 0100     		.2byte	0x1
+ 1594 019e 16       		.byte	0x16
+ 1595 019f 13       		.byte	0x13
+ 1596 01a0 71       		.byte	0x71
+ 1597 01a1 20       		.sleb128 32
+ 1598 01a2 06       		.byte	0x6
+ 1599 01a3 7E       		.byte	0x7e
+ 1600 01a4 00       		.sleb128 0
+ 1601 01a5 29       		.byte	0x29
+ 1602 01a6 28       		.byte	0x28
+ 1603 01a7 0100     		.2byte	0x1
+ 1604 01a9 16       		.byte	0x16
+ 1605 01aa 13       		.byte	0x13
+ 1606 01ab 74       		.byte	0x74
+ 1607 01ac 00       		.sleb128 0
+ 1608 01ad 32       		.byte	0x32
+ 1609 01ae 24       		.byte	0x24
+ 1610 01af 76       		.byte	0x76
+ 1611 01b0 00       		.sleb128 0
+ 1612 01b1 22       		.byte	0x22
+ 1613 01b2 06       		.byte	0x6
+ 1614 01b3 1E       		.byte	0x1e
+ 1615 01b4 7E       		.byte	0x7e
+ 1616 01b5 00       		.sleb128 0
+ 1617 01b6 71       		.byte	0x71
+ 1618 01b7 20       		.sleb128 32
+ 1619 01b8 06       		.byte	0x6
+ 1620 01b9 0A       		.byte	0xa
+ 1621 01ba FF7F     		.2byte	0x7fff
+ 1622 01bc 1E       		.byte	0x1e
+ 1623 01bd 71       		.byte	0x71
+ 1624 01be 20       		.sleb128 32
+ 1625 01bf 06       		.byte	0x6
+ 1626 01c0 71       		.byte	0x71
+ 1627 01c1 20       		.sleb128 32
+ 1628 01c2 06       		.byte	0x6
+ 1629 01c3 7E       		.byte	0x7e
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 32
+
+
+ 1630 01c4 00       		.sleb128 0
+ 1631 01c5 2E       		.byte	0x2e
+ 1632 01c6 28       		.byte	0x28
+ 1633 01c7 0100     		.2byte	0x1
+ 1634 01c9 16       		.byte	0x16
+ 1635 01ca 13       		.byte	0x13
+ 1636 01cb 3F       		.byte	0x3f
+ 1637 01cc 25       		.byte	0x25
+ 1638 01cd 71       		.byte	0x71
+ 1639 01ce 20       		.sleb128 32
+ 1640 01cf 06       		.byte	0x6
+ 1641 01d0 0A       		.byte	0xa
+ 1642 01d1 FF7F     		.2byte	0x7fff
+ 1643 01d3 1E       		.byte	0x1e
+ 1644 01d4 71       		.byte	0x71
+ 1645 01d5 20       		.sleb128 32
+ 1646 01d6 06       		.byte	0x6
+ 1647 01d7 71       		.byte	0x71
+ 1648 01d8 20       		.sleb128 32
+ 1649 01d9 06       		.byte	0x6
+ 1650 01da 7E       		.byte	0x7e
+ 1651 01db 00       		.sleb128 0
+ 1652 01dc 2E       		.byte	0x2e
+ 1653 01dd 28       		.byte	0x28
+ 1654 01de 0100     		.2byte	0x1
+ 1655 01e0 16       		.byte	0x16
+ 1656 01e1 13       		.byte	0x13
+ 1657 01e2 71       		.byte	0x71
+ 1658 01e3 20       		.sleb128 32
+ 1659 01e4 06       		.byte	0x6
+ 1660 01e5 7E       		.byte	0x7e
+ 1661 01e6 00       		.sleb128 0
+ 1662 01e7 2E       		.byte	0x2e
+ 1663 01e8 28       		.byte	0x28
+ 1664 01e9 0100     		.2byte	0x1
+ 1665 01eb 16       		.byte	0x16
+ 1666 01ec 13       		.byte	0x13
+ 1667 01ed 71       		.byte	0x71
+ 1668 01ee 20       		.sleb128 32
+ 1669 01ef 06       		.byte	0x6
+ 1670 01f0 7E       		.byte	0x7e
+ 1671 01f1 00       		.sleb128 0
+ 1672 01f2 29       		.byte	0x29
+ 1673 01f3 28       		.byte	0x28
+ 1674 01f4 0100     		.2byte	0x1
+ 1675 01f6 16       		.byte	0x16
+ 1676 01f7 13       		.byte	0x13
+ 1677 01f8 74       		.byte	0x74
+ 1678 01f9 00       		.sleb128 0
+ 1679 01fa 32       		.byte	0x32
+ 1680 01fb 24       		.byte	0x24
+ 1681 01fc 76       		.byte	0x76
+ 1682 01fd 00       		.sleb128 0
+ 1683 01fe 22       		.byte	0x22
+ 1684 01ff 06       		.byte	0x6
+ 1685 0200 7E       		.byte	0x7e
+ 1686 0201 00       		.sleb128 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 33
+
+
+ 1687 0202 2E       		.byte	0x2e
+ 1688 0203 28       		.byte	0x28
+ 1689 0204 0100     		.2byte	0x1
+ 1690 0206 16       		.byte	0x16
+ 1691 0207 13       		.byte	0x13
+ 1692 0208 74       		.byte	0x74
+ 1693 0209 00       		.sleb128 0
+ 1694 020a 32       		.byte	0x32
+ 1695 020b 24       		.byte	0x24
+ 1696 020c 76       		.byte	0x76
+ 1697 020d 00       		.sleb128 0
+ 1698 020e 22       		.byte	0x22
+ 1699 020f 06       		.byte	0x6
+ 1700 0210 7E       		.byte	0x7e
+ 1701 0211 00       		.sleb128 0
+ 1702 0212 2E       		.byte	0x2e
+ 1703 0213 28       		.byte	0x28
+ 1704 0214 0100     		.2byte	0x1
+ 1705 0216 16       		.byte	0x16
+ 1706 0217 13       		.byte	0x13
+ 1707 0218 9F       		.byte	0x9f
+ 1708 0219 60000000 		.4byte	.LVL4
+ 1709 021d 6E000000 		.4byte	.LVL6
+ 1710 0221 0100     		.2byte	0x1
+ 1711 0223 53       		.byte	0x53
+ 1712 0224 6E000000 		.4byte	.LVL6
+ 1713 0228 BC000000 		.4byte	.LVL20
+ 1714 022c 0100     		.2byte	0x1
+ 1715 022e 57       		.byte	0x57
+ 1716 022f 00000000 		.4byte	0
+ 1717 0233 00000000 		.4byte	0
+ 1718              	.LLST5:
+ 1719 0237 6E000000 		.4byte	.LVL6
+ 1720 023b 7C000000 		.4byte	.LVL7
+ 1721 023f 0200     		.2byte	0x2
+ 1722 0241 30       		.byte	0x30
+ 1723 0242 9F       		.byte	0x9f
+ 1724 0243 7C000000 		.4byte	.LVL7
+ 1725 0247 86000000 		.4byte	.LVL9
+ 1726 024b 0200     		.2byte	0x2
+ 1727 024d 31       		.byte	0x31
+ 1728 024e 9F       		.byte	0x9f
+ 1729 024f 86000000 		.4byte	.LVL9
+ 1730 0253 8A000000 		.4byte	.LVL10
+ 1731 0257 0200     		.2byte	0x2
+ 1732 0259 30       		.byte	0x30
+ 1733 025a 9F       		.byte	0x9f
+ 1734 025b 8A000000 		.4byte	.LVL10
+ 1735 025f BC000000 		.4byte	.LVL20
+ 1736 0263 0100     		.2byte	0x1
+ 1737 0265 58       		.byte	0x58
+ 1738 0266 00000000 		.4byte	0
+ 1739 026a 00000000 		.4byte	0
+ 1740              	.LLST6:
+ 1741 026e 6E000000 		.4byte	.LVL6
+ 1742 0272 84000000 		.4byte	.LVL8
+ 1743 0276 0200     		.2byte	0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 34
+
+
+ 1744 0278 30       		.byte	0x30
+ 1745 0279 9F       		.byte	0x9f
+ 1746 027a 84000000 		.4byte	.LVL8
+ 1747 027e 86000000 		.4byte	.LVL9
+ 1748 0282 0100     		.2byte	0x1
+ 1749 0284 56       		.byte	0x56
+ 1750 0285 86000000 		.4byte	.LVL9
+ 1751 0289 8A000000 		.4byte	.LVL10
+ 1752 028d 0200     		.2byte	0x2
+ 1753 028f 30       		.byte	0x30
+ 1754 0290 9F       		.byte	0x9f
+ 1755 0291 8A000000 		.4byte	.LVL10
+ 1756 0295 BC000000 		.4byte	.LVL20
+ 1757 0299 0100     		.2byte	0x1
+ 1758 029b 56       		.byte	0x56
+ 1759 029c 00000000 		.4byte	0
+ 1760 02a0 00000000 		.4byte	0
+ 1761              	.LLST7:
+ 1762 02a4 6E000000 		.4byte	.LVL6
+ 1763 02a8 BC000000 		.4byte	.LVL20
+ 1764 02ac 0100     		.2byte	0x1
+ 1765 02ae 57       		.byte	0x57
+ 1766 02af 00000000 		.4byte	0
+ 1767 02b3 00000000 		.4byte	0
+ 1768              	.LLST8:
+ 1769 02b7 8A000000 		.4byte	.LVL10
+ 1770 02bb 8C000000 		.4byte	.LVL11
+ 1771 02bf 0200     		.2byte	0x2
+ 1772 02c1 30       		.byte	0x30
+ 1773 02c2 9F       		.byte	0x9f
+ 1774 02c3 8C000000 		.4byte	.LVL11
+ 1775 02c7 9C000000 		.4byte	.LVL14
+ 1776 02cb 0300     		.2byte	0x3
+ 1777 02cd 08       		.byte	0x8
+ 1778 02ce 50       		.byte	0x50
+ 1779 02cf 9F       		.byte	0x9f
+ 1780 02d0 9C000000 		.4byte	.LVL14
+ 1781 02d4 A4000000 		.4byte	.LVL15
+ 1782 02d8 0100     		.2byte	0x1
+ 1783 02da 52       		.byte	0x52
+ 1784 02db A4000000 		.4byte	.LVL15
+ 1785 02df AB000000 		.4byte	.LVL18-1
+ 1786 02e3 0200     		.2byte	0x2
+ 1787 02e5 91       		.byte	0x91
+ 1788 02e6 64       		.sleb128 -28
+ 1789 02e7 00000000 		.4byte	0
+ 1790 02eb 00000000 		.4byte	0
+ 1791              		.section	.debug_aranges,"",%progbits
+ 1792 0000 1C000000 		.4byte	0x1c
+ 1793 0004 0200     		.2byte	0x2
+ 1794 0006 00000000 		.4byte	.Ldebug_info0
+ 1795 000a 04       		.byte	0x4
+ 1796 000b 00       		.byte	0
+ 1797 000c 0000     		.2byte	0
+ 1798 000e 0000     		.2byte	0
+ 1799 0010 00000000 		.4byte	.LFB68
+ 1800 0014 DC000000 		.4byte	.LFE68-.LFB68
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 35
+
+
+ 1801 0018 00000000 		.4byte	0
+ 1802 001c 00000000 		.4byte	0
+ 1803              		.section	.debug_ranges,"",%progbits
+ 1804              	.Ldebug_ranges0:
+ 1805 0000 00000000 		.4byte	.LFB68
+ 1806 0004 DC000000 		.4byte	.LFE68
+ 1807 0008 00000000 		.4byte	0
+ 1808 000c 00000000 		.4byte	0
+ 1809              		.section	.debug_line,"",%progbits
+ 1810              	.Ldebug_line0:
+ 1811 0000 47020000 		.section	.debug_str,"MS",%progbits,1
+ 1811      0200E201 
+ 1811      00000201 
+ 1811      FB0E0D00 
+ 1811      01010101 
+ 1812              	.LASF82:
+ 1813 0000 6F6E7469 		.ascii	"ontime\000"
+ 1813      6D6500
+ 1814              	.LASF87:
+ 1815 0007 6E6F6973 		.ascii	"noiseAmplitude\000"
+ 1815      65416D70 
+ 1815      6C697475 
+ 1815      646500
+ 1816              	.LASF29:
+ 1817 0016 61747461 		.ascii	"attack\000"
+ 1817      636B00
+ 1818              	.LASF54:
+ 1819 001d 42555253 		.ascii	"BURST_OFF\000"
+ 1819      545F4F46 
+ 1819      4600
+ 1820              	.LASF43:
+ 1821 0027 53494446 		.ascii	"SIDFilterData_t\000"
+ 1821      696C7465 
+ 1821      72446174 
+ 1821      615F7400 
+ 1822              	.LASF40:
+ 1823 0037 68707645 		.ascii	"hpvEnabled\000"
+ 1823      6E61626C 
+ 1823      656400
+ 1824              	.LASF57:
+ 1825 0042 494E5452 		.ascii	"INTR_MOD_CUR\000"
+ 1825      5F4D4F44 
+ 1825      5F435552 
+ 1825      00
+ 1826              	.LASF89:
+ 1827 004f 5349445F 		.ascii	"SID_filterData\000"
+ 1827      66696C74 
+ 1827      65724461 
+ 1827      746100
+ 1828              	.LASF68:
+ 1829 005e 7163775F 		.ascii	"qcw_ramp\000"
+ 1829      72616D70 
+ 1829      00
+ 1830              	.LASF44:
+ 1831 0067 54696D65 		.ascii	"TimerHandle_t\000"
+ 1831      7248616E 
+ 1831      646C655F 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 36
+
+
+ 1831      7400
+ 1832              	.LASF2:
+ 1833 0075 73686F72 		.ascii	"short int\000"
+ 1833      7420696E 
+ 1833      7400
+ 1834              	.LASF59:
+ 1835 007f 62757273 		.ascii	"burst_state\000"
+ 1835      745F7374 
+ 1835      61746500 
+ 1836              	.LASF80:
+ 1837 008b 6368616E 		.ascii	"channel\000"
+ 1837      6E656C00 
+ 1838              	.LASF17:
+ 1839 0093 73697A65 		.ascii	"sizetype\000"
+ 1839      74797065 
+ 1839      00
+ 1840              	.LASF11:
+ 1841 009c 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1841      206C6F6E 
+ 1841      6720756E 
+ 1841      7369676E 
+ 1841      65642069 
+ 1842              	.LASF10:
+ 1843 00b3 6C6F6E67 		.ascii	"long long int\000"
+ 1843      206C6F6E 
+ 1843      6720696E 
+ 1843      7400
+ 1844              	.LASF69:
+ 1845 00c1 7163775F 		.ascii	"qcw_holdoff\000"
+ 1845      686F6C64 
+ 1845      6F666600 
+ 1846              	.LASF94:
+ 1847 00cd 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1847      43393920 
+ 1847      352E342E 
+ 1847      31203230 
+ 1847      31363036 
+ 1848 0100 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1848      20726576 
+ 1848      6973696F 
+ 1848      6E203233 
+ 1848      37373135 
+ 1849 0133 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 1849      74643D67 
+ 1849      6E753939 
+ 1849      202D6666 
+ 1849      756E6374 
+ 1850              	.LASF99:
+ 1851 0166 53696446 		.ascii	"SidFilter_updateVoice\000"
+ 1851      696C7465 
+ 1851      725F7570 
+ 1851      64617465 
+ 1851      566F6963 
+ 1852              	.LASF90:
+ 1853 017c 696E7465 		.ascii	"interrupter\000"
+ 1853      72727570 
+ 1853      74657200 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 37
+
+
+ 1854              	.LASF4:
+ 1855 0188 5F5F7569 		.ascii	"__uint16_t\000"
+ 1855      6E743136 
+ 1855      5F7400
+ 1856              	.LASF47:
+ 1857 0193 696E7465 		.ascii	"interrupter_DMA\000"
+ 1857      72727570 
+ 1857      7465725F 
+ 1857      444D4100 
+ 1858              	.LASF53:
+ 1859 01a3 42555253 		.ascii	"BURST_ON\000"
+ 1859      545F4F4E 
+ 1859      00
+ 1860              	.LASF51:
+ 1861 01ac 494E5452 		.ascii	"INTR_MODE_BLOCKED\000"
+ 1861      5F4D4F44 
+ 1861      455F424C 
+ 1861      4F434B45 
+ 1861      4400
+ 1862              	.LASF30:
+ 1863 01be 64656361 		.ascii	"decay\000"
+ 1863      7900
+ 1864              	.LASF67:
+ 1865 01c4 6F666674 		.ascii	"offtime\000"
+ 1865      696D6500 
+ 1866              	.LASF21:
+ 1867 01cc 41445352 		.ascii	"ADSR_IDLE\000"
+ 1867      5F49444C 
+ 1867      4500
+ 1868              	.LASF42:
+ 1869 01d6 68707645 		.ascii	"hpvEnabledGlobally\000"
+ 1869      6E61626C 
+ 1869      6564476C 
+ 1869      6F62616C 
+ 1869      6C7900
+ 1870              	.LASF13:
+ 1871 01e9 75696E74 		.ascii	"uint8_t\000"
+ 1871      385F7400 
+ 1872              	.LASF85:
+ 1873 01f1 68707650 		.ascii	"hpvPhase\000"
+ 1873      68617365 
+ 1873      00
+ 1874              	.LASF52:
+ 1875 01fa 696E7465 		.ascii	"interrupter_burst\000"
+ 1875      72727570 
+ 1875      7465725F 
+ 1875      62757273 
+ 1875      7400
+ 1876              	.LASF71:
+ 1877 020c 7163775F 		.ascii	"qcw_max\000"
+ 1877      6D617800 
+ 1878              	.LASF48:
+ 1879 0214 696E7465 		.ascii	"interrupter_mode\000"
+ 1879      72727570 
+ 1879      7465725F 
+ 1879      6D6F6465 
+ 1879      00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 38
+
+
+ 1880              	.LASF95:
+ 1881 0225 2E2E5C63 		.ascii	"..\\common\\vms\\SidFilter.c\000"
+ 1881      6F6D6D6F 
+ 1881      6E5C766D 
+ 1881      735C5369 
+ 1881      6446696C 
+ 1882              	.LASF24:
+ 1883 023f 41445352 		.ascii	"ADSR_SUSTAIN\000"
+ 1883      5F535553 
+ 1883      5441494E 
+ 1883      00
+ 1884              	.LASF19:
+ 1885 024c 666C6F61 		.ascii	"float\000"
+ 1885      7400
+ 1886              	.LASF23:
+ 1887 0252 41445352 		.ascii	"ADSR_DECAY\000"
+ 1887      5F444543 
+ 1887      415900
+ 1888              	.LASF60:
+ 1889 025d 646D615F 		.ascii	"dma_mode\000"
+ 1889      6D6F6465 
+ 1889      00
+ 1890              	.LASF7:
+ 1891 0266 6C6F6E67 		.ascii	"long int\000"
+ 1891      20696E74 
+ 1891      00
+ 1892              	.LASF27:
+ 1893 026f 61647372 		.ascii	"adsrState\000"
+ 1893      53746174 
+ 1893      6500
+ 1894              	.LASF3:
+ 1895 0279 5F5F7569 		.ascii	"__uint8_t\000"
+ 1895      6E74385F 
+ 1895      7400
+ 1896              	.LASF36:
+ 1897 0283 63757272 		.ascii	"currentEnvelopeStartValue\000"
+ 1897      656E7445 
+ 1897      6E76656C 
+ 1897      6F706553 
+ 1897      74617274 
+ 1898              	.LASF37:
+ 1899 029d 63757272 		.ascii	"currentEnvelopeVolume\000"
+ 1899      656E7445 
+ 1899      6E76656C 
+ 1899      6F706556 
+ 1899      6F6C756D 
+ 1900              	.LASF72:
+ 1901 02b3 7163775F 		.ascii	"qcw_repeat\000"
+ 1901      72657065 
+ 1901      617400
+ 1902              	.LASF28:
+ 1903 02be 666C6167 		.ascii	"flags\000"
+ 1903      7300
+ 1904              	.LASF32:
+ 1905 02c4 72656C65 		.ascii	"release\000"
+ 1905      61736500 
+ 1906              	.LASF50:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 39
+
+
+ 1907 02cc 494E5452 		.ascii	"INTR_MODE_TR\000"
+ 1907      5F4D4F44 
+ 1907      455F5452 
+ 1907      00
+ 1908              	.LASF33:
+ 1909 02d9 66726571 		.ascii	"frequency_dHz\000"
+ 1909      75656E63 
+ 1909      795F6448 
+ 1909      7A00
+ 1910              	.LASF1:
+ 1911 02e7 756E7369 		.ascii	"unsigned char\000"
+ 1911      676E6564 
+ 1911      20636861 
+ 1911      7200
+ 1912              	.LASF78:
+ 1913 02f5 74656D70 		.ascii	"temp_duty\000"
+ 1913      5F647574 
+ 1913      7900
+ 1914              	.LASF76:
+ 1915 02ff 62757273 		.ascii	"burst_off\000"
+ 1915      745F6F66 
+ 1915      6600
+ 1916              	.LASF75:
+ 1917 0309 62757273 		.ascii	"burst_on\000"
+ 1917      745F6F6E 
+ 1917      00
+ 1918              	.LASF38:
+ 1919 0312 53494443 		.ascii	"SIDChannelData_t\000"
+ 1919      68616E6E 
+ 1919      656C4461 
+ 1919      74615F74 
+ 1919      00
+ 1920              	.LASF0:
+ 1921 0323 7369676E 		.ascii	"signed char\000"
+ 1921      65642063 
+ 1921      68617200 
+ 1922              	.LASF63:
+ 1923 032f 74756E65 		.ascii	"tune_start\000"
+ 1923      5F737461 
+ 1923      727400
+ 1924              	.LASF49:
+ 1925 033a 494E5452 		.ascii	"INTR_MODE_OFF\000"
+ 1925      5F4D4F44 
+ 1925      455F4F46 
+ 1925      4600
+ 1926              	.LASF16:
+ 1927 0348 75696E74 		.ascii	"uint32_t\000"
+ 1927      33325F74 
+ 1927      00
+ 1928              	.LASF12:
+ 1929 0351 756E7369 		.ascii	"unsigned int\000"
+ 1929      676E6564 
+ 1929      20696E74 
+ 1929      00
+ 1930              	.LASF55:
+ 1931 035e 696E7465 		.ascii	"interrupter_modulation\000"
+ 1931      72727570 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 40
+
+
+ 1931      7465725F 
+ 1931      6D6F6475 
+ 1931      6C617469 
+ 1932              	.LASF14:
+ 1933 0375 75696E74 		.ascii	"uint16_t\000"
+ 1933      31365F74 
+ 1933      00
+ 1934              	.LASF41:
+ 1935 037e 6E6F6973 		.ascii	"noiseVolume\000"
+ 1935      65566F6C 
+ 1935      756D6500 
+ 1936              	.LASF91:
+ 1937 038a 70617261 		.ascii	"param\000"
+ 1937      6D00
+ 1938              	.LASF35:
+ 1939 0390 63757272 		.ascii	"currentEnvelopeFactor\000"
+ 1939      656E7445 
+ 1939      6E76656C 
+ 1939      6F706546 
+ 1939      6163746F 
+ 1940              	.LASF66:
+ 1941 03a6 74756E65 		.ascii	"tune_delay\000"
+ 1941      5F64656C 
+ 1941      617900
+ 1942              	.LASF5:
+ 1943 03b1 73686F72 		.ascii	"short unsigned int\000"
+ 1943      7420756E 
+ 1943      7369676E 
+ 1943      65642069 
+ 1943      6E7400
+ 1944              	.LASF62:
+ 1945 03c4 696E7465 		.ascii	"interrupter_params\000"
+ 1945      72727570 
+ 1945      7465725F 
+ 1945      70617261 
+ 1945      6D7300
+ 1946              	.LASF22:
+ 1947 03d7 41445352 		.ascii	"ADSR_ATTACK\000"
+ 1947      5F415454 
+ 1947      41434B00 
+ 1948              	.LASF18:
+ 1949 03e3 63686172 		.ascii	"char\000"
+ 1949      00
+ 1950              	.LASF15:
+ 1951 03e8 696E7433 		.ascii	"int32_t\000"
+ 1951      325F7400 
+ 1952              	.LASF93:
+ 1953 03f0 53696747 		.ascii	"SigGen_setHyperVoiceSID\000"
+ 1953      656E5F73 
+ 1953      65744879 
+ 1953      70657256 
+ 1953      6F696365 
+ 1954              	.LASF70:
+ 1955 0408 7163775F 		.ascii	"qcw_offset\000"
+ 1955      6F666673 
+ 1955      657400
+ 1956              	.LASF26:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 41
+
+
+ 1957 0413 41445352 		.ascii	"ADSRState_t\000"
+ 1957      53746174 
+ 1957      655F7400 
+ 1958              	.LASF58:
+ 1959 041f 6D6F6465 		.ascii	"mode\000"
+ 1959      00
+ 1960              	.LASF79:
+ 1961 0424 636C695F 		.ascii	"cli_parameter\000"
+ 1961      70617261 
+ 1961      6D657465 
+ 1961      7200
+ 1962              	.LASF61:
+ 1963 0432 78427572 		.ascii	"xBurst_Timer\000"
+ 1963      73745F54 
+ 1963      696D6572 
+ 1963      00
+ 1964              	.LASF9:
+ 1965 043f 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1965      20756E73 
+ 1965      69676E65 
+ 1965      6420696E 
+ 1965      7400
+ 1966              	.LASF56:
+ 1967 0451 494E5452 		.ascii	"INTR_MOD_PW\000"
+ 1967      5F4D4F44 
+ 1967      5F505700 
+ 1968              	.LASF81:
+ 1969 045d 6368616E 		.ascii	"channelData\000"
+ 1969      6E656C44 
+ 1969      61746100 
+ 1970              	.LASF65:
+ 1971 0469 74756E65 		.ascii	"tune_pw\000"
+ 1971      5F707700 
+ 1972              	.LASF88:
+ 1973 0471 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1973      52784275 
+ 1973      66666572 
+ 1973      00
+ 1974              	.LASF8:
+ 1975 047e 5F5F7569 		.ascii	"__uint32_t\000"
+ 1975      6E743332 
+ 1975      5F7400
+ 1976              	.LASF45:
+ 1977 0489 494E5452 		.ascii	"INTR_DMA_TR\000"
+ 1977      5F444D41 
+ 1977      5F545200 
+ 1978              	.LASF97:
+ 1979 0495 746D7254 		.ascii	"tmrTimerControl\000"
+ 1979      696D6572 
+ 1979      436F6E74 
+ 1979      726F6C00 
+ 1980              	.LASF6:
+ 1981 04a5 5F5F696E 		.ascii	"__int32_t\000"
+ 1981      7433325F 
+ 1981      7400
+ 1982              	.LASF31:
+ 1983 04af 73757374 		.ascii	"sustainVolume\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 42
+
+
+ 1983      61696E56 
+ 1983      6F6C756D 
+ 1983      6500
+ 1984              	.LASF25:
+ 1985 04bd 41445352 		.ascii	"ADSR_RELEASE\000"
+ 1985      5F52454C 
+ 1985      45415345 
+ 1985      00
+ 1986              	.LASF98:
+ 1987 04ca 70617261 		.ascii	"parameter_struct\000"
+ 1987      6D657465 
+ 1987      725F7374 
+ 1987      72756374 
+ 1987      00
+ 1988              	.LASF74:
+ 1989 04db 7163775F 		.ascii	"qcw_vol\000"
+ 1989      766F6C00 
+ 1990              	.LASF73:
+ 1991 04e3 7163775F 		.ascii	"qcw_freq\000"
+ 1991      66726571 
+ 1991      00
+ 1992              	.LASF64:
+ 1993 04ec 74756E65 		.ascii	"tune_end\000"
+ 1993      5F656E64 
+ 1993      00
+ 1994              	.LASF77:
+ 1995 04f5 73796E74 		.ascii	"synth\000"
+ 1995      6800
+ 1996              	.LASF86:
+ 1997 04fb 68707656 		.ascii	"hpvVolume\000"
+ 1997      6F6C756D 
+ 1997      6500
+ 1998              	.LASF92:
+ 1999 0505 53696747 		.ascii	"SigGen_setVoiceSID\000"
+ 1999      656E5F73 
+ 1999      6574566F 
+ 1999      69636553 
+ 1999      494400
+ 2000              	.LASF20:
+ 2001 0518 646F7562 		.ascii	"double\000"
+ 2001      6C6500
+ 2002              	.LASF83:
+ 2003 051f 746F7461 		.ascii	"totalVolume\000"
+ 2003      6C566F6C 
+ 2003      756D6500 
+ 2004              	.LASF84:
+ 2005 052b 68707643 		.ascii	"hpvCount\000"
+ 2005      6F756E74 
+ 2005      00
+ 2006              	.LASF96:
+ 2007 0534 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 2007      73657273 
+ 2007      5C636865 
+ 2007      6D695C55 
+ 2007      44335F51 
+ 2008              	.LASF39:
+ 2009 0559 6368616E 		.ascii	"channelVolume\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc2tezmJ.s 			page 43
+
+
+ 2009      6E656C56 
+ 2009      6F6C756D 
+ 2009      6500
+ 2010              	.LASF34:
+ 2011 0567 70756C73 		.ascii	"pulsewidth\000"
+ 2011      65776964 
+ 2011      746800
+ 2012              	.LASF46:
+ 2013 0572 494E5452 		.ascii	"INTR_DMA_DDS\000"
+ 2013      5F444D41 
+ 2013      5F444453 
+ 2013      00
+ 2014              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

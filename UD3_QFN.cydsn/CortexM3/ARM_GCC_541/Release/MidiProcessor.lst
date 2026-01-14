@@ -1,0 +1,4106 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"MidiProcessor.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.resetChannelData,"ax",%progbits
+  20              		.align	1
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	resetChannelData, %function
+  24              	resetChannelData:
+  25              	.LFB77:
+  26              		.file 1 "..\\common\\vms\\MidiProcessor.c"
+   1:..\common\vms/MidiProcessor.c ****  /*
+   2:..\common\vms/MidiProcessor.c ****  * File:   midiProcessor.c
+   3:..\common\vms/MidiProcessor.c ****  * Author: Thorb
+   4:..\common\vms/MidiProcessor.c ****  *
+   5:..\common\vms/MidiProcessor.c ****  * Created on 10 January 2023, 23:16
+   6:..\common\vms/MidiProcessor.c ****  */
+   7:..\common\vms/MidiProcessor.c **** 
+   8:..\common\vms/MidiProcessor.c **** #include <math.h>
+   9:..\common\vms/MidiProcessor.c **** 
+  10:..\common\vms/MidiProcessor.c **** #include "MidiProcessor.h"
+  11:..\common\vms/MidiProcessor.c **** #include "SignalGenerator.h"
+  12:..\common\vms/MidiProcessor.c **** #include "VMS.h"
+  13:..\common\vms/MidiProcessor.c **** #include "VMSWrapper.h"
+  14:..\common\vms/MidiProcessor.c **** #include "MidiFilter.h"
+  15:..\common\vms/MidiProcessor.c **** #include "NoteMapper.h"
+  16:..\common\vms/MidiProcessor.c **** 
+  17:..\common\vms/MidiProcessor.c **** #define MIDIPROC_CH_CURR_RPN(CHANNEL) (((channelDescriptors[CHANNEL].parameters[MIDI_CC_RPN_MSB] <<
+  18:..\common\vms/MidiProcessor.c **** #define MIDIPROC_CH_CURR_DATA(CHANNEL) (((channelDescriptors[CHANNEL].parameters[MIDI_CC_DATA_COARS
+  19:..\common\vms/MidiProcessor.c **** 
+  20:..\common\vms/MidiProcessor.c **** //Note frequency lookup table
+  21:..\common\vms/MidiProcessor.c **** static const uint32_t Midi_NoteFreq_dHz[] = {82, 87, 92, 97, 103, 109, 116, 122, 130, 138, 146, 154
+  22:..\common\vms/MidiProcessor.c **** 
+  23:..\common\vms/MidiProcessor.c **** static MidiChannelDescriptor_t * channelDescriptors;
+  24:..\common\vms/MidiProcessor.c **** 
+  25:..\common\vms/MidiProcessor.c **** static void MidiProcessor_DataHandler(uint32_t channel, uint32_t parameter);
+  26:..\common\vms/MidiProcessor.c **** static void MidiProcessor_updateStereoVolume(uint32_t channel);
+  27:..\common\vms/MidiProcessor.c **** static void resetChannelData(uint32_t channel);
+  28:..\common\vms/MidiProcessor.c **** static MidiFilterHandle_t * filters[SIGGEN_OUTPUTCOUNT];
+  29:..\common\vms/MidiProcessor.c **** 
+  30:..\common\vms/MidiProcessor.c **** void MidiProcessor_init(){
+  31:..\common\vms/MidiProcessor.c ****     //TODO add stereo parameters to the UD3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 2
+
+
+  32:..\common\vms/MidiProcessor.c ****     
+  33:..\common\vms/MidiProcessor.c ****     //initialize midi filters
+  34:..\common\vms/MidiProcessor.c ****     for(uint32_t i = 0; i < SIGGEN_OUTPUTCOUNT; i++){
+  35:..\common\vms/MidiProcessor.c ****         filters[i] = MidiFilter_create(i);
+  36:..\common\vms/MidiProcessor.c ****     }
+  37:..\common\vms/MidiProcessor.c ****     
+  38:..\common\vms/MidiProcessor.c ****     channelDescriptors = pvPortMalloc(sizeof(MidiChannelDescriptor_t)*MIDI_CHANNELCOUNT);
+  39:..\common\vms/MidiProcessor.c ****     for(uint32_t i = 0; i < MIDI_CHANNELCOUNT; i++){
+  40:..\common\vms/MidiProcessor.c ****         resetChannelData(i);
+  41:..\common\vms/MidiProcessor.c ****     }
+  42:..\common\vms/MidiProcessor.c **** }
+  43:..\common\vms/MidiProcessor.c **** 
+  44:..\common\vms/MidiProcessor.c **** uint32_t MidiProcessor_noteToFrequency_dHz(uint32_t note){
+  45:..\common\vms/MidiProcessor.c ****     return Midi_NoteFreq_dHz[note];
+  46:..\common\vms/MidiProcessor.c **** }
+  47:..\common\vms/MidiProcessor.c **** 
+  48:..\common\vms/MidiProcessor.c **** uint32_t MidiProcessor_getLastFrequency(uint32_t channel){
+  49:..\common\vms/MidiProcessor.c ****     return channelDescriptors[channel].lastFrequency;
+  50:..\common\vms/MidiProcessor.c **** }
+  51:..\common\vms/MidiProcessor.c **** 
+  52:..\common\vms/MidiProcessor.c **** void MidiProcessor_setLastFrequency(uint32_t channel, uint32_t frequency){
+  53:..\common\vms/MidiProcessor.c ****     channelDescriptors[channel].lastFrequency = frequency;
+  54:..\common\vms/MidiProcessor.c **** }
+  55:..\common\vms/MidiProcessor.c **** 
+  56:..\common\vms/MidiProcessor.c **** uint32_t MidiProcessor_getBendFactor(uint32_t channel){
+  57:..\common\vms/MidiProcessor.c ****     return channelDescriptors[channel].bendFactor;
+  58:..\common\vms/MidiProcessor.c **** }
+  59:..\common\vms/MidiProcessor.c **** 
+  60:..\common\vms/MidiProcessor.c **** uint32_t MidiProcessor_getDamperVolume(uint32_t channel){
+  61:..\common\vms/MidiProcessor.c ****     return channelDescriptors[channel].parameters[MIDI_CC_DAMPER_PEDAL] ? 0xd3 : MIDI_VOLUME_MAX;
+  62:..\common\vms/MidiProcessor.c **** }
+  63:..\common\vms/MidiProcessor.c **** 
+  64:..\common\vms/MidiProcessor.c **** uint32_t MidiProcessor_getVolume(uint32_t channel){
+  65:..\common\vms/MidiProcessor.c ****     return channelDescriptors[channel].parameters[MIDI_CC_VOLUME];
+  66:..\common\vms/MidiProcessor.c **** }
+  67:..\common\vms/MidiProcessor.c **** 
+  68:..\common\vms/MidiProcessor.c **** uint32_t MidiProcessor_getStereoVolume(uint32_t channel){
+  69:..\common\vms/MidiProcessor.c ****     return channelDescriptors[channel].stereoVolume;
+  70:..\common\vms/MidiProcessor.c **** }
+  71:..\common\vms/MidiProcessor.c **** 
+  72:..\common\vms/MidiProcessor.c **** uint32_t MidiProcessor_getCCValue(uint32_t channel, uint32_t id){
+  73:..\common\vms/MidiProcessor.c ****     return channelDescriptors[channel].parameters[id];
+  74:..\common\vms/MidiProcessor.c **** }
+  75:..\common\vms/MidiProcessor.c **** 
+  76:..\common\vms/MidiProcessor.c **** static void resetChannelData(uint32_t channel){
+  27              		.loc 1 76 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              	.LVL0:
+  77:..\common\vms/MidiProcessor.c ****             
+  78:..\common\vms/MidiProcessor.c ****     //we also want to reset other dynamic values incase they got messed up and the user hit stop be
+  79:..\common\vms/MidiProcessor.c ****     channelDescriptors[channel].bendRange = 2.0;
+  32              		.loc 1 79 0
+  33 0000 0D4B     		ldr	r3, .L2
+  76:..\common\vms/MidiProcessor.c ****             
+  34              		.loc 1 76 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 3
+
+
+  35 0002 10B5     		push	{r4, lr}
+  36              		.cfi_def_cfa_offset 8
+  37              		.cfi_offset 4, -8
+  38              		.cfi_offset 14, -4
+  39              		.loc 1 79 0
+  40 0004 1C68     		ldr	r4, [r3]
+  41 0006 9823     		movs	r3, #152
+  42 0008 03FB0044 		mla	r4, r3, r0, r4
+  43 000c 4FF08043 		mov	r3, #1073741824
+  44 0010 C4F88830 		str	r3, [r4, #136]	@ float
+  80:..\common\vms/MidiProcessor.c ****     memset(channelDescriptors[channel].parameters, 0, 128);
+  45              		.loc 1 80 0
+  46 0014 8022     		movs	r2, #128
+  47 0016 0021     		movs	r1, #0
+  48 0018 2046     		mov	r0, r4
+  49              	.LVL1:
+  50 001a FFF7FEFF 		bl	memset
+  51              	.LVL2:
+  81:..\common\vms/MidiProcessor.c ****     channelDescriptors[channel].parameters[MIDI_CC_VOLUME] = MIDI_VOLUME_MAX;
+  52              		.loc 1 81 0
+  53 001e 7F23     		movs	r3, #127
+  82:..\common\vms/MidiProcessor.c **** 
+  83:..\common\vms/MidiProcessor.c ****     channelDescriptors[channel].bendFactor = 1<<13;
+  54              		.loc 1 83 0
+  55 0020 4FF40052 		mov	r2, #8192
+  56 0024 C4F88020 		str	r2, [r4, #128]
+  81:..\common\vms/MidiProcessor.c ****     channelDescriptors[channel].parameters[MIDI_CC_VOLUME] = MIDI_VOLUME_MAX;
+  57              		.loc 1 81 0
+  58 0028 E371     		strb	r3, [r4, #7]
+  84:..\common\vms/MidiProcessor.c ****     channelDescriptors[channel].bendRangeRaw = 0;
+  59              		.loc 1 84 0
+  60 002a 0022     		movs	r2, #0
+  61 002c A4F88420 		strh	r2, [r4, #132]	@ movhi
+  85:..\common\vms/MidiProcessor.c ****     channelDescriptors[channel].bendRange = 2.0;
+  86:..\common\vms/MidiProcessor.c **** 
+  87:..\common\vms/MidiProcessor.c ****     channelDescriptors[channel].stereoVolume = MIDI_VOLUME_MAX;
+  62              		.loc 1 87 0
+  63 0030 C4F89030 		str	r3, [r4, #144]
+  64 0034 10BD     		pop	{r4, pc}
+  65              	.L3:
+  66 0036 00BF     		.align	2
+  67              	.L2:
+  68 0038 00000000 		.word	.LANCHOR0
+  69              		.cfi_endproc
+  70              	.LFE77:
+  71              		.size	resetChannelData, .-resetChannelData
+  72              		.section	.text.MidiProcessor_init,"ax",%progbits
+  73              		.align	1
+  74              		.global	MidiProcessor_init
+  75              		.thumb
+  76              		.thumb_func
+  77              		.type	MidiProcessor_init, %function
+  78              	MidiProcessor_init:
+  79              	.LFB68:
+  30:..\common\vms/MidiProcessor.c ****     //TODO add stereo parameters to the UD3
+  80              		.loc 1 30 0
+  81              		.cfi_startproc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 4
+
+
+  82              		@ args = 0, pretend = 0, frame = 0
+  83              		@ frame_needed = 0, uses_anonymous_args = 0
+  84              	.LVL3:
+  85 0000 10B5     		push	{r4, lr}
+  86              		.cfi_def_cfa_offset 8
+  87              		.cfi_offset 4, -8
+  88              		.cfi_offset 14, -4
+  89              	.LBB2:
+  35:..\common\vms/MidiProcessor.c ****     }
+  90              		.loc 1 35 0
+  91 0002 0020     		movs	r0, #0
+  92 0004 FFF7FEFF 		bl	MidiFilter_create
+  93              	.LVL4:
+  94 0008 074C     		ldr	r4, .L8
+  95 000a 6060     		str	r0, [r4, #4]
+  96              	.LVL5:
+  97              	.LBE2:
+  38:..\common\vms/MidiProcessor.c ****     for(uint32_t i = 0; i < MIDI_CHANNELCOUNT; i++){
+  98              		.loc 1 38 0
+  99 000c 4FF41860 		mov	r0, #2432
+ 100 0010 FFF7FEFF 		bl	pvPortMalloc
+ 101              	.LVL6:
+ 102 0014 2060     		str	r0, [r4]
+ 103              	.LVL7:
+ 104              	.LBB3:
+  39:..\common\vms/MidiProcessor.c ****         resetChannelData(i);
+ 105              		.loc 1 39 0
+ 106 0016 0024     		movs	r4, #0
+ 107              	.LVL8:
+ 108              	.L5:
+  40:..\common\vms/MidiProcessor.c ****     }
+ 109              		.loc 1 40 0 discriminator 3
+ 110 0018 2046     		mov	r0, r4
+  39:..\common\vms/MidiProcessor.c ****         resetChannelData(i);
+ 111              		.loc 1 39 0 discriminator 3
+ 112 001a 0134     		adds	r4, r4, #1
+ 113              	.LVL9:
+  40:..\common\vms/MidiProcessor.c ****     }
+ 114              		.loc 1 40 0 discriminator 3
+ 115 001c FFF7FEFF 		bl	resetChannelData
+ 116              	.LVL10:
+  39:..\common\vms/MidiProcessor.c ****         resetChannelData(i);
+ 117              		.loc 1 39 0 discriminator 3
+ 118 0020 102C     		cmp	r4, #16
+ 119 0022 F9D1     		bne	.L5
+ 120              	.LBE3:
+  42:..\common\vms/MidiProcessor.c **** 
+ 121              		.loc 1 42 0
+ 122 0024 10BD     		pop	{r4, pc}
+ 123              	.LVL11:
+ 124              	.L9:
+ 125 0026 00BF     		.align	2
+ 126              	.L8:
+ 127 0028 00000000 		.word	.LANCHOR0
+ 128              		.cfi_endproc
+ 129              	.LFE68:
+ 130              		.size	MidiProcessor_init, .-MidiProcessor_init
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 5
+
+
+ 131              		.section	.text.MidiProcessor_noteToFrequency_dHz,"ax",%progbits
+ 132              		.align	1
+ 133              		.global	MidiProcessor_noteToFrequency_dHz
+ 134              		.thumb
+ 135              		.thumb_func
+ 136              		.type	MidiProcessor_noteToFrequency_dHz, %function
+ 137              	MidiProcessor_noteToFrequency_dHz:
+ 138              	.LFB69:
+  44:..\common\vms/MidiProcessor.c ****     return Midi_NoteFreq_dHz[note];
+ 139              		.loc 1 44 0
+ 140              		.cfi_startproc
+ 141              		@ args = 0, pretend = 0, frame = 0
+ 142              		@ frame_needed = 0, uses_anonymous_args = 0
+ 143              		@ link register save eliminated.
+ 144              	.LVL12:
+  46:..\common\vms/MidiProcessor.c **** 
+ 145              		.loc 1 46 0
+ 146 0000 014B     		ldr	r3, .L11
+ 147 0002 53F82000 		ldr	r0, [r3, r0, lsl #2]
+ 148              	.LVL13:
+ 149 0006 7047     		bx	lr
+ 150              	.L12:
+ 151              		.align	2
+ 152              	.L11:
+ 153 0008 00000000 		.word	.LANCHOR1
+ 154              		.cfi_endproc
+ 155              	.LFE69:
+ 156              		.size	MidiProcessor_noteToFrequency_dHz, .-MidiProcessor_noteToFrequency_dHz
+ 157              		.section	.text.MidiProcessor_getLastFrequency,"ax",%progbits
+ 158              		.align	1
+ 159              		.global	MidiProcessor_getLastFrequency
+ 160              		.thumb
+ 161              		.thumb_func
+ 162              		.type	MidiProcessor_getLastFrequency, %function
+ 163              	MidiProcessor_getLastFrequency:
+ 164              	.LFB70:
+  48:..\common\vms/MidiProcessor.c ****     return channelDescriptors[channel].lastFrequency;
+ 165              		.loc 1 48 0
+ 166              		.cfi_startproc
+ 167              		@ args = 0, pretend = 0, frame = 0
+ 168              		@ frame_needed = 0, uses_anonymous_args = 0
+ 169              		@ link register save eliminated.
+ 170              	.LVL14:
+  49:..\common\vms/MidiProcessor.c **** }
+ 171              		.loc 1 49 0
+ 172 0000 034B     		ldr	r3, .L14
+ 173 0002 1A68     		ldr	r2, [r3]
+ 174 0004 9823     		movs	r3, #152
+ 175 0006 03FB0020 		mla	r0, r3, r0, r2
+ 176              	.LVL15:
+  50:..\common\vms/MidiProcessor.c **** 
+ 177              		.loc 1 50 0
+ 178 000a D0F88C00 		ldr	r0, [r0, #140]
+ 179 000e 7047     		bx	lr
+ 180              	.L15:
+ 181              		.align	2
+ 182              	.L14:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 6
+
+
+ 183 0010 00000000 		.word	.LANCHOR0
+ 184              		.cfi_endproc
+ 185              	.LFE70:
+ 186              		.size	MidiProcessor_getLastFrequency, .-MidiProcessor_getLastFrequency
+ 187              		.section	.text.MidiProcessor_setLastFrequency,"ax",%progbits
+ 188              		.align	1
+ 189              		.global	MidiProcessor_setLastFrequency
+ 190              		.thumb
+ 191              		.thumb_func
+ 192              		.type	MidiProcessor_setLastFrequency, %function
+ 193              	MidiProcessor_setLastFrequency:
+ 194              	.LFB71:
+  52:..\common\vms/MidiProcessor.c ****     channelDescriptors[channel].lastFrequency = frequency;
+ 195              		.loc 1 52 0
+ 196              		.cfi_startproc
+ 197              		@ args = 0, pretend = 0, frame = 0
+ 198              		@ frame_needed = 0, uses_anonymous_args = 0
+ 199              		@ link register save eliminated.
+ 200              	.LVL16:
+  53:..\common\vms/MidiProcessor.c **** }
+ 201              		.loc 1 53 0
+ 202 0000 034B     		ldr	r3, .L17
+ 203 0002 1A68     		ldr	r2, [r3]
+ 204 0004 9823     		movs	r3, #152
+ 205 0006 03FB0020 		mla	r0, r3, r0, r2
+ 206              	.LVL17:
+ 207 000a C0F88C10 		str	r1, [r0, #140]
+ 208 000e 7047     		bx	lr
+ 209              	.L18:
+ 210              		.align	2
+ 211              	.L17:
+ 212 0010 00000000 		.word	.LANCHOR0
+ 213              		.cfi_endproc
+ 214              	.LFE71:
+ 215              		.size	MidiProcessor_setLastFrequency, .-MidiProcessor_setLastFrequency
+ 216              		.section	.text.MidiProcessor_getBendFactor,"ax",%progbits
+ 217              		.align	1
+ 218              		.global	MidiProcessor_getBendFactor
+ 219              		.thumb
+ 220              		.thumb_func
+ 221              		.type	MidiProcessor_getBendFactor, %function
+ 222              	MidiProcessor_getBendFactor:
+ 223              	.LFB72:
+  56:..\common\vms/MidiProcessor.c ****     return channelDescriptors[channel].bendFactor;
+ 224              		.loc 1 56 0
+ 225              		.cfi_startproc
+ 226              		@ args = 0, pretend = 0, frame = 0
+ 227              		@ frame_needed = 0, uses_anonymous_args = 0
+ 228              		@ link register save eliminated.
+ 229              	.LVL18:
+  57:..\common\vms/MidiProcessor.c **** }
+ 230              		.loc 1 57 0
+ 231 0000 034B     		ldr	r3, .L20
+ 232 0002 1A68     		ldr	r2, [r3]
+ 233 0004 9823     		movs	r3, #152
+ 234 0006 03FB0020 		mla	r0, r3, r0, r2
+ 235              	.LVL19:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 7
+
+
+  58:..\common\vms/MidiProcessor.c **** 
+ 236              		.loc 1 58 0
+ 237 000a D0F88000 		ldr	r0, [r0, #128]
+ 238 000e 7047     		bx	lr
+ 239              	.L21:
+ 240              		.align	2
+ 241              	.L20:
+ 242 0010 00000000 		.word	.LANCHOR0
+ 243              		.cfi_endproc
+ 244              	.LFE72:
+ 245              		.size	MidiProcessor_getBendFactor, .-MidiProcessor_getBendFactor
+ 246              		.section	.text.MidiProcessor_getDamperVolume,"ax",%progbits
+ 247              		.align	1
+ 248              		.global	MidiProcessor_getDamperVolume
+ 249              		.thumb
+ 250              		.thumb_func
+ 251              		.type	MidiProcessor_getDamperVolume, %function
+ 252              	MidiProcessor_getDamperVolume:
+ 253              	.LFB73:
+  60:..\common\vms/MidiProcessor.c ****     return channelDescriptors[channel].parameters[MIDI_CC_DAMPER_PEDAL] ? 0xd3 : MIDI_VOLUME_MAX;
+ 254              		.loc 1 60 0
+ 255              		.cfi_startproc
+ 256              		@ args = 0, pretend = 0, frame = 0
+ 257              		@ frame_needed = 0, uses_anonymous_args = 0
+ 258              		@ link register save eliminated.
+ 259              	.LVL20:
+  61:..\common\vms/MidiProcessor.c **** }
+ 260              		.loc 1 61 0
+ 261 0000 054B     		ldr	r3, .L25
+ 262 0002 1A68     		ldr	r2, [r3]
+ 263 0004 9823     		movs	r3, #152
+ 264 0006 03FB0020 		mla	r0, r3, r0, r2
+ 265              	.LVL21:
+ 266 000a 90F84330 		ldrb	r3, [r0, #67]	@ zero_extendqisi2
+ 267 000e 002B     		cmp	r3, #0
+  62:..\common\vms/MidiProcessor.c **** 
+ 268              		.loc 1 62 0
+ 269 0010 14BF     		ite	ne
+ 270 0012 D320     		movne	r0, #211
+ 271 0014 7F20     		moveq	r0, #127
+ 272 0016 7047     		bx	lr
+ 273              	.L26:
+ 274              		.align	2
+ 275              	.L25:
+ 276 0018 00000000 		.word	.LANCHOR0
+ 277              		.cfi_endproc
+ 278              	.LFE73:
+ 279              		.size	MidiProcessor_getDamperVolume, .-MidiProcessor_getDamperVolume
+ 280              		.section	.text.MidiProcessor_getVolume,"ax",%progbits
+ 281              		.align	1
+ 282              		.global	MidiProcessor_getVolume
+ 283              		.thumb
+ 284              		.thumb_func
+ 285              		.type	MidiProcessor_getVolume, %function
+ 286              	MidiProcessor_getVolume:
+ 287              	.LFB74:
+  64:..\common\vms/MidiProcessor.c ****     return channelDescriptors[channel].parameters[MIDI_CC_VOLUME];
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 8
+
+
+ 288              		.loc 1 64 0
+ 289              		.cfi_startproc
+ 290              		@ args = 0, pretend = 0, frame = 0
+ 291              		@ frame_needed = 0, uses_anonymous_args = 0
+ 292              		@ link register save eliminated.
+ 293              	.LVL22:
+  65:..\common\vms/MidiProcessor.c **** }
+ 294              		.loc 1 65 0
+ 295 0000 034B     		ldr	r3, .L28
+ 296 0002 1A68     		ldr	r2, [r3]
+ 297 0004 9823     		movs	r3, #152
+ 298 0006 03FB0020 		mla	r0, r3, r0, r2
+ 299              	.LVL23:
+  66:..\common\vms/MidiProcessor.c **** 
+ 300              		.loc 1 66 0
+ 301 000a C079     		ldrb	r0, [r0, #7]	@ zero_extendqisi2
+ 302 000c 7047     		bx	lr
+ 303              	.L29:
+ 304 000e 00BF     		.align	2
+ 305              	.L28:
+ 306 0010 00000000 		.word	.LANCHOR0
+ 307              		.cfi_endproc
+ 308              	.LFE74:
+ 309              		.size	MidiProcessor_getVolume, .-MidiProcessor_getVolume
+ 310              		.section	.text.MidiProcessor_getStereoVolume,"ax",%progbits
+ 311              		.align	1
+ 312              		.global	MidiProcessor_getStereoVolume
+ 313              		.thumb
+ 314              		.thumb_func
+ 315              		.type	MidiProcessor_getStereoVolume, %function
+ 316              	MidiProcessor_getStereoVolume:
+ 317              	.LFB75:
+  68:..\common\vms/MidiProcessor.c ****     return channelDescriptors[channel].stereoVolume;
+ 318              		.loc 1 68 0
+ 319              		.cfi_startproc
+ 320              		@ args = 0, pretend = 0, frame = 0
+ 321              		@ frame_needed = 0, uses_anonymous_args = 0
+ 322              		@ link register save eliminated.
+ 323              	.LVL24:
+  69:..\common\vms/MidiProcessor.c **** }
+ 324              		.loc 1 69 0
+ 325 0000 034B     		ldr	r3, .L31
+ 326 0002 1A68     		ldr	r2, [r3]
+ 327 0004 9823     		movs	r3, #152
+ 328 0006 03FB0020 		mla	r0, r3, r0, r2
+ 329              	.LVL25:
+  70:..\common\vms/MidiProcessor.c **** 
+ 330              		.loc 1 70 0
+ 331 000a D0F89000 		ldr	r0, [r0, #144]
+ 332 000e 7047     		bx	lr
+ 333              	.L32:
+ 334              		.align	2
+ 335              	.L31:
+ 336 0010 00000000 		.word	.LANCHOR0
+ 337              		.cfi_endproc
+ 338              	.LFE75:
+ 339              		.size	MidiProcessor_getStereoVolume, .-MidiProcessor_getStereoVolume
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 9
+
+
+ 340              		.section	.text.MidiProcessor_getCCValue,"ax",%progbits
+ 341              		.align	1
+ 342              		.global	MidiProcessor_getCCValue
+ 343              		.thumb
+ 344              		.thumb_func
+ 345              		.type	MidiProcessor_getCCValue, %function
+ 346              	MidiProcessor_getCCValue:
+ 347              	.LFB76:
+  72:..\common\vms/MidiProcessor.c ****     return channelDescriptors[channel].parameters[id];
+ 348              		.loc 1 72 0
+ 349              		.cfi_startproc
+ 350              		@ args = 0, pretend = 0, frame = 0
+ 351              		@ frame_needed = 0, uses_anonymous_args = 0
+ 352              		@ link register save eliminated.
+ 353              	.LVL26:
+  73:..\common\vms/MidiProcessor.c **** }
+ 354              		.loc 1 73 0
+ 355 0000 034B     		ldr	r3, .L34
+ 356 0002 1A68     		ldr	r2, [r3]
+ 357 0004 9823     		movs	r3, #152
+ 358 0006 03FB0020 		mla	r0, r3, r0, r2
+ 359              	.LVL27:
+  74:..\common\vms/MidiProcessor.c **** 
+ 360              		.loc 1 74 0
+ 361 000a 405C     		ldrb	r0, [r0, r1]	@ zero_extendqisi2
+ 362 000c 7047     		bx	lr
+ 363              	.L35:
+ 364 000e 00BF     		.align	2
+ 365              	.L34:
+ 366 0010 00000000 		.word	.LANCHOR0
+ 367              		.cfi_endproc
+ 368              	.LFE76:
+ 369              		.size	MidiProcessor_getCCValue, .-MidiProcessor_getCCValue
+ 370              		.section	.text.MidiProcessor_resetMidi,"ax",%progbits
+ 371              		.align	1
+ 372              		.global	MidiProcessor_resetMidi
+ 373              		.thumb
+ 374              		.thumb_func
+ 375              		.type	MidiProcessor_resetMidi, %function
+ 376              	MidiProcessor_resetMidi:
+ 377              	.LFB78:
+  88:..\common\vms/MidiProcessor.c ****     //TODO: MidiProcessor_recalculateStereoVolume();
+  89:..\common\vms/MidiProcessor.c **** 
+  90:..\common\vms/MidiProcessor.c ****     //channelDescriptors[channel].programm = 0; 
+  91:..\common\vms/MidiProcessor.c **** }
+  92:..\common\vms/MidiProcessor.c **** 
+  93:..\common\vms/MidiProcessor.c **** void MidiProcessor_resetMidi(){
+ 378              		.loc 1 93 0
+ 379              		.cfi_startproc
+ 380              		@ args = 0, pretend = 0, frame = 0
+ 381              		@ frame_needed = 0, uses_anonymous_args = 0
+ 382 0000 10B5     		push	{r4, lr}
+ 383              		.cfi_def_cfa_offset 8
+ 384              		.cfi_offset 4, -8
+ 385              		.cfi_offset 14, -4
+  94:..\common\vms/MidiProcessor.c ****     //reset all midi data
+  95:..\common\vms/MidiProcessor.c ****     
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 10
+
+
+  96:..\common\vms/MidiProcessor.c ****     VMSW_panicHandler();
+ 386              		.loc 1 96 0
+ 387 0002 FFF7FEFF 		bl	VMSW_panicHandler
+ 388              	.LVL28:
+  97:..\common\vms/MidiProcessor.c ****     SigGen_killAudio();
+ 389              		.loc 1 97 0
+ 390 0006 FFF7FEFF 		bl	SigGen_killAudio
+ 391              	.LVL29:
+ 392              	.LBB4:
+  98:..\common\vms/MidiProcessor.c ****     
+  99:..\common\vms/MidiProcessor.c ****     //TODO evaluate if this should affect all channels:
+ 100:..\common\vms/MidiProcessor.c ****     //reset all bend factors
+ 101:..\common\vms/MidiProcessor.c ****     for(uint32_t killChannel = 0;killChannel < 16; killChannel++){
+ 393              		.loc 1 101 0
+ 394 000a 0024     		movs	r4, #0
+ 395              	.LVL30:
+ 396              	.L37:
+ 102:..\common\vms/MidiProcessor.c ****         resetChannelData(killChannel);
+ 397              		.loc 1 102 0 discriminator 3
+ 398 000c 2046     		mov	r0, r4
+ 101:..\common\vms/MidiProcessor.c ****         resetChannelData(killChannel);
+ 399              		.loc 1 101 0 discriminator 3
+ 400 000e 0134     		adds	r4, r4, #1
+ 401              	.LVL31:
+ 402              		.loc 1 102 0 discriminator 3
+ 403 0010 FFF7FEFF 		bl	resetChannelData
+ 404              	.LVL32:
+ 101:..\common\vms/MidiProcessor.c ****         resetChannelData(killChannel);
+ 405              		.loc 1 101 0 discriminator 3
+ 406 0014 102C     		cmp	r4, #16
+ 407 0016 F9D1     		bne	.L37
+ 408              	.LBE4:
+ 103:..\common\vms/MidiProcessor.c ****     }
+ 104:..\common\vms/MidiProcessor.c **** }
+ 409              		.loc 1 104 0
+ 410 0018 10BD     		pop	{r4, pc}
+ 411              		.cfi_endproc
+ 412              	.LFE78:
+ 413              		.size	MidiProcessor_resetMidi, .-MidiProcessor_resetMidi
+ 414              		.global	__aeabi_i2f
+ 415              		.global	__aeabi_fmul
+ 416              		.global	__aeabi_fdiv
+ 417              		.global	__aeabi_f2uiz
+ 418              		.section	.text.MidiProcessor_processCmd,"ax",%progbits
+ 419              		.align	1
+ 420              		.global	MidiProcessor_processCmd
+ 421              		.thumb
+ 422              		.thumb_func
+ 423              		.type	MidiProcessor_processCmd, %function
+ 424              	MidiProcessor_processCmd:
+ 425              	.LFB79:
+ 105:..\common\vms/MidiProcessor.c **** 
+ 106:..\common\vms/MidiProcessor.c **** void MidiProcessor_processCmd(uint32_t cable, uint32_t channel, uint32_t cmd, uint32_t param1, uint
+ 426              		.loc 1 106 0
+ 427              		.cfi_startproc
+ 428              		@ args = 4, pretend = 0, frame = 0
+ 429              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 11
+
+
+ 430              	.LVL33:
+ 431 0000 73B5     		push	{r0, r1, r4, r5, r6, lr}
+ 432              		.cfi_def_cfa_offset 24
+ 433              		.cfi_offset 4, -16
+ 434              		.cfi_offset 5, -12
+ 435              		.cfi_offset 6, -8
+ 436              		.cfi_offset 14, -4
+ 107:..\common\vms/MidiProcessor.c ****     if(cmd == MIDI_CMD_NOTE_OFF){
+ 437              		.loc 1 107 0
+ 438 0002 802A     		cmp	r2, #128
+ 106:..\common\vms/MidiProcessor.c ****     if(cmd == MIDI_CMD_NOTE_OFF){
+ 439              		.loc 1 106 0
+ 440 0004 0C46     		mov	r4, r1
+ 441 0006 0698     		ldr	r0, [sp, #24]
+ 442              	.LVL34:
+ 443 0008 1946     		mov	r1, r3
+ 444              	.LVL35:
+ 445              		.loc 1 107 0
+ 446 000a 08D1     		bne	.L40
+ 447              	.LVL36:
+ 448              	.L43:
+ 449              	.LBB13:
+ 108:..\common\vms/MidiProcessor.c ****         for(uint32_t i = 0; i < SIGGEN_OUTPUTCOUNT; i++){
+ 109:..\common\vms/MidiProcessor.c ****             MidiFilter_eventHandler(filters[i], MIDI_EVT_NOTEOFF, channel, param1, (uint32_t)NULL, 
+ 450              		.loc 1 109 0 discriminator 1
+ 451 000c 0023     		movs	r3, #0
+ 452              	.LVL37:
+ 453 000e 5548     		ldr	r0, .L74
+ 454 0010 0193     		str	r3, [sp, #4]
+ 455 0012 0093     		str	r3, [sp]
+ 456 0014 2246     		mov	r2, r4
+ 457 0016 0B46     		mov	r3, r1
+ 458 0018 4068     		ldr	r0, [r0, #4]
+ 459 001a 0221     		movs	r1, #2
+ 460              	.LVL38:
+ 461 001c 16E0     		b	.L72
+ 462              	.LVL39:
+ 463              	.L40:
+ 464              	.LBE13:
+ 110:..\common\vms/MidiProcessor.c ****         }
+ 111:..\common\vms/MidiProcessor.c ****         //send noteOff event to mapper
+ 112:..\common\vms/MidiProcessor.c ****         
+ 113:..\common\vms/MidiProcessor.c ****     }else if(cmd == MIDI_CMD_NOTE_ON){
+ 465              		.loc 1 113 0
+ 466 001e 902A     		cmp	r2, #144
+ 467 0020 17D1     		bne	.L42
+ 114:..\common\vms/MidiProcessor.c ****         
+ 115:..\common\vms/MidiProcessor.c ****         if(param2 > 0 && channelDescriptors[channel].parameters[MIDI_CC_VOLUME] > 0  && channelDesc
+ 468              		.loc 1 115 0
+ 469 0022 0028     		cmp	r0, #0
+ 470 0024 F2D0     		beq	.L43
+ 471              		.loc 1 115 0 is_stmt 0 discriminator 1
+ 472 0026 4F4D     		ldr	r5, .L74
+ 473 0028 9822     		movs	r2, #152
+ 474              	.LVL40:
+ 475 002a 2E68     		ldr	r6, [r5]
+ 476 002c 02FB0462 		mla	r2, r2, r4, r6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 12
+
+
+ 477 0030 D679     		ldrb	r6, [r2, #7]	@ zero_extendqisi2
+ 478 0032 002E     		cmp	r6, #0
+ 479 0034 EAD0     		beq	.L43
+ 480              		.loc 1 115 0 discriminator 2
+ 481 0036 D2F89060 		ldr	r6, [r2, #144]
+ 482 003a 002E     		cmp	r6, #0
+ 483 003c E6D0     		beq	.L43
+ 484              	.LVL41:
+ 485              	.LBB14:
+ 116:..\common\vms/MidiProcessor.c ****             //yes, send noteOn event to the mapper
+ 117:..\common\vms/MidiProcessor.c ****             for(uint32_t i = 0; i < SIGGEN_OUTPUTCOUNT; i++){
+ 118:..\common\vms/MidiProcessor.c ****                 MidiFilter_eventHandler(filters[i], MIDI_EVT_NOTEON, channel, param1, param2, chann
+ 486              		.loc 1 118 0 is_stmt 1 discriminator 1
+ 487 003e 92F89420 		ldrb	r2, [r2, #148]	@ zero_extendqisi2
+ 488 0042 0121     		movs	r1, #1
+ 489              	.LVL42:
+ 490 0044 8DE80500 		stmia	sp, {r0, r2}
+ 491 0048 2246     		mov	r2, r4
+ 492 004a 6868     		ldr	r0, [r5, #4]
+ 493              	.LVL43:
+ 494              	.L72:
+ 495 004c FFF7FEFF 		bl	MidiFilter_eventHandler
+ 496              	.LVL44:
+ 497 0050 86E0     		b	.L39
+ 498              	.LVL45:
+ 499              	.L42:
+ 500              	.LBE14:
+ 119:..\common\vms/MidiProcessor.c ****             }
+ 120:..\common\vms/MidiProcessor.c ****         }else{
+ 121:..\common\vms/MidiProcessor.c ****             //no, volume == 0. Either the volume modifiers are 0 or the note velocity is 0. A veloc
+ 122:..\common\vms/MidiProcessor.c ****             for(uint32_t i = 0; i < SIGGEN_OUTPUTCOUNT; i++){
+ 123:..\common\vms/MidiProcessor.c ****                 MidiFilter_eventHandler(filters[i], MIDI_EVT_NOTEOFF, channel, param1, (uint32_t)NU
+ 124:..\common\vms/MidiProcessor.c ****             }
+ 125:..\common\vms/MidiProcessor.c ****             //send noteOff event to mapper
+ 126:..\common\vms/MidiProcessor.c ****         }
+ 127:..\common\vms/MidiProcessor.c **** 
+ 128:..\common\vms/MidiProcessor.c ****     }else if(cmd == MIDI_CMD_CONTROLLER_CHANGE){
+ 501              		.loc 1 128 0
+ 502 0052 B02A     		cmp	r2, #176
+ 503 0054 3AD1     		bne	.L44
+ 129:..\common\vms/MidiProcessor.c ****         //write value into buffer. Those control values that have no value will be written too, but
+ 130:..\common\vms/MidiProcessor.c ****         channelDescriptors[channel].parameters[param1] = param2;
+ 504              		.loc 1 130 0
+ 505 0056 434B     		ldr	r3, .L74
+ 506 0058 9822     		movs	r2, #152
+ 507              	.LVL46:
+ 508 005a 1B68     		ldr	r3, [r3]
+ 509 005c 02FB0432 		mla	r2, r2, r4, r3
+ 131:..\common\vms/MidiProcessor.c ****         
+ 132:..\common\vms/MidiProcessor.c ****         //now check if we need to do anything with the data we received
+ 133:..\common\vms/MidiProcessor.c ****         if(param1 == MIDI_CC_ALL_SOUND_OFF || param1 == MIDI_CC_ALL_NOTES_OFF || param1 == MIDI_CC_
+ 510              		.loc 1 133 0
+ 511 0060 A1F17803 		sub	r3, r1, #120
+ 512 0064 012B     		cmp	r3, #1
+ 130:..\common\vms/MidiProcessor.c ****         
+ 513              		.loc 1 130 0
+ 514 0066 5054     		strb	r0, [r2, r1]
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 13
+
+
+ 515              		.loc 1 133 0
+ 516 0068 01D9     		bls	.L45
+ 517              		.loc 1 133 0 is_stmt 0 discriminator 1
+ 518 006a 7B29     		cmp	r1, #123
+ 519 006c 04D1     		bne	.L46
+ 520              	.L45:
+ 134:..\common\vms/MidiProcessor.c ****             //user pressed either the stop or midi panic button. Make sure to kill the output and r
+ 135:..\common\vms/MidiProcessor.c ****             MidiProcessor_resetMidi();
+ 136:..\common\vms/MidiProcessor.c ****             
+ 137:..\common\vms/MidiProcessor.c ****         }else if(param1 == MIDI_CC_VOLUME){
+ 138:..\common\vms/MidiProcessor.c ****             //send volume_change event to the mapper
+ 139:..\common\vms/MidiProcessor.c ****             Mapper_volumeChangeHandler(channel);
+ 140:..\common\vms/MidiProcessor.c ****             
+ 141:..\common\vms/MidiProcessor.c ****         }else if(param1 == MIDI_CC_PAN){
+ 142:..\common\vms/MidiProcessor.c ****             //recalculate stereo volume
+ 143:..\common\vms/MidiProcessor.c ****             MidiProcessor_updateStereoVolume(channel);
+ 144:..\common\vms/MidiProcessor.c ****             
+ 145:..\common\vms/MidiProcessor.c ****             //send volume_change event to the mapper
+ 146:..\common\vms/MidiProcessor.c ****             Mapper_volumeChangeHandler(channel);
+ 147:..\common\vms/MidiProcessor.c **** 
+ 148:..\common\vms/MidiProcessor.c ****         }else if(param1 == MIDI_CC_DATA_FINE || param1 == MIDI_CC_DATA_COARSE){
+ 149:..\common\vms/MidiProcessor.c ****             //Data was received (might be a RPN change), go to the matching handler
+ 150:..\common\vms/MidiProcessor.c ****             MidiProcessor_DataHandler(channel, param2);
+ 151:..\common\vms/MidiProcessor.c **** 
+ 152:..\common\vms/MidiProcessor.c ****         }else if(param1 == MIDI_CC_NRPN_LSB || param1 == MIDI_CC_NRPN_MSB){
+ 153:..\common\vms/MidiProcessor.c ****             //NRPN change was requested, we don't support any. However a spurious NRPN message with
+ 154:..\common\vms/MidiProcessor.c ****             channelDescriptors[channel].parameters[MIDI_CC_RPN_MSB] = 0x3f;
+ 155:..\common\vms/MidiProcessor.c ****             channelDescriptors[channel].parameters[MIDI_CC_RPN_LSB] = 0x3f;
+ 156:..\common\vms/MidiProcessor.c ****         }
+ 157:..\common\vms/MidiProcessor.c **** 
+ 158:..\common\vms/MidiProcessor.c **** 
+ 159:..\common\vms/MidiProcessor.c ****     }else if(cmd == MIDI_CMD_PITCH_BEND){
+ 160:..\common\vms/MidiProcessor.c ****         //convert the two parameters to one signed 14bit value
+ 161:..\common\vms/MidiProcessor.c ****         int16_t bendParameter = (((param2 << 7) | param1) - 8192);
+ 162:..\common\vms/MidiProcessor.c ****         
+ 163:..\common\vms/MidiProcessor.c ****         //calculate the factor that frequencies need to be multiplied with and convert to fixed poi
+ 164:..\common\vms/MidiProcessor.c ****         float bendOffset = (float) bendParameter / 8192.0;
+ 165:..\common\vms/MidiProcessor.c ****         channelDescriptors[channel].bendFactor = (uint32_t) (powf(2, (bendOffset * (float) channelD
+ 166:..\common\vms/MidiProcessor.c **** 
+ 167:..\common\vms/MidiProcessor.c ****         //call bendHandler to tweak already playing notes
+ 168:..\common\vms/MidiProcessor.c ****         Mapper_bendHandler(channel);
+ 169:..\common\vms/MidiProcessor.c **** 
+ 170:..\common\vms/MidiProcessor.c ****     }else if(cmd == MIDI_CMD_PROGRAM_CHANGE){
+ 171:..\common\vms/MidiProcessor.c ****         //programm was changed, call mapper and update the map data pointer
+ 172:..\common\vms/MidiProcessor.c ****         channelDescriptors[channel].programm = param1;
+ 173:..\common\vms/MidiProcessor.c ****         Mapper_programmChangeHandler(channel, param1);
+ 174:..\common\vms/MidiProcessor.c ****     }
+ 175:..\common\vms/MidiProcessor.c **** }
+ 521              		.loc 1 175 0 is_stmt 1
+ 522 006e 02B0     		add	sp, sp, #8
+ 523              		.cfi_remember_state
+ 524              		.cfi_def_cfa_offset 16
+ 525              		@ sp needed
+ 526 0070 BDE87040 		pop	{r4, r5, r6, lr}
+ 527              		.cfi_restore 14
+ 528              		.cfi_restore 6
+ 529              		.cfi_restore 5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 14
+
+
+ 530              		.cfi_restore 4
+ 531              		.cfi_def_cfa_offset 0
+ 532              	.LVL47:
+ 135:..\common\vms/MidiProcessor.c ****             
+ 533              		.loc 1 135 0
+ 534 0074 FFF7FEBF 		b	MidiProcessor_resetMidi
+ 535              	.LVL48:
+ 536              	.L46:
+ 537              		.cfi_restore_state
+ 137:..\common\vms/MidiProcessor.c ****             //send volume_change event to the mapper
+ 538              		.loc 1 137 0
+ 539 0078 0729     		cmp	r1, #7
+ 540 007a 05D1     		bne	.L47
+ 541              	.LVL49:
+ 542              	.L49:
+ 139:..\common\vms/MidiProcessor.c ****             
+ 543              		.loc 1 139 0
+ 544 007c 2046     		mov	r0, r4
+ 545              		.loc 1 175 0
+ 546 007e 02B0     		add	sp, sp, #8
+ 547              		.cfi_remember_state
+ 548              		.cfi_def_cfa_offset 16
+ 549              		@ sp needed
+ 550 0080 BDE87040 		pop	{r4, r5, r6, lr}
+ 551              		.cfi_restore 14
+ 552              		.cfi_restore 6
+ 553              		.cfi_restore 5
+ 554              		.cfi_restore 4
+ 555              		.cfi_def_cfa_offset 0
+ 556              	.LVL50:
+ 139:..\common\vms/MidiProcessor.c ****             
+ 557              		.loc 1 139 0
+ 558 0084 FFF7FEBF 		b	Mapper_volumeChangeHandler
+ 559              	.LVL51:
+ 560              	.L47:
+ 561              		.cfi_restore_state
+ 141:..\common\vms/MidiProcessor.c ****             //recalculate stereo volume
+ 562              		.loc 1 141 0
+ 563 0088 0A29     		cmp	r1, #10
+ 564 008a 06D1     		bne	.L48
+ 565              	.LVL52:
+ 566              	.LBB15:
+ 567              	.LBB16:
+ 176:..\common\vms/MidiProcessor.c **** 
+ 177:..\common\vms/MidiProcessor.c **** static void MidiProcessor_updateStereoVolume(uint32_t channel){
+ 178:..\common\vms/MidiProcessor.c ****     channelDescriptors[channel].stereoVolume = MIDI_VOLUME_MAX;
+ 568              		.loc 1 178 0
+ 569 008c 7F23     		movs	r3, #127
+ 570 008e C2F89030 		str	r3, [r2, #144]
+ 571              	.LVL53:
+ 179:..\common\vms/MidiProcessor.c ****     
+ 180:..\common\vms/MidiProcessor.c ****     //TODO... we still don't have NVM storage of config parameters
+ 181:..\common\vms/MidiProcessor.c ****     uint8_t stereoPosition = 64;
+ 182:..\common\vms/MidiProcessor.c ****     uint8_t stereoWidth = 127;
+ 183:..\common\vms/MidiProcessor.c ****     uint8_t stereoSlope = 255;
+ 184:..\common\vms/MidiProcessor.c ****     
+ 185:..\common\vms/MidiProcessor.c ****     int16_t sp = channelDescriptors[channel].parameters[MIDI_CC_PAN];
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 15
+
+
+ 572              		.loc 1 185 0
+ 573 0092 937A     		ldrb	r3, [r2, #10]	@ zero_extendqisi2
+ 574              	.LVL54:
+ 186:..\common\vms/MidiProcessor.c ****     int16_t rsStart = (stereoPosition - stereoWidth - MIDI_VOLUME_MAX/stereoSlope);
+ 187:..\common\vms/MidiProcessor.c ****     int16_t fsEnd = (stereoPosition + stereoWidth + MIDI_VOLUME_MAX/stereoSlope);
+ 188:..\common\vms/MidiProcessor.c ****     
+ 189:..\common\vms/MidiProcessor.c ****     
+ 190:..\common\vms/MidiProcessor.c ****     if(sp < rsStart){                                                   //span before volume > 0
+ 191:..\common\vms/MidiProcessor.c ****         channelDescriptors[channel].stereoVolume = 0;
+ 192:..\common\vms/MidiProcessor.c ****     }else if(sp > rsStart && sp < (stereoPosition - stereoWidth)){      //rising slope
+ 193:..\common\vms/MidiProcessor.c ****         channelDescriptors[channel].stereoVolume = (sp - rsStart) * stereoSlope;
+ 194:..\common\vms/MidiProcessor.c ****     }else if(sp < (stereoPosition + stereoWidth) && sp > (stereoPosition - stereoWidth)){   //span 
+ 575              		.loc 1 194 0
+ 576 0094 BE2B     		cmp	r3, #190
+ 577 0096 F1DD     		ble	.L49
+ 578 0098 53E0     		b	.L73
+ 579              	.LVL55:
+ 580              	.L48:
+ 581              	.LBE16:
+ 582              	.LBE15:
+ 148:..\common\vms/MidiProcessor.c ****             //Data was received (might be a RPN change), go to the matching handler
+ 583              		.loc 1 148 0 discriminator 1
+ 584 009a 21F02003 		bic	r3, r1, #32
+ 585 009e 062B     		cmp	r3, #6
+ 586 00a0 0BD1     		bne	.L51
+ 587              	.LVL56:
+ 588              	.LBB18:
+ 589              	.LBB19:
+ 195:..\common\vms/MidiProcessor.c ****         channelDescriptors[channel].stereoVolume = MIDI_VOLUME_MAX;
+ 196:..\common\vms/MidiProcessor.c ****     }else if(sp < fsEnd && sp > (stereoPosition - stereoWidth)){        //falling slope
+ 197:..\common\vms/MidiProcessor.c ****         channelDescriptors[channel].stereoVolume = MIDI_VOLUME_MAX - (sp - stereoPosition - stereoW
+ 198:..\common\vms/MidiProcessor.c ****     }else if(sp > fsEnd){                                               //span after the volume cur
+ 199:..\common\vms/MidiProcessor.c ****         channelDescriptors[channel].stereoVolume = 0;
+ 200:..\common\vms/MidiProcessor.c ****     }
+ 201:..\common\vms/MidiProcessor.c **** }
+ 202:..\common\vms/MidiProcessor.c **** 
+ 203:..\common\vms/MidiProcessor.c **** //Some midi data 
+ 204:..\common\vms/MidiProcessor.c **** static void MidiProcessor_DataHandler(uint32_t channel, uint32_t parameter){
+ 205:..\common\vms/MidiProcessor.c ****     if(MIDIPROC_CH_CURR_RPN(channel) == MIDI_RPN_BENDRANGE){     //get the 100ths semitones for the
+ 590              		.loc 1 205 0
+ 591 00a2 B2F86430 		ldrh	r3, [r2, #100]
+ 592 00a6 002B     		cmp	r3, #0
+ 593 00a8 5AD1     		bne	.L39
+ 206:..\common\vms/MidiProcessor.c ****         channelDescriptors[channel].bendRangeRaw = MIDIPROC_CH_CURR_DATA(channel);
+ 594              		.loc 1 206 0
+ 595 00aa 9179     		ldrb	r1, [r2, #6]	@ zero_extendqisi2
+ 596              	.LVL57:
+ 597 00ac 92F82630 		ldrb	r3, [r2, #38]	@ zero_extendqisi2
+ 598 00b0 43EA0123 		orr	r3, r3, r1, lsl #8
+ 599 00b4 A2F88430 		strh	r3, [r2, #132]	@ movhi
+ 600 00b8 52E0     		b	.L39
+ 601              	.LVL58:
+ 602              	.L51:
+ 603              	.LBE19:
+ 604              	.LBE18:
+ 152:..\common\vms/MidiProcessor.c ****             //NRPN change was requested, we don't support any. However a spurious NRPN message with
+ 605              		.loc 1 152 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 16
+
+
+ 606 00ba 6239     		subs	r1, r1, #98
+ 607              	.LVL59:
+ 608 00bc 0129     		cmp	r1, #1
+ 609 00be 4FD8     		bhi	.L39
+ 154:..\common\vms/MidiProcessor.c ****             channelDescriptors[channel].parameters[MIDI_CC_RPN_LSB] = 0x3f;
+ 610              		.loc 1 154 0
+ 611 00c0 3F23     		movs	r3, #63
+ 612 00c2 82F86530 		strb	r3, [r2, #101]
+ 155:..\common\vms/MidiProcessor.c ****         }
+ 613              		.loc 1 155 0
+ 614 00c6 82F86430 		strb	r3, [r2, #100]
+ 615 00ca 49E0     		b	.L39
+ 616              	.LVL60:
+ 617              	.L44:
+ 159:..\common\vms/MidiProcessor.c ****         //convert the two parameters to one signed 14bit value
+ 618              		.loc 1 159 0
+ 619 00cc E02A     		cmp	r2, #224
+ 620 00ce 29D1     		bne	.L54
+ 621              	.LVL61:
+ 622              	.LBB20:
+ 165:..\common\vms/MidiProcessor.c **** 
+ 623              		.loc 1 165 0
+ 624 00d0 244B     		ldr	r3, .L74
+ 625 00d2 41EAC010 		orr	r0, r1, r0, lsl #7
+ 626              	.LVL62:
+ 627 00d6 1D68     		ldr	r5, [r3]
+ 628 00d8 9823     		movs	r3, #152
+ 629 00da 03FB0455 		mla	r5, r3, r4, r5
+ 630 00de A0F50050 		sub	r0, r0, #8192
+ 631 00e2 00B2     		sxth	r0, r0
+ 632 00e4 FFF7FEFF 		bl	__aeabi_i2f
+ 633              	.LVL63:
+ 634 00e8 4FF06451 		mov	r1, #956301312
+ 635 00ec FFF7FEFF 		bl	__aeabi_fmul
+ 636              	.LVL64:
+ 637 00f0 D5F88810 		ldr	r1, [r5, #136]	@ float
+ 638 00f4 FFF7FEFF 		bl	__aeabi_fmul
+ 639              	.LVL65:
+ 640 00f8 1B49     		ldr	r1, .L74+4
+ 641 00fa FFF7FEFF 		bl	__aeabi_fdiv
+ 642              	.LVL66:
+ 643 00fe 0146     		mov	r1, r0
+ 644 0100 4FF08040 		mov	r0, #1073741824
+ 645 0104 FFF7FEFF 		bl	powf
+ 646              	.LVL67:
+ 647 0108 4FF08C41 		mov	r1, #1174405120
+ 648 010c FFF7FEFF 		bl	__aeabi_fmul
+ 649              	.LVL68:
+ 650 0110 FFF7FEFF 		bl	__aeabi_f2uiz
+ 651              	.LVL69:
+ 652 0114 C5F88000 		str	r0, [r5, #128]
+ 168:..\common\vms/MidiProcessor.c **** 
+ 653              		.loc 1 168 0
+ 654 0118 2046     		mov	r0, r4
+ 655              	.LBE20:
+ 175:..\common\vms/MidiProcessor.c **** 
+ 656              		.loc 1 175 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 17
+
+
+ 657 011a 02B0     		add	sp, sp, #8
+ 658              		.cfi_remember_state
+ 659              		.cfi_def_cfa_offset 16
+ 660              		@ sp needed
+ 661 011c BDE87040 		pop	{r4, r5, r6, lr}
+ 662              		.cfi_restore 14
+ 663              		.cfi_restore 6
+ 664              		.cfi_restore 5
+ 665              		.cfi_restore 4
+ 666              		.cfi_def_cfa_offset 0
+ 667              	.LVL70:
+ 668              	.LBB21:
+ 168:..\common\vms/MidiProcessor.c **** 
+ 669              		.loc 1 168 0
+ 670 0120 FFF7FEBF 		b	Mapper_bendHandler
+ 671              	.LVL71:
+ 672              	.L54:
+ 673              		.cfi_restore_state
+ 674              	.LBE21:
+ 170:..\common\vms/MidiProcessor.c ****         //programm was changed, call mapper and update the map data pointer
+ 675              		.loc 1 170 0
+ 676 0124 C02A     		cmp	r2, #192
+ 677 0126 1BD1     		bne	.L39
+ 173:..\common\vms/MidiProcessor.c ****     }
+ 678              		.loc 1 173 0
+ 679 0128 2046     		mov	r0, r4
+ 172:..\common\vms/MidiProcessor.c ****         Mapper_programmChangeHandler(channel, param1);
+ 680              		.loc 1 172 0
+ 681 012a 0E4B     		ldr	r3, .L74
+ 682 012c 1A68     		ldr	r2, [r3]
+ 683              	.LVL72:
+ 684 012e 9823     		movs	r3, #152
+ 685 0130 03FB0423 		mla	r3, r3, r4, r2
+ 686 0134 83F89410 		strb	r1, [r3, #148]
+ 175:..\common\vms/MidiProcessor.c **** 
+ 687              		.loc 1 175 0
+ 688 0138 02B0     		add	sp, sp, #8
+ 689              		.cfi_remember_state
+ 690              		.cfi_def_cfa_offset 16
+ 691              		@ sp needed
+ 692 013a BDE87040 		pop	{r4, r5, r6, lr}
+ 693              		.cfi_restore 14
+ 694              		.cfi_restore 6
+ 695              		.cfi_restore 5
+ 696              		.cfi_restore 4
+ 697              		.cfi_def_cfa_offset 0
+ 698              	.LVL73:
+ 173:..\common\vms/MidiProcessor.c ****     }
+ 699              		.loc 1 173 0
+ 700 013e FFF7FEBF 		b	Mapper_programmChangeHandler
+ 701              	.LVL74:
+ 702              	.L73:
+ 703              		.cfi_restore_state
+ 704              	.LBB22:
+ 705              	.LBB17:
+ 185:..\common\vms/MidiProcessor.c ****     int16_t rsStart = (stereoPosition - stereoWidth - MIDI_VOLUME_MAX/stereoSlope);
+ 706              		.loc 1 185 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 18
+
+
+ 707 0142 19B2     		sxth	r1, r3
+ 708              	.LVL75:
+ 196:..\common\vms/MidiProcessor.c ****         channelDescriptors[channel].stereoVolume = MIDI_VOLUME_MAX - (sp - stereoPosition - stereoW
+ 709              		.loc 1 196 0
+ 710 0144 BE29     		cmp	r1, #190
+ 711 0146 05DC     		bgt	.L70
+ 197:..\common\vms/MidiProcessor.c ****     }else if(sp > fsEnd){                                               //span after the volume cur
+ 712              		.loc 1 197 0
+ 713 0148 BF3B     		subs	r3, r3, #191
+ 714              	.LVL76:
+ 715 014a C3EB0323 		rsb	r3, r3, r3, lsl #8
+ 716              	.LVL77:
+ 717 014e C3F17F03 		rsb	r3, r3, #127
+ 718 0152 02E0     		b	.L71
+ 719              	.LVL78:
+ 720              	.L70:
+ 198:..\common\vms/MidiProcessor.c ****         channelDescriptors[channel].stereoVolume = 0;
+ 721              		.loc 1 198 0
+ 722 0154 BF29     		cmp	r1, #191
+ 723 0156 91D0     		beq	.L49
+ 199:..\common\vms/MidiProcessor.c ****     }
+ 724              		.loc 1 199 0
+ 725 0158 0023     		movs	r3, #0
+ 726              	.LVL79:
+ 727              	.L71:
+ 728 015a C2F89030 		str	r3, [r2, #144]
+ 729 015e 8DE7     		b	.L49
+ 730              	.LVL80:
+ 731              	.L39:
+ 732              	.LBE17:
+ 733              	.LBE22:
+ 175:..\common\vms/MidiProcessor.c **** 
+ 734              		.loc 1 175 0
+ 735 0160 02B0     		add	sp, sp, #8
+ 736              		.cfi_def_cfa_offset 16
+ 737              		@ sp needed
+ 738 0162 70BD     		pop	{r4, r5, r6, pc}
+ 739              	.LVL81:
+ 740              	.L75:
+ 741              		.align	2
+ 742              	.L74:
+ 743 0164 00000000 		.word	.LANCHOR0
+ 744 0168 00004041 		.word	1094713344
+ 745              		.cfi_endproc
+ 746              	.LFE79:
+ 747              		.size	MidiProcessor_processCmd, .-MidiProcessor_processCmd
+ 748              		.section	.rodata
+ 749              		.align	2
+ 750              		.set	.LANCHOR1,. + 0
+ 751              		.type	Midi_NoteFreq_dHz, %object
+ 752              		.size	Midi_NoteFreq_dHz, 512
+ 753              	Midi_NoteFreq_dHz:
+ 754 0000 52000000 		.word	82
+ 755 0004 57000000 		.word	87
+ 756 0008 5C000000 		.word	92
+ 757 000c 61000000 		.word	97
+ 758 0010 67000000 		.word	103
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 19
+
+
+ 759 0014 6D000000 		.word	109
+ 760 0018 74000000 		.word	116
+ 761 001c 7A000000 		.word	122
+ 762 0020 82000000 		.word	130
+ 763 0024 8A000000 		.word	138
+ 764 0028 92000000 		.word	146
+ 765 002c 9A000000 		.word	154
+ 766 0030 A4000000 		.word	164
+ 767 0034 AD000000 		.word	173
+ 768 0038 B8000000 		.word	184
+ 769 003c C2000000 		.word	194
+ 770 0040 CE000000 		.word	206
+ 771 0044 DA000000 		.word	218
+ 772 0048 E7000000 		.word	231
+ 773 004c F5000000 		.word	245
+ 774 0050 04010000 		.word	260
+ 775 0054 13010000 		.word	275
+ 776 0058 23010000 		.word	291
+ 777 005c 35010000 		.word	309
+ 778 0060 47010000 		.word	327
+ 779 0064 5A010000 		.word	346
+ 780 0068 6F010000 		.word	367
+ 781 006c 85010000 		.word	389
+ 782 0070 9C010000 		.word	412
+ 783 0074 B5010000 		.word	437
+ 784 0078 CE010000 		.word	462
+ 785 007c EA010000 		.word	490
+ 786 0080 07020000 		.word	519
+ 787 0084 26020000 		.word	550
+ 788 0088 47020000 		.word	583
+ 789 008c 69020000 		.word	617
+ 790 0090 8E020000 		.word	654
+ 791 0094 B5020000 		.word	693
+ 792 0098 DE020000 		.word	734
+ 793 009c 0A030000 		.word	778
+ 794 00a0 38030000 		.word	824
+ 795 00a4 69030000 		.word	873
+ 796 00a8 9D030000 		.word	925
+ 797 00ac D4030000 		.word	980
+ 798 00b0 0E040000 		.word	1038
+ 799 00b4 4C040000 		.word	1100
+ 800 00b8 8D040000 		.word	1165
+ 801 00bc D3040000 		.word	1235
+ 802 00c0 1C050000 		.word	1308
+ 803 00c4 6A050000 		.word	1386
+ 804 00c8 BC050000 		.word	1468
+ 805 00cc 14060000 		.word	1556
+ 806 00d0 70060000 		.word	1648
+ 807 00d4 D2060000 		.word	1746
+ 808 00d8 3A070000 		.word	1850
+ 809 00dc A8070000 		.word	1960
+ 810 00e0 1D080000 		.word	2077
+ 811 00e4 98080000 		.word	2200
+ 812 00e8 1B090000 		.word	2331
+ 813 00ec A5090000 		.word	2469
+ 814 00f0 380A0000 		.word	2616
+ 815 00f4 D40A0000 		.word	2772
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 20
+
+
+ 816 00f8 790B0000 		.word	2937
+ 817 00fc 270C0000 		.word	3111
+ 818 0100 E00C0000 		.word	3296
+ 819 0104 A40D0000 		.word	3492
+ 820 0108 740E0000 		.word	3700
+ 821 010c 500F0000 		.word	3920
+ 822 0110 39100000 		.word	4153
+ 823 0114 30110000 		.word	4400
+ 824 0118 36120000 		.word	4662
+ 825 011c 4B130000 		.word	4939
+ 826 0120 71140000 		.word	5233
+ 827 0124 A8150000 		.word	5544
+ 828 0128 F1160000 		.word	5873
+ 829 012c 4F180000 		.word	6223
+ 830 0130 C1190000 		.word	6593
+ 831 0134 491B0000 		.word	6985
+ 832 0138 E81C0000 		.word	7400
+ 833 013c A01E0000 		.word	7840
+ 834 0140 72200000 		.word	8306
+ 835 0144 60220000 		.word	8800
+ 836 0148 6B240000 		.word	9323
+ 837 014c 96260000 		.word	9878
+ 838 0150 E1280000 		.word	10465
+ 839 0154 4F2B0000 		.word	11087
+ 840 0158 E32D0000 		.word	11747
+ 841 015c 9D300000 		.word	12445
+ 842 0160 81330000 		.word	13185
+ 843 0164 91360000 		.word	13969
+ 844 0168 D0390000 		.word	14800
+ 845 016c 403D0000 		.word	15680
+ 846 0170 E4400000 		.word	16612
+ 847 0174 C0440000 		.word	17600
+ 848 0178 D7480000 		.word	18647
+ 849 017c 2B4D0000 		.word	19755
+ 850 0180 C2510000 		.word	20930
+ 851 0184 9F560000 		.word	22175
+ 852 0188 C55B0000 		.word	23493
+ 853 018c 3A610000 		.word	24890
+ 854 0190 02670000 		.word	26370
+ 855 0194 226D0000 		.word	27938
+ 856 0198 A0730000 		.word	29600
+ 857 019c 807A0000 		.word	31360
+ 858 01a0 C8810000 		.word	33224
+ 859 01a4 80890000 		.word	35200
+ 860 01a8 AD910000 		.word	37293
+ 861 01ac 579A0000 		.word	39511
+ 862 01b0 84A30000 		.word	41860
+ 863 01b4 3DAD0000 		.word	44349
+ 864 01b8 8AB70000 		.word	46986
+ 865 01bc 74C20000 		.word	49780
+ 866 01c0 04CE0000 		.word	52740
+ 867 01c4 45DA0000 		.word	55877
+ 868 01c8 3FE70000 		.word	59199
+ 869 01cc FFF40000 		.word	62719
+ 870 01d0 91030100 		.word	66449
+ 871 01d4 00130100 		.word	70400
+ 872 01d8 5A230100 		.word	74586
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 21
+
+
+ 873 01dc AD340100 		.word	79021
+ 874 01e0 08470100 		.word	83720
+ 875 01e4 7A5A0100 		.word	88698
+ 876 01e8 156F0100 		.word	93973
+ 877 01ec E9840100 		.word	99561
+ 878 01f0 099C0100 		.word	105481
+ 879 01f4 89B40100 		.word	111753
+ 880 01f8 7ECE0100 		.word	118398
+ 881 01fc FFE90100 		.word	125439
+ 882              		.bss
+ 883              		.align	2
+ 884              		.set	.LANCHOR0,. + 0
+ 885              		.type	channelDescriptors, %object
+ 886              		.size	channelDescriptors, 4
+ 887              	channelDescriptors:
+ 888 0000 00000000 		.space	4
+ 889              		.type	filters, %object
+ 890              		.size	filters, 4
+ 891              	filters:
+ 892 0004 00000000 		.space	4
+ 893              		.text
+ 894              	.Letext0:
+ 895              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 896              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 897              		.file 4 "..\\common\\vms\\MidiProcessor.h"
+ 898              		.file 5 "..\\common\\vms\\MidiFilter.h"
+ 899              		.file 6 "..\\common\\rtos\\include/portable.h"
+ 900              		.file 7 "..\\common\\vms\\VMSWrapper.h"
+ 901              		.file 8 "..\\common\\ud3core/SignalGenerator.h"
+ 902              		.file 9 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 903              		.file 10 "..\\common\\vms\\NoteMapper.h"
+ 904              		.file 11 "Generated_Source\\PSoC5/core_cm3.h"
+ 905              		.section	.debug_info,"",%progbits
+ 906              	.Ldebug_info0:
+ 907 0000 11070000 		.4byte	0x711
+ 908 0004 0400     		.2byte	0x4
+ 909 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 910 000a 04       		.byte	0x4
+ 911 000b 01       		.uleb128 0x1
+ 912 000c E8000000 		.4byte	.LASF77
+ 913 0010 0C       		.byte	0xc
+ 914 0011 D5010000 		.4byte	.LASF78
+ 915 0015 1C050000 		.4byte	.LASF79
+ 916 0019 30000000 		.4byte	.Ldebug_ranges0+0x30
+ 917 001d 00000000 		.4byte	0
+ 918 0021 00000000 		.4byte	.Ldebug_line0
+ 919 0025 02       		.uleb128 0x2
+ 920 0026 04       		.byte	0x4
+ 921 0027 04       		.byte	0x4
+ 922 0028 F3010000 		.4byte	.LASF0
+ 923 002c 02       		.uleb128 0x2
+ 924 002d 02       		.byte	0x2
+ 925 002e 05       		.byte	0x5
+ 926 002f 9C000000 		.4byte	.LASF1
+ 927 0033 03       		.uleb128 0x3
+ 928 0034 04       		.byte	0x4
+ 929 0035 05       		.byte	0x5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 22
+
+
+ 930 0036 696E7400 		.ascii	"int\000"
+ 931 003a 02       		.uleb128 0x2
+ 932 003b 04       		.byte	0x4
+ 933 003c 07       		.byte	0x7
+ 934 003d 44030000 		.4byte	.LASF2
+ 935 0041 02       		.uleb128 0x2
+ 936 0042 01       		.byte	0x1
+ 937 0043 06       		.byte	0x6
+ 938 0044 2F030000 		.4byte	.LASF3
+ 939 0048 04       		.uleb128 0x4
+ 940 0049 90020000 		.4byte	.LASF5
+ 941 004d 02       		.byte	0x2
+ 942 004e 1D       		.byte	0x1d
+ 943 004f 53000000 		.4byte	0x53
+ 944 0053 02       		.uleb128 0x2
+ 945 0054 01       		.byte	0x1
+ 946 0055 08       		.byte	0x8
+ 947 0056 21030000 		.4byte	.LASF4
+ 948 005a 04       		.uleb128 0x4
+ 949 005b B7040000 		.4byte	.LASF6
+ 950 005f 02       		.byte	0x2
+ 951 0060 29       		.byte	0x29
+ 952 0061 2C000000 		.4byte	0x2c
+ 953 0065 04       		.uleb128 0x4
+ 954 0066 88010000 		.4byte	.LASF7
+ 955 006a 02       		.byte	0x2
+ 956 006b 2B       		.byte	0x2b
+ 957 006c 70000000 		.4byte	0x70
+ 958 0070 02       		.uleb128 0x2
+ 959 0071 02       		.byte	0x2
+ 960 0072 07       		.byte	0x7
+ 961 0073 94030000 		.4byte	.LASF8
+ 962 0077 04       		.uleb128 0x4
+ 963 0078 AD040000 		.4byte	.LASF9
+ 964 007c 02       		.byte	0x2
+ 965 007d 3F       		.byte	0x3f
+ 966 007e 82000000 		.4byte	0x82
+ 967 0082 02       		.uleb128 0x2
+ 968 0083 04       		.byte	0x4
+ 969 0084 05       		.byte	0x5
+ 970 0085 54020000 		.4byte	.LASF10
+ 971 0089 04       		.uleb128 0x4
+ 972 008a 68040000 		.4byte	.LASF11
+ 973 008e 02       		.byte	0x2
+ 974 008f 41       		.byte	0x41
+ 975 0090 94000000 		.4byte	0x94
+ 976 0094 02       		.uleb128 0x2
+ 977 0095 04       		.byte	0x4
+ 978 0096 07       		.byte	0x7
+ 979 0097 3B040000 		.4byte	.LASF12
+ 980 009b 02       		.uleb128 0x2
+ 981 009c 08       		.byte	0x8
+ 982 009d 05       		.byte	0x5
+ 983 009e 09020000 		.4byte	.LASF13
+ 984 00a2 02       		.uleb128 0x2
+ 985 00a3 08       		.byte	0x8
+ 986 00a4 07       		.byte	0x7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 23
+
+
+ 987 00a5 17020000 		.4byte	.LASF14
+ 988 00a9 02       		.uleb128 0x2
+ 989 00aa 04       		.byte	0x4
+ 990 00ab 07       		.byte	0x7
+ 991 00ac A6000000 		.4byte	.LASF15
+ 992 00b0 02       		.uleb128 0x2
+ 993 00b1 01       		.byte	0x1
+ 994 00b2 08       		.byte	0x8
+ 995 00b3 D3030000 		.4byte	.LASF16
+ 996 00b7 02       		.uleb128 0x2
+ 997 00b8 08       		.byte	0x8
+ 998 00b9 04       		.byte	0x4
+ 999 00ba D9040000 		.4byte	.LASF17
+ 1000 00be 02       		.uleb128 0x2
+ 1001 00bf 08       		.byte	0x8
+ 1002 00c0 04       		.byte	0x4
+ 1003 00c1 15030000 		.4byte	.LASF18
+ 1004 00c5 04       		.uleb128 0x4
+ 1005 00c6 CD010000 		.4byte	.LASF19
+ 1006 00ca 03       		.byte	0x3
+ 1007 00cb 18       		.byte	0x18
+ 1008 00cc 48000000 		.4byte	0x48
+ 1009 00d0 04       		.uleb128 0x4
+ 1010 00d1 E9030000 		.4byte	.LASF20
+ 1011 00d5 03       		.byte	0x3
+ 1012 00d6 20       		.byte	0x20
+ 1013 00d7 5A000000 		.4byte	0x5a
+ 1014 00db 04       		.uleb128 0x4
+ 1015 00dc D8030000 		.4byte	.LASF21
+ 1016 00e0 03       		.byte	0x3
+ 1017 00e1 24       		.byte	0x24
+ 1018 00e2 65000000 		.4byte	0x65
+ 1019 00e6 04       		.uleb128 0x4
+ 1020 00e7 E1030000 		.4byte	.LASF22
+ 1021 00eb 03       		.byte	0x3
+ 1022 00ec 2C       		.byte	0x2c
+ 1023 00ed 77000000 		.4byte	0x77
+ 1024 00f1 04       		.uleb128 0x4
+ 1025 00f2 3B030000 		.4byte	.LASF23
+ 1026 00f6 03       		.byte	0x3
+ 1027 00f7 30       		.byte	0x30
+ 1028 00f8 89000000 		.4byte	0x89
+ 1029 00fc 05       		.uleb128 0x5
+ 1030 00fd 98       		.byte	0x98
+ 1031 00fe 04       		.byte	0x4
+ 1032 00ff 30       		.byte	0x30
+ 1033 0100 59010000 		.4byte	0x159
+ 1034 0104 06       		.uleb128 0x6
+ 1035 0105 EB020000 		.4byte	.LASF24
+ 1036 0109 04       		.byte	0x4
+ 1037 010a 31       		.byte	0x31
+ 1038 010b 59010000 		.4byte	0x159
+ 1039 010f 00       		.byte	0
+ 1040 0110 06       		.uleb128 0x6
+ 1041 0111 AF000000 		.4byte	.LASF25
+ 1042 0115 04       		.byte	0x4
+ 1043 0116 34       		.byte	0x34
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 24
+
+
+ 1044 0117 F1000000 		.4byte	0xf1
+ 1045 011b 80       		.byte	0x80
+ 1046 011c 06       		.uleb128 0x6
+ 1047 011d 5D020000 		.4byte	.LASF26
+ 1048 0121 04       		.byte	0x4
+ 1049 0122 35       		.byte	0x35
+ 1050 0123 DB000000 		.4byte	0xdb
+ 1051 0127 84       		.byte	0x84
+ 1052 0128 06       		.uleb128 0x6
+ 1053 0129 E8040000 		.4byte	.LASF27
+ 1054 012d 04       		.byte	0x4
+ 1055 012e 36       		.byte	0x36
+ 1056 012f 25000000 		.4byte	0x25
+ 1057 0133 88       		.byte	0x88
+ 1058 0134 06       		.uleb128 0x6
+ 1059 0135 C1040000 		.4byte	.LASF28
+ 1060 0139 04       		.byte	0x4
+ 1061 013a 38       		.byte	0x38
+ 1062 013b F1000000 		.4byte	0xf1
+ 1063 013f 8C       		.byte	0x8c
+ 1064 0140 06       		.uleb128 0x6
+ 1065 0141 70020000 		.4byte	.LASF29
+ 1066 0145 04       		.byte	0x4
+ 1067 0146 3B       		.byte	0x3b
+ 1068 0147 F1000000 		.4byte	0xf1
+ 1069 014b 90       		.byte	0x90
+ 1070 014c 06       		.uleb128 0x6
+ 1071 014d C4010000 		.4byte	.LASF30
+ 1072 0151 04       		.byte	0x4
+ 1073 0152 3D       		.byte	0x3d
+ 1074 0153 C5000000 		.4byte	0xc5
+ 1075 0157 94       		.byte	0x94
+ 1076 0158 00       		.byte	0
+ 1077 0159 07       		.uleb128 0x7
+ 1078 015a C5000000 		.4byte	0xc5
+ 1079 015e 69010000 		.4byte	0x169
+ 1080 0162 08       		.uleb128 0x8
+ 1081 0163 A9000000 		.4byte	0xa9
+ 1082 0167 7F       		.byte	0x7f
+ 1083 0168 00       		.byte	0
+ 1084 0169 04       		.uleb128 0x4
+ 1085 016a 4A000000 		.4byte	.LASF31
+ 1086 016e 04       		.byte	0x4
+ 1087 016f 3E       		.byte	0x3e
+ 1088 0170 FC000000 		.4byte	0xfc
+ 1089 0174 09       		.uleb128 0x9
+ 1090 0175 E6000000 		.4byte	0xe6
+ 1091 0179 0A       		.uleb128 0xa
+ 1092 017a 01       		.byte	0x1
+ 1093 017b 53000000 		.4byte	0x53
+ 1094 017f 05       		.byte	0x5
+ 1095 0180 06       		.byte	0x6
+ 1096 0181 98010000 		.4byte	0x198
+ 1097 0185 0B       		.uleb128 0xb
+ 1098 0186 F6020000 		.4byte	.LASF32
+ 1099 018a 00       		.byte	0
+ 1100 018b 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 25
+
+
+ 1101 018c F9010000 		.4byte	.LASF33
+ 1102 0190 01       		.byte	0x1
+ 1103 0191 0B       		.uleb128 0xb
+ 1104 0192 04030000 		.4byte	.LASF34
+ 1105 0196 02       		.byte	0x2
+ 1106 0197 00       		.byte	0
+ 1107 0198 05       		.uleb128 0x5
+ 1108 0199 04       		.byte	0x4
+ 1109 019a 05       		.byte	0x5
+ 1110 019b 08       		.byte	0x8
+ 1111 019c AD010000 		.4byte	0x1ad
+ 1112 01a0 06       		.uleb128 0x6
+ 1113 01a1 BA000000 		.4byte	.LASF35
+ 1114 01a5 05       		.byte	0x5
+ 1115 01a6 09       		.byte	0x9
+ 1116 01a7 F1000000 		.4byte	0xf1
+ 1117 01ab 00       		.byte	0
+ 1118 01ac 00       		.byte	0
+ 1119 01ad 04       		.uleb128 0x4
+ 1120 01ae C0030000 		.4byte	.LASF36
+ 1121 01b2 05       		.byte	0x5
+ 1122 01b3 0B       		.byte	0xb
+ 1123 01b4 98010000 		.4byte	0x198
+ 1124 01b8 0C       		.uleb128 0xc
+ 1125 01b9 B2020000 		.4byte	.LASF51
+ 1126 01bd 01       		.byte	0x1
+ 1127 01be CC       		.byte	0xcc
+ 1128 01bf 01       		.byte	0x1
+ 1129 01c0 DB010000 		.4byte	0x1db
+ 1130 01c4 0D       		.uleb128 0xd
+ 1131 01c5 F6030000 		.4byte	.LASF37
+ 1132 01c9 01       		.byte	0x1
+ 1133 01ca CC       		.byte	0xcc
+ 1134 01cb F1000000 		.4byte	0xf1
+ 1135 01cf 0D       		.uleb128 0xd
+ 1136 01d0 64030000 		.4byte	.LASF38
+ 1137 01d4 01       		.byte	0x1
+ 1138 01d5 CC       		.byte	0xcc
+ 1139 01d6 F1000000 		.4byte	0xf1
+ 1140 01da 00       		.byte	0
+ 1141 01db 0E       		.uleb128 0xe
+ 1142 01dc 7F050000 		.4byte	.LASF80
+ 1143 01e0 01       		.byte	0x1
+ 1144 01e1 4C       		.byte	0x4c
+ 1145 01e2 00000000 		.4byte	.LFB77
+ 1146 01e6 3C000000 		.4byte	.LFE77-.LFB77
+ 1147 01ea 01       		.uleb128 0x1
+ 1148 01eb 9C       		.byte	0x9c
+ 1149 01ec 1B020000 		.4byte	0x21b
+ 1150 01f0 0F       		.uleb128 0xf
+ 1151 01f1 F6030000 		.4byte	.LASF37
+ 1152 01f5 01       		.byte	0x1
+ 1153 01f6 4C       		.byte	0x4c
+ 1154 01f7 F1000000 		.4byte	0xf1
+ 1155 01fb 00000000 		.4byte	.LLST0
+ 1156 01ff 10       		.uleb128 0x10
+ 1157 0200 1E000000 		.4byte	.LVL2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 26
+
+
+ 1158 0204 A7060000 		.4byte	0x6a7
+ 1159 0208 11       		.uleb128 0x11
+ 1160 0209 01       		.uleb128 0x1
+ 1161 020a 50       		.byte	0x50
+ 1162 020b 02       		.uleb128 0x2
+ 1163 020c 74       		.byte	0x74
+ 1164 020d 00       		.sleb128 0
+ 1165 020e 11       		.uleb128 0x11
+ 1166 020f 01       		.uleb128 0x1
+ 1167 0210 51       		.byte	0x51
+ 1168 0211 01       		.uleb128 0x1
+ 1169 0212 30       		.byte	0x30
+ 1170 0213 11       		.uleb128 0x11
+ 1171 0214 01       		.uleb128 0x1
+ 1172 0215 52       		.byte	0x52
+ 1173 0216 02       		.uleb128 0x2
+ 1174 0217 08       		.byte	0x8
+ 1175 0218 80       		.byte	0x80
+ 1176 0219 00       		.byte	0
+ 1177 021a 00       		.byte	0
+ 1178 021b 12       		.uleb128 0x12
+ 1179 021c 7D020000 		.4byte	.LASF48
+ 1180 0220 01       		.byte	0x1
+ 1181 0221 1E       		.byte	0x1e
+ 1182 0222 00000000 		.4byte	.LFB68
+ 1183 0226 2C000000 		.4byte	.LFE68-.LFB68
+ 1184 022a 01       		.uleb128 0x1
+ 1185 022b 9C       		.byte	0x9c
+ 1186 022c 97020000 		.4byte	0x297
+ 1187 0230 13       		.uleb128 0x13
+ 1188 0231 02000000 		.4byte	.LBB2
+ 1189 0235 0A000000 		.4byte	.LBE2-.LBB2
+ 1190 0239 5A020000 		.4byte	0x25a
+ 1191 023d 14       		.uleb128 0x14
+ 1192 023e 6900     		.ascii	"i\000"
+ 1193 0240 01       		.byte	0x1
+ 1194 0241 22       		.byte	0x22
+ 1195 0242 F1000000 		.4byte	0xf1
+ 1196 0246 21000000 		.4byte	.LLST1
+ 1197 024a 10       		.uleb128 0x10
+ 1198 024b 08000000 		.4byte	.LVL4
+ 1199 024f B0060000 		.4byte	0x6b0
+ 1200 0253 11       		.uleb128 0x11
+ 1201 0254 01       		.uleb128 0x1
+ 1202 0255 50       		.byte	0x50
+ 1203 0256 01       		.uleb128 0x1
+ 1204 0257 30       		.byte	0x30
+ 1205 0258 00       		.byte	0
+ 1206 0259 00       		.byte	0
+ 1207 025a 13       		.uleb128 0x13
+ 1208 025b 16000000 		.4byte	.LBB3
+ 1209 025f 0E000000 		.4byte	.LBE3-.LBB3
+ 1210 0263 85020000 		.4byte	0x285
+ 1211 0267 14       		.uleb128 0x14
+ 1212 0268 6900     		.ascii	"i\000"
+ 1213 026a 01       		.byte	0x1
+ 1214 026b 27       		.byte	0x27
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 27
+
+
+ 1215 026c F1000000 		.4byte	0xf1
+ 1216 0270 41000000 		.4byte	.LLST2
+ 1217 0274 10       		.uleb128 0x10
+ 1218 0275 20000000 		.4byte	.LVL10
+ 1219 0279 DB010000 		.4byte	0x1db
+ 1220 027d 11       		.uleb128 0x11
+ 1221 027e 01       		.uleb128 0x1
+ 1222 027f 50       		.byte	0x50
+ 1223 0280 02       		.uleb128 0x2
+ 1224 0281 74       		.byte	0x74
+ 1225 0282 7F       		.sleb128 -1
+ 1226 0283 00       		.byte	0
+ 1227 0284 00       		.byte	0
+ 1228 0285 10       		.uleb128 0x10
+ 1229 0286 14000000 		.4byte	.LVL6
+ 1230 028a BB060000 		.4byte	0x6bb
+ 1231 028e 11       		.uleb128 0x11
+ 1232 028f 01       		.uleb128 0x1
+ 1233 0290 50       		.byte	0x50
+ 1234 0291 03       		.uleb128 0x3
+ 1235 0292 0A       		.byte	0xa
+ 1236 0293 8009     		.2byte	0x980
+ 1237 0295 00       		.byte	0
+ 1238 0296 00       		.byte	0
+ 1239 0297 15       		.uleb128 0x15
+ 1240 0298 19040000 		.4byte	.LASF40
+ 1241 029c 01       		.byte	0x1
+ 1242 029d 2C       		.byte	0x2c
+ 1243 029e F1000000 		.4byte	0xf1
+ 1244 02a2 00000000 		.4byte	.LFB69
+ 1245 02a6 0C000000 		.4byte	.LFE69-.LFB69
+ 1246 02aa 01       		.uleb128 0x1
+ 1247 02ab 9C       		.byte	0x9c
+ 1248 02ac C0020000 		.4byte	0x2c0
+ 1249 02b0 0F       		.uleb128 0xf
+ 1250 02b1 F1030000 		.4byte	.LASF39
+ 1251 02b5 01       		.byte	0x1
+ 1252 02b6 2C       		.byte	0x2c
+ 1253 02b7 F1000000 		.4byte	0xf1
+ 1254 02bb 83000000 		.4byte	.LLST3
+ 1255 02bf 00       		.byte	0
+ 1256 02c0 15       		.uleb128 0x15
+ 1257 02c1 2E020000 		.4byte	.LASF41
+ 1258 02c5 01       		.byte	0x1
+ 1259 02c6 30       		.byte	0x30
+ 1260 02c7 F1000000 		.4byte	0xf1
+ 1261 02cb 00000000 		.4byte	.LFB70
+ 1262 02cf 14000000 		.4byte	.LFE70-.LFB70
+ 1263 02d3 01       		.uleb128 0x1
+ 1264 02d4 9C       		.byte	0x9c
+ 1265 02d5 E9020000 		.4byte	0x2e9
+ 1266 02d9 0F       		.uleb128 0xf
+ 1267 02da F6030000 		.4byte	.LASF37
+ 1268 02de 01       		.byte	0x1
+ 1269 02df 30       		.byte	0x30
+ 1270 02e0 F1000000 		.4byte	0xf1
+ 1271 02e4 A4000000 		.4byte	.LLST4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 28
+
+
+ 1272 02e8 00       		.byte	0
+ 1273 02e9 16       		.uleb128 0x16
+ 1274 02ea CC020000 		.4byte	.LASF58
+ 1275 02ee 01       		.byte	0x1
+ 1276 02ef 34       		.byte	0x34
+ 1277 02f0 00000000 		.4byte	.LFB71
+ 1278 02f4 14000000 		.4byte	.LFE71-.LFB71
+ 1279 02f8 01       		.uleb128 0x1
+ 1280 02f9 9C       		.byte	0x9c
+ 1281 02fa 1B030000 		.4byte	0x31b
+ 1282 02fe 0F       		.uleb128 0xf
+ 1283 02ff F6030000 		.4byte	.LASF37
+ 1284 0303 01       		.byte	0x1
+ 1285 0304 34       		.byte	0x34
+ 1286 0305 F1000000 		.4byte	0xf1
+ 1287 0309 C5000000 		.4byte	.LLST5
+ 1288 030d 17       		.uleb128 0x17
+ 1289 030e CF040000 		.4byte	.LASF42
+ 1290 0312 01       		.byte	0x1
+ 1291 0313 34       		.byte	0x34
+ 1292 0314 F1000000 		.4byte	0xf1
+ 1293 0318 01       		.uleb128 0x1
+ 1294 0319 51       		.byte	0x51
+ 1295 031a 00       		.byte	0
+ 1296 031b 15       		.uleb128 0x15
+ 1297 031c 91040000 		.4byte	.LASF43
+ 1298 0320 01       		.byte	0x1
+ 1299 0321 38       		.byte	0x38
+ 1300 0322 F1000000 		.4byte	0xf1
+ 1301 0326 00000000 		.4byte	.LFB72
+ 1302 032a 14000000 		.4byte	.LFE72-.LFB72
+ 1303 032e 01       		.uleb128 0x1
+ 1304 032f 9C       		.byte	0x9c
+ 1305 0330 44030000 		.4byte	0x344
+ 1306 0334 0F       		.uleb128 0xf
+ 1307 0335 F6030000 		.4byte	.LASF37
+ 1308 0339 01       		.byte	0x1
+ 1309 033a 38       		.byte	0x38
+ 1310 033b F1000000 		.4byte	0xf1
+ 1311 033f E6000000 		.4byte	.LLST6
+ 1312 0343 00       		.byte	0
+ 1313 0344 15       		.uleb128 0x15
+ 1314 0345 20000000 		.4byte	.LASF44
+ 1315 0349 01       		.byte	0x1
+ 1316 034a 3C       		.byte	0x3c
+ 1317 034b F1000000 		.4byte	0xf1
+ 1318 034f 00000000 		.4byte	.LFB73
+ 1319 0353 1C000000 		.4byte	.LFE73-.LFB73
+ 1320 0357 01       		.uleb128 0x1
+ 1321 0358 9C       		.byte	0x9c
+ 1322 0359 6D030000 		.4byte	0x36d
+ 1323 035d 0F       		.uleb128 0xf
+ 1324 035e F6030000 		.4byte	.LASF37
+ 1325 0362 01       		.byte	0x1
+ 1326 0363 3C       		.byte	0x3c
+ 1327 0364 F1000000 		.4byte	0xf1
+ 1328 0368 07010000 		.4byte	.LLST7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 29
+
+
+ 1329 036c 00       		.byte	0
+ 1330 036d 15       		.uleb128 0x15
+ 1331 036e 04050000 		.4byte	.LASF45
+ 1332 0372 01       		.byte	0x1
+ 1333 0373 40       		.byte	0x40
+ 1334 0374 F1000000 		.4byte	0xf1
+ 1335 0378 00000000 		.4byte	.LFB74
+ 1336 037c 14000000 		.4byte	.LFE74-.LFB74
+ 1337 0380 01       		.uleb128 0x1
+ 1338 0381 9C       		.byte	0x9c
+ 1339 0382 96030000 		.4byte	0x396
+ 1340 0386 0F       		.uleb128 0xf
+ 1341 0387 F6030000 		.4byte	.LASF37
+ 1342 038b 01       		.byte	0x1
+ 1343 038c 40       		.byte	0x40
+ 1344 038d F1000000 		.4byte	0xf1
+ 1345 0391 28010000 		.4byte	.LLST8
+ 1346 0395 00       		.byte	0
+ 1347 0396 15       		.uleb128 0x15
+ 1348 0397 4E050000 		.4byte	.LASF46
+ 1349 039b 01       		.byte	0x1
+ 1350 039c 44       		.byte	0x44
+ 1351 039d F1000000 		.4byte	0xf1
+ 1352 03a1 00000000 		.4byte	.LFB75
+ 1353 03a5 14000000 		.4byte	.LFE75-.LFB75
+ 1354 03a9 01       		.uleb128 0x1
+ 1355 03aa 9C       		.byte	0x9c
+ 1356 03ab BF030000 		.4byte	0x3bf
+ 1357 03af 0F       		.uleb128 0xf
+ 1358 03b0 F6030000 		.4byte	.LASF37
+ 1359 03b4 01       		.byte	0x1
+ 1360 03b5 44       		.byte	0x44
+ 1361 03b6 F1000000 		.4byte	0xf1
+ 1362 03ba 49010000 		.4byte	.LLST9
+ 1363 03be 00       		.byte	0
+ 1364 03bf 15       		.uleb128 0x15
+ 1365 03c0 AB010000 		.4byte	.LASF47
+ 1366 03c4 01       		.byte	0x1
+ 1367 03c5 48       		.byte	0x48
+ 1368 03c6 F1000000 		.4byte	0xf1
+ 1369 03ca 00000000 		.4byte	.LFB76
+ 1370 03ce 14000000 		.4byte	.LFE76-.LFB76
+ 1371 03d2 01       		.uleb128 0x1
+ 1372 03d3 9C       		.byte	0x9c
+ 1373 03d4 F4030000 		.4byte	0x3f4
+ 1374 03d8 0F       		.uleb128 0xf
+ 1375 03d9 F6030000 		.4byte	.LASF37
+ 1376 03dd 01       		.byte	0x1
+ 1377 03de 48       		.byte	0x48
+ 1378 03df F1000000 		.4byte	0xf1
+ 1379 03e3 6A010000 		.4byte	.LLST10
+ 1380 03e7 18       		.uleb128 0x18
+ 1381 03e8 696400   		.ascii	"id\000"
+ 1382 03eb 01       		.byte	0x1
+ 1383 03ec 48       		.byte	0x48
+ 1384 03ed F1000000 		.4byte	0xf1
+ 1385 03f1 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 30
+
+
+ 1386 03f2 51       		.byte	0x51
+ 1387 03f3 00       		.byte	0
+ 1388 03f4 12       		.uleb128 0x12
+ 1389 03f5 9A020000 		.4byte	.LASF49
+ 1390 03f9 01       		.byte	0x1
+ 1391 03fa 5D       		.byte	0x5d
+ 1392 03fb 00000000 		.4byte	.LFB78
+ 1393 03ff 1A000000 		.4byte	.LFE78-.LFB78
+ 1394 0403 01       		.uleb128 0x1
+ 1395 0404 9C       		.byte	0x9c
+ 1396 0405 49040000 		.4byte	0x449
+ 1397 0409 13       		.uleb128 0x13
+ 1398 040a 0A000000 		.4byte	.LBB4
+ 1399 040e 0E000000 		.4byte	.LBE4-.LBB4
+ 1400 0412 36040000 		.4byte	0x436
+ 1401 0416 19       		.uleb128 0x19
+ 1402 0417 85040000 		.4byte	.LASF50
+ 1403 041b 01       		.byte	0x1
+ 1404 041c 65       		.byte	0x65
+ 1405 041d F1000000 		.4byte	0xf1
+ 1406 0421 8B010000 		.4byte	.LLST11
+ 1407 0425 10       		.uleb128 0x10
+ 1408 0426 14000000 		.4byte	.LVL32
+ 1409 042a DB010000 		.4byte	0x1db
+ 1410 042e 11       		.uleb128 0x11
+ 1411 042f 01       		.uleb128 0x1
+ 1412 0430 50       		.byte	0x50
+ 1413 0431 02       		.uleb128 0x2
+ 1414 0432 74       		.byte	0x74
+ 1415 0433 7F       		.sleb128 -1
+ 1416 0434 00       		.byte	0
+ 1417 0435 00       		.byte	0
+ 1418 0436 1A       		.uleb128 0x1a
+ 1419 0437 06000000 		.4byte	.LVL28
+ 1420 043b C6060000 		.4byte	0x6c6
+ 1421 043f 1A       		.uleb128 0x1a
+ 1422 0440 0A000000 		.4byte	.LVL29
+ 1423 0444 D1060000 		.4byte	0x6d1
+ 1424 0448 00       		.byte	0
+ 1425 0449 0C       		.uleb128 0xc
+ 1426 044a C7000000 		.4byte	.LASF52
+ 1427 044e 01       		.byte	0x1
+ 1428 044f B1       		.byte	0xb1
+ 1429 0450 01       		.byte	0x1
+ 1430 0451 A2040000 		.4byte	0x4a2
+ 1431 0455 0D       		.uleb128 0xd
+ 1432 0456 F6030000 		.4byte	.LASF37
+ 1433 045a 01       		.byte	0x1
+ 1434 045b B1       		.byte	0xb1
+ 1435 045c F1000000 		.4byte	0xf1
+ 1436 0460 1B       		.uleb128 0x1b
+ 1437 0461 0C000000 		.4byte	.LASF53
+ 1438 0465 01       		.byte	0x1
+ 1439 0466 B5       		.byte	0xb5
+ 1440 0467 C5000000 		.4byte	0xc5
+ 1441 046b 1B       		.uleb128 0x1b
+ 1442 046c 00000000 		.4byte	.LASF54
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 31
+
+
+ 1443 0470 01       		.byte	0x1
+ 1444 0471 B6       		.byte	0xb6
+ 1445 0472 C5000000 		.4byte	0xc5
+ 1446 0476 1B       		.uleb128 0x1b
+ 1447 0477 3E000000 		.4byte	.LASF55
+ 1448 047b 01       		.byte	0x1
+ 1449 047c B7       		.byte	0xb7
+ 1450 047d C5000000 		.4byte	0xc5
+ 1451 0481 1C       		.uleb128 0x1c
+ 1452 0482 737000   		.ascii	"sp\000"
+ 1453 0485 01       		.byte	0x1
+ 1454 0486 B9       		.byte	0xb9
+ 1455 0487 D0000000 		.4byte	0xd0
+ 1456 048b 1B       		.uleb128 0x1b
+ 1457 048c E0040000 		.4byte	.LASF56
+ 1458 0490 01       		.byte	0x1
+ 1459 0491 BA       		.byte	0xba
+ 1460 0492 D0000000 		.4byte	0xd0
+ 1461 0496 1B       		.uleb128 0x1b
+ 1462 0497 6A020000 		.4byte	.LASF57
+ 1463 049b 01       		.byte	0x1
+ 1464 049c BB       		.byte	0xbb
+ 1465 049d D0000000 		.4byte	0xd0
+ 1466 04a1 00       		.byte	0
+ 1467 04a2 1D       		.uleb128 0x1d
+ 1468 04a3 A7030000 		.4byte	.LASF59
+ 1469 04a7 01       		.byte	0x1
+ 1470 04a8 6A       		.byte	0x6a
+ 1471 04a9 00000000 		.4byte	.LFB79
+ 1472 04ad 6C010000 		.4byte	.LFE79-.LFB79
+ 1473 04b1 01       		.uleb128 0x1
+ 1474 04b2 9C       		.byte	0x9c
+ 1475 04b3 32060000 		.4byte	0x632
+ 1476 04b7 0F       		.uleb128 0xf
+ 1477 04b8 62040000 		.4byte	.LASF60
+ 1478 04bc 01       		.byte	0x1
+ 1479 04bd 6A       		.byte	0x6a
+ 1480 04be F1000000 		.4byte	0xf1
+ 1481 04c2 CD010000 		.4byte	.LLST12
+ 1482 04c6 0F       		.uleb128 0xf
+ 1483 04c7 F6030000 		.4byte	.LASF37
+ 1484 04cb 01       		.byte	0x1
+ 1485 04cc 6A       		.byte	0x6a
+ 1486 04cd F1000000 		.4byte	0xf1
+ 1487 04d1 EE010000 		.4byte	.LLST13
+ 1488 04d5 1E       		.uleb128 0x1e
+ 1489 04d6 636D6400 		.ascii	"cmd\000"
+ 1490 04da 01       		.byte	0x1
+ 1491 04db 6A       		.byte	0x6a
+ 1492 04dc F1000000 		.4byte	0xf1
+ 1493 04e0 B5020000 		.4byte	.LLST14
+ 1494 04e4 0F       		.uleb128 0xf
+ 1495 04e5 81010000 		.4byte	.LASF61
+ 1496 04e9 01       		.byte	0x1
+ 1497 04ea 6A       		.byte	0x6a
+ 1498 04eb F1000000 		.4byte	0xf1
+ 1499 04ef 3A030000 		.4byte	.LLST15
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 32
+
+
+ 1500 04f3 0F       		.uleb128 0xf
+ 1501 04f4 8D030000 		.4byte	.LASF62
+ 1502 04f8 01       		.byte	0x1
+ 1503 04f9 6A       		.byte	0x6a
+ 1504 04fa F1000000 		.4byte	0xf1
+ 1505 04fe 36040000 		.4byte	.LLST16
+ 1506 0502 13       		.uleb128 0x13
+ 1507 0503 0C000000 		.4byte	.LBB13
+ 1508 0507 12000000 		.4byte	.LBE13-.LBB13
+ 1509 050b 1D050000 		.4byte	0x51d
+ 1510 050f 14       		.uleb128 0x14
+ 1511 0510 6900     		.ascii	"i\000"
+ 1512 0512 01       		.byte	0x1
+ 1513 0513 6C       		.byte	0x6c
+ 1514 0514 F1000000 		.4byte	0xf1
+ 1515 0518 B6040000 		.4byte	.LLST17
+ 1516 051c 00       		.byte	0
+ 1517 051d 13       		.uleb128 0x13
+ 1518 051e 3E000000 		.4byte	.LBB14
+ 1519 0522 14000000 		.4byte	.LBE14-.LBB14
+ 1520 0526 41050000 		.4byte	0x541
+ 1521 052a 14       		.uleb128 0x14
+ 1522 052b 6900     		.ascii	"i\000"
+ 1523 052d 01       		.byte	0x1
+ 1524 052e 75       		.byte	0x75
+ 1525 052f F1000000 		.4byte	0xf1
+ 1526 0533 CA040000 		.4byte	.LLST18
+ 1527 0537 1A       		.uleb128 0x1a
+ 1528 0538 50000000 		.4byte	.LVL44
+ 1529 053c DC060000 		.4byte	0x6dc
+ 1530 0540 00       		.byte	0
+ 1531 0541 1F       		.uleb128 0x1f
+ 1532 0542 49040000 		.4byte	0x449
+ 1533 0546 8C000000 		.4byte	.LBB15
+ 1534 054a 00000000 		.4byte	.Ldebug_ranges0+0
+ 1535 054e 01       		.byte	0x1
+ 1536 054f 8F       		.byte	0x8f
+ 1537 0550 9A050000 		.4byte	0x59a
+ 1538 0554 20       		.uleb128 0x20
+ 1539 0555 55040000 		.4byte	0x455
+ 1540 0559 EA040000 		.4byte	.LLST19
+ 1541 055d 21       		.uleb128 0x21
+ 1542 055e 00000000 		.4byte	.Ldebug_ranges0+0
+ 1543 0562 22       		.uleb128 0x22
+ 1544 0563 60040000 		.4byte	0x460
+ 1545 0567 08050000 		.4byte	.LLST20
+ 1546 056b 22       		.uleb128 0x22
+ 1547 056c 6B040000 		.4byte	0x46b
+ 1548 0570 2A050000 		.4byte	.LLST21
+ 1549 0574 22       		.uleb128 0x22
+ 1550 0575 76040000 		.4byte	0x476
+ 1551 0579 4C050000 		.4byte	.LLST22
+ 1552 057d 22       		.uleb128 0x22
+ 1553 057e 81040000 		.4byte	0x481
+ 1554 0582 6E050000 		.4byte	.LLST23
+ 1555 0586 22       		.uleb128 0x22
+ 1556 0587 8B040000 		.4byte	0x48b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 33
+
+
+ 1557 058b DB050000 		.4byte	.LLST24
+ 1558 058f 22       		.uleb128 0x22
+ 1559 0590 96040000 		.4byte	0x496
+ 1560 0594 FD050000 		.4byte	.LLST25
+ 1561 0598 00       		.byte	0
+ 1562 0599 00       		.byte	0
+ 1563 059a 23       		.uleb128 0x23
+ 1564 059b B8010000 		.4byte	0x1b8
+ 1565 059f A2000000 		.4byte	.LBB18
+ 1566 05a3 18000000 		.4byte	.LBE18-.LBB18
+ 1567 05a7 01       		.byte	0x1
+ 1568 05a8 96       		.byte	0x96
+ 1569 05a9 C0050000 		.4byte	0x5c0
+ 1570 05ad 20       		.uleb128 0x20
+ 1571 05ae CF010000 		.4byte	0x1cf
+ 1572 05b2 1F060000 		.4byte	.LLST26
+ 1573 05b6 20       		.uleb128 0x20
+ 1574 05b7 C4010000 		.4byte	0x1c4
+ 1575 05bb 32060000 		.4byte	.LLST27
+ 1576 05bf 00       		.byte	0
+ 1577 05c0 24       		.uleb128 0x24
+ 1578 05c1 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 1579 05c5 02060000 		.4byte	0x602
+ 1580 05c9 19       		.uleb128 0x19
+ 1581 05ca 6E030000 		.4byte	.LASF63
+ 1582 05ce 01       		.byte	0x1
+ 1583 05cf A1       		.byte	0xa1
+ 1584 05d0 D0000000 		.4byte	0xd0
+ 1585 05d4 45060000 		.4byte	.LLST28
+ 1586 05d8 19       		.uleb128 0x19
+ 1587 05d9 62000000 		.4byte	.LASF64
+ 1588 05dd 01       		.byte	0x1
+ 1589 05de A4       		.byte	0xa4
+ 1590 05df 25000000 		.4byte	0x25
+ 1591 05e3 7B060000 		.4byte	.LLST29
+ 1592 05e7 1A       		.uleb128 0x1a
+ 1593 05e8 08010000 		.4byte	.LVL67
+ 1594 05ec E7060000 		.4byte	0x6e7
+ 1595 05f0 25       		.uleb128 0x25
+ 1596 05f1 24010000 		.4byte	.LVL71
+ 1597 05f5 F3060000 		.4byte	0x6f3
+ 1598 05f9 11       		.uleb128 0x11
+ 1599 05fa 01       		.uleb128 0x1
+ 1600 05fb 50       		.byte	0x50
+ 1601 05fc 03       		.uleb128 0x3
+ 1602 05fd F3       		.byte	0xf3
+ 1603 05fe 01       		.uleb128 0x1
+ 1604 05ff 51       		.byte	0x51
+ 1605 0600 00       		.byte	0
+ 1606 0601 00       		.byte	0
+ 1607 0602 26       		.uleb128 0x26
+ 1608 0603 78000000 		.4byte	.LVL48
+ 1609 0607 F4030000 		.4byte	0x3f4
+ 1610 060b 27       		.uleb128 0x27
+ 1611 060c 88000000 		.4byte	.LVL51
+ 1612 0610 FE060000 		.4byte	0x6fe
+ 1613 0614 20060000 		.4byte	0x620
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 34
+
+
+ 1614 0618 11       		.uleb128 0x11
+ 1615 0619 01       		.uleb128 0x1
+ 1616 061a 50       		.byte	0x50
+ 1617 061b 03       		.uleb128 0x3
+ 1618 061c F3       		.byte	0xf3
+ 1619 061d 01       		.uleb128 0x1
+ 1620 061e 51       		.byte	0x51
+ 1621 061f 00       		.byte	0
+ 1622 0620 25       		.uleb128 0x25
+ 1623 0621 42010000 		.4byte	.LVL74
+ 1624 0625 09070000 		.4byte	0x709
+ 1625 0629 11       		.uleb128 0x11
+ 1626 062a 01       		.uleb128 0x1
+ 1627 062b 50       		.byte	0x50
+ 1628 062c 03       		.uleb128 0x3
+ 1629 062d F3       		.byte	0xf3
+ 1630 062e 01       		.uleb128 0x1
+ 1631 062f 51       		.byte	0x51
+ 1632 0630 00       		.byte	0
+ 1633 0631 00       		.byte	0
+ 1634 0632 07       		.uleb128 0x7
+ 1635 0633 42060000 		.4byte	0x642
+ 1636 0637 42060000 		.4byte	0x642
+ 1637 063b 08       		.uleb128 0x8
+ 1638 063c A9000000 		.4byte	0xa9
+ 1639 0640 7F       		.byte	0x7f
+ 1640 0641 00       		.byte	0
+ 1641 0642 28       		.uleb128 0x28
+ 1642 0643 F1000000 		.4byte	0xf1
+ 1643 0647 29       		.uleb128 0x29
+ 1644 0648 73040000 		.4byte	.LASF65
+ 1645 064c 01       		.byte	0x1
+ 1646 064d 15       		.byte	0x15
+ 1647 064e 58060000 		.4byte	0x658
+ 1648 0652 05       		.uleb128 0x5
+ 1649 0653 03       		.byte	0x3
+ 1650 0654 00000000 		.4byte	Midi_NoteFreq_dHz
+ 1651 0658 28       		.uleb128 0x28
+ 1652 0659 32060000 		.4byte	0x632
+ 1653 065d 29       		.uleb128 0x29
+ 1654 065e 6C050000 		.4byte	.LASF66
+ 1655 0662 01       		.byte	0x1
+ 1656 0663 17       		.byte	0x17
+ 1657 0664 6E060000 		.4byte	0x66e
+ 1658 0668 05       		.uleb128 0x5
+ 1659 0669 03       		.byte	0x3
+ 1660 066a 00000000 		.4byte	channelDescriptors
+ 1661 066e 2A       		.uleb128 0x2a
+ 1662 066f 04       		.byte	0x4
+ 1663 0670 69010000 		.4byte	0x169
+ 1664 0674 07       		.uleb128 0x7
+ 1665 0675 84060000 		.4byte	0x684
+ 1666 0679 84060000 		.4byte	0x684
+ 1667 067d 08       		.uleb128 0x8
+ 1668 067e A9000000 		.4byte	0xa9
+ 1669 0682 00       		.byte	0
+ 1670 0683 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 35
+
+
+ 1671 0684 2A       		.uleb128 0x2a
+ 1672 0685 04       		.byte	0x4
+ 1673 0686 AD010000 		.4byte	0x1ad
+ 1674 068a 29       		.uleb128 0x29
+ 1675 068b 4D040000 		.4byte	.LASF67
+ 1676 068f 01       		.byte	0x1
+ 1677 0690 1C       		.byte	0x1c
+ 1678 0691 74060000 		.4byte	0x674
+ 1679 0695 05       		.uleb128 0x5
+ 1680 0696 03       		.byte	0x3
+ 1681 0697 04000000 		.4byte	filters
+ 1682 069b 2B       		.uleb128 0x2b
+ 1683 069c 55040000 		.4byte	.LASF81
+ 1684 06a0 0B       		.byte	0xb
+ 1685 06a1 1207     		.2byte	0x712
+ 1686 06a3 74010000 		.4byte	0x174
+ 1687 06a7 2C       		.uleb128 0x2c
+ 1688 06a8 4D020000 		.4byte	.LASF82
+ 1689 06ac 4D020000 		.4byte	.LASF82
+ 1690 06b0 2D       		.uleb128 0x2d
+ 1691 06b1 8A000000 		.4byte	.LASF68
+ 1692 06b5 8A000000 		.4byte	.LASF68
+ 1693 06b9 05       		.byte	0x5
+ 1694 06ba 0D       		.byte	0xd
+ 1695 06bb 2D       		.uleb128 0x2d
+ 1696 06bc 41050000 		.4byte	.LASF69
+ 1697 06c0 41050000 		.4byte	.LASF69
+ 1698 06c4 06       		.byte	0x6
+ 1699 06c5 B0       		.byte	0xb0
+ 1700 06c6 2D       		.uleb128 0x2d
+ 1701 06c7 F2040000 		.4byte	.LASF70
+ 1702 06cb F2040000 		.4byte	.LASF70
+ 1703 06cf 07       		.byte	0x7
+ 1704 06d0 17       		.byte	0x17
+ 1705 06d1 2D       		.uleb128 0x2d
+ 1706 06d2 7C030000 		.4byte	.LASF71
+ 1707 06d6 7C030000 		.4byte	.LASF71
+ 1708 06da 08       		.byte	0x8
+ 1709 06db 9B       		.byte	0x9b
+ 1710 06dc 2D       		.uleb128 0x2d
+ 1711 06dd 93010000 		.4byte	.LASF72
+ 1712 06e1 93010000 		.4byte	.LASF72
+ 1713 06e5 05       		.byte	0x5
+ 1714 06e6 0E       		.byte	0xe
+ 1715 06e7 2E       		.uleb128 0x2e
+ 1716 06e8 1B000000 		.4byte	.LASF73
+ 1717 06ec 1B000000 		.4byte	.LASF73
+ 1718 06f0 09       		.byte	0x9
+ 1719 06f1 8401     		.2byte	0x184
+ 1720 06f3 2D       		.uleb128 0x2d
+ 1721 06f4 51030000 		.4byte	.LASF74
+ 1722 06f8 51030000 		.4byte	.LASF74
+ 1723 06fc 0A       		.byte	0xa
+ 1724 06fd 4C       		.byte	0x4c
+ 1725 06fe 2D       		.uleb128 0x2d
+ 1726 06ff FE030000 		.4byte	.LASF75
+ 1727 0703 FE030000 		.4byte	.LASF75
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 36
+
+
+ 1728 0707 0A       		.byte	0xa
+ 1729 0708 4F       		.byte	0x4f
+ 1730 0709 2D       		.uleb128 0x2d
+ 1731 070a 6D000000 		.4byte	.LASF76
+ 1732 070e 6D000000 		.4byte	.LASF76
+ 1733 0712 0A       		.byte	0xa
+ 1734 0713 4B       		.byte	0x4b
+ 1735 0714 00       		.byte	0
+ 1736              		.section	.debug_abbrev,"",%progbits
+ 1737              	.Ldebug_abbrev0:
+ 1738 0000 01       		.uleb128 0x1
+ 1739 0001 11       		.uleb128 0x11
+ 1740 0002 01       		.byte	0x1
+ 1741 0003 25       		.uleb128 0x25
+ 1742 0004 0E       		.uleb128 0xe
+ 1743 0005 13       		.uleb128 0x13
+ 1744 0006 0B       		.uleb128 0xb
+ 1745 0007 03       		.uleb128 0x3
+ 1746 0008 0E       		.uleb128 0xe
+ 1747 0009 1B       		.uleb128 0x1b
+ 1748 000a 0E       		.uleb128 0xe
+ 1749 000b 55       		.uleb128 0x55
+ 1750 000c 17       		.uleb128 0x17
+ 1751 000d 11       		.uleb128 0x11
+ 1752 000e 01       		.uleb128 0x1
+ 1753 000f 10       		.uleb128 0x10
+ 1754 0010 17       		.uleb128 0x17
+ 1755 0011 00       		.byte	0
+ 1756 0012 00       		.byte	0
+ 1757 0013 02       		.uleb128 0x2
+ 1758 0014 24       		.uleb128 0x24
+ 1759 0015 00       		.byte	0
+ 1760 0016 0B       		.uleb128 0xb
+ 1761 0017 0B       		.uleb128 0xb
+ 1762 0018 3E       		.uleb128 0x3e
+ 1763 0019 0B       		.uleb128 0xb
+ 1764 001a 03       		.uleb128 0x3
+ 1765 001b 0E       		.uleb128 0xe
+ 1766 001c 00       		.byte	0
+ 1767 001d 00       		.byte	0
+ 1768 001e 03       		.uleb128 0x3
+ 1769 001f 24       		.uleb128 0x24
+ 1770 0020 00       		.byte	0
+ 1771 0021 0B       		.uleb128 0xb
+ 1772 0022 0B       		.uleb128 0xb
+ 1773 0023 3E       		.uleb128 0x3e
+ 1774 0024 0B       		.uleb128 0xb
+ 1775 0025 03       		.uleb128 0x3
+ 1776 0026 08       		.uleb128 0x8
+ 1777 0027 00       		.byte	0
+ 1778 0028 00       		.byte	0
+ 1779 0029 04       		.uleb128 0x4
+ 1780 002a 16       		.uleb128 0x16
+ 1781 002b 00       		.byte	0
+ 1782 002c 03       		.uleb128 0x3
+ 1783 002d 0E       		.uleb128 0xe
+ 1784 002e 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 37
+
+
+ 1785 002f 0B       		.uleb128 0xb
+ 1786 0030 3B       		.uleb128 0x3b
+ 1787 0031 0B       		.uleb128 0xb
+ 1788 0032 49       		.uleb128 0x49
+ 1789 0033 13       		.uleb128 0x13
+ 1790 0034 00       		.byte	0
+ 1791 0035 00       		.byte	0
+ 1792 0036 05       		.uleb128 0x5
+ 1793 0037 13       		.uleb128 0x13
+ 1794 0038 01       		.byte	0x1
+ 1795 0039 0B       		.uleb128 0xb
+ 1796 003a 0B       		.uleb128 0xb
+ 1797 003b 3A       		.uleb128 0x3a
+ 1798 003c 0B       		.uleb128 0xb
+ 1799 003d 3B       		.uleb128 0x3b
+ 1800 003e 0B       		.uleb128 0xb
+ 1801 003f 01       		.uleb128 0x1
+ 1802 0040 13       		.uleb128 0x13
+ 1803 0041 00       		.byte	0
+ 1804 0042 00       		.byte	0
+ 1805 0043 06       		.uleb128 0x6
+ 1806 0044 0D       		.uleb128 0xd
+ 1807 0045 00       		.byte	0
+ 1808 0046 03       		.uleb128 0x3
+ 1809 0047 0E       		.uleb128 0xe
+ 1810 0048 3A       		.uleb128 0x3a
+ 1811 0049 0B       		.uleb128 0xb
+ 1812 004a 3B       		.uleb128 0x3b
+ 1813 004b 0B       		.uleb128 0xb
+ 1814 004c 49       		.uleb128 0x49
+ 1815 004d 13       		.uleb128 0x13
+ 1816 004e 38       		.uleb128 0x38
+ 1817 004f 0B       		.uleb128 0xb
+ 1818 0050 00       		.byte	0
+ 1819 0051 00       		.byte	0
+ 1820 0052 07       		.uleb128 0x7
+ 1821 0053 01       		.uleb128 0x1
+ 1822 0054 01       		.byte	0x1
+ 1823 0055 49       		.uleb128 0x49
+ 1824 0056 13       		.uleb128 0x13
+ 1825 0057 01       		.uleb128 0x1
+ 1826 0058 13       		.uleb128 0x13
+ 1827 0059 00       		.byte	0
+ 1828 005a 00       		.byte	0
+ 1829 005b 08       		.uleb128 0x8
+ 1830 005c 21       		.uleb128 0x21
+ 1831 005d 00       		.byte	0
+ 1832 005e 49       		.uleb128 0x49
+ 1833 005f 13       		.uleb128 0x13
+ 1834 0060 2F       		.uleb128 0x2f
+ 1835 0061 0B       		.uleb128 0xb
+ 1836 0062 00       		.byte	0
+ 1837 0063 00       		.byte	0
+ 1838 0064 09       		.uleb128 0x9
+ 1839 0065 35       		.uleb128 0x35
+ 1840 0066 00       		.byte	0
+ 1841 0067 49       		.uleb128 0x49
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 38
+
+
+ 1842 0068 13       		.uleb128 0x13
+ 1843 0069 00       		.byte	0
+ 1844 006a 00       		.byte	0
+ 1845 006b 0A       		.uleb128 0xa
+ 1846 006c 04       		.uleb128 0x4
+ 1847 006d 01       		.byte	0x1
+ 1848 006e 0B       		.uleb128 0xb
+ 1849 006f 0B       		.uleb128 0xb
+ 1850 0070 49       		.uleb128 0x49
+ 1851 0071 13       		.uleb128 0x13
+ 1852 0072 3A       		.uleb128 0x3a
+ 1853 0073 0B       		.uleb128 0xb
+ 1854 0074 3B       		.uleb128 0x3b
+ 1855 0075 0B       		.uleb128 0xb
+ 1856 0076 01       		.uleb128 0x1
+ 1857 0077 13       		.uleb128 0x13
+ 1858 0078 00       		.byte	0
+ 1859 0079 00       		.byte	0
+ 1860 007a 0B       		.uleb128 0xb
+ 1861 007b 28       		.uleb128 0x28
+ 1862 007c 00       		.byte	0
+ 1863 007d 03       		.uleb128 0x3
+ 1864 007e 0E       		.uleb128 0xe
+ 1865 007f 1C       		.uleb128 0x1c
+ 1866 0080 0B       		.uleb128 0xb
+ 1867 0081 00       		.byte	0
+ 1868 0082 00       		.byte	0
+ 1869 0083 0C       		.uleb128 0xc
+ 1870 0084 2E       		.uleb128 0x2e
+ 1871 0085 01       		.byte	0x1
+ 1872 0086 03       		.uleb128 0x3
+ 1873 0087 0E       		.uleb128 0xe
+ 1874 0088 3A       		.uleb128 0x3a
+ 1875 0089 0B       		.uleb128 0xb
+ 1876 008a 3B       		.uleb128 0x3b
+ 1877 008b 0B       		.uleb128 0xb
+ 1878 008c 27       		.uleb128 0x27
+ 1879 008d 19       		.uleb128 0x19
+ 1880 008e 20       		.uleb128 0x20
+ 1881 008f 0B       		.uleb128 0xb
+ 1882 0090 01       		.uleb128 0x1
+ 1883 0091 13       		.uleb128 0x13
+ 1884 0092 00       		.byte	0
+ 1885 0093 00       		.byte	0
+ 1886 0094 0D       		.uleb128 0xd
+ 1887 0095 05       		.uleb128 0x5
+ 1888 0096 00       		.byte	0
+ 1889 0097 03       		.uleb128 0x3
+ 1890 0098 0E       		.uleb128 0xe
+ 1891 0099 3A       		.uleb128 0x3a
+ 1892 009a 0B       		.uleb128 0xb
+ 1893 009b 3B       		.uleb128 0x3b
+ 1894 009c 0B       		.uleb128 0xb
+ 1895 009d 49       		.uleb128 0x49
+ 1896 009e 13       		.uleb128 0x13
+ 1897 009f 00       		.byte	0
+ 1898 00a0 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 39
+
+
+ 1899 00a1 0E       		.uleb128 0xe
+ 1900 00a2 2E       		.uleb128 0x2e
+ 1901 00a3 01       		.byte	0x1
+ 1902 00a4 03       		.uleb128 0x3
+ 1903 00a5 0E       		.uleb128 0xe
+ 1904 00a6 3A       		.uleb128 0x3a
+ 1905 00a7 0B       		.uleb128 0xb
+ 1906 00a8 3B       		.uleb128 0x3b
+ 1907 00a9 0B       		.uleb128 0xb
+ 1908 00aa 27       		.uleb128 0x27
+ 1909 00ab 19       		.uleb128 0x19
+ 1910 00ac 11       		.uleb128 0x11
+ 1911 00ad 01       		.uleb128 0x1
+ 1912 00ae 12       		.uleb128 0x12
+ 1913 00af 06       		.uleb128 0x6
+ 1914 00b0 40       		.uleb128 0x40
+ 1915 00b1 18       		.uleb128 0x18
+ 1916 00b2 9742     		.uleb128 0x2117
+ 1917 00b4 19       		.uleb128 0x19
+ 1918 00b5 01       		.uleb128 0x1
+ 1919 00b6 13       		.uleb128 0x13
+ 1920 00b7 00       		.byte	0
+ 1921 00b8 00       		.byte	0
+ 1922 00b9 0F       		.uleb128 0xf
+ 1923 00ba 05       		.uleb128 0x5
+ 1924 00bb 00       		.byte	0
+ 1925 00bc 03       		.uleb128 0x3
+ 1926 00bd 0E       		.uleb128 0xe
+ 1927 00be 3A       		.uleb128 0x3a
+ 1928 00bf 0B       		.uleb128 0xb
+ 1929 00c0 3B       		.uleb128 0x3b
+ 1930 00c1 0B       		.uleb128 0xb
+ 1931 00c2 49       		.uleb128 0x49
+ 1932 00c3 13       		.uleb128 0x13
+ 1933 00c4 02       		.uleb128 0x2
+ 1934 00c5 17       		.uleb128 0x17
+ 1935 00c6 00       		.byte	0
+ 1936 00c7 00       		.byte	0
+ 1937 00c8 10       		.uleb128 0x10
+ 1938 00c9 898201   		.uleb128 0x4109
+ 1939 00cc 01       		.byte	0x1
+ 1940 00cd 11       		.uleb128 0x11
+ 1941 00ce 01       		.uleb128 0x1
+ 1942 00cf 31       		.uleb128 0x31
+ 1943 00d0 13       		.uleb128 0x13
+ 1944 00d1 00       		.byte	0
+ 1945 00d2 00       		.byte	0
+ 1946 00d3 11       		.uleb128 0x11
+ 1947 00d4 8A8201   		.uleb128 0x410a
+ 1948 00d7 00       		.byte	0
+ 1949 00d8 02       		.uleb128 0x2
+ 1950 00d9 18       		.uleb128 0x18
+ 1951 00da 9142     		.uleb128 0x2111
+ 1952 00dc 18       		.uleb128 0x18
+ 1953 00dd 00       		.byte	0
+ 1954 00de 00       		.byte	0
+ 1955 00df 12       		.uleb128 0x12
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 40
+
+
+ 1956 00e0 2E       		.uleb128 0x2e
+ 1957 00e1 01       		.byte	0x1
+ 1958 00e2 3F       		.uleb128 0x3f
+ 1959 00e3 19       		.uleb128 0x19
+ 1960 00e4 03       		.uleb128 0x3
+ 1961 00e5 0E       		.uleb128 0xe
+ 1962 00e6 3A       		.uleb128 0x3a
+ 1963 00e7 0B       		.uleb128 0xb
+ 1964 00e8 3B       		.uleb128 0x3b
+ 1965 00e9 0B       		.uleb128 0xb
+ 1966 00ea 11       		.uleb128 0x11
+ 1967 00eb 01       		.uleb128 0x1
+ 1968 00ec 12       		.uleb128 0x12
+ 1969 00ed 06       		.uleb128 0x6
+ 1970 00ee 40       		.uleb128 0x40
+ 1971 00ef 18       		.uleb128 0x18
+ 1972 00f0 9742     		.uleb128 0x2117
+ 1973 00f2 19       		.uleb128 0x19
+ 1974 00f3 01       		.uleb128 0x1
+ 1975 00f4 13       		.uleb128 0x13
+ 1976 00f5 00       		.byte	0
+ 1977 00f6 00       		.byte	0
+ 1978 00f7 13       		.uleb128 0x13
+ 1979 00f8 0B       		.uleb128 0xb
+ 1980 00f9 01       		.byte	0x1
+ 1981 00fa 11       		.uleb128 0x11
+ 1982 00fb 01       		.uleb128 0x1
+ 1983 00fc 12       		.uleb128 0x12
+ 1984 00fd 06       		.uleb128 0x6
+ 1985 00fe 01       		.uleb128 0x1
+ 1986 00ff 13       		.uleb128 0x13
+ 1987 0100 00       		.byte	0
+ 1988 0101 00       		.byte	0
+ 1989 0102 14       		.uleb128 0x14
+ 1990 0103 34       		.uleb128 0x34
+ 1991 0104 00       		.byte	0
+ 1992 0105 03       		.uleb128 0x3
+ 1993 0106 08       		.uleb128 0x8
+ 1994 0107 3A       		.uleb128 0x3a
+ 1995 0108 0B       		.uleb128 0xb
+ 1996 0109 3B       		.uleb128 0x3b
+ 1997 010a 0B       		.uleb128 0xb
+ 1998 010b 49       		.uleb128 0x49
+ 1999 010c 13       		.uleb128 0x13
+ 2000 010d 02       		.uleb128 0x2
+ 2001 010e 17       		.uleb128 0x17
+ 2002 010f 00       		.byte	0
+ 2003 0110 00       		.byte	0
+ 2004 0111 15       		.uleb128 0x15
+ 2005 0112 2E       		.uleb128 0x2e
+ 2006 0113 01       		.byte	0x1
+ 2007 0114 3F       		.uleb128 0x3f
+ 2008 0115 19       		.uleb128 0x19
+ 2009 0116 03       		.uleb128 0x3
+ 2010 0117 0E       		.uleb128 0xe
+ 2011 0118 3A       		.uleb128 0x3a
+ 2012 0119 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 41
+
+
+ 2013 011a 3B       		.uleb128 0x3b
+ 2014 011b 0B       		.uleb128 0xb
+ 2015 011c 27       		.uleb128 0x27
+ 2016 011d 19       		.uleb128 0x19
+ 2017 011e 49       		.uleb128 0x49
+ 2018 011f 13       		.uleb128 0x13
+ 2019 0120 11       		.uleb128 0x11
+ 2020 0121 01       		.uleb128 0x1
+ 2021 0122 12       		.uleb128 0x12
+ 2022 0123 06       		.uleb128 0x6
+ 2023 0124 40       		.uleb128 0x40
+ 2024 0125 18       		.uleb128 0x18
+ 2025 0126 9742     		.uleb128 0x2117
+ 2026 0128 19       		.uleb128 0x19
+ 2027 0129 01       		.uleb128 0x1
+ 2028 012a 13       		.uleb128 0x13
+ 2029 012b 00       		.byte	0
+ 2030 012c 00       		.byte	0
+ 2031 012d 16       		.uleb128 0x16
+ 2032 012e 2E       		.uleb128 0x2e
+ 2033 012f 01       		.byte	0x1
+ 2034 0130 3F       		.uleb128 0x3f
+ 2035 0131 19       		.uleb128 0x19
+ 2036 0132 03       		.uleb128 0x3
+ 2037 0133 0E       		.uleb128 0xe
+ 2038 0134 3A       		.uleb128 0x3a
+ 2039 0135 0B       		.uleb128 0xb
+ 2040 0136 3B       		.uleb128 0x3b
+ 2041 0137 0B       		.uleb128 0xb
+ 2042 0138 27       		.uleb128 0x27
+ 2043 0139 19       		.uleb128 0x19
+ 2044 013a 11       		.uleb128 0x11
+ 2045 013b 01       		.uleb128 0x1
+ 2046 013c 12       		.uleb128 0x12
+ 2047 013d 06       		.uleb128 0x6
+ 2048 013e 40       		.uleb128 0x40
+ 2049 013f 18       		.uleb128 0x18
+ 2050 0140 9742     		.uleb128 0x2117
+ 2051 0142 19       		.uleb128 0x19
+ 2052 0143 01       		.uleb128 0x1
+ 2053 0144 13       		.uleb128 0x13
+ 2054 0145 00       		.byte	0
+ 2055 0146 00       		.byte	0
+ 2056 0147 17       		.uleb128 0x17
+ 2057 0148 05       		.uleb128 0x5
+ 2058 0149 00       		.byte	0
+ 2059 014a 03       		.uleb128 0x3
+ 2060 014b 0E       		.uleb128 0xe
+ 2061 014c 3A       		.uleb128 0x3a
+ 2062 014d 0B       		.uleb128 0xb
+ 2063 014e 3B       		.uleb128 0x3b
+ 2064 014f 0B       		.uleb128 0xb
+ 2065 0150 49       		.uleb128 0x49
+ 2066 0151 13       		.uleb128 0x13
+ 2067 0152 02       		.uleb128 0x2
+ 2068 0153 18       		.uleb128 0x18
+ 2069 0154 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 42
+
+
+ 2070 0155 00       		.byte	0
+ 2071 0156 18       		.uleb128 0x18
+ 2072 0157 05       		.uleb128 0x5
+ 2073 0158 00       		.byte	0
+ 2074 0159 03       		.uleb128 0x3
+ 2075 015a 08       		.uleb128 0x8
+ 2076 015b 3A       		.uleb128 0x3a
+ 2077 015c 0B       		.uleb128 0xb
+ 2078 015d 3B       		.uleb128 0x3b
+ 2079 015e 0B       		.uleb128 0xb
+ 2080 015f 49       		.uleb128 0x49
+ 2081 0160 13       		.uleb128 0x13
+ 2082 0161 02       		.uleb128 0x2
+ 2083 0162 18       		.uleb128 0x18
+ 2084 0163 00       		.byte	0
+ 2085 0164 00       		.byte	0
+ 2086 0165 19       		.uleb128 0x19
+ 2087 0166 34       		.uleb128 0x34
+ 2088 0167 00       		.byte	0
+ 2089 0168 03       		.uleb128 0x3
+ 2090 0169 0E       		.uleb128 0xe
+ 2091 016a 3A       		.uleb128 0x3a
+ 2092 016b 0B       		.uleb128 0xb
+ 2093 016c 3B       		.uleb128 0x3b
+ 2094 016d 0B       		.uleb128 0xb
+ 2095 016e 49       		.uleb128 0x49
+ 2096 016f 13       		.uleb128 0x13
+ 2097 0170 02       		.uleb128 0x2
+ 2098 0171 17       		.uleb128 0x17
+ 2099 0172 00       		.byte	0
+ 2100 0173 00       		.byte	0
+ 2101 0174 1A       		.uleb128 0x1a
+ 2102 0175 898201   		.uleb128 0x4109
+ 2103 0178 00       		.byte	0
+ 2104 0179 11       		.uleb128 0x11
+ 2105 017a 01       		.uleb128 0x1
+ 2106 017b 31       		.uleb128 0x31
+ 2107 017c 13       		.uleb128 0x13
+ 2108 017d 00       		.byte	0
+ 2109 017e 00       		.byte	0
+ 2110 017f 1B       		.uleb128 0x1b
+ 2111 0180 34       		.uleb128 0x34
+ 2112 0181 00       		.byte	0
+ 2113 0182 03       		.uleb128 0x3
+ 2114 0183 0E       		.uleb128 0xe
+ 2115 0184 3A       		.uleb128 0x3a
+ 2116 0185 0B       		.uleb128 0xb
+ 2117 0186 3B       		.uleb128 0x3b
+ 2118 0187 0B       		.uleb128 0xb
+ 2119 0188 49       		.uleb128 0x49
+ 2120 0189 13       		.uleb128 0x13
+ 2121 018a 00       		.byte	0
+ 2122 018b 00       		.byte	0
+ 2123 018c 1C       		.uleb128 0x1c
+ 2124 018d 34       		.uleb128 0x34
+ 2125 018e 00       		.byte	0
+ 2126 018f 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 43
+
+
+ 2127 0190 08       		.uleb128 0x8
+ 2128 0191 3A       		.uleb128 0x3a
+ 2129 0192 0B       		.uleb128 0xb
+ 2130 0193 3B       		.uleb128 0x3b
+ 2131 0194 0B       		.uleb128 0xb
+ 2132 0195 49       		.uleb128 0x49
+ 2133 0196 13       		.uleb128 0x13
+ 2134 0197 00       		.byte	0
+ 2135 0198 00       		.byte	0
+ 2136 0199 1D       		.uleb128 0x1d
+ 2137 019a 2E       		.uleb128 0x2e
+ 2138 019b 01       		.byte	0x1
+ 2139 019c 3F       		.uleb128 0x3f
+ 2140 019d 19       		.uleb128 0x19
+ 2141 019e 03       		.uleb128 0x3
+ 2142 019f 0E       		.uleb128 0xe
+ 2143 01a0 3A       		.uleb128 0x3a
+ 2144 01a1 0B       		.uleb128 0xb
+ 2145 01a2 3B       		.uleb128 0x3b
+ 2146 01a3 0B       		.uleb128 0xb
+ 2147 01a4 27       		.uleb128 0x27
+ 2148 01a5 19       		.uleb128 0x19
+ 2149 01a6 11       		.uleb128 0x11
+ 2150 01a7 01       		.uleb128 0x1
+ 2151 01a8 12       		.uleb128 0x12
+ 2152 01a9 06       		.uleb128 0x6
+ 2153 01aa 40       		.uleb128 0x40
+ 2154 01ab 18       		.uleb128 0x18
+ 2155 01ac 9642     		.uleb128 0x2116
+ 2156 01ae 19       		.uleb128 0x19
+ 2157 01af 01       		.uleb128 0x1
+ 2158 01b0 13       		.uleb128 0x13
+ 2159 01b1 00       		.byte	0
+ 2160 01b2 00       		.byte	0
+ 2161 01b3 1E       		.uleb128 0x1e
+ 2162 01b4 05       		.uleb128 0x5
+ 2163 01b5 00       		.byte	0
+ 2164 01b6 03       		.uleb128 0x3
+ 2165 01b7 08       		.uleb128 0x8
+ 2166 01b8 3A       		.uleb128 0x3a
+ 2167 01b9 0B       		.uleb128 0xb
+ 2168 01ba 3B       		.uleb128 0x3b
+ 2169 01bb 0B       		.uleb128 0xb
+ 2170 01bc 49       		.uleb128 0x49
+ 2171 01bd 13       		.uleb128 0x13
+ 2172 01be 02       		.uleb128 0x2
+ 2173 01bf 17       		.uleb128 0x17
+ 2174 01c0 00       		.byte	0
+ 2175 01c1 00       		.byte	0
+ 2176 01c2 1F       		.uleb128 0x1f
+ 2177 01c3 1D       		.uleb128 0x1d
+ 2178 01c4 01       		.byte	0x1
+ 2179 01c5 31       		.uleb128 0x31
+ 2180 01c6 13       		.uleb128 0x13
+ 2181 01c7 52       		.uleb128 0x52
+ 2182 01c8 01       		.uleb128 0x1
+ 2183 01c9 55       		.uleb128 0x55
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 44
+
+
+ 2184 01ca 17       		.uleb128 0x17
+ 2185 01cb 58       		.uleb128 0x58
+ 2186 01cc 0B       		.uleb128 0xb
+ 2187 01cd 59       		.uleb128 0x59
+ 2188 01ce 0B       		.uleb128 0xb
+ 2189 01cf 01       		.uleb128 0x1
+ 2190 01d0 13       		.uleb128 0x13
+ 2191 01d1 00       		.byte	0
+ 2192 01d2 00       		.byte	0
+ 2193 01d3 20       		.uleb128 0x20
+ 2194 01d4 05       		.uleb128 0x5
+ 2195 01d5 00       		.byte	0
+ 2196 01d6 31       		.uleb128 0x31
+ 2197 01d7 13       		.uleb128 0x13
+ 2198 01d8 02       		.uleb128 0x2
+ 2199 01d9 17       		.uleb128 0x17
+ 2200 01da 00       		.byte	0
+ 2201 01db 00       		.byte	0
+ 2202 01dc 21       		.uleb128 0x21
+ 2203 01dd 0B       		.uleb128 0xb
+ 2204 01de 01       		.byte	0x1
+ 2205 01df 55       		.uleb128 0x55
+ 2206 01e0 17       		.uleb128 0x17
+ 2207 01e1 00       		.byte	0
+ 2208 01e2 00       		.byte	0
+ 2209 01e3 22       		.uleb128 0x22
+ 2210 01e4 34       		.uleb128 0x34
+ 2211 01e5 00       		.byte	0
+ 2212 01e6 31       		.uleb128 0x31
+ 2213 01e7 13       		.uleb128 0x13
+ 2214 01e8 02       		.uleb128 0x2
+ 2215 01e9 17       		.uleb128 0x17
+ 2216 01ea 00       		.byte	0
+ 2217 01eb 00       		.byte	0
+ 2218 01ec 23       		.uleb128 0x23
+ 2219 01ed 1D       		.uleb128 0x1d
+ 2220 01ee 01       		.byte	0x1
+ 2221 01ef 31       		.uleb128 0x31
+ 2222 01f0 13       		.uleb128 0x13
+ 2223 01f1 11       		.uleb128 0x11
+ 2224 01f2 01       		.uleb128 0x1
+ 2225 01f3 12       		.uleb128 0x12
+ 2226 01f4 06       		.uleb128 0x6
+ 2227 01f5 58       		.uleb128 0x58
+ 2228 01f6 0B       		.uleb128 0xb
+ 2229 01f7 59       		.uleb128 0x59
+ 2230 01f8 0B       		.uleb128 0xb
+ 2231 01f9 01       		.uleb128 0x1
+ 2232 01fa 13       		.uleb128 0x13
+ 2233 01fb 00       		.byte	0
+ 2234 01fc 00       		.byte	0
+ 2235 01fd 24       		.uleb128 0x24
+ 2236 01fe 0B       		.uleb128 0xb
+ 2237 01ff 01       		.byte	0x1
+ 2238 0200 55       		.uleb128 0x55
+ 2239 0201 17       		.uleb128 0x17
+ 2240 0202 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 45
+
+
+ 2241 0203 13       		.uleb128 0x13
+ 2242 0204 00       		.byte	0
+ 2243 0205 00       		.byte	0
+ 2244 0206 25       		.uleb128 0x25
+ 2245 0207 898201   		.uleb128 0x4109
+ 2246 020a 01       		.byte	0x1
+ 2247 020b 11       		.uleb128 0x11
+ 2248 020c 01       		.uleb128 0x1
+ 2249 020d 9542     		.uleb128 0x2115
+ 2250 020f 19       		.uleb128 0x19
+ 2251 0210 31       		.uleb128 0x31
+ 2252 0211 13       		.uleb128 0x13
+ 2253 0212 00       		.byte	0
+ 2254 0213 00       		.byte	0
+ 2255 0214 26       		.uleb128 0x26
+ 2256 0215 898201   		.uleb128 0x4109
+ 2257 0218 00       		.byte	0
+ 2258 0219 11       		.uleb128 0x11
+ 2259 021a 01       		.uleb128 0x1
+ 2260 021b 9542     		.uleb128 0x2115
+ 2261 021d 19       		.uleb128 0x19
+ 2262 021e 31       		.uleb128 0x31
+ 2263 021f 13       		.uleb128 0x13
+ 2264 0220 00       		.byte	0
+ 2265 0221 00       		.byte	0
+ 2266 0222 27       		.uleb128 0x27
+ 2267 0223 898201   		.uleb128 0x4109
+ 2268 0226 01       		.byte	0x1
+ 2269 0227 11       		.uleb128 0x11
+ 2270 0228 01       		.uleb128 0x1
+ 2271 0229 9542     		.uleb128 0x2115
+ 2272 022b 19       		.uleb128 0x19
+ 2273 022c 31       		.uleb128 0x31
+ 2274 022d 13       		.uleb128 0x13
+ 2275 022e 01       		.uleb128 0x1
+ 2276 022f 13       		.uleb128 0x13
+ 2277 0230 00       		.byte	0
+ 2278 0231 00       		.byte	0
+ 2279 0232 28       		.uleb128 0x28
+ 2280 0233 26       		.uleb128 0x26
+ 2281 0234 00       		.byte	0
+ 2282 0235 49       		.uleb128 0x49
+ 2283 0236 13       		.uleb128 0x13
+ 2284 0237 00       		.byte	0
+ 2285 0238 00       		.byte	0
+ 2286 0239 29       		.uleb128 0x29
+ 2287 023a 34       		.uleb128 0x34
+ 2288 023b 00       		.byte	0
+ 2289 023c 03       		.uleb128 0x3
+ 2290 023d 0E       		.uleb128 0xe
+ 2291 023e 3A       		.uleb128 0x3a
+ 2292 023f 0B       		.uleb128 0xb
+ 2293 0240 3B       		.uleb128 0x3b
+ 2294 0241 0B       		.uleb128 0xb
+ 2295 0242 49       		.uleb128 0x49
+ 2296 0243 13       		.uleb128 0x13
+ 2297 0244 02       		.uleb128 0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 46
+
+
+ 2298 0245 18       		.uleb128 0x18
+ 2299 0246 00       		.byte	0
+ 2300 0247 00       		.byte	0
+ 2301 0248 2A       		.uleb128 0x2a
+ 2302 0249 0F       		.uleb128 0xf
+ 2303 024a 00       		.byte	0
+ 2304 024b 0B       		.uleb128 0xb
+ 2305 024c 0B       		.uleb128 0xb
+ 2306 024d 49       		.uleb128 0x49
+ 2307 024e 13       		.uleb128 0x13
+ 2308 024f 00       		.byte	0
+ 2309 0250 00       		.byte	0
+ 2310 0251 2B       		.uleb128 0x2b
+ 2311 0252 34       		.uleb128 0x34
+ 2312 0253 00       		.byte	0
+ 2313 0254 03       		.uleb128 0x3
+ 2314 0255 0E       		.uleb128 0xe
+ 2315 0256 3A       		.uleb128 0x3a
+ 2316 0257 0B       		.uleb128 0xb
+ 2317 0258 3B       		.uleb128 0x3b
+ 2318 0259 05       		.uleb128 0x5
+ 2319 025a 49       		.uleb128 0x49
+ 2320 025b 13       		.uleb128 0x13
+ 2321 025c 3F       		.uleb128 0x3f
+ 2322 025d 19       		.uleb128 0x19
+ 2323 025e 3C       		.uleb128 0x3c
+ 2324 025f 19       		.uleb128 0x19
+ 2325 0260 00       		.byte	0
+ 2326 0261 00       		.byte	0
+ 2327 0262 2C       		.uleb128 0x2c
+ 2328 0263 2E       		.uleb128 0x2e
+ 2329 0264 00       		.byte	0
+ 2330 0265 3F       		.uleb128 0x3f
+ 2331 0266 19       		.uleb128 0x19
+ 2332 0267 3C       		.uleb128 0x3c
+ 2333 0268 19       		.uleb128 0x19
+ 2334 0269 6E       		.uleb128 0x6e
+ 2335 026a 0E       		.uleb128 0xe
+ 2336 026b 03       		.uleb128 0x3
+ 2337 026c 0E       		.uleb128 0xe
+ 2338 026d 00       		.byte	0
+ 2339 026e 00       		.byte	0
+ 2340 026f 2D       		.uleb128 0x2d
+ 2341 0270 2E       		.uleb128 0x2e
+ 2342 0271 00       		.byte	0
+ 2343 0272 3F       		.uleb128 0x3f
+ 2344 0273 19       		.uleb128 0x19
+ 2345 0274 3C       		.uleb128 0x3c
+ 2346 0275 19       		.uleb128 0x19
+ 2347 0276 6E       		.uleb128 0x6e
+ 2348 0277 0E       		.uleb128 0xe
+ 2349 0278 03       		.uleb128 0x3
+ 2350 0279 0E       		.uleb128 0xe
+ 2351 027a 3A       		.uleb128 0x3a
+ 2352 027b 0B       		.uleb128 0xb
+ 2353 027c 3B       		.uleb128 0x3b
+ 2354 027d 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 47
+
+
+ 2355 027e 00       		.byte	0
+ 2356 027f 00       		.byte	0
+ 2357 0280 2E       		.uleb128 0x2e
+ 2358 0281 2E       		.uleb128 0x2e
+ 2359 0282 00       		.byte	0
+ 2360 0283 3F       		.uleb128 0x3f
+ 2361 0284 19       		.uleb128 0x19
+ 2362 0285 3C       		.uleb128 0x3c
+ 2363 0286 19       		.uleb128 0x19
+ 2364 0287 6E       		.uleb128 0x6e
+ 2365 0288 0E       		.uleb128 0xe
+ 2366 0289 03       		.uleb128 0x3
+ 2367 028a 0E       		.uleb128 0xe
+ 2368 028b 3A       		.uleb128 0x3a
+ 2369 028c 0B       		.uleb128 0xb
+ 2370 028d 3B       		.uleb128 0x3b
+ 2371 028e 05       		.uleb128 0x5
+ 2372 028f 00       		.byte	0
+ 2373 0290 00       		.byte	0
+ 2374 0291 00       		.byte	0
+ 2375              		.section	.debug_loc,"",%progbits
+ 2376              	.Ldebug_loc0:
+ 2377              	.LLST0:
+ 2378 0000 00000000 		.4byte	.LVL0
+ 2379 0004 1A000000 		.4byte	.LVL1
+ 2380 0008 0100     		.2byte	0x1
+ 2381 000a 50       		.byte	0x50
+ 2382 000b 1A000000 		.4byte	.LVL1
+ 2383 000f 3C000000 		.4byte	.LFE77
+ 2384 0013 0400     		.2byte	0x4
+ 2385 0015 F3       		.byte	0xf3
+ 2386 0016 01       		.uleb128 0x1
+ 2387 0017 50       		.byte	0x50
+ 2388 0018 9F       		.byte	0x9f
+ 2389 0019 00000000 		.4byte	0
+ 2390 001d 00000000 		.4byte	0
+ 2391              	.LLST1:
+ 2392 0021 00000000 		.4byte	.LVL3
+ 2393 0025 0C000000 		.4byte	.LVL5
+ 2394 0029 0200     		.2byte	0x2
+ 2395 002b 30       		.byte	0x30
+ 2396 002c 9F       		.byte	0x9f
+ 2397 002d 0C000000 		.4byte	.LVL5
+ 2398 0031 2C000000 		.4byte	.LFE68
+ 2399 0035 0200     		.2byte	0x2
+ 2400 0037 31       		.byte	0x31
+ 2401 0038 9F       		.byte	0x9f
+ 2402 0039 00000000 		.4byte	0
+ 2403 003d 00000000 		.4byte	0
+ 2404              	.LLST2:
+ 2405 0041 16000000 		.4byte	.LVL7
+ 2406 0045 18000000 		.4byte	.LVL8
+ 2407 0049 0200     		.2byte	0x2
+ 2408 004b 30       		.byte	0x30
+ 2409 004c 9F       		.byte	0x9f
+ 2410 004d 18000000 		.4byte	.LVL8
+ 2411 0051 1C000000 		.4byte	.LVL9
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 48
+
+
+ 2412 0055 0100     		.2byte	0x1
+ 2413 0057 54       		.byte	0x54
+ 2414 0058 1C000000 		.4byte	.LVL9
+ 2415 005c 1F000000 		.4byte	.LVL10-1
+ 2416 0060 0100     		.2byte	0x1
+ 2417 0062 50       		.byte	0x50
+ 2418 0063 1F000000 		.4byte	.LVL10-1
+ 2419 0067 20000000 		.4byte	.LVL10
+ 2420 006b 0300     		.2byte	0x3
+ 2421 006d 74       		.byte	0x74
+ 2422 006e 7F       		.sleb128 -1
+ 2423 006f 9F       		.byte	0x9f
+ 2424 0070 20000000 		.4byte	.LVL10
+ 2425 0074 26000000 		.4byte	.LVL11
+ 2426 0078 0100     		.2byte	0x1
+ 2427 007a 54       		.byte	0x54
+ 2428 007b 00000000 		.4byte	0
+ 2429 007f 00000000 		.4byte	0
+ 2430              	.LLST3:
+ 2431 0083 00000000 		.4byte	.LVL12
+ 2432 0087 06000000 		.4byte	.LVL13
+ 2433 008b 0100     		.2byte	0x1
+ 2434 008d 50       		.byte	0x50
+ 2435 008e 06000000 		.4byte	.LVL13
+ 2436 0092 0C000000 		.4byte	.LFE69
+ 2437 0096 0400     		.2byte	0x4
+ 2438 0098 F3       		.byte	0xf3
+ 2439 0099 01       		.uleb128 0x1
+ 2440 009a 50       		.byte	0x50
+ 2441 009b 9F       		.byte	0x9f
+ 2442 009c 00000000 		.4byte	0
+ 2443 00a0 00000000 		.4byte	0
+ 2444              	.LLST4:
+ 2445 00a4 00000000 		.4byte	.LVL14
+ 2446 00a8 0A000000 		.4byte	.LVL15
+ 2447 00ac 0100     		.2byte	0x1
+ 2448 00ae 50       		.byte	0x50
+ 2449 00af 0A000000 		.4byte	.LVL15
+ 2450 00b3 14000000 		.4byte	.LFE70
+ 2451 00b7 0400     		.2byte	0x4
+ 2452 00b9 F3       		.byte	0xf3
+ 2453 00ba 01       		.uleb128 0x1
+ 2454 00bb 50       		.byte	0x50
+ 2455 00bc 9F       		.byte	0x9f
+ 2456 00bd 00000000 		.4byte	0
+ 2457 00c1 00000000 		.4byte	0
+ 2458              	.LLST5:
+ 2459 00c5 00000000 		.4byte	.LVL16
+ 2460 00c9 0A000000 		.4byte	.LVL17
+ 2461 00cd 0100     		.2byte	0x1
+ 2462 00cf 50       		.byte	0x50
+ 2463 00d0 0A000000 		.4byte	.LVL17
+ 2464 00d4 14000000 		.4byte	.LFE71
+ 2465 00d8 0400     		.2byte	0x4
+ 2466 00da F3       		.byte	0xf3
+ 2467 00db 01       		.uleb128 0x1
+ 2468 00dc 50       		.byte	0x50
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 49
+
+
+ 2469 00dd 9F       		.byte	0x9f
+ 2470 00de 00000000 		.4byte	0
+ 2471 00e2 00000000 		.4byte	0
+ 2472              	.LLST6:
+ 2473 00e6 00000000 		.4byte	.LVL18
+ 2474 00ea 0A000000 		.4byte	.LVL19
+ 2475 00ee 0100     		.2byte	0x1
+ 2476 00f0 50       		.byte	0x50
+ 2477 00f1 0A000000 		.4byte	.LVL19
+ 2478 00f5 14000000 		.4byte	.LFE72
+ 2479 00f9 0400     		.2byte	0x4
+ 2480 00fb F3       		.byte	0xf3
+ 2481 00fc 01       		.uleb128 0x1
+ 2482 00fd 50       		.byte	0x50
+ 2483 00fe 9F       		.byte	0x9f
+ 2484 00ff 00000000 		.4byte	0
+ 2485 0103 00000000 		.4byte	0
+ 2486              	.LLST7:
+ 2487 0107 00000000 		.4byte	.LVL20
+ 2488 010b 0A000000 		.4byte	.LVL21
+ 2489 010f 0100     		.2byte	0x1
+ 2490 0111 50       		.byte	0x50
+ 2491 0112 0A000000 		.4byte	.LVL21
+ 2492 0116 1C000000 		.4byte	.LFE73
+ 2493 011a 0400     		.2byte	0x4
+ 2494 011c F3       		.byte	0xf3
+ 2495 011d 01       		.uleb128 0x1
+ 2496 011e 50       		.byte	0x50
+ 2497 011f 9F       		.byte	0x9f
+ 2498 0120 00000000 		.4byte	0
+ 2499 0124 00000000 		.4byte	0
+ 2500              	.LLST8:
+ 2501 0128 00000000 		.4byte	.LVL22
+ 2502 012c 0A000000 		.4byte	.LVL23
+ 2503 0130 0100     		.2byte	0x1
+ 2504 0132 50       		.byte	0x50
+ 2505 0133 0A000000 		.4byte	.LVL23
+ 2506 0137 14000000 		.4byte	.LFE74
+ 2507 013b 0400     		.2byte	0x4
+ 2508 013d F3       		.byte	0xf3
+ 2509 013e 01       		.uleb128 0x1
+ 2510 013f 50       		.byte	0x50
+ 2511 0140 9F       		.byte	0x9f
+ 2512 0141 00000000 		.4byte	0
+ 2513 0145 00000000 		.4byte	0
+ 2514              	.LLST9:
+ 2515 0149 00000000 		.4byte	.LVL24
+ 2516 014d 0A000000 		.4byte	.LVL25
+ 2517 0151 0100     		.2byte	0x1
+ 2518 0153 50       		.byte	0x50
+ 2519 0154 0A000000 		.4byte	.LVL25
+ 2520 0158 14000000 		.4byte	.LFE75
+ 2521 015c 0400     		.2byte	0x4
+ 2522 015e F3       		.byte	0xf3
+ 2523 015f 01       		.uleb128 0x1
+ 2524 0160 50       		.byte	0x50
+ 2525 0161 9F       		.byte	0x9f
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 50
+
+
+ 2526 0162 00000000 		.4byte	0
+ 2527 0166 00000000 		.4byte	0
+ 2528              	.LLST10:
+ 2529 016a 00000000 		.4byte	.LVL26
+ 2530 016e 0A000000 		.4byte	.LVL27
+ 2531 0172 0100     		.2byte	0x1
+ 2532 0174 50       		.byte	0x50
+ 2533 0175 0A000000 		.4byte	.LVL27
+ 2534 0179 14000000 		.4byte	.LFE76
+ 2535 017d 0400     		.2byte	0x4
+ 2536 017f F3       		.byte	0xf3
+ 2537 0180 01       		.uleb128 0x1
+ 2538 0181 50       		.byte	0x50
+ 2539 0182 9F       		.byte	0x9f
+ 2540 0183 00000000 		.4byte	0
+ 2541 0187 00000000 		.4byte	0
+ 2542              	.LLST11:
+ 2543 018b 0A000000 		.4byte	.LVL29
+ 2544 018f 0C000000 		.4byte	.LVL30
+ 2545 0193 0200     		.2byte	0x2
+ 2546 0195 30       		.byte	0x30
+ 2547 0196 9F       		.byte	0x9f
+ 2548 0197 0C000000 		.4byte	.LVL30
+ 2549 019b 10000000 		.4byte	.LVL31
+ 2550 019f 0100     		.2byte	0x1
+ 2551 01a1 54       		.byte	0x54
+ 2552 01a2 10000000 		.4byte	.LVL31
+ 2553 01a6 13000000 		.4byte	.LVL32-1
+ 2554 01aa 0100     		.2byte	0x1
+ 2555 01ac 50       		.byte	0x50
+ 2556 01ad 13000000 		.4byte	.LVL32-1
+ 2557 01b1 14000000 		.4byte	.LVL32
+ 2558 01b5 0300     		.2byte	0x3
+ 2559 01b7 74       		.byte	0x74
+ 2560 01b8 7F       		.sleb128 -1
+ 2561 01b9 9F       		.byte	0x9f
+ 2562 01ba 14000000 		.4byte	.LVL32
+ 2563 01be 1A000000 		.4byte	.LFE78
+ 2564 01c2 0100     		.2byte	0x1
+ 2565 01c4 54       		.byte	0x54
+ 2566 01c5 00000000 		.4byte	0
+ 2567 01c9 00000000 		.4byte	0
+ 2568              	.LLST12:
+ 2569 01cd 00000000 		.4byte	.LVL33
+ 2570 01d1 08000000 		.4byte	.LVL34
+ 2571 01d5 0100     		.2byte	0x1
+ 2572 01d7 50       		.byte	0x50
+ 2573 01d8 08000000 		.4byte	.LVL34
+ 2574 01dc 6C010000 		.4byte	.LFE79
+ 2575 01e0 0400     		.2byte	0x4
+ 2576 01e2 F3       		.byte	0xf3
+ 2577 01e3 01       		.uleb128 0x1
+ 2578 01e4 50       		.byte	0x50
+ 2579 01e5 9F       		.byte	0x9f
+ 2580 01e6 00000000 		.4byte	0
+ 2581 01ea 00000000 		.4byte	0
+ 2582              	.LLST13:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 51
+
+
+ 2583 01ee 00000000 		.4byte	.LVL33
+ 2584 01f2 0A000000 		.4byte	.LVL35
+ 2585 01f6 0100     		.2byte	0x1
+ 2586 01f8 51       		.byte	0x51
+ 2587 01f9 0A000000 		.4byte	.LVL35
+ 2588 01fd 4C000000 		.4byte	.LVL43
+ 2589 0201 0100     		.2byte	0x1
+ 2590 0203 54       		.byte	0x54
+ 2591 0204 4C000000 		.4byte	.LVL43
+ 2592 0208 4F000000 		.4byte	.LVL44-1
+ 2593 020c 0100     		.2byte	0x1
+ 2594 020e 52       		.byte	0x52
+ 2595 020f 4F000000 		.4byte	.LVL44-1
+ 2596 0213 74000000 		.4byte	.LVL47
+ 2597 0217 0100     		.2byte	0x1
+ 2598 0219 54       		.byte	0x54
+ 2599 021a 74000000 		.4byte	.LVL47
+ 2600 021e 78000000 		.4byte	.LVL48
+ 2601 0222 0400     		.2byte	0x4
+ 2602 0224 F3       		.byte	0xf3
+ 2603 0225 01       		.uleb128 0x1
+ 2604 0226 51       		.byte	0x51
+ 2605 0227 9F       		.byte	0x9f
+ 2606 0228 78000000 		.4byte	.LVL48
+ 2607 022c 84000000 		.4byte	.LVL50
+ 2608 0230 0100     		.2byte	0x1
+ 2609 0232 54       		.byte	0x54
+ 2610 0233 84000000 		.4byte	.LVL50
+ 2611 0237 87000000 		.4byte	.LVL51-1
+ 2612 023b 0100     		.2byte	0x1
+ 2613 023d 50       		.byte	0x50
+ 2614 023e 87000000 		.4byte	.LVL51-1
+ 2615 0242 88000000 		.4byte	.LVL51
+ 2616 0246 0400     		.2byte	0x4
+ 2617 0248 F3       		.byte	0xf3
+ 2618 0249 01       		.uleb128 0x1
+ 2619 024a 51       		.byte	0x51
+ 2620 024b 9F       		.byte	0x9f
+ 2621 024c 88000000 		.4byte	.LVL51
+ 2622 0250 20010000 		.4byte	.LVL70
+ 2623 0254 0100     		.2byte	0x1
+ 2624 0256 54       		.byte	0x54
+ 2625 0257 20010000 		.4byte	.LVL70
+ 2626 025b 23010000 		.4byte	.LVL71-1
+ 2627 025f 0100     		.2byte	0x1
+ 2628 0261 50       		.byte	0x50
+ 2629 0262 23010000 		.4byte	.LVL71-1
+ 2630 0266 24010000 		.4byte	.LVL71
+ 2631 026a 0400     		.2byte	0x4
+ 2632 026c F3       		.byte	0xf3
+ 2633 026d 01       		.uleb128 0x1
+ 2634 026e 51       		.byte	0x51
+ 2635 026f 9F       		.byte	0x9f
+ 2636 0270 24010000 		.4byte	.LVL71
+ 2637 0274 3E010000 		.4byte	.LVL73
+ 2638 0278 0100     		.2byte	0x1
+ 2639 027a 54       		.byte	0x54
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 52
+
+
+ 2640 027b 3E010000 		.4byte	.LVL73
+ 2641 027f 41010000 		.4byte	.LVL74-1
+ 2642 0283 0100     		.2byte	0x1
+ 2643 0285 50       		.byte	0x50
+ 2644 0286 41010000 		.4byte	.LVL74-1
+ 2645 028a 42010000 		.4byte	.LVL74
+ 2646 028e 0400     		.2byte	0x4
+ 2647 0290 F3       		.byte	0xf3
+ 2648 0291 01       		.uleb128 0x1
+ 2649 0292 51       		.byte	0x51
+ 2650 0293 9F       		.byte	0x9f
+ 2651 0294 42010000 		.4byte	.LVL74
+ 2652 0298 64010000 		.4byte	.LVL81
+ 2653 029c 0100     		.2byte	0x1
+ 2654 029e 54       		.byte	0x54
+ 2655 029f 64010000 		.4byte	.LVL81
+ 2656 02a3 6C010000 		.4byte	.LFE79
+ 2657 02a7 0400     		.2byte	0x4
+ 2658 02a9 F3       		.byte	0xf3
+ 2659 02aa 01       		.uleb128 0x1
+ 2660 02ab 51       		.byte	0x51
+ 2661 02ac 9F       		.byte	0x9f
+ 2662 02ad 00000000 		.4byte	0
+ 2663 02b1 00000000 		.4byte	0
+ 2664              	.LLST14:
+ 2665 02b5 00000000 		.4byte	.LVL33
+ 2666 02b9 0C000000 		.4byte	.LVL36
+ 2667 02bd 0100     		.2byte	0x1
+ 2668 02bf 52       		.byte	0x52
+ 2669 02c0 0C000000 		.4byte	.LVL36
+ 2670 02c4 1E000000 		.4byte	.LVL39
+ 2671 02c8 0400     		.2byte	0x4
+ 2672 02ca F3       		.byte	0xf3
+ 2673 02cb 01       		.uleb128 0x1
+ 2674 02cc 52       		.byte	0x52
+ 2675 02cd 9F       		.byte	0x9f
+ 2676 02ce 1E000000 		.4byte	.LVL39
+ 2677 02d2 2A000000 		.4byte	.LVL40
+ 2678 02d6 0100     		.2byte	0x1
+ 2679 02d8 52       		.byte	0x52
+ 2680 02d9 2A000000 		.4byte	.LVL40
+ 2681 02dd 52000000 		.4byte	.LVL45
+ 2682 02e1 0400     		.2byte	0x4
+ 2683 02e3 F3       		.byte	0xf3
+ 2684 02e4 01       		.uleb128 0x1
+ 2685 02e5 52       		.byte	0x52
+ 2686 02e6 9F       		.byte	0x9f
+ 2687 02e7 52000000 		.4byte	.LVL45
+ 2688 02eb 5A000000 		.4byte	.LVL46
+ 2689 02ef 0100     		.2byte	0x1
+ 2690 02f1 52       		.byte	0x52
+ 2691 02f2 5A000000 		.4byte	.LVL46
+ 2692 02f6 CC000000 		.4byte	.LVL60
+ 2693 02fa 0400     		.2byte	0x4
+ 2694 02fc F3       		.byte	0xf3
+ 2695 02fd 01       		.uleb128 0x1
+ 2696 02fe 52       		.byte	0x52
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 53
+
+
+ 2697 02ff 9F       		.byte	0x9f
+ 2698 0300 CC000000 		.4byte	.LVL60
+ 2699 0304 E7000000 		.4byte	.LVL63-1
+ 2700 0308 0100     		.2byte	0x1
+ 2701 030a 52       		.byte	0x52
+ 2702 030b E7000000 		.4byte	.LVL63-1
+ 2703 030f 24010000 		.4byte	.LVL71
+ 2704 0313 0400     		.2byte	0x4
+ 2705 0315 F3       		.byte	0xf3
+ 2706 0316 01       		.uleb128 0x1
+ 2707 0317 52       		.byte	0x52
+ 2708 0318 9F       		.byte	0x9f
+ 2709 0319 24010000 		.4byte	.LVL71
+ 2710 031d 2E010000 		.4byte	.LVL72
+ 2711 0321 0100     		.2byte	0x1
+ 2712 0323 52       		.byte	0x52
+ 2713 0324 2E010000 		.4byte	.LVL72
+ 2714 0328 6C010000 		.4byte	.LFE79
+ 2715 032c 0400     		.2byte	0x4
+ 2716 032e F3       		.byte	0xf3
+ 2717 032f 01       		.uleb128 0x1
+ 2718 0330 52       		.byte	0x52
+ 2719 0331 9F       		.byte	0x9f
+ 2720 0332 00000000 		.4byte	0
+ 2721 0336 00000000 		.4byte	0
+ 2722              	.LLST15:
+ 2723 033a 00000000 		.4byte	.LVL33
+ 2724 033e 0E000000 		.4byte	.LVL37
+ 2725 0342 0100     		.2byte	0x1
+ 2726 0344 53       		.byte	0x53
+ 2727 0345 0E000000 		.4byte	.LVL37
+ 2728 0349 1C000000 		.4byte	.LVL38
+ 2729 034d 0100     		.2byte	0x1
+ 2730 034f 51       		.byte	0x51
+ 2731 0350 1C000000 		.4byte	.LVL38
+ 2732 0354 1E000000 		.4byte	.LVL39
+ 2733 0358 0100     		.2byte	0x1
+ 2734 035a 53       		.byte	0x53
+ 2735 035b 1E000000 		.4byte	.LVL39
+ 2736 035f 44000000 		.4byte	.LVL42
+ 2737 0363 0100     		.2byte	0x1
+ 2738 0365 51       		.byte	0x51
+ 2739 0366 44000000 		.4byte	.LVL42
+ 2740 036a 4F000000 		.4byte	.LVL44-1
+ 2741 036e 0100     		.2byte	0x1
+ 2742 0370 53       		.byte	0x53
+ 2743 0371 4F000000 		.4byte	.LVL44-1
+ 2744 0375 52000000 		.4byte	.LVL45
+ 2745 0379 0400     		.2byte	0x4
+ 2746 037b F3       		.byte	0xf3
+ 2747 037c 01       		.uleb128 0x1
+ 2748 037d 53       		.byte	0x53
+ 2749 037e 9F       		.byte	0x9f
+ 2750 037f 52000000 		.4byte	.LVL45
+ 2751 0383 77000000 		.4byte	.LVL48-1
+ 2752 0387 0100     		.2byte	0x1
+ 2753 0389 51       		.byte	0x51
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 54
+
+
+ 2754 038a 77000000 		.4byte	.LVL48-1
+ 2755 038e 78000000 		.4byte	.LVL48
+ 2756 0392 0400     		.2byte	0x4
+ 2757 0394 F3       		.byte	0xf3
+ 2758 0395 01       		.uleb128 0x1
+ 2759 0396 53       		.byte	0x53
+ 2760 0397 9F       		.byte	0x9f
+ 2761 0398 78000000 		.4byte	.LVL48
+ 2762 039c 7C000000 		.4byte	.LVL49
+ 2763 03a0 0100     		.2byte	0x1
+ 2764 03a2 51       		.byte	0x51
+ 2765 03a3 7C000000 		.4byte	.LVL49
+ 2766 03a7 88000000 		.4byte	.LVL51
+ 2767 03ab 0400     		.2byte	0x4
+ 2768 03ad F3       		.byte	0xf3
+ 2769 03ae 01       		.uleb128 0x1
+ 2770 03af 53       		.byte	0x53
+ 2771 03b0 9F       		.byte	0x9f
+ 2772 03b1 88000000 		.4byte	.LVL51
+ 2773 03b5 AC000000 		.4byte	.LVL57
+ 2774 03b9 0100     		.2byte	0x1
+ 2775 03bb 51       		.byte	0x51
+ 2776 03bc AC000000 		.4byte	.LVL57
+ 2777 03c0 BA000000 		.4byte	.LVL58
+ 2778 03c4 0400     		.2byte	0x4
+ 2779 03c6 F3       		.byte	0xf3
+ 2780 03c7 01       		.uleb128 0x1
+ 2781 03c8 53       		.byte	0x53
+ 2782 03c9 9F       		.byte	0x9f
+ 2783 03ca BA000000 		.4byte	.LVL58
+ 2784 03ce BC000000 		.4byte	.LVL59
+ 2785 03d2 0100     		.2byte	0x1
+ 2786 03d4 51       		.byte	0x51
+ 2787 03d5 BC000000 		.4byte	.LVL59
+ 2788 03d9 CC000000 		.4byte	.LVL60
+ 2789 03dd 0400     		.2byte	0x4
+ 2790 03df 71       		.byte	0x71
+ 2791 03e0 E200     		.sleb128 98
+ 2792 03e2 9F       		.byte	0x9f
+ 2793 03e3 CC000000 		.4byte	.LVL60
+ 2794 03e7 E7000000 		.4byte	.LVL63-1
+ 2795 03eb 0100     		.2byte	0x1
+ 2796 03ed 51       		.byte	0x51
+ 2797 03ee E7000000 		.4byte	.LVL63-1
+ 2798 03f2 24010000 		.4byte	.LVL71
+ 2799 03f6 0400     		.2byte	0x4
+ 2800 03f8 F3       		.byte	0xf3
+ 2801 03f9 01       		.uleb128 0x1
+ 2802 03fa 53       		.byte	0x53
+ 2803 03fb 9F       		.byte	0x9f
+ 2804 03fc 24010000 		.4byte	.LVL71
+ 2805 0400 41010000 		.4byte	.LVL74-1
+ 2806 0404 0100     		.2byte	0x1
+ 2807 0406 51       		.byte	0x51
+ 2808 0407 41010000 		.4byte	.LVL74-1
+ 2809 040b 42010000 		.4byte	.LVL74
+ 2810 040f 0400     		.2byte	0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 55
+
+
+ 2811 0411 F3       		.byte	0xf3
+ 2812 0412 01       		.uleb128 0x1
+ 2813 0413 53       		.byte	0x53
+ 2814 0414 9F       		.byte	0x9f
+ 2815 0415 42010000 		.4byte	.LVL74
+ 2816 0419 44010000 		.4byte	.LVL75
+ 2817 041d 0100     		.2byte	0x1
+ 2818 041f 51       		.byte	0x51
+ 2819 0420 44010000 		.4byte	.LVL75
+ 2820 0424 6C010000 		.4byte	.LFE79
+ 2821 0428 0400     		.2byte	0x4
+ 2822 042a F3       		.byte	0xf3
+ 2823 042b 01       		.uleb128 0x1
+ 2824 042c 53       		.byte	0x53
+ 2825 042d 9F       		.byte	0x9f
+ 2826 042e 00000000 		.4byte	0
+ 2827 0432 00000000 		.4byte	0
+ 2828              	.LLST16:
+ 2829 0436 00000000 		.4byte	.LVL33
+ 2830 043a 74000000 		.4byte	.LVL47
+ 2831 043e 0200     		.2byte	0x2
+ 2832 0440 91       		.byte	0x91
+ 2833 0441 00       		.sleb128 0
+ 2834 0442 74000000 		.4byte	.LVL47
+ 2835 0446 78000000 		.4byte	.LVL48
+ 2836 044a 0200     		.2byte	0x2
+ 2837 044c 7D       		.byte	0x7d
+ 2838 044d 00       		.sleb128 0
+ 2839 044e 78000000 		.4byte	.LVL48
+ 2840 0452 84000000 		.4byte	.LVL50
+ 2841 0456 0200     		.2byte	0x2
+ 2842 0458 91       		.byte	0x91
+ 2843 0459 00       		.sleb128 0
+ 2844 045a 84000000 		.4byte	.LVL50
+ 2845 045e 88000000 		.4byte	.LVL51
+ 2846 0462 0200     		.2byte	0x2
+ 2847 0464 7D       		.byte	0x7d
+ 2848 0465 00       		.sleb128 0
+ 2849 0466 88000000 		.4byte	.LVL51
+ 2850 046a 20010000 		.4byte	.LVL70
+ 2851 046e 0200     		.2byte	0x2
+ 2852 0470 91       		.byte	0x91
+ 2853 0471 00       		.sleb128 0
+ 2854 0472 20010000 		.4byte	.LVL70
+ 2855 0476 24010000 		.4byte	.LVL71
+ 2856 047a 0200     		.2byte	0x2
+ 2857 047c 7D       		.byte	0x7d
+ 2858 047d 00       		.sleb128 0
+ 2859 047e 24010000 		.4byte	.LVL71
+ 2860 0482 3E010000 		.4byte	.LVL73
+ 2861 0486 0200     		.2byte	0x2
+ 2862 0488 91       		.byte	0x91
+ 2863 0489 00       		.sleb128 0
+ 2864 048a 3E010000 		.4byte	.LVL73
+ 2865 048e 42010000 		.4byte	.LVL74
+ 2866 0492 0200     		.2byte	0x2
+ 2867 0494 7D       		.byte	0x7d
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 56
+
+
+ 2868 0495 00       		.sleb128 0
+ 2869 0496 42010000 		.4byte	.LVL74
+ 2870 049a 64010000 		.4byte	.LVL81
+ 2871 049e 0200     		.2byte	0x2
+ 2872 04a0 91       		.byte	0x91
+ 2873 04a1 00       		.sleb128 0
+ 2874 04a2 64010000 		.4byte	.LVL81
+ 2875 04a6 6C010000 		.4byte	.LFE79
+ 2876 04aa 0200     		.2byte	0x2
+ 2877 04ac 7D       		.byte	0x7d
+ 2878 04ad 00       		.sleb128 0
+ 2879 04ae 00000000 		.4byte	0
+ 2880 04b2 00000000 		.4byte	0
+ 2881              	.LLST17:
+ 2882 04b6 0C000000 		.4byte	.LVL36
+ 2883 04ba 1E000000 		.4byte	.LVL39
+ 2884 04be 0200     		.2byte	0x2
+ 2885 04c0 30       		.byte	0x30
+ 2886 04c1 9F       		.byte	0x9f
+ 2887 04c2 00000000 		.4byte	0
+ 2888 04c6 00000000 		.4byte	0
+ 2889              	.LLST18:
+ 2890 04ca 3E000000 		.4byte	.LVL41
+ 2891 04ce 4C000000 		.4byte	.LVL43
+ 2892 04d2 0200     		.2byte	0x2
+ 2893 04d4 30       		.byte	0x30
+ 2894 04d5 9F       		.byte	0x9f
+ 2895 04d6 50000000 		.4byte	.LVL44
+ 2896 04da 52000000 		.4byte	.LVL45
+ 2897 04de 0200     		.2byte	0x2
+ 2898 04e0 31       		.byte	0x31
+ 2899 04e1 9F       		.byte	0x9f
+ 2900 04e2 00000000 		.4byte	0
+ 2901 04e6 00000000 		.4byte	0
+ 2902              	.LLST19:
+ 2903 04ea 8C000000 		.4byte	.LVL52
+ 2904 04ee 9A000000 		.4byte	.LVL55
+ 2905 04f2 0100     		.2byte	0x1
+ 2906 04f4 54       		.byte	0x54
+ 2907 04f5 42010000 		.4byte	.LVL74
+ 2908 04f9 60010000 		.4byte	.LVL80
+ 2909 04fd 0100     		.2byte	0x1
+ 2910 04ff 54       		.byte	0x54
+ 2911 0500 00000000 		.4byte	0
+ 2912 0504 00000000 		.4byte	0
+ 2913              	.LLST20:
+ 2914 0508 92000000 		.4byte	.LVL53
+ 2915 050c 9A000000 		.4byte	.LVL55
+ 2916 0510 0300     		.2byte	0x3
+ 2917 0512 08       		.byte	0x8
+ 2918 0513 40       		.byte	0x40
+ 2919 0514 9F       		.byte	0x9f
+ 2920 0515 42010000 		.4byte	.LVL74
+ 2921 0519 60010000 		.4byte	.LVL80
+ 2922 051d 0300     		.2byte	0x3
+ 2923 051f 08       		.byte	0x8
+ 2924 0520 40       		.byte	0x40
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 57
+
+
+ 2925 0521 9F       		.byte	0x9f
+ 2926 0522 00000000 		.4byte	0
+ 2927 0526 00000000 		.4byte	0
+ 2928              	.LLST21:
+ 2929 052a 92000000 		.4byte	.LVL53
+ 2930 052e 9A000000 		.4byte	.LVL55
+ 2931 0532 0300     		.2byte	0x3
+ 2932 0534 08       		.byte	0x8
+ 2933 0535 7F       		.byte	0x7f
+ 2934 0536 9F       		.byte	0x9f
+ 2935 0537 42010000 		.4byte	.LVL74
+ 2936 053b 60010000 		.4byte	.LVL80
+ 2937 053f 0300     		.2byte	0x3
+ 2938 0541 08       		.byte	0x8
+ 2939 0542 7F       		.byte	0x7f
+ 2940 0543 9F       		.byte	0x9f
+ 2941 0544 00000000 		.4byte	0
+ 2942 0548 00000000 		.4byte	0
+ 2943              	.LLST22:
+ 2944 054c 92000000 		.4byte	.LVL53
+ 2945 0550 9A000000 		.4byte	.LVL55
+ 2946 0554 0300     		.2byte	0x3
+ 2947 0556 09       		.byte	0x9
+ 2948 0557 FF       		.byte	0xff
+ 2949 0558 9F       		.byte	0x9f
+ 2950 0559 42010000 		.4byte	.LVL74
+ 2951 055d 60010000 		.4byte	.LVL80
+ 2952 0561 0300     		.2byte	0x3
+ 2953 0563 09       		.byte	0x9
+ 2954 0564 FF       		.byte	0xff
+ 2955 0565 9F       		.byte	0x9f
+ 2956 0566 00000000 		.4byte	0
+ 2957 056a 00000000 		.4byte	0
+ 2958              	.LLST23:
+ 2959 056e 94000000 		.4byte	.LVL54
+ 2960 0572 9A000000 		.4byte	.LVL55
+ 2961 0576 0600     		.2byte	0x6
+ 2962 0578 73       		.byte	0x73
+ 2963 0579 00       		.sleb128 0
+ 2964 057a 08       		.byte	0x8
+ 2965 057b FF       		.byte	0xff
+ 2966 057c 1A       		.byte	0x1a
+ 2967 057d 9F       		.byte	0x9f
+ 2968 057e 42010000 		.4byte	.LVL74
+ 2969 0582 4A010000 		.4byte	.LVL76
+ 2970 0586 0600     		.2byte	0x6
+ 2971 0588 73       		.byte	0x73
+ 2972 0589 00       		.sleb128 0
+ 2973 058a 08       		.byte	0x8
+ 2974 058b FF       		.byte	0xff
+ 2975 058c 1A       		.byte	0x1a
+ 2976 058d 9F       		.byte	0x9f
+ 2977 058e 4A010000 		.4byte	.LVL76
+ 2978 0592 4E010000 		.4byte	.LVL77
+ 2979 0596 0700     		.2byte	0x7
+ 2980 0598 73       		.byte	0x73
+ 2981 0599 BF01     		.sleb128 191
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 58
+
+
+ 2982 059b 08       		.byte	0x8
+ 2983 059c FF       		.byte	0xff
+ 2984 059d 1A       		.byte	0x1a
+ 2985 059e 9F       		.byte	0x9f
+ 2986 059f 4E010000 		.4byte	.LVL77
+ 2987 05a3 54010000 		.4byte	.LVL78
+ 2988 05a7 0800     		.2byte	0x8
+ 2989 05a9 72       		.byte	0x72
+ 2990 05aa 0A       		.sleb128 10
+ 2991 05ab 94       		.byte	0x94
+ 2992 05ac 01       		.byte	0x1
+ 2993 05ad 08       		.byte	0x8
+ 2994 05ae FF       		.byte	0xff
+ 2995 05af 1A       		.byte	0x1a
+ 2996 05b0 9F       		.byte	0x9f
+ 2997 05b1 54010000 		.4byte	.LVL78
+ 2998 05b5 5A010000 		.4byte	.LVL79
+ 2999 05b9 0600     		.2byte	0x6
+ 3000 05bb 73       		.byte	0x73
+ 3001 05bc 00       		.sleb128 0
+ 3002 05bd 08       		.byte	0x8
+ 3003 05be FF       		.byte	0xff
+ 3004 05bf 1A       		.byte	0x1a
+ 3005 05c0 9F       		.byte	0x9f
+ 3006 05c1 5A010000 		.4byte	.LVL79
+ 3007 05c5 60010000 		.4byte	.LVL80
+ 3008 05c9 0800     		.2byte	0x8
+ 3009 05cb 72       		.byte	0x72
+ 3010 05cc 0A       		.sleb128 10
+ 3011 05cd 94       		.byte	0x94
+ 3012 05ce 01       		.byte	0x1
+ 3013 05cf 08       		.byte	0x8
+ 3014 05d0 FF       		.byte	0xff
+ 3015 05d1 1A       		.byte	0x1a
+ 3016 05d2 9F       		.byte	0x9f
+ 3017 05d3 00000000 		.4byte	0
+ 3018 05d7 00000000 		.4byte	0
+ 3019              	.LLST24:
+ 3020 05db 94000000 		.4byte	.LVL54
+ 3021 05df 9A000000 		.4byte	.LVL55
+ 3022 05e3 0300     		.2byte	0x3
+ 3023 05e5 09       		.byte	0x9
+ 3024 05e6 C1       		.byte	0xc1
+ 3025 05e7 9F       		.byte	0x9f
+ 3026 05e8 42010000 		.4byte	.LVL74
+ 3027 05ec 60010000 		.4byte	.LVL80
+ 3028 05f0 0300     		.2byte	0x3
+ 3029 05f2 09       		.byte	0x9
+ 3030 05f3 C1       		.byte	0xc1
+ 3031 05f4 9F       		.byte	0x9f
+ 3032 05f5 00000000 		.4byte	0
+ 3033 05f9 00000000 		.4byte	0
+ 3034              	.LLST25:
+ 3035 05fd 94000000 		.4byte	.LVL54
+ 3036 0601 9A000000 		.4byte	.LVL55
+ 3037 0605 0300     		.2byte	0x3
+ 3038 0607 08       		.byte	0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 59
+
+
+ 3039 0608 BF       		.byte	0xbf
+ 3040 0609 9F       		.byte	0x9f
+ 3041 060a 42010000 		.4byte	.LVL74
+ 3042 060e 60010000 		.4byte	.LVL80
+ 3043 0612 0300     		.2byte	0x3
+ 3044 0614 08       		.byte	0x8
+ 3045 0615 BF       		.byte	0xbf
+ 3046 0616 9F       		.byte	0x9f
+ 3047 0617 00000000 		.4byte	0
+ 3048 061b 00000000 		.4byte	0
+ 3049              	.LLST26:
+ 3050 061f A2000000 		.4byte	.LVL56
+ 3051 0623 BA000000 		.4byte	.LVL58
+ 3052 0627 0100     		.2byte	0x1
+ 3053 0629 50       		.byte	0x50
+ 3054 062a 00000000 		.4byte	0
+ 3055 062e 00000000 		.4byte	0
+ 3056              	.LLST27:
+ 3057 0632 A2000000 		.4byte	.LVL56
+ 3058 0636 BA000000 		.4byte	.LVL58
+ 3059 063a 0100     		.2byte	0x1
+ 3060 063c 54       		.byte	0x54
+ 3061 063d 00000000 		.4byte	0
+ 3062 0641 00000000 		.4byte	0
+ 3063              	.LLST28:
+ 3064 0645 D0000000 		.4byte	.LVL61
+ 3065 0649 D6000000 		.4byte	.LVL62
+ 3066 064d 0C00     		.2byte	0xc
+ 3067 064f 70       		.byte	0x70
+ 3068 0650 00       		.sleb128 0
+ 3069 0651 37       		.byte	0x37
+ 3070 0652 24       		.byte	0x24
+ 3071 0653 71       		.byte	0x71
+ 3072 0654 00       		.sleb128 0
+ 3073 0655 21       		.byte	0x21
+ 3074 0656 0A       		.byte	0xa
+ 3075 0657 0020     		.2byte	0x2000
+ 3076 0659 1C       		.byte	0x1c
+ 3077 065a 9F       		.byte	0x9f
+ 3078 065b D6000000 		.4byte	.LVL62
+ 3079 065f E7000000 		.4byte	.LVL63-1
+ 3080 0663 0E00     		.2byte	0xe
+ 3081 0665 91       		.byte	0x91
+ 3082 0666 00       		.sleb128 0
+ 3083 0667 94       		.byte	0x94
+ 3084 0668 02       		.byte	0x2
+ 3085 0669 37       		.byte	0x37
+ 3086 066a 24       		.byte	0x24
+ 3087 066b 71       		.byte	0x71
+ 3088 066c 00       		.sleb128 0
+ 3089 066d 21       		.byte	0x21
+ 3090 066e 0A       		.byte	0xa
+ 3091 066f 0020     		.2byte	0x2000
+ 3092 0671 1C       		.byte	0x1c
+ 3093 0672 9F       		.byte	0x9f
+ 3094 0673 00000000 		.4byte	0
+ 3095 0677 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 60
+
+
+ 3096              	.LLST29:
+ 3097 067b D0000000 		.4byte	.LVL61
+ 3098 067f D6000000 		.4byte	.LVL62
+ 3099 0683 1800     		.2byte	0x18
+ 3100 0685 70       		.byte	0x70
+ 3101 0686 00       		.sleb128 0
+ 3102 0687 37       		.byte	0x37
+ 3103 0688 24       		.byte	0x24
+ 3104 0689 71       		.byte	0x71
+ 3105 068a 00       		.sleb128 0
+ 3106 068b 21       		.byte	0x21
+ 3107 068c 0A       		.byte	0xa
+ 3108 068d 0020     		.2byte	0x2000
+ 3109 068f 1C       		.byte	0x1c
+ 3110 0690 F7       		.byte	0xf7
+ 3111 0691 2C       		.uleb128 0x2c
+ 3112 0692 F7       		.byte	0xf7
+ 3113 0693 25       		.uleb128 0x25
+ 3114 0694 F4       		.byte	0xf4
+ 3115 0695 25       		.uleb128 0x25
+ 3116 0696 04       		.byte	0x4
+ 3117 0697 00000039 		.4byte	0x39000000
+ 3118 069b 1E       		.byte	0x1e
+ 3119 069c 9F       		.byte	0x9f
+ 3120 069d D6000000 		.4byte	.LVL62
+ 3121 06a1 E7000000 		.4byte	.LVL63-1
+ 3122 06a5 1A00     		.2byte	0x1a
+ 3123 06a7 91       		.byte	0x91
+ 3124 06a8 00       		.sleb128 0
+ 3125 06a9 94       		.byte	0x94
+ 3126 06aa 02       		.byte	0x2
+ 3127 06ab 37       		.byte	0x37
+ 3128 06ac 24       		.byte	0x24
+ 3129 06ad 71       		.byte	0x71
+ 3130 06ae 00       		.sleb128 0
+ 3131 06af 21       		.byte	0x21
+ 3132 06b0 0A       		.byte	0xa
+ 3133 06b1 0020     		.2byte	0x2000
+ 3134 06b3 1C       		.byte	0x1c
+ 3135 06b4 F7       		.byte	0xf7
+ 3136 06b5 2C       		.uleb128 0x2c
+ 3137 06b6 F7       		.byte	0xf7
+ 3138 06b7 25       		.uleb128 0x25
+ 3139 06b8 F4       		.byte	0xf4
+ 3140 06b9 25       		.uleb128 0x25
+ 3141 06ba 04       		.byte	0x4
+ 3142 06bb 00000039 		.4byte	0x39000000
+ 3143 06bf 1E       		.byte	0x1e
+ 3144 06c0 9F       		.byte	0x9f
+ 3145 06c1 00000000 		.4byte	0
+ 3146 06c5 00000000 		.4byte	0
+ 3147              		.section	.debug_aranges,"",%progbits
+ 3148 0000 74000000 		.4byte	0x74
+ 3149 0004 0200     		.2byte	0x2
+ 3150 0006 00000000 		.4byte	.Ldebug_info0
+ 3151 000a 04       		.byte	0x4
+ 3152 000b 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 61
+
+
+ 3153 000c 0000     		.2byte	0
+ 3154 000e 0000     		.2byte	0
+ 3155 0010 00000000 		.4byte	.LFB77
+ 3156 0014 3C000000 		.4byte	.LFE77-.LFB77
+ 3157 0018 00000000 		.4byte	.LFB68
+ 3158 001c 2C000000 		.4byte	.LFE68-.LFB68
+ 3159 0020 00000000 		.4byte	.LFB69
+ 3160 0024 0C000000 		.4byte	.LFE69-.LFB69
+ 3161 0028 00000000 		.4byte	.LFB70
+ 3162 002c 14000000 		.4byte	.LFE70-.LFB70
+ 3163 0030 00000000 		.4byte	.LFB71
+ 3164 0034 14000000 		.4byte	.LFE71-.LFB71
+ 3165 0038 00000000 		.4byte	.LFB72
+ 3166 003c 14000000 		.4byte	.LFE72-.LFB72
+ 3167 0040 00000000 		.4byte	.LFB73
+ 3168 0044 1C000000 		.4byte	.LFE73-.LFB73
+ 3169 0048 00000000 		.4byte	.LFB74
+ 3170 004c 14000000 		.4byte	.LFE74-.LFB74
+ 3171 0050 00000000 		.4byte	.LFB75
+ 3172 0054 14000000 		.4byte	.LFE75-.LFB75
+ 3173 0058 00000000 		.4byte	.LFB76
+ 3174 005c 14000000 		.4byte	.LFE76-.LFB76
+ 3175 0060 00000000 		.4byte	.LFB78
+ 3176 0064 1A000000 		.4byte	.LFE78-.LFB78
+ 3177 0068 00000000 		.4byte	.LFB79
+ 3178 006c 6C010000 		.4byte	.LFE79-.LFB79
+ 3179 0070 00000000 		.4byte	0
+ 3180 0074 00000000 		.4byte	0
+ 3181              		.section	.debug_ranges,"",%progbits
+ 3182              	.Ldebug_ranges0:
+ 3183 0000 8C000000 		.4byte	.LBB15
+ 3184 0004 9A000000 		.4byte	.LBE15
+ 3185 0008 42010000 		.4byte	.LBB22
+ 3186 000c 60010000 		.4byte	.LBE22
+ 3187 0010 00000000 		.4byte	0
+ 3188 0014 00000000 		.4byte	0
+ 3189 0018 D0000000 		.4byte	.LBB20
+ 3190 001c 1A010000 		.4byte	.LBE20
+ 3191 0020 20010000 		.4byte	.LBB21
+ 3192 0024 24010000 		.4byte	.LBE21
+ 3193 0028 00000000 		.4byte	0
+ 3194 002c 00000000 		.4byte	0
+ 3195 0030 00000000 		.4byte	.LFB77
+ 3196 0034 3C000000 		.4byte	.LFE77
+ 3197 0038 00000000 		.4byte	.LFB68
+ 3198 003c 2C000000 		.4byte	.LFE68
+ 3199 0040 00000000 		.4byte	.LFB69
+ 3200 0044 0C000000 		.4byte	.LFE69
+ 3201 0048 00000000 		.4byte	.LFB70
+ 3202 004c 14000000 		.4byte	.LFE70
+ 3203 0050 00000000 		.4byte	.LFB71
+ 3204 0054 14000000 		.4byte	.LFE71
+ 3205 0058 00000000 		.4byte	.LFB72
+ 3206 005c 14000000 		.4byte	.LFE72
+ 3207 0060 00000000 		.4byte	.LFB73
+ 3208 0064 1C000000 		.4byte	.LFE73
+ 3209 0068 00000000 		.4byte	.LFB74
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 62
+
+
+ 3210 006c 14000000 		.4byte	.LFE74
+ 3211 0070 00000000 		.4byte	.LFB75
+ 3212 0074 14000000 		.4byte	.LFE75
+ 3213 0078 00000000 		.4byte	.LFB76
+ 3214 007c 14000000 		.4byte	.LFE76
+ 3215 0080 00000000 		.4byte	.LFB78
+ 3216 0084 1A000000 		.4byte	.LFE78
+ 3217 0088 00000000 		.4byte	.LFB79
+ 3218 008c 6C010000 		.4byte	.LFE79
+ 3219 0090 00000000 		.4byte	0
+ 3220 0094 00000000 		.4byte	0
+ 3221              		.section	.debug_line,"",%progbits
+ 3222              	.Ldebug_line0:
+ 3223 0000 C6030000 		.section	.debug_str,"MS",%progbits,1
+ 3223      02005702 
+ 3223      00000201 
+ 3223      FB0E0D00 
+ 3223      01010101 
+ 3224              	.LASF54:
+ 3225 0000 73746572 		.ascii	"stereoWidth\000"
+ 3225      656F5769 
+ 3225      64746800 
+ 3226              	.LASF53:
+ 3227 000c 73746572 		.ascii	"stereoPosition\000"
+ 3227      656F506F 
+ 3227      73697469 
+ 3227      6F6E00
+ 3228              	.LASF73:
+ 3229 001b 706F7766 		.ascii	"powf\000"
+ 3229      00
+ 3230              	.LASF44:
+ 3231 0020 4D696469 		.ascii	"MidiProcessor_getDamperVolume\000"
+ 3231      50726F63 
+ 3231      6573736F 
+ 3231      725F6765 
+ 3231      7444616D 
+ 3232              	.LASF55:
+ 3233 003e 73746572 		.ascii	"stereoSlope\000"
+ 3233      656F536C 
+ 3233      6F706500 
+ 3234              	.LASF31:
+ 3235 004a 4D696469 		.ascii	"MidiChannelDescriptor_t\000"
+ 3235      4368616E 
+ 3235      6E656C44 
+ 3235      65736372 
+ 3235      6970746F 
+ 3236              	.LASF64:
+ 3237 0062 62656E64 		.ascii	"bendOffset\000"
+ 3237      4F666673 
+ 3237      657400
+ 3238              	.LASF76:
+ 3239 006d 4D617070 		.ascii	"Mapper_programmChangeHandler\000"
+ 3239      65725F70 
+ 3239      726F6772 
+ 3239      616D6D43 
+ 3239      68616E67 
+ 3240              	.LASF68:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 63
+
+
+ 3241 008a 4D696469 		.ascii	"MidiFilter_create\000"
+ 3241      46696C74 
+ 3241      65725F63 
+ 3241      72656174 
+ 3241      6500
+ 3242              	.LASF1:
+ 3243 009c 73686F72 		.ascii	"short int\000"
+ 3243      7420696E 
+ 3243      7400
+ 3244              	.LASF15:
+ 3245 00a6 73697A65 		.ascii	"sizetype\000"
+ 3245      74797065 
+ 3245      00
+ 3246              	.LASF25:
+ 3247 00af 62656E64 		.ascii	"bendFactor\000"
+ 3247      46616374 
+ 3247      6F7200
+ 3248              	.LASF35:
+ 3249 00ba 74617267 		.ascii	"targetOutput\000"
+ 3249      65744F75 
+ 3249      74707574 
+ 3249      00
+ 3250              	.LASF52:
+ 3251 00c7 4D696469 		.ascii	"MidiProcessor_updateStereoVolume\000"
+ 3251      50726F63 
+ 3251      6573736F 
+ 3251      725F7570 
+ 3251      64617465 
+ 3252              	.LASF77:
+ 3253 00e8 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 3253      43393920 
+ 3253      352E342E 
+ 3253      31203230 
+ 3253      31363036 
+ 3254 011b 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 3254      20726576 
+ 3254      6973696F 
+ 3254      6E203233 
+ 3254      37373135 
+ 3255 014e 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 3255      74643D67 
+ 3255      6E753939 
+ 3255      202D6666 
+ 3255      756E6374 
+ 3256              	.LASF61:
+ 3257 0181 70617261 		.ascii	"param1\000"
+ 3257      6D3100
+ 3258              	.LASF7:
+ 3259 0188 5F5F7569 		.ascii	"__uint16_t\000"
+ 3259      6E743136 
+ 3259      5F7400
+ 3260              	.LASF72:
+ 3261 0193 4D696469 		.ascii	"MidiFilter_eventHandler\000"
+ 3261      46696C74 
+ 3261      65725F65 
+ 3261      76656E74 
+ 3261      48616E64 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 64
+
+
+ 3262              	.LASF47:
+ 3263 01ab 4D696469 		.ascii	"MidiProcessor_getCCValue\000"
+ 3263      50726F63 
+ 3263      6573736F 
+ 3263      725F6765 
+ 3263      74434356 
+ 3264              	.LASF30:
+ 3265 01c4 70726F67 		.ascii	"programm\000"
+ 3265      72616D6D 
+ 3265      00
+ 3266              	.LASF19:
+ 3267 01cd 75696E74 		.ascii	"uint8_t\000"
+ 3267      385F7400 
+ 3268              	.LASF78:
+ 3269 01d5 2E2E5C63 		.ascii	"..\\common\\vms\\MidiProcessor.c\000"
+ 3269      6F6D6D6F 
+ 3269      6E5C766D 
+ 3269      735C4D69 
+ 3269      64695072 
+ 3270              	.LASF0:
+ 3271 01f3 666C6F61 		.ascii	"float\000"
+ 3271      7400
+ 3272              	.LASF33:
+ 3273 01f9 4D494449 		.ascii	"MIDI_EVT_NOTEON\000"
+ 3273      5F455654 
+ 3273      5F4E4F54 
+ 3273      454F4E00 
+ 3274              	.LASF13:
+ 3275 0209 6C6F6E67 		.ascii	"long long int\000"
+ 3275      206C6F6E 
+ 3275      6720696E 
+ 3275      7400
+ 3276              	.LASF14:
+ 3277 0217 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 3277      206C6F6E 
+ 3277      6720756E 
+ 3277      7369676E 
+ 3277      65642069 
+ 3278              	.LASF41:
+ 3279 022e 4D696469 		.ascii	"MidiProcessor_getLastFrequency\000"
+ 3279      50726F63 
+ 3279      6573736F 
+ 3279      725F6765 
+ 3279      744C6173 
+ 3280              	.LASF82:
+ 3281 024d 6D656D73 		.ascii	"memset\000"
+ 3281      657400
+ 3282              	.LASF10:
+ 3283 0254 6C6F6E67 		.ascii	"long int\000"
+ 3283      20696E74 
+ 3283      00
+ 3284              	.LASF26:
+ 3285 025d 62656E64 		.ascii	"bendRangeRaw\000"
+ 3285      52616E67 
+ 3285      65526177 
+ 3285      00
+ 3286              	.LASF57:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 65
+
+
+ 3287 026a 6673456E 		.ascii	"fsEnd\000"
+ 3287      6400
+ 3288              	.LASF29:
+ 3289 0270 73746572 		.ascii	"stereoVolume\000"
+ 3289      656F566F 
+ 3289      6C756D65 
+ 3289      00
+ 3290              	.LASF48:
+ 3291 027d 4D696469 		.ascii	"MidiProcessor_init\000"
+ 3291      50726F63 
+ 3291      6573736F 
+ 3291      725F696E 
+ 3291      697400
+ 3292              	.LASF5:
+ 3293 0290 5F5F7569 		.ascii	"__uint8_t\000"
+ 3293      6E74385F 
+ 3293      7400
+ 3294              	.LASF49:
+ 3295 029a 4D696469 		.ascii	"MidiProcessor_resetMidi\000"
+ 3295      50726F63 
+ 3295      6573736F 
+ 3295      725F7265 
+ 3295      7365744D 
+ 3296              	.LASF51:
+ 3297 02b2 4D696469 		.ascii	"MidiProcessor_DataHandler\000"
+ 3297      50726F63 
+ 3297      6573736F 
+ 3297      725F4461 
+ 3297      74614861 
+ 3298              	.LASF58:
+ 3299 02cc 4D696469 		.ascii	"MidiProcessor_setLastFrequency\000"
+ 3299      50726F63 
+ 3299      6573736F 
+ 3299      725F7365 
+ 3299      744C6173 
+ 3300              	.LASF24:
+ 3301 02eb 70617261 		.ascii	"parameters\000"
+ 3301      6D657465 
+ 3301      727300
+ 3302              	.LASF32:
+ 3303 02f6 4D494449 		.ascii	"MIDI_EVT_NULL\000"
+ 3303      5F455654 
+ 3303      5F4E554C 
+ 3303      4C00
+ 3304              	.LASF34:
+ 3305 0304 4D494449 		.ascii	"MIDI_EVT_NOTEOFF\000"
+ 3305      5F455654 
+ 3305      5F4E4F54 
+ 3305      454F4646 
+ 3305      00
+ 3306              	.LASF18:
+ 3307 0315 6C6F6E67 		.ascii	"long double\000"
+ 3307      20646F75 
+ 3307      626C6500 
+ 3308              	.LASF4:
+ 3309 0321 756E7369 		.ascii	"unsigned char\000"
+ 3309      676E6564 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 66
+
+
+ 3309      20636861 
+ 3309      7200
+ 3310              	.LASF3:
+ 3311 032f 7369676E 		.ascii	"signed char\000"
+ 3311      65642063 
+ 3311      68617200 
+ 3312              	.LASF23:
+ 3313 033b 75696E74 		.ascii	"uint32_t\000"
+ 3313      33325F74 
+ 3313      00
+ 3314              	.LASF2:
+ 3315 0344 756E7369 		.ascii	"unsigned int\000"
+ 3315      676E6564 
+ 3315      20696E74 
+ 3315      00
+ 3316              	.LASF74:
+ 3317 0351 4D617070 		.ascii	"Mapper_bendHandler\000"
+ 3317      65725F62 
+ 3317      656E6448 
+ 3317      616E646C 
+ 3317      657200
+ 3318              	.LASF38:
+ 3319 0364 70617261 		.ascii	"parameter\000"
+ 3319      6D657465 
+ 3319      7200
+ 3320              	.LASF63:
+ 3321 036e 62656E64 		.ascii	"bendParameter\000"
+ 3321      50617261 
+ 3321      6D657465 
+ 3321      7200
+ 3322              	.LASF71:
+ 3323 037c 53696747 		.ascii	"SigGen_killAudio\000"
+ 3323      656E5F6B 
+ 3323      696C6C41 
+ 3323      7564696F 
+ 3323      00
+ 3324              	.LASF62:
+ 3325 038d 70617261 		.ascii	"param2\000"
+ 3325      6D3200
+ 3326              	.LASF8:
+ 3327 0394 73686F72 		.ascii	"short unsigned int\000"
+ 3327      7420756E 
+ 3327      7369676E 
+ 3327      65642069 
+ 3327      6E7400
+ 3328              	.LASF59:
+ 3329 03a7 4D696469 		.ascii	"MidiProcessor_processCmd\000"
+ 3329      50726F63 
+ 3329      6573736F 
+ 3329      725F7072 
+ 3329      6F636573 
+ 3330              	.LASF36:
+ 3331 03c0 4D696469 		.ascii	"MidiFilterHandle_t\000"
+ 3331      46696C74 
+ 3331      65724861 
+ 3331      6E646C65 
+ 3331      5F7400
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 67
+
+
+ 3332              	.LASF16:
+ 3333 03d3 63686172 		.ascii	"char\000"
+ 3333      00
+ 3334              	.LASF21:
+ 3335 03d8 75696E74 		.ascii	"uint16_t\000"
+ 3335      31365F74 
+ 3335      00
+ 3336              	.LASF22:
+ 3337 03e1 696E7433 		.ascii	"int32_t\000"
+ 3337      325F7400 
+ 3338              	.LASF20:
+ 3339 03e9 696E7431 		.ascii	"int16_t\000"
+ 3339      365F7400 
+ 3340              	.LASF39:
+ 3341 03f1 6E6F7465 		.ascii	"note\000"
+ 3341      00
+ 3342              	.LASF37:
+ 3343 03f6 6368616E 		.ascii	"channel\000"
+ 3343      6E656C00 
+ 3344              	.LASF75:
+ 3345 03fe 4D617070 		.ascii	"Mapper_volumeChangeHandler\000"
+ 3345      65725F76 
+ 3345      6F6C756D 
+ 3345      65436861 
+ 3345      6E676548 
+ 3346              	.LASF40:
+ 3347 0419 4D696469 		.ascii	"MidiProcessor_noteToFrequency_dHz\000"
+ 3347      50726F63 
+ 3347      6573736F 
+ 3347      725F6E6F 
+ 3347      7465546F 
+ 3348              	.LASF12:
+ 3349 043b 6C6F6E67 		.ascii	"long unsigned int\000"
+ 3349      20756E73 
+ 3349      69676E65 
+ 3349      6420696E 
+ 3349      7400
+ 3350              	.LASF67:
+ 3351 044d 66696C74 		.ascii	"filters\000"
+ 3351      65727300 
+ 3352              	.LASF81:
+ 3353 0455 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 3353      52784275 
+ 3353      66666572 
+ 3353      00
+ 3354              	.LASF60:
+ 3355 0462 6361626C 		.ascii	"cable\000"
+ 3355      6500
+ 3356              	.LASF11:
+ 3357 0468 5F5F7569 		.ascii	"__uint32_t\000"
+ 3357      6E743332 
+ 3357      5F7400
+ 3358              	.LASF65:
+ 3359 0473 4D696469 		.ascii	"Midi_NoteFreq_dHz\000"
+ 3359      5F4E6F74 
+ 3359      65467265 
+ 3359      715F6448 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 68
+
+
+ 3359      7A00
+ 3360              	.LASF50:
+ 3361 0485 6B696C6C 		.ascii	"killChannel\000"
+ 3361      4368616E 
+ 3361      6E656C00 
+ 3362              	.LASF43:
+ 3363 0491 4D696469 		.ascii	"MidiProcessor_getBendFactor\000"
+ 3363      50726F63 
+ 3363      6573736F 
+ 3363      725F6765 
+ 3363      7442656E 
+ 3364              	.LASF9:
+ 3365 04ad 5F5F696E 		.ascii	"__int32_t\000"
+ 3365      7433325F 
+ 3365      7400
+ 3366              	.LASF6:
+ 3367 04b7 5F5F696E 		.ascii	"__int16_t\000"
+ 3367      7431365F 
+ 3367      7400
+ 3368              	.LASF28:
+ 3369 04c1 6C617374 		.ascii	"lastFrequency\000"
+ 3369      46726571 
+ 3369      75656E63 
+ 3369      7900
+ 3370              	.LASF42:
+ 3371 04cf 66726571 		.ascii	"frequency\000"
+ 3371      75656E63 
+ 3371      7900
+ 3372              	.LASF17:
+ 3373 04d9 646F7562 		.ascii	"double\000"
+ 3373      6C6500
+ 3374              	.LASF56:
+ 3375 04e0 72735374 		.ascii	"rsStart\000"
+ 3375      61727400 
+ 3376              	.LASF27:
+ 3377 04e8 62656E64 		.ascii	"bendRange\000"
+ 3377      52616E67 
+ 3377      6500
+ 3378              	.LASF70:
+ 3379 04f2 564D5357 		.ascii	"VMSW_panicHandler\000"
+ 3379      5F70616E 
+ 3379      69634861 
+ 3379      6E646C65 
+ 3379      7200
+ 3380              	.LASF45:
+ 3381 0504 4D696469 		.ascii	"MidiProcessor_getVolume\000"
+ 3381      50726F63 
+ 3381      6573736F 
+ 3381      725F6765 
+ 3381      74566F6C 
+ 3382              	.LASF79:
+ 3383 051c 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 3383      73657273 
+ 3383      5C636865 
+ 3383      6D695C55 
+ 3383      44335F51 
+ 3384              	.LASF69:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccW46XLm.s 			page 69
+
+
+ 3385 0541 7076506F 		.ascii	"pvPortMalloc\000"
+ 3385      72744D61 
+ 3385      6C6C6F63 
+ 3385      00
+ 3386              	.LASF46:
+ 3387 054e 4D696469 		.ascii	"MidiProcessor_getStereoVolume\000"
+ 3387      50726F63 
+ 3387      6573736F 
+ 3387      725F6765 
+ 3387      74537465 
+ 3388              	.LASF66:
+ 3389 056c 6368616E 		.ascii	"channelDescriptors\000"
+ 3389      6E656C44 
+ 3389      65736372 
+ 3389      6970746F 
+ 3389      727300
+ 3390              	.LASF80:
+ 3391 057f 72657365 		.ascii	"resetChannelData\000"
+ 3391      74436861 
+ 3391      6E6E656C 
+ 3391      44617461 
+ 3391      00
+ 3392              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

@@ -1,0 +1,1055 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"OnTimeCounter_PM.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.OnTimeCounter_SaveConfig,"ax",%progbits
+  20              		.align	1
+  21              		.global	OnTimeCounter_SaveConfig
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	OnTimeCounter_SaveConfig, %function
+  25              	OnTimeCounter_SaveConfig:
+  26              	.LFB0:
+  27              		.file 1 "Generated_Source\\PSoC5\\OnTimeCounter_PM.c"
+   1:Generated_Source\PSoC5/OnTimeCounter_PM.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * File Name: OnTimeCounter_PM.c
+   3:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Version 2.80
+   4:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+   5:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  Description:
+   6:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *     This file provides the power management source code to API for the
+   7:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *     Timer.
+   8:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+   9:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *   Note:
+  10:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *     None
+  11:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+  12:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *******************************************************************************
+  13:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Copyright 2008-2017, Cypress Semiconductor Corporation.  All rights reserved.
+  14:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * You may use this file only in accordance with the license, terms, conditions,
+  15:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * disclaimers, and limitations in the end user license agreement accompanying
+  16:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * the software package with which this file was provided.
+  17:Generated_Source\PSoC5/OnTimeCounter_PM.c **** ********************************************************************************/
+  18:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+  19:Generated_Source\PSoC5/OnTimeCounter_PM.c **** #include "OnTimeCounter.h"
+  20:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+  21:Generated_Source\PSoC5/OnTimeCounter_PM.c **** static OnTimeCounter_backupStruct OnTimeCounter_backup;
+  22:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+  23:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+  24:Generated_Source\PSoC5/OnTimeCounter_PM.c **** /*******************************************************************************
+  25:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Function Name: OnTimeCounter_SaveConfig
+  26:Generated_Source\PSoC5/OnTimeCounter_PM.c **** ********************************************************************************
+  27:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+  28:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Summary:
+  29:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *     Save the current user configuration
+  30:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 2
+
+
+  31:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Parameters:
+  32:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  void
+  33:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+  34:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Return:
+  35:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  void
+  36:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+  37:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Global variables:
+  38:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  OnTimeCounter_backup:  Variables of this global structure are modified to
+  39:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  store the values of non retention configuration registers when Sleep() API is
+  40:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  called.
+  41:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+  42:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *******************************************************************************/
+  43:Generated_Source\PSoC5/OnTimeCounter_PM.c **** void OnTimeCounter_SaveConfig(void) 
+  44:Generated_Source\PSoC5/OnTimeCounter_PM.c **** {
+  28              		.loc 1 44 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 10B5     		push	{r4, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 4, -8
+  35              		.cfi_offset 14, -4
+  45:Generated_Source\PSoC5/OnTimeCounter_PM.c ****     #if (!OnTimeCounter_UsingFixedFunction)
+  46:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         OnTimeCounter_backup.TimerUdb = OnTimeCounter_ReadCounter();
+  36              		.loc 1 46 0
+  37 0002 FFF7FEFF 		bl	OnTimeCounter_ReadCounter
+  38              	.LVL0:
+  39 0006 044C     		ldr	r4, .L2
+  47:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         OnTimeCounter_backup.InterruptMaskValue = OnTimeCounter_STATUS_MASK;
+  40              		.loc 1 47 0
+  41 0008 044B     		ldr	r3, .L2+4
+  46:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         OnTimeCounter_backup.InterruptMaskValue = OnTimeCounter_STATUS_MASK;
+  42              		.loc 1 46 0
+  43 000a 6060     		str	r0, [r4, #4]
+  44              		.loc 1 47 0
+  45 000c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  46 000e 2372     		strb	r3, [r4, #8]
+  48:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         #if (OnTimeCounter_UsingHWCaptureCounter)
+  49:Generated_Source\PSoC5/OnTimeCounter_PM.c ****             OnTimeCounter_backup.TimerCaptureCounter = OnTimeCounter_ReadCaptureCount();
+  50:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         #endif /* Back Up capture counter register  */
+  51:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+  52:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         #if(!OnTimeCounter_UDB_CONTROL_REG_REMOVED)
+  53:Generated_Source\PSoC5/OnTimeCounter_PM.c ****             OnTimeCounter_backup.TimerControlRegister = OnTimeCounter_ReadControlRegister();
+  47              		.loc 1 53 0
+  48 0010 FFF7FEFF 		bl	OnTimeCounter_ReadControlRegister
+  49              	.LVL1:
+  50 0014 6072     		strb	r0, [r4, #9]
+  51 0016 10BD     		pop	{r4, pc}
+  52              	.L3:
+  53              		.align	2
+  54              	.L2:
+  55 0018 00000000 		.word	.LANCHOR0
+  56 001c 89650040 		.word	1073767817
+  57              		.cfi_endproc
+  58              	.LFE0:
+  59              		.size	OnTimeCounter_SaveConfig, .-OnTimeCounter_SaveConfig
+  60              		.section	.text.OnTimeCounter_RestoreConfig,"ax",%progbits
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 3
+
+
+  61              		.align	1
+  62              		.global	OnTimeCounter_RestoreConfig
+  63              		.thumb
+  64              		.thumb_func
+  65              		.type	OnTimeCounter_RestoreConfig, %function
+  66              	OnTimeCounter_RestoreConfig:
+  67              	.LFB1:
+  54:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         #endif /* Backup the enable state of the Timer component */
+  55:Generated_Source\PSoC5/OnTimeCounter_PM.c ****     #endif /* Backup non retention registers in UDB implementation. All fixed function registers ar
+  56:Generated_Source\PSoC5/OnTimeCounter_PM.c **** }
+  57:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+  58:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+  59:Generated_Source\PSoC5/OnTimeCounter_PM.c **** /*******************************************************************************
+  60:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Function Name: OnTimeCounter_RestoreConfig
+  61:Generated_Source\PSoC5/OnTimeCounter_PM.c **** ********************************************************************************
+  62:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+  63:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Summary:
+  64:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  Restores the current user configuration.
+  65:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+  66:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Parameters:
+  67:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  void
+  68:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+  69:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Return:
+  70:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  void
+  71:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+  72:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Global variables:
+  73:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  OnTimeCounter_backup:  Variables of this global structure are used to
+  74:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  restore the values of non retention registers on wakeup from sleep mode.
+  75:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+  76:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *******************************************************************************/
+  77:Generated_Source\PSoC5/OnTimeCounter_PM.c **** void OnTimeCounter_RestoreConfig(void) 
+  78:Generated_Source\PSoC5/OnTimeCounter_PM.c **** {   
+  68              		.loc 1 78 0
+  69              		.cfi_startproc
+  70              		@ args = 0, pretend = 0, frame = 0
+  71              		@ frame_needed = 0, uses_anonymous_args = 0
+  72 0000 10B5     		push	{r4, lr}
+  73              		.cfi_def_cfa_offset 8
+  74              		.cfi_offset 4, -8
+  75              		.cfi_offset 14, -4
+  79:Generated_Source\PSoC5/OnTimeCounter_PM.c ****     #if (!OnTimeCounter_UsingFixedFunction)
+  80:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+  81:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         OnTimeCounter_WriteCounter(OnTimeCounter_backup.TimerUdb);
+  76              		.loc 1 81 0
+  77 0002 064C     		ldr	r4, .L5
+  78 0004 6068     		ldr	r0, [r4, #4]
+  79 0006 FFF7FEFF 		bl	OnTimeCounter_WriteCounter
+  80              	.LVL2:
+  82:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         OnTimeCounter_STATUS_MASK =OnTimeCounter_backup.InterruptMaskValue;
+  81              		.loc 1 82 0
+  82 000a 227A     		ldrb	r2, [r4, #8]	@ zero_extendqisi2
+  83 000c 044B     		ldr	r3, .L5+4
+  84 000e 1A70     		strb	r2, [r3]
+  83:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         #if (OnTimeCounter_UsingHWCaptureCounter)
+  84:Generated_Source\PSoC5/OnTimeCounter_PM.c ****             OnTimeCounter_SetCaptureCount(OnTimeCounter_backup.TimerCaptureCounter);
+  85:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         #endif /* Restore Capture counter register*/
+  86:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 4
+
+
+  87:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         #if(!OnTimeCounter_UDB_CONTROL_REG_REMOVED)
+  88:Generated_Source\PSoC5/OnTimeCounter_PM.c ****             OnTimeCounter_WriteControlRegister(OnTimeCounter_backup.TimerControlRegister);
+  85              		.loc 1 88 0
+  86 0010 607A     		ldrb	r0, [r4, #9]	@ zero_extendqisi2
+  89:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         #endif /* Restore the enable state of the Timer component */
+  90:Generated_Source\PSoC5/OnTimeCounter_PM.c ****     #endif /* Restore non retention registers in the UDB implementation only */
+  91:Generated_Source\PSoC5/OnTimeCounter_PM.c **** }
+  87              		.loc 1 91 0
+  88 0012 BDE81040 		pop	{r4, lr}
+  89              		.cfi_restore 14
+  90              		.cfi_restore 4
+  91              		.cfi_def_cfa_offset 0
+  88:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         #endif /* Restore the enable state of the Timer component */
+  92              		.loc 1 88 0
+  93 0016 FFF7FEBF 		b	OnTimeCounter_WriteControlRegister
+  94              	.LVL3:
+  95              	.L6:
+  96 001a 00BF     		.align	2
+  97              	.L5:
+  98 001c 00000000 		.word	.LANCHOR0
+  99 0020 89650040 		.word	1073767817
+ 100              		.cfi_endproc
+ 101              	.LFE1:
+ 102              		.size	OnTimeCounter_RestoreConfig, .-OnTimeCounter_RestoreConfig
+ 103              		.section	.text.OnTimeCounter_Sleep,"ax",%progbits
+ 104              		.align	1
+ 105              		.global	OnTimeCounter_Sleep
+ 106              		.thumb
+ 107              		.thumb_func
+ 108              		.type	OnTimeCounter_Sleep, %function
+ 109              	OnTimeCounter_Sleep:
+ 110              	.LFB2:
+  92:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+  93:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+  94:Generated_Source\PSoC5/OnTimeCounter_PM.c **** /*******************************************************************************
+  95:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Function Name: OnTimeCounter_Sleep
+  96:Generated_Source\PSoC5/OnTimeCounter_PM.c **** ********************************************************************************
+  97:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+  98:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Summary:
+  99:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *     Stop and Save the user configuration
+ 100:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+ 101:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Parameters:
+ 102:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  void
+ 103:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+ 104:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Return:
+ 105:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  void
+ 106:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+ 107:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Global variables:
+ 108:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  OnTimeCounter_backup.TimerEnableState:  Is modified depending on the
+ 109:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  enable state of the block before entering sleep mode.
+ 110:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+ 111:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *******************************************************************************/
+ 112:Generated_Source\PSoC5/OnTimeCounter_PM.c **** void OnTimeCounter_Sleep(void) 
+ 113:Generated_Source\PSoC5/OnTimeCounter_PM.c **** {
+ 111              		.loc 1 113 0
+ 112              		.cfi_startproc
+ 113              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 5
+
+
+ 114              		@ frame_needed = 0, uses_anonymous_args = 0
+ 115 0000 08B5     		push	{r3, lr}
+ 116              		.cfi_def_cfa_offset 8
+ 117              		.cfi_offset 3, -8
+ 118              		.cfi_offset 14, -4
+ 114:Generated_Source\PSoC5/OnTimeCounter_PM.c ****     #if(!OnTimeCounter_UDB_CONTROL_REG_REMOVED)
+ 115:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         /* Save Counter's enable state */
+ 116:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         if(OnTimeCounter_CTRL_ENABLE == (OnTimeCounter_CONTROL & OnTimeCounter_CTRL_ENABLE))
+ 119              		.loc 1 116 0
+ 120 0002 074B     		ldr	r3, .L11
+ 121 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 122 0006 13F0800F 		tst	r3, #128
+ 123 000a 064B     		ldr	r3, .L11+4
+ 117:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         {
+ 118:Generated_Source\PSoC5/OnTimeCounter_PM.c ****             /* Timer is enabled */
+ 119:Generated_Source\PSoC5/OnTimeCounter_PM.c ****             OnTimeCounter_backup.TimerEnableState = 1u;
+ 124              		.loc 1 119 0
+ 125 000c 14BF     		ite	ne
+ 126 000e 0122     		movne	r2, #1
+ 120:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         }
+ 121:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         else
+ 122:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         {
+ 123:Generated_Source\PSoC5/OnTimeCounter_PM.c ****             /* Timer is disabled */
+ 124:Generated_Source\PSoC5/OnTimeCounter_PM.c ****             OnTimeCounter_backup.TimerEnableState = 0u;
+ 127              		.loc 1 124 0
+ 128 0010 0022     		moveq	r2, #0
+ 129 0012 1A70     		strb	r2, [r3]
+ 125:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         }
+ 126:Generated_Source\PSoC5/OnTimeCounter_PM.c ****     #endif /* Back up enable state from the Timer control register */
+ 127:Generated_Source\PSoC5/OnTimeCounter_PM.c ****     OnTimeCounter_Stop();
+ 130              		.loc 1 127 0
+ 131 0014 FFF7FEFF 		bl	OnTimeCounter_Stop
+ 132              	.LVL4:
+ 128:Generated_Source\PSoC5/OnTimeCounter_PM.c ****     OnTimeCounter_SaveConfig();
+ 129:Generated_Source\PSoC5/OnTimeCounter_PM.c **** }
+ 133              		.loc 1 129 0
+ 134 0018 BDE80840 		pop	{r3, lr}
+ 135              		.cfi_restore 14
+ 136              		.cfi_restore 3
+ 137              		.cfi_def_cfa_offset 0
+ 128:Generated_Source\PSoC5/OnTimeCounter_PM.c ****     OnTimeCounter_SaveConfig();
+ 138              		.loc 1 128 0
+ 139 001c FFF7FEBF 		b	OnTimeCounter_SaveConfig
+ 140              	.LVL5:
+ 141              	.L12:
+ 142              		.align	2
+ 143              	.L11:
+ 144 0020 7A650040 		.word	1073767802
+ 145 0024 00000000 		.word	.LANCHOR0
+ 146              		.cfi_endproc
+ 147              	.LFE2:
+ 148              		.size	OnTimeCounter_Sleep, .-OnTimeCounter_Sleep
+ 149              		.section	.text.OnTimeCounter_Wakeup,"ax",%progbits
+ 150              		.align	1
+ 151              		.global	OnTimeCounter_Wakeup
+ 152              		.thumb
+ 153              		.thumb_func
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 6
+
+
+ 154              		.type	OnTimeCounter_Wakeup, %function
+ 155              	OnTimeCounter_Wakeup:
+ 156              	.LFB3:
+ 130:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+ 131:Generated_Source\PSoC5/OnTimeCounter_PM.c **** 
+ 132:Generated_Source\PSoC5/OnTimeCounter_PM.c **** /*******************************************************************************
+ 133:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Function Name: OnTimeCounter_Wakeup
+ 134:Generated_Source\PSoC5/OnTimeCounter_PM.c **** ********************************************************************************
+ 135:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+ 136:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Summary:
+ 137:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  Restores and enables the user configuration
+ 138:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+ 139:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Parameters:
+ 140:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  void
+ 141:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+ 142:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Return:
+ 143:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  void
+ 144:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+ 145:Generated_Source\PSoC5/OnTimeCounter_PM.c **** * Global variables:
+ 146:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  OnTimeCounter_backup.enableState:  Is used to restore the enable state of
+ 147:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *  block on wakeup from sleep mode.
+ 148:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *
+ 149:Generated_Source\PSoC5/OnTimeCounter_PM.c **** *******************************************************************************/
+ 150:Generated_Source\PSoC5/OnTimeCounter_PM.c **** void OnTimeCounter_Wakeup(void) 
+ 151:Generated_Source\PSoC5/OnTimeCounter_PM.c **** {
+ 157              		.loc 1 151 0
+ 158              		.cfi_startproc
+ 159              		@ args = 0, pretend = 0, frame = 0
+ 160              		@ frame_needed = 0, uses_anonymous_args = 0
+ 161 0000 08B5     		push	{r3, lr}
+ 162              		.cfi_def_cfa_offset 8
+ 163              		.cfi_offset 3, -8
+ 164              		.cfi_offset 14, -4
+ 152:Generated_Source\PSoC5/OnTimeCounter_PM.c ****     OnTimeCounter_RestoreConfig();
+ 165              		.loc 1 152 0
+ 166 0002 FFF7FEFF 		bl	OnTimeCounter_RestoreConfig
+ 167              	.LVL6:
+ 153:Generated_Source\PSoC5/OnTimeCounter_PM.c ****     #if(!OnTimeCounter_UDB_CONTROL_REG_REMOVED)
+ 154:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         if(OnTimeCounter_backup.TimerEnableState == 1u)
+ 168              		.loc 1 154 0
+ 169 0006 044B     		ldr	r3, .L16
+ 170 0008 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 171 000a 012B     		cmp	r3, #1
+ 172 000c 03D1     		bne	.L13
+ 155:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         {     /* Enable Timer's operation */
+ 156:Generated_Source\PSoC5/OnTimeCounter_PM.c ****                 OnTimeCounter_Enable();
+ 157:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         } /* Do nothing if Timer was disabled before */
+ 158:Generated_Source\PSoC5/OnTimeCounter_PM.c ****     #endif /* Remove this code section if Control register is removed */
+ 159:Generated_Source\PSoC5/OnTimeCounter_PM.c **** }
+ 173              		.loc 1 159 0
+ 174 000e BDE80840 		pop	{r3, lr}
+ 175              		.cfi_remember_state
+ 176              		.cfi_restore 14
+ 177              		.cfi_restore 3
+ 178              		.cfi_def_cfa_offset 0
+ 156:Generated_Source\PSoC5/OnTimeCounter_PM.c ****         } /* Do nothing if Timer was disabled before */
+ 179              		.loc 1 156 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 7
+
+
+ 180 0012 FFF7FEBF 		b	OnTimeCounter_Enable
+ 181              	.LVL7:
+ 182              	.L13:
+ 183              		.cfi_restore_state
+ 184 0016 08BD     		pop	{r3, pc}
+ 185              	.L17:
+ 186              		.align	2
+ 187              	.L16:
+ 188 0018 00000000 		.word	.LANCHOR0
+ 189              		.cfi_endproc
+ 190              	.LFE3:
+ 191              		.size	OnTimeCounter_Wakeup, .-OnTimeCounter_Wakeup
+ 192              		.bss
+ 193              		.align	2
+ 194              		.set	.LANCHOR0,. + 0
+ 195              		.type	OnTimeCounter_backup, %object
+ 196              		.size	OnTimeCounter_backup, 12
+ 197              	OnTimeCounter_backup:
+ 198 0000 00000000 		.space	12
+ 198      00000000 
+ 198      00000000 
+ 199              		.text
+ 200              	.Letext0:
+ 201              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+ 202              		.file 3 "Generated_Source\\PSoC5\\OnTimeCounter.h"
+ 203              		.section	.debug_info,"",%progbits
+ 204              	.Ldebug_info0:
+ 205 0000 E4010000 		.4byte	0x1e4
+ 206 0004 0400     		.2byte	0x4
+ 207 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 208 000a 04       		.byte	0x4
+ 209 000b 01       		.uleb128 0x1
+ 210 000c BF000000 		.4byte	.LASF31
+ 211 0010 0C       		.byte	0xc
+ 212 0011 11000000 		.4byte	.LASF32
+ 213 0015 70020000 		.4byte	.LASF33
+ 214 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 215 001d 00000000 		.4byte	0
+ 216 0021 00000000 		.4byte	.Ldebug_line0
+ 217 0025 02       		.uleb128 0x2
+ 218 0026 01       		.byte	0x1
+ 219 0027 06       		.byte	0x6
+ 220 0028 CF020000 		.4byte	.LASF0
+ 221 002c 02       		.uleb128 0x2
+ 222 002d 01       		.byte	0x1
+ 223 002e 08       		.byte	0x8
+ 224 002f 9A000000 		.4byte	.LASF1
+ 225 0033 02       		.uleb128 0x2
+ 226 0034 02       		.byte	0x2
+ 227 0035 05       		.byte	0x5
+ 228 0036 44020000 		.4byte	.LASF2
+ 229 003a 02       		.uleb128 0x2
+ 230 003b 02       		.byte	0x2
+ 231 003c 07       		.byte	0x7
+ 232 003d 3B000000 		.4byte	.LASF3
+ 233 0041 02       		.uleb128 0x2
+ 234 0042 04       		.byte	0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 8
+
+
+ 235 0043 05       		.byte	0x5
+ 236 0044 95020000 		.4byte	.LASF4
+ 237 0048 02       		.uleb128 0x2
+ 238 0049 04       		.byte	0x4
+ 239 004a 07       		.byte	0x7
+ 240 004b AD000000 		.4byte	.LASF5
+ 241 004f 02       		.uleb128 0x2
+ 242 0050 08       		.byte	0x8
+ 243 0051 05       		.byte	0x5
+ 244 0052 01020000 		.4byte	.LASF6
+ 245 0056 02       		.uleb128 0x2
+ 246 0057 08       		.byte	0x8
+ 247 0058 07       		.byte	0x7
+ 248 0059 CE010000 		.4byte	.LASF7
+ 249 005d 03       		.uleb128 0x3
+ 250 005e 04       		.byte	0x4
+ 251 005f 05       		.byte	0x5
+ 252 0060 696E7400 		.ascii	"int\000"
+ 253 0064 02       		.uleb128 0x2
+ 254 0065 04       		.byte	0x4
+ 255 0066 07       		.byte	0x7
+ 256 0067 C1010000 		.4byte	.LASF8
+ 257 006b 04       		.uleb128 0x4
+ 258 006c 58010000 		.4byte	.LASF9
+ 259 0070 02       		.byte	0x2
+ 260 0071 9201     		.2byte	0x192
+ 261 0073 2C000000 		.4byte	0x2c
+ 262 0077 04       		.uleb128 0x4
+ 263 0078 8E010000 		.4byte	.LASF10
+ 264 007c 02       		.byte	0x2
+ 265 007d 9401     		.2byte	0x194
+ 266 007f 48000000 		.4byte	0x48
+ 267 0083 02       		.uleb128 0x2
+ 268 0084 04       		.byte	0x4
+ 269 0085 04       		.byte	0x4
+ 270 0086 71000000 		.4byte	.LASF11
+ 271 008a 02       		.uleb128 0x2
+ 272 008b 08       		.byte	0x8
+ 273 008c 04       		.byte	0x4
+ 274 008d 73010000 		.4byte	.LASF12
+ 275 0091 02       		.uleb128 0x2
+ 276 0092 01       		.byte	0x1
+ 277 0093 08       		.byte	0x8
+ 278 0094 0F020000 		.4byte	.LASF13
+ 279 0098 04       		.uleb128 0x4
+ 280 0099 A8000000 		.4byte	.LASF14
+ 281 009d 02       		.byte	0x2
+ 282 009e 3C02     		.2byte	0x23c
+ 283 00a0 A4000000 		.4byte	0xa4
+ 284 00a4 05       		.uleb128 0x5
+ 285 00a5 6B000000 		.4byte	0x6b
+ 286 00a9 02       		.uleb128 0x2
+ 287 00aa 04       		.byte	0x4
+ 288 00ab 07       		.byte	0x7
+ 289 00ac F8010000 		.4byte	.LASF15
+ 290 00b0 06       		.uleb128 0x6
+ 291 00b1 0C       		.byte	0xc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 9
+
+
+ 292 00b2 03       		.byte	0x3
+ 293 00b3 43       		.byte	0x43
+ 294 00b4 E9000000 		.4byte	0xe9
+ 295 00b8 07       		.uleb128 0x7
+ 296 00b9 00000000 		.4byte	.LASF16
+ 297 00bd 03       		.byte	0x3
+ 298 00be 45       		.byte	0x45
+ 299 00bf 6B000000 		.4byte	0x6b
+ 300 00c3 00       		.byte	0
+ 301 00c4 07       		.uleb128 0x7
+ 302 00c5 68000000 		.4byte	.LASF17
+ 303 00c9 03       		.byte	0x3
+ 304 00ca 48       		.byte	0x48
+ 305 00cb 77000000 		.4byte	0x77
+ 306 00cf 04       		.byte	0x4
+ 307 00d0 07       		.uleb128 0x7
+ 308 00d1 95010000 		.4byte	.LASF18
+ 309 00d5 03       		.byte	0x3
+ 310 00d6 49       		.byte	0x49
+ 311 00d7 6B000000 		.4byte	0x6b
+ 312 00db 08       		.byte	0x8
+ 313 00dc 07       		.uleb128 0x7
+ 314 00dd F6020000 		.4byte	.LASF19
+ 315 00e1 03       		.byte	0x3
+ 316 00e2 4F       		.byte	0x4f
+ 317 00e3 6B000000 		.4byte	0x6b
+ 318 00e7 09       		.byte	0x9
+ 319 00e8 00       		.byte	0
+ 320 00e9 08       		.uleb128 0x8
+ 321 00ea DB020000 		.4byte	.LASF20
+ 322 00ee 03       		.byte	0x3
+ 323 00ef 53       		.byte	0x53
+ 324 00f0 B0000000 		.4byte	0xb0
+ 325 00f4 09       		.uleb128 0x9
+ 326 00f5 A8010000 		.4byte	.LASF21
+ 327 00f9 01       		.byte	0x1
+ 328 00fa 2B       		.byte	0x2b
+ 329 00fb 00000000 		.4byte	.LFB0
+ 330 00ff 20000000 		.4byte	.LFE0-.LFB0
+ 331 0103 01       		.uleb128 0x1
+ 332 0104 9C       		.byte	0x9c
+ 333 0105 1C010000 		.4byte	0x11c
+ 334 0109 0A       		.uleb128 0xa
+ 335 010a 06000000 		.4byte	.LVL0
+ 336 010e A5010000 		.4byte	0x1a5
+ 337 0112 0A       		.uleb128 0xa
+ 338 0113 14000000 		.4byte	.LVL1
+ 339 0117 B0010000 		.4byte	0x1b0
+ 340 011b 00       		.byte	0
+ 341 011c 09       		.uleb128 0x9
+ 342 011d B3020000 		.4byte	.LASF22
+ 343 0121 01       		.byte	0x1
+ 344 0122 4D       		.byte	0x4d
+ 345 0123 00000000 		.4byte	.LFB1
+ 346 0127 24000000 		.4byte	.LFE1-.LFB1
+ 347 012b 01       		.uleb128 0x1
+ 348 012c 9C       		.byte	0x9c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 10
+
+
+ 349 012d 44010000 		.4byte	0x144
+ 350 0131 0A       		.uleb128 0xa
+ 351 0132 0A000000 		.4byte	.LVL2
+ 352 0136 BB010000 		.4byte	0x1bb
+ 353 013a 0B       		.uleb128 0xb
+ 354 013b 1A000000 		.4byte	.LVL3
+ 355 013f C6010000 		.4byte	0x1c6
+ 356 0143 00       		.byte	0
+ 357 0144 09       		.uleb128 0x9
+ 358 0145 7A010000 		.4byte	.LASF23
+ 359 0149 01       		.byte	0x1
+ 360 014a 70       		.byte	0x70
+ 361 014b 00000000 		.4byte	.LFB2
+ 362 014f 28000000 		.4byte	.LFE2-.LFB2
+ 363 0153 01       		.uleb128 0x1
+ 364 0154 9C       		.byte	0x9c
+ 365 0155 6C010000 		.4byte	0x16c
+ 366 0159 0A       		.uleb128 0xa
+ 367 015a 18000000 		.4byte	.LVL4
+ 368 015e D1010000 		.4byte	0x1d1
+ 369 0162 0B       		.uleb128 0xb
+ 370 0163 20000000 		.4byte	.LVL5
+ 371 0167 F4000000 		.4byte	0xf4
+ 372 016b 00       		.byte	0
+ 373 016c 09       		.uleb128 0x9
+ 374 016d 9E020000 		.4byte	.LASF24
+ 375 0171 01       		.byte	0x1
+ 376 0172 96       		.byte	0x96
+ 377 0173 00000000 		.4byte	.LFB3
+ 378 0177 1C000000 		.4byte	.LFE3-.LFB3
+ 379 017b 01       		.uleb128 0x1
+ 380 017c 9C       		.byte	0x9c
+ 381 017d 94010000 		.4byte	0x194
+ 382 0181 0A       		.uleb128 0xa
+ 383 0182 06000000 		.4byte	.LVL6
+ 384 0186 1C010000 		.4byte	0x11c
+ 385 018a 0B       		.uleb128 0xb
+ 386 018b 16000000 		.4byte	.LVL7
+ 387 018f DC010000 		.4byte	0x1dc
+ 388 0193 00       		.byte	0
+ 389 0194 0C       		.uleb128 0xc
+ 390 0195 14020000 		.4byte	.LASF34
+ 391 0199 01       		.byte	0x1
+ 392 019a 15       		.byte	0x15
+ 393 019b E9000000 		.4byte	0xe9
+ 394 019f 05       		.uleb128 0x5
+ 395 01a0 03       		.byte	0x3
+ 396 01a1 00000000 		.4byte	OnTimeCounter_backup
+ 397 01a5 0D       		.uleb128 0xd
+ 398 01a6 4E000000 		.4byte	.LASF25
+ 399 01aa 4E000000 		.4byte	.LASF25
+ 400 01ae 03       		.byte	0x3
+ 401 01af 69       		.byte	0x69
+ 402 01b0 0D       		.uleb128 0xd
+ 403 01b1 4E020000 		.4byte	.LASF26
+ 404 01b5 4E020000 		.4byte	.LASF26
+ 405 01b9 03       		.byte	0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 11
+
+
+ 406 01ba 63       		.byte	0x63
+ 407 01bb 0D       		.uleb128 0xd
+ 408 01bc 29020000 		.4byte	.LASF27
+ 409 01c0 29020000 		.4byte	.LASF27
+ 410 01c4 03       		.byte	0x3
+ 411 01c5 6A       		.byte	0x6a
+ 412 01c6 0D       		.uleb128 0xd
+ 413 01c7 77000000 		.4byte	.LASF28
+ 414 01cb 77000000 		.4byte	.LASF28
+ 415 01cf 03       		.byte	0x3
+ 416 01d0 64       		.byte	0x64
+ 417 01d1 0D       		.uleb128 0xd
+ 418 01d2 E5010000 		.4byte	.LASF29
+ 419 01d6 E5010000 		.4byte	.LASF29
+ 420 01da 03       		.byte	0x3
+ 421 01db 5B       		.byte	0x5b
+ 422 01dc 0D       		.uleb128 0xd
+ 423 01dd 5E010000 		.4byte	.LASF30
+ 424 01e1 5E010000 		.4byte	.LASF30
+ 425 01e5 03       		.byte	0x3
+ 426 01e6 8B       		.byte	0x8b
+ 427 01e7 00       		.byte	0
+ 428              		.section	.debug_abbrev,"",%progbits
+ 429              	.Ldebug_abbrev0:
+ 430 0000 01       		.uleb128 0x1
+ 431 0001 11       		.uleb128 0x11
+ 432 0002 01       		.byte	0x1
+ 433 0003 25       		.uleb128 0x25
+ 434 0004 0E       		.uleb128 0xe
+ 435 0005 13       		.uleb128 0x13
+ 436 0006 0B       		.uleb128 0xb
+ 437 0007 03       		.uleb128 0x3
+ 438 0008 0E       		.uleb128 0xe
+ 439 0009 1B       		.uleb128 0x1b
+ 440 000a 0E       		.uleb128 0xe
+ 441 000b 55       		.uleb128 0x55
+ 442 000c 17       		.uleb128 0x17
+ 443 000d 11       		.uleb128 0x11
+ 444 000e 01       		.uleb128 0x1
+ 445 000f 10       		.uleb128 0x10
+ 446 0010 17       		.uleb128 0x17
+ 447 0011 00       		.byte	0
+ 448 0012 00       		.byte	0
+ 449 0013 02       		.uleb128 0x2
+ 450 0014 24       		.uleb128 0x24
+ 451 0015 00       		.byte	0
+ 452 0016 0B       		.uleb128 0xb
+ 453 0017 0B       		.uleb128 0xb
+ 454 0018 3E       		.uleb128 0x3e
+ 455 0019 0B       		.uleb128 0xb
+ 456 001a 03       		.uleb128 0x3
+ 457 001b 0E       		.uleb128 0xe
+ 458 001c 00       		.byte	0
+ 459 001d 00       		.byte	0
+ 460 001e 03       		.uleb128 0x3
+ 461 001f 24       		.uleb128 0x24
+ 462 0020 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 12
+
+
+ 463 0021 0B       		.uleb128 0xb
+ 464 0022 0B       		.uleb128 0xb
+ 465 0023 3E       		.uleb128 0x3e
+ 466 0024 0B       		.uleb128 0xb
+ 467 0025 03       		.uleb128 0x3
+ 468 0026 08       		.uleb128 0x8
+ 469 0027 00       		.byte	0
+ 470 0028 00       		.byte	0
+ 471 0029 04       		.uleb128 0x4
+ 472 002a 16       		.uleb128 0x16
+ 473 002b 00       		.byte	0
+ 474 002c 03       		.uleb128 0x3
+ 475 002d 0E       		.uleb128 0xe
+ 476 002e 3A       		.uleb128 0x3a
+ 477 002f 0B       		.uleb128 0xb
+ 478 0030 3B       		.uleb128 0x3b
+ 479 0031 05       		.uleb128 0x5
+ 480 0032 49       		.uleb128 0x49
+ 481 0033 13       		.uleb128 0x13
+ 482 0034 00       		.byte	0
+ 483 0035 00       		.byte	0
+ 484 0036 05       		.uleb128 0x5
+ 485 0037 35       		.uleb128 0x35
+ 486 0038 00       		.byte	0
+ 487 0039 49       		.uleb128 0x49
+ 488 003a 13       		.uleb128 0x13
+ 489 003b 00       		.byte	0
+ 490 003c 00       		.byte	0
+ 491 003d 06       		.uleb128 0x6
+ 492 003e 13       		.uleb128 0x13
+ 493 003f 01       		.byte	0x1
+ 494 0040 0B       		.uleb128 0xb
+ 495 0041 0B       		.uleb128 0xb
+ 496 0042 3A       		.uleb128 0x3a
+ 497 0043 0B       		.uleb128 0xb
+ 498 0044 3B       		.uleb128 0x3b
+ 499 0045 0B       		.uleb128 0xb
+ 500 0046 01       		.uleb128 0x1
+ 501 0047 13       		.uleb128 0x13
+ 502 0048 00       		.byte	0
+ 503 0049 00       		.byte	0
+ 504 004a 07       		.uleb128 0x7
+ 505 004b 0D       		.uleb128 0xd
+ 506 004c 00       		.byte	0
+ 507 004d 03       		.uleb128 0x3
+ 508 004e 0E       		.uleb128 0xe
+ 509 004f 3A       		.uleb128 0x3a
+ 510 0050 0B       		.uleb128 0xb
+ 511 0051 3B       		.uleb128 0x3b
+ 512 0052 0B       		.uleb128 0xb
+ 513 0053 49       		.uleb128 0x49
+ 514 0054 13       		.uleb128 0x13
+ 515 0055 38       		.uleb128 0x38
+ 516 0056 0B       		.uleb128 0xb
+ 517 0057 00       		.byte	0
+ 518 0058 00       		.byte	0
+ 519 0059 08       		.uleb128 0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 13
+
+
+ 520 005a 16       		.uleb128 0x16
+ 521 005b 00       		.byte	0
+ 522 005c 03       		.uleb128 0x3
+ 523 005d 0E       		.uleb128 0xe
+ 524 005e 3A       		.uleb128 0x3a
+ 525 005f 0B       		.uleb128 0xb
+ 526 0060 3B       		.uleb128 0x3b
+ 527 0061 0B       		.uleb128 0xb
+ 528 0062 49       		.uleb128 0x49
+ 529 0063 13       		.uleb128 0x13
+ 530 0064 00       		.byte	0
+ 531 0065 00       		.byte	0
+ 532 0066 09       		.uleb128 0x9
+ 533 0067 2E       		.uleb128 0x2e
+ 534 0068 01       		.byte	0x1
+ 535 0069 3F       		.uleb128 0x3f
+ 536 006a 19       		.uleb128 0x19
+ 537 006b 03       		.uleb128 0x3
+ 538 006c 0E       		.uleb128 0xe
+ 539 006d 3A       		.uleb128 0x3a
+ 540 006e 0B       		.uleb128 0xb
+ 541 006f 3B       		.uleb128 0x3b
+ 542 0070 0B       		.uleb128 0xb
+ 543 0071 27       		.uleb128 0x27
+ 544 0072 19       		.uleb128 0x19
+ 545 0073 11       		.uleb128 0x11
+ 546 0074 01       		.uleb128 0x1
+ 547 0075 12       		.uleb128 0x12
+ 548 0076 06       		.uleb128 0x6
+ 549 0077 40       		.uleb128 0x40
+ 550 0078 18       		.uleb128 0x18
+ 551 0079 9742     		.uleb128 0x2117
+ 552 007b 19       		.uleb128 0x19
+ 553 007c 01       		.uleb128 0x1
+ 554 007d 13       		.uleb128 0x13
+ 555 007e 00       		.byte	0
+ 556 007f 00       		.byte	0
+ 557 0080 0A       		.uleb128 0xa
+ 558 0081 898201   		.uleb128 0x4109
+ 559 0084 00       		.byte	0
+ 560 0085 11       		.uleb128 0x11
+ 561 0086 01       		.uleb128 0x1
+ 562 0087 31       		.uleb128 0x31
+ 563 0088 13       		.uleb128 0x13
+ 564 0089 00       		.byte	0
+ 565 008a 00       		.byte	0
+ 566 008b 0B       		.uleb128 0xb
+ 567 008c 898201   		.uleb128 0x4109
+ 568 008f 00       		.byte	0
+ 569 0090 11       		.uleb128 0x11
+ 570 0091 01       		.uleb128 0x1
+ 571 0092 9542     		.uleb128 0x2115
+ 572 0094 19       		.uleb128 0x19
+ 573 0095 31       		.uleb128 0x31
+ 574 0096 13       		.uleb128 0x13
+ 575 0097 00       		.byte	0
+ 576 0098 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 14
+
+
+ 577 0099 0C       		.uleb128 0xc
+ 578 009a 34       		.uleb128 0x34
+ 579 009b 00       		.byte	0
+ 580 009c 03       		.uleb128 0x3
+ 581 009d 0E       		.uleb128 0xe
+ 582 009e 3A       		.uleb128 0x3a
+ 583 009f 0B       		.uleb128 0xb
+ 584 00a0 3B       		.uleb128 0x3b
+ 585 00a1 0B       		.uleb128 0xb
+ 586 00a2 49       		.uleb128 0x49
+ 587 00a3 13       		.uleb128 0x13
+ 588 00a4 02       		.uleb128 0x2
+ 589 00a5 18       		.uleb128 0x18
+ 590 00a6 00       		.byte	0
+ 591 00a7 00       		.byte	0
+ 592 00a8 0D       		.uleb128 0xd
+ 593 00a9 2E       		.uleb128 0x2e
+ 594 00aa 00       		.byte	0
+ 595 00ab 3F       		.uleb128 0x3f
+ 596 00ac 19       		.uleb128 0x19
+ 597 00ad 3C       		.uleb128 0x3c
+ 598 00ae 19       		.uleb128 0x19
+ 599 00af 6E       		.uleb128 0x6e
+ 600 00b0 0E       		.uleb128 0xe
+ 601 00b1 03       		.uleb128 0x3
+ 602 00b2 0E       		.uleb128 0xe
+ 603 00b3 3A       		.uleb128 0x3a
+ 604 00b4 0B       		.uleb128 0xb
+ 605 00b5 3B       		.uleb128 0x3b
+ 606 00b6 0B       		.uleb128 0xb
+ 607 00b7 00       		.byte	0
+ 608 00b8 00       		.byte	0
+ 609 00b9 00       		.byte	0
+ 610              		.section	.debug_aranges,"",%progbits
+ 611 0000 34000000 		.4byte	0x34
+ 612 0004 0200     		.2byte	0x2
+ 613 0006 00000000 		.4byte	.Ldebug_info0
+ 614 000a 04       		.byte	0x4
+ 615 000b 00       		.byte	0
+ 616 000c 0000     		.2byte	0
+ 617 000e 0000     		.2byte	0
+ 618 0010 00000000 		.4byte	.LFB0
+ 619 0014 20000000 		.4byte	.LFE0-.LFB0
+ 620 0018 00000000 		.4byte	.LFB1
+ 621 001c 24000000 		.4byte	.LFE1-.LFB1
+ 622 0020 00000000 		.4byte	.LFB2
+ 623 0024 28000000 		.4byte	.LFE2-.LFB2
+ 624 0028 00000000 		.4byte	.LFB3
+ 625 002c 1C000000 		.4byte	.LFE3-.LFB3
+ 626 0030 00000000 		.4byte	0
+ 627 0034 00000000 		.4byte	0
+ 628              		.section	.debug_ranges,"",%progbits
+ 629              	.Ldebug_ranges0:
+ 630 0000 00000000 		.4byte	.LFB0
+ 631 0004 20000000 		.4byte	.LFE0
+ 632 0008 00000000 		.4byte	.LFB1
+ 633 000c 24000000 		.4byte	.LFE1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 15
+
+
+ 634 0010 00000000 		.4byte	.LFB2
+ 635 0014 28000000 		.4byte	.LFE2
+ 636 0018 00000000 		.4byte	.LFB3
+ 637 001c 1C000000 		.4byte	.LFE3
+ 638 0020 00000000 		.4byte	0
+ 639 0024 00000000 		.4byte	0
+ 640              		.section	.debug_line,"",%progbits
+ 641              	.Ldebug_line0:
+ 642 0000 B9000000 		.section	.debug_str,"MS",%progbits,1
+ 642      02006000 
+ 642      00000201 
+ 642      FB0E0D00 
+ 642      01010101 
+ 643              	.LASF16:
+ 644 0000 54696D65 		.ascii	"TimerEnableState\000"
+ 644      72456E61 
+ 644      626C6553 
+ 644      74617465 
+ 644      00
+ 645              	.LASF32:
+ 646 0011 47656E65 		.ascii	"Generated_Source\\PSoC5\\OnTimeCounter_PM.c\000"
+ 646      72617465 
+ 646      645F536F 
+ 646      75726365 
+ 646      5C50536F 
+ 647              	.LASF3:
+ 648 003b 73686F72 		.ascii	"short unsigned int\000"
+ 648      7420756E 
+ 648      7369676E 
+ 648      65642069 
+ 648      6E7400
+ 649              	.LASF25:
+ 650 004e 4F6E5469 		.ascii	"OnTimeCounter_ReadCounter\000"
+ 650      6D65436F 
+ 650      756E7465 
+ 650      725F5265 
+ 650      6164436F 
+ 651              	.LASF17:
+ 652 0068 54696D65 		.ascii	"TimerUdb\000"
+ 652      72556462 
+ 652      00
+ 653              	.LASF11:
+ 654 0071 666C6F61 		.ascii	"float\000"
+ 654      7400
+ 655              	.LASF28:
+ 656 0077 4F6E5469 		.ascii	"OnTimeCounter_WriteControlRegister\000"
+ 656      6D65436F 
+ 656      756E7465 
+ 656      725F5772 
+ 656      69746543 
+ 657              	.LASF1:
+ 658 009a 756E7369 		.ascii	"unsigned char\000"
+ 658      676E6564 
+ 658      20636861 
+ 658      7200
+ 659              	.LASF14:
+ 660 00a8 72656738 		.ascii	"reg8\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 16
+
+
+ 660      00
+ 661              	.LASF5:
+ 662 00ad 6C6F6E67 		.ascii	"long unsigned int\000"
+ 662      20756E73 
+ 662      69676E65 
+ 662      6420696E 
+ 662      7400
+ 663              	.LASF31:
+ 664 00bf 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 664      43393920 
+ 664      352E342E 
+ 664      31203230 
+ 664      31363036 
+ 665 00f2 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 665      20726576 
+ 665      6973696F 
+ 665      6E203233 
+ 665      37373135 
+ 666 0125 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 666      74643D67 
+ 666      6E753939 
+ 666      202D6666 
+ 666      756E6374 
+ 667              	.LASF9:
+ 668 0158 75696E74 		.ascii	"uint8\000"
+ 668      3800
+ 669              	.LASF30:
+ 670 015e 4F6E5469 		.ascii	"OnTimeCounter_Enable\000"
+ 670      6D65436F 
+ 670      756E7465 
+ 670      725F456E 
+ 670      61626C65 
+ 671              	.LASF12:
+ 672 0173 646F7562 		.ascii	"double\000"
+ 672      6C6500
+ 673              	.LASF23:
+ 674 017a 4F6E5469 		.ascii	"OnTimeCounter_Sleep\000"
+ 674      6D65436F 
+ 674      756E7465 
+ 674      725F536C 
+ 674      65657000 
+ 675              	.LASF10:
+ 676 018e 75696E74 		.ascii	"uint32\000"
+ 676      333200
+ 677              	.LASF18:
+ 678 0195 496E7465 		.ascii	"InterruptMaskValue\000"
+ 678      72727570 
+ 678      744D6173 
+ 678      6B56616C 
+ 678      756500
+ 679              	.LASF21:
+ 680 01a8 4F6E5469 		.ascii	"OnTimeCounter_SaveConfig\000"
+ 680      6D65436F 
+ 680      756E7465 
+ 680      725F5361 
+ 680      7665436F 
+ 681              	.LASF8:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 17
+
+
+ 682 01c1 756E7369 		.ascii	"unsigned int\000"
+ 682      676E6564 
+ 682      20696E74 
+ 682      00
+ 683              	.LASF7:
+ 684 01ce 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 684      206C6F6E 
+ 684      6720756E 
+ 684      7369676E 
+ 684      65642069 
+ 685              	.LASF29:
+ 686 01e5 4F6E5469 		.ascii	"OnTimeCounter_Stop\000"
+ 686      6D65436F 
+ 686      756E7465 
+ 686      725F5374 
+ 686      6F7000
+ 687              	.LASF15:
+ 688 01f8 73697A65 		.ascii	"sizetype\000"
+ 688      74797065 
+ 688      00
+ 689              	.LASF6:
+ 690 0201 6C6F6E67 		.ascii	"long long int\000"
+ 690      206C6F6E 
+ 690      6720696E 
+ 690      7400
+ 691              	.LASF13:
+ 692 020f 63686172 		.ascii	"char\000"
+ 692      00
+ 693              	.LASF34:
+ 694 0214 4F6E5469 		.ascii	"OnTimeCounter_backup\000"
+ 694      6D65436F 
+ 694      756E7465 
+ 694      725F6261 
+ 694      636B7570 
+ 695              	.LASF27:
+ 696 0229 4F6E5469 		.ascii	"OnTimeCounter_WriteCounter\000"
+ 696      6D65436F 
+ 696      756E7465 
+ 696      725F5772 
+ 696      69746543 
+ 697              	.LASF2:
+ 698 0244 73686F72 		.ascii	"short int\000"
+ 698      7420696E 
+ 698      7400
+ 699              	.LASF26:
+ 700 024e 4F6E5469 		.ascii	"OnTimeCounter_ReadControlRegister\000"
+ 700      6D65436F 
+ 700      756E7465 
+ 700      725F5265 
+ 700      6164436F 
+ 701              	.LASF33:
+ 702 0270 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 702      73657273 
+ 702      5C636865 
+ 702      6D695C55 
+ 702      44335F51 
+ 703              	.LASF4:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccigg5rZ.s 			page 18
+
+
+ 704 0295 6C6F6E67 		.ascii	"long int\000"
+ 704      20696E74 
+ 704      00
+ 705              	.LASF24:
+ 706 029e 4F6E5469 		.ascii	"OnTimeCounter_Wakeup\000"
+ 706      6D65436F 
+ 706      756E7465 
+ 706      725F5761 
+ 706      6B657570 
+ 707              	.LASF22:
+ 708 02b3 4F6E5469 		.ascii	"OnTimeCounter_RestoreConfig\000"
+ 708      6D65436F 
+ 708      756E7465 
+ 708      725F5265 
+ 708      73746F72 
+ 709              	.LASF0:
+ 710 02cf 7369676E 		.ascii	"signed char\000"
+ 710      65642063 
+ 710      68617200 
+ 711              	.LASF20:
+ 712 02db 4F6E5469 		.ascii	"OnTimeCounter_backupStruct\000"
+ 712      6D65436F 
+ 712      756E7465 
+ 712      725F6261 
+ 712      636B7570 
+ 713              	.LASF19:
+ 714 02f6 54696D65 		.ascii	"TimerControlRegister\000"
+ 714      72436F6E 
+ 714      74726F6C 
+ 714      52656769 
+ 714      73746572 
+ 715              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

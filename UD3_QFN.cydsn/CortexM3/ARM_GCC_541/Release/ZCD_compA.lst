@@ -1,0 +1,2502 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"ZCD_compA.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.ZCD_compA_trimAdjust,"ax",%progbits
+  20              		.align	1
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	ZCD_compA_trimAdjust, %function
+  24              	ZCD_compA_trimAdjust:
+  25              	.LFB6:
+  26              		.file 1 "Generated_Source\\PSoC5\\ZCD_compA.c"
+   1:Generated_Source\PSoC5/ZCD_compA.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/ZCD_compA.c **** * File Name: ZCD_compA.c
+   3:Generated_Source\PSoC5/ZCD_compA.c **** * Version 2.0
+   4:Generated_Source\PSoC5/ZCD_compA.c **** *
+   5:Generated_Source\PSoC5/ZCD_compA.c **** * Description:
+   6:Generated_Source\PSoC5/ZCD_compA.c **** *  This file provides the source code to the API for the Comparator component
+   7:Generated_Source\PSoC5/ZCD_compA.c **** *
+   8:Generated_Source\PSoC5/ZCD_compA.c **** * Note:
+   9:Generated_Source\PSoC5/ZCD_compA.c **** *  None
+  10:Generated_Source\PSoC5/ZCD_compA.c **** *
+  11:Generated_Source\PSoC5/ZCD_compA.c **** ********************************************************************************
+  12:Generated_Source\PSoC5/ZCD_compA.c **** * Copyright 2008-2012, Cypress Semiconductor Corporation.  All rights reserved.
+  13:Generated_Source\PSoC5/ZCD_compA.c **** * You may use this file only in accordance with the license, terms, conditions, 
+  14:Generated_Source\PSoC5/ZCD_compA.c **** * disclaimers, and limitations in the end user license agreement accompanying 
+  15:Generated_Source\PSoC5/ZCD_compA.c **** * the software package with which this file was provided.
+  16:Generated_Source\PSoC5/ZCD_compA.c **** *******************************************************************************/
+  17:Generated_Source\PSoC5/ZCD_compA.c **** 
+  18:Generated_Source\PSoC5/ZCD_compA.c **** #include "ZCD_compA.h"
+  19:Generated_Source\PSoC5/ZCD_compA.c **** 
+  20:Generated_Source\PSoC5/ZCD_compA.c **** uint8 ZCD_compA_initVar = 0u;
+  21:Generated_Source\PSoC5/ZCD_compA.c **** 
+  22:Generated_Source\PSoC5/ZCD_compA.c **** /* Internal functions definitoin */
+  23:Generated_Source\PSoC5/ZCD_compA.c **** static void ZCD_compA_trimAdjust(uint8 nibble) ;
+  24:Generated_Source\PSoC5/ZCD_compA.c **** 
+  25:Generated_Source\PSoC5/ZCD_compA.c **** /* static ZCD_compA_backupStruct  ZCD_compA_backup; */
+  26:Generated_Source\PSoC5/ZCD_compA.c **** #if (CY_PSOC5A)
+  27:Generated_Source\PSoC5/ZCD_compA.c ****     static ZCD_compA_LOWPOWER_BACKUP_STRUCT  ZCD_compA_lowPowerBackup;
+  28:Generated_Source\PSoC5/ZCD_compA.c **** #endif /* CY_PSOC5A */
+  29:Generated_Source\PSoC5/ZCD_compA.c **** 
+  30:Generated_Source\PSoC5/ZCD_compA.c **** /* variable to decide whether or not to restore the control register in 
+  31:Generated_Source\PSoC5/ZCD_compA.c ****    Enable() API for PSoC5A only */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 2
+
+
+  32:Generated_Source\PSoC5/ZCD_compA.c **** #if (CY_PSOC5A)
+  33:Generated_Source\PSoC5/ZCD_compA.c ****     static uint8 ZCD_compA_restoreReg = 0u;
+  34:Generated_Source\PSoC5/ZCD_compA.c **** #endif /* CY_PSOC5A */
+  35:Generated_Source\PSoC5/ZCD_compA.c **** 
+  36:Generated_Source\PSoC5/ZCD_compA.c **** 
+  37:Generated_Source\PSoC5/ZCD_compA.c **** /*******************************************************************************
+  38:Generated_Source\PSoC5/ZCD_compA.c **** * Function Name: ZCD_compA_Init
+  39:Generated_Source\PSoC5/ZCD_compA.c **** ********************************************************************************
+  40:Generated_Source\PSoC5/ZCD_compA.c **** *
+  41:Generated_Source\PSoC5/ZCD_compA.c **** * Summary:
+  42:Generated_Source\PSoC5/ZCD_compA.c **** *  Initialize to the schematic state
+  43:Generated_Source\PSoC5/ZCD_compA.c **** * 
+  44:Generated_Source\PSoC5/ZCD_compA.c **** * Parameters:
+  45:Generated_Source\PSoC5/ZCD_compA.c **** *  void
+  46:Generated_Source\PSoC5/ZCD_compA.c **** *
+  47:Generated_Source\PSoC5/ZCD_compA.c **** * Return:
+  48:Generated_Source\PSoC5/ZCD_compA.c **** *  void
+  49:Generated_Source\PSoC5/ZCD_compA.c **** *
+  50:Generated_Source\PSoC5/ZCD_compA.c **** *******************************************************************************/
+  51:Generated_Source\PSoC5/ZCD_compA.c **** void ZCD_compA_Init(void) 
+  52:Generated_Source\PSoC5/ZCD_compA.c **** {
+  53:Generated_Source\PSoC5/ZCD_compA.c ****     /* Set default speed/power */
+  54:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_SetSpeed(ZCD_compA_DEFAULT_SPEED);
+  55:Generated_Source\PSoC5/ZCD_compA.c **** 
+  56:Generated_Source\PSoC5/ZCD_compA.c ****     /* Set default Hysteresis */
+  57:Generated_Source\PSoC5/ZCD_compA.c ****     #if ( ZCD_compA_DEFAULT_HYSTERESIS == 0u )
+  58:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_CR |= ZCD_compA_HYST_OFF;
+  59:Generated_Source\PSoC5/ZCD_compA.c ****     #else
+  60:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_CR &= (uint8)(~ZCD_compA_HYST_OFF);
+  61:Generated_Source\PSoC5/ZCD_compA.c ****     #endif /* ZCD_compA_DEFAULT_HYSTERESIS == 0u */
+  62:Generated_Source\PSoC5/ZCD_compA.c ****     /* Power down override feature is not supported for PSoC5A. */
+  63:Generated_Source\PSoC5/ZCD_compA.c ****     #if (CY_PSOC3 || CY_PSOC5LP)
+  64:Generated_Source\PSoC5/ZCD_compA.c ****         /* Set default Power Down Override */
+  65:Generated_Source\PSoC5/ZCD_compA.c ****         #if ( ZCD_compA_DEFAULT_PWRDWN_OVRD == 0u )
+  66:Generated_Source\PSoC5/ZCD_compA.c ****             ZCD_compA_CR &= (uint8)(~ZCD_compA_PWRDWN_OVRD);
+  67:Generated_Source\PSoC5/ZCD_compA.c ****         #else 
+  68:Generated_Source\PSoC5/ZCD_compA.c ****             ZCD_compA_CR |= ZCD_compA_PWRDWN_OVRD;
+  69:Generated_Source\PSoC5/ZCD_compA.c ****         #endif /* ZCD_compA_DEFAULT_PWRDWN_OVRD == 0u */
+  70:Generated_Source\PSoC5/ZCD_compA.c ****     #endif /* CY_PSOC3 || CY_PSOC5LP */
+  71:Generated_Source\PSoC5/ZCD_compA.c ****     
+  72:Generated_Source\PSoC5/ZCD_compA.c ****     /* Set mux always on logic */
+  73:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_CR |= ZCD_compA_MX_AO;
+  74:Generated_Source\PSoC5/ZCD_compA.c **** 
+  75:Generated_Source\PSoC5/ZCD_compA.c ****     /* Set default sync */
+  76:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_CLK &= (uint8)(~ZCD_compA_SYNCCLK_MASK);
+  77:Generated_Source\PSoC5/ZCD_compA.c ****     #if ( ZCD_compA_DEFAULT_BYPASS_SYNC == 0u )
+  78:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_CLK |= ZCD_compA_SYNC_CLK_EN;
+  79:Generated_Source\PSoC5/ZCD_compA.c ****     #else
+  80:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_CLK |= ZCD_compA_BYPASS_SYNC;
+  81:Generated_Source\PSoC5/ZCD_compA.c ****     #endif /* ZCD_compA_DEFAULT_BYPASS_SYNC == 0u */
+  82:Generated_Source\PSoC5/ZCD_compA.c **** }
+  83:Generated_Source\PSoC5/ZCD_compA.c **** 
+  84:Generated_Source\PSoC5/ZCD_compA.c **** 
+  85:Generated_Source\PSoC5/ZCD_compA.c **** /*******************************************************************************
+  86:Generated_Source\PSoC5/ZCD_compA.c **** * Function Name: ZCD_compA_Enable
+  87:Generated_Source\PSoC5/ZCD_compA.c **** ********************************************************************************
+  88:Generated_Source\PSoC5/ZCD_compA.c **** *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 3
+
+
+  89:Generated_Source\PSoC5/ZCD_compA.c **** * Summary:
+  90:Generated_Source\PSoC5/ZCD_compA.c **** *  Enable the Comparator
+  91:Generated_Source\PSoC5/ZCD_compA.c **** * 
+  92:Generated_Source\PSoC5/ZCD_compA.c **** * Parameters:
+  93:Generated_Source\PSoC5/ZCD_compA.c **** *  void
+  94:Generated_Source\PSoC5/ZCD_compA.c **** *
+  95:Generated_Source\PSoC5/ZCD_compA.c **** * Return:
+  96:Generated_Source\PSoC5/ZCD_compA.c **** *  void
+  97:Generated_Source\PSoC5/ZCD_compA.c **** *
+  98:Generated_Source\PSoC5/ZCD_compA.c **** *******************************************************************************/
+  99:Generated_Source\PSoC5/ZCD_compA.c **** void ZCD_compA_Enable(void) 
+ 100:Generated_Source\PSoC5/ZCD_compA.c **** {
+ 101:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_PWRMGR |= ZCD_compA_ACT_PWR_EN;
+ 102:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_STBY_PWRMGR |= ZCD_compA_STBY_PWR_EN;
+ 103:Generated_Source\PSoC5/ZCD_compA.c ****      
+ 104:Generated_Source\PSoC5/ZCD_compA.c ****      /* This is to restore the value of register CR which is saved 
+ 105:Generated_Source\PSoC5/ZCD_compA.c ****     in prior to the modification in stop() API */
+ 106:Generated_Source\PSoC5/ZCD_compA.c ****     #if (CY_PSOC5A)
+ 107:Generated_Source\PSoC5/ZCD_compA.c ****         if(ZCD_compA_restoreReg == 1u)
+ 108:Generated_Source\PSoC5/ZCD_compA.c ****         {
+ 109:Generated_Source\PSoC5/ZCD_compA.c ****             ZCD_compA_CR = ZCD_compA_lowPowerBackup.compCRReg;
+ 110:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 111:Generated_Source\PSoC5/ZCD_compA.c ****             /* Clear the flag */
+ 112:Generated_Source\PSoC5/ZCD_compA.c ****             ZCD_compA_restoreReg = 0u;
+ 113:Generated_Source\PSoC5/ZCD_compA.c ****         }
+ 114:Generated_Source\PSoC5/ZCD_compA.c ****     #endif /* CY_PSOC5A */
+ 115:Generated_Source\PSoC5/ZCD_compA.c **** }
+ 116:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 117:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 118:Generated_Source\PSoC5/ZCD_compA.c **** /*******************************************************************************
+ 119:Generated_Source\PSoC5/ZCD_compA.c **** * Function Name: ZCD_compA_Start
+ 120:Generated_Source\PSoC5/ZCD_compA.c **** ********************************************************************************
+ 121:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 122:Generated_Source\PSoC5/ZCD_compA.c **** * Summary:
+ 123:Generated_Source\PSoC5/ZCD_compA.c **** *  The start function initializes the Analog Comparator with the default values.
+ 124:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 125:Generated_Source\PSoC5/ZCD_compA.c **** * Parameters:
+ 126:Generated_Source\PSoC5/ZCD_compA.c **** *  void
+ 127:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 128:Generated_Source\PSoC5/ZCD_compA.c **** * Return:
+ 129:Generated_Source\PSoC5/ZCD_compA.c **** *  void 
+ 130:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 131:Generated_Source\PSoC5/ZCD_compA.c **** * Global variables:
+ 132:Generated_Source\PSoC5/ZCD_compA.c **** *  ZCD_compA_initVar: Is modified when this function is called for the 
+ 133:Generated_Source\PSoC5/ZCD_compA.c **** *   first time. Is used to ensure that initialization happens only once.
+ 134:Generated_Source\PSoC5/ZCD_compA.c **** *  
+ 135:Generated_Source\PSoC5/ZCD_compA.c **** *******************************************************************************/
+ 136:Generated_Source\PSoC5/ZCD_compA.c **** void ZCD_compA_Start(void) 
+ 137:Generated_Source\PSoC5/ZCD_compA.c **** {
+ 138:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 139:Generated_Source\PSoC5/ZCD_compA.c ****     if ( ZCD_compA_initVar == 0u )
+ 140:Generated_Source\PSoC5/ZCD_compA.c ****     {
+ 141:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_Init();
+ 142:Generated_Source\PSoC5/ZCD_compA.c ****         
+ 143:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_initVar = 1u;
+ 144:Generated_Source\PSoC5/ZCD_compA.c ****     }   
+ 145:Generated_Source\PSoC5/ZCD_compA.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 4
+
+
+ 146:Generated_Source\PSoC5/ZCD_compA.c ****     /* Enable power to comparator */
+ 147:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_Enable();    
+ 148:Generated_Source\PSoC5/ZCD_compA.c **** }
+ 149:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 150:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 151:Generated_Source\PSoC5/ZCD_compA.c **** /*******************************************************************************
+ 152:Generated_Source\PSoC5/ZCD_compA.c **** * Function Name: ZCD_compA_Stop
+ 153:Generated_Source\PSoC5/ZCD_compA.c **** ********************************************************************************
+ 154:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 155:Generated_Source\PSoC5/ZCD_compA.c **** * Summary:
+ 156:Generated_Source\PSoC5/ZCD_compA.c **** *  Powers down amplifier to lowest power state.
+ 157:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 158:Generated_Source\PSoC5/ZCD_compA.c **** * Parameters:
+ 159:Generated_Source\PSoC5/ZCD_compA.c **** *  void
+ 160:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 161:Generated_Source\PSoC5/ZCD_compA.c **** * Return:
+ 162:Generated_Source\PSoC5/ZCD_compA.c **** *  void
+ 163:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 164:Generated_Source\PSoC5/ZCD_compA.c **** *******************************************************************************/
+ 165:Generated_Source\PSoC5/ZCD_compA.c **** void ZCD_compA_Stop(void) 
+ 166:Generated_Source\PSoC5/ZCD_compA.c **** {
+ 167:Generated_Source\PSoC5/ZCD_compA.c ****     /* Disable power to comparator */
+ 168:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_PWRMGR &= (uint8)(~ZCD_compA_ACT_PWR_EN);
+ 169:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_STBY_PWRMGR &= (uint8)(~ZCD_compA_STBY_PWR_EN);
+ 170:Generated_Source\PSoC5/ZCD_compA.c ****     
+ 171:Generated_Source\PSoC5/ZCD_compA.c ****     #if (CY_PSOC5A)
+ 172:Generated_Source\PSoC5/ZCD_compA.c ****         /* Enable the variable */
+ 173:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_restoreReg = 1u;
+ 174:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 175:Generated_Source\PSoC5/ZCD_compA.c ****         /* Save the control register before clearing it */
+ 176:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_lowPowerBackup.compCRReg = ZCD_compA_CR;
+ 177:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_CR = ZCD_compA_COMP_REG_CLR;
+ 178:Generated_Source\PSoC5/ZCD_compA.c ****     #endif /* CY_PSOC5A */
+ 179:Generated_Source\PSoC5/ZCD_compA.c **** }
+ 180:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 181:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 182:Generated_Source\PSoC5/ZCD_compA.c **** /*******************************************************************************
+ 183:Generated_Source\PSoC5/ZCD_compA.c **** * Function Name: ZCD_compA_SetSpeed
+ 184:Generated_Source\PSoC5/ZCD_compA.c **** ********************************************************************************
+ 185:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 186:Generated_Source\PSoC5/ZCD_compA.c **** * Summary:
+ 187:Generated_Source\PSoC5/ZCD_compA.c **** *  This function sets the speed of the Analog Comparator. The faster the speed
+ 188:Generated_Source\PSoC5/ZCD_compA.c **** *  the more power that is used.
+ 189:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 190:Generated_Source\PSoC5/ZCD_compA.c **** * Parameters:
+ 191:Generated_Source\PSoC5/ZCD_compA.c **** *  speed: (uint8) Sets operation mode of Comparator
+ 192:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 193:Generated_Source\PSoC5/ZCD_compA.c **** * Return:
+ 194:Generated_Source\PSoC5/ZCD_compA.c **** *  void
+ 195:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 196:Generated_Source\PSoC5/ZCD_compA.c **** *******************************************************************************/
+ 197:Generated_Source\PSoC5/ZCD_compA.c **** void ZCD_compA_SetSpeed(uint8 speed) 
+ 198:Generated_Source\PSoC5/ZCD_compA.c **** {
+ 199:Generated_Source\PSoC5/ZCD_compA.c ****     /* Clear and Set power level */    
+ 200:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_CR = (ZCD_compA_CR & (uint8)(~ZCD_compA_PWR_MODE_MASK)) |
+ 201:Generated_Source\PSoC5/ZCD_compA.c ****                            (speed & ZCD_compA_PWR_MODE_MASK);
+ 202:Generated_Source\PSoC5/ZCD_compA.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 5
+
+
+ 203:Generated_Source\PSoC5/ZCD_compA.c ****     /* Set trim value for high speed comparator */
+ 204:Generated_Source\PSoC5/ZCD_compA.c ****     if(speed == ZCD_compA_HIGHSPEED)
+ 205:Generated_Source\PSoC5/ZCD_compA.c ****     {
+ 206:Generated_Source\PSoC5/ZCD_compA.c ****         /* PSoC5A */
+ 207:Generated_Source\PSoC5/ZCD_compA.c ****         #if (CY_PSOC5A)
+ 208:Generated_Source\PSoC5/ZCD_compA.c ****             ZCD_compA_TR = ZCD_compA_HS_TRIM_TR0;
+ 209:Generated_Source\PSoC5/ZCD_compA.c ****         #endif /* CY_PSOC5A */
+ 210:Generated_Source\PSoC5/ZCD_compA.c ****         
+ 211:Generated_Source\PSoC5/ZCD_compA.c ****         /* PSoC3, PSoC5LP or later */
+ 212:Generated_Source\PSoC5/ZCD_compA.c ****         #if (CY_PSOC3 || CY_PSOC5LP) 
+ 213:Generated_Source\PSoC5/ZCD_compA.c ****             ZCD_compA_TR0 = ZCD_compA_HS_TRIM_TR0;
+ 214:Generated_Source\PSoC5/ZCD_compA.c ****             ZCD_compA_TR1 = ZCD_compA_HS_TRIM_TR1;
+ 215:Generated_Source\PSoC5/ZCD_compA.c ****         #endif /* CY_PSOC3 || CY_PSOC5LP */
+ 216:Generated_Source\PSoC5/ZCD_compA.c ****     }
+ 217:Generated_Source\PSoC5/ZCD_compA.c ****     else
+ 218:Generated_Source\PSoC5/ZCD_compA.c ****     {
+ 219:Generated_Source\PSoC5/ZCD_compA.c ****     /* PSoC5A */
+ 220:Generated_Source\PSoC5/ZCD_compA.c ****         #if (CY_PSOC5A)
+ 221:Generated_Source\PSoC5/ZCD_compA.c ****             ZCD_compA_TR = ZCD_compA_LS_TRIM_TR0;
+ 222:Generated_Source\PSoC5/ZCD_compA.c ****         #endif /* CY_PSOC5A */
+ 223:Generated_Source\PSoC5/ZCD_compA.c ****         
+ 224:Generated_Source\PSoC5/ZCD_compA.c ****         /* PSoC3, PSoC5LP or later */
+ 225:Generated_Source\PSoC5/ZCD_compA.c ****         #if (CY_PSOC3 || CY_PSOC5LP) 
+ 226:Generated_Source\PSoC5/ZCD_compA.c ****             ZCD_compA_TR0 = ZCD_compA_LS_TRIM_TR0;
+ 227:Generated_Source\PSoC5/ZCD_compA.c ****             ZCD_compA_TR1 = ZCD_compA_LS_TRIM_TR1;
+ 228:Generated_Source\PSoC5/ZCD_compA.c ****         #endif /* CY_PSOC3 || CY_PSOC5LP */
+ 229:Generated_Source\PSoC5/ZCD_compA.c ****     }
+ 230:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 231:Generated_Source\PSoC5/ZCD_compA.c **** }
+ 232:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 233:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 234:Generated_Source\PSoC5/ZCD_compA.c **** /*******************************************************************************
+ 235:Generated_Source\PSoC5/ZCD_compA.c **** * Function Name: ZCD_compA_GetCompare
+ 236:Generated_Source\PSoC5/ZCD_compA.c **** ********************************************************************************
+ 237:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 238:Generated_Source\PSoC5/ZCD_compA.c **** * Summary:
+ 239:Generated_Source\PSoC5/ZCD_compA.c **** *  This function returns the comparator output value.
+ 240:Generated_Source\PSoC5/ZCD_compA.c **** *  This value is not affected by the Polarity parameter.
+ 241:Generated_Source\PSoC5/ZCD_compA.c **** *  This valuea lways reflects a noninverted state.
+ 242:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 243:Generated_Source\PSoC5/ZCD_compA.c **** * Parameters:
+ 244:Generated_Source\PSoC5/ZCD_compA.c **** *   None
+ 245:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 246:Generated_Source\PSoC5/ZCD_compA.c **** * Return:
+ 247:Generated_Source\PSoC5/ZCD_compA.c **** *  (uint8)  0     - if Pos_Input less than Neg_input
+ 248:Generated_Source\PSoC5/ZCD_compA.c **** *           non 0 - if Pos_Input greater than Neg_input.
+ 249:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 250:Generated_Source\PSoC5/ZCD_compA.c **** *******************************************************************************/
+ 251:Generated_Source\PSoC5/ZCD_compA.c **** uint8 ZCD_compA_GetCompare(void) 
+ 252:Generated_Source\PSoC5/ZCD_compA.c **** {
+ 253:Generated_Source\PSoC5/ZCD_compA.c ****     return( ZCD_compA_WRK & ZCD_compA_CMP_OUT_MASK);
+ 254:Generated_Source\PSoC5/ZCD_compA.c **** }
+ 255:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 256:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 257:Generated_Source\PSoC5/ZCD_compA.c **** /*******************************************************************************
+ 258:Generated_Source\PSoC5/ZCD_compA.c **** * Function Name: ZCD_compA_trimAdjust
+ 259:Generated_Source\PSoC5/ZCD_compA.c **** ********************************************************************************
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 6
+
+
+ 260:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 261:Generated_Source\PSoC5/ZCD_compA.c **** * Summary:
+ 262:Generated_Source\PSoC5/ZCD_compA.c **** *  This function adjusts the value in the low nibble/high nibble of the Analog 
+ 263:Generated_Source\PSoC5/ZCD_compA.c **** *  Comparator trim register
+ 264:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 265:Generated_Source\PSoC5/ZCD_compA.c **** * Parameters:  
+ 266:Generated_Source\PSoC5/ZCD_compA.c **** *  nibble:
+ 267:Generated_Source\PSoC5/ZCD_compA.c **** *      0 -- adjusts the value in the low nibble
+ 268:Generated_Source\PSoC5/ZCD_compA.c **** *      1 -- adjusts the value in the high nibble
+ 269:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 270:Generated_Source\PSoC5/ZCD_compA.c **** * Return:
+ 271:Generated_Source\PSoC5/ZCD_compA.c **** *  None
+ 272:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 273:Generated_Source\PSoC5/ZCD_compA.c **** * Theory: 
+ 274:Generated_Source\PSoC5/ZCD_compA.c **** *  Function assumes comparator block is setup for trim adjust.
+ 275:Generated_Source\PSoC5/ZCD_compA.c **** *  Intended to be called from Comp_ZeroCal()
+ 276:Generated_Source\PSoC5/ZCD_compA.c **** * 
+ 277:Generated_Source\PSoC5/ZCD_compA.c **** * Side Effects:
+ 278:Generated_Source\PSoC5/ZCD_compA.c **** *  Routine uses a course 1ms delay following each trim adjustment to allow 
+ 279:Generated_Source\PSoC5/ZCD_compA.c **** *  the comparator output to respond.
+ 280:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 281:Generated_Source\PSoC5/ZCD_compA.c **** *******************************************************************************/
+ 282:Generated_Source\PSoC5/ZCD_compA.c **** static void ZCD_compA_trimAdjust(uint8 nibble) 
+ 283:Generated_Source\PSoC5/ZCD_compA.c **** {
+  27              		.loc 1 283 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              	.LVL0:
+  32 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+  33              		.cfi_def_cfa_offset 32
+  34              		.cfi_offset 4, -32
+  35              		.cfi_offset 5, -28
+  36              		.cfi_offset 6, -24
+  37              		.cfi_offset 7, -20
+  38              		.cfi_offset 8, -16
+  39              		.cfi_offset 9, -12
+  40              		.cfi_offset 10, -8
+  41              		.cfi_offset 14, -4
+ 284:Generated_Source\PSoC5/ZCD_compA.c ****     uint8 trimCnt, trimCntMax;
+ 285:Generated_Source\PSoC5/ZCD_compA.c ****     uint8 cmpState;   
+ 286:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 287:Generated_Source\PSoC5/ZCD_compA.c ****     /* get current state of comparator output */
+ 288:Generated_Source\PSoC5/ZCD_compA.c ****     cmpState = ZCD_compA_WRK & ZCD_compA_CMP_OUT_MASK;
+  42              		.loc 1 288 0
+  43 0004 1D4D     		ldr	r5, .L15
+ 289:Generated_Source\PSoC5/ZCD_compA.c ****     
+ 290:Generated_Source\PSoC5/ZCD_compA.c ****     if (nibble == 0u)
+  44              		.loc 1 290 0
+  45 0006 8046     		mov	r8, r0
+ 288:Generated_Source\PSoC5/ZCD_compA.c ****     
+  46              		.loc 1 288 0
+  47 0008 2C78     		ldrb	r4, [r5]	@ zero_extendqisi2
+  48 000a 04F00104 		and	r4, r4, #1
+  49              	.LVL1:
+  50              		.loc 1 290 0
+  51 000e 30B9     		cbnz	r0, .L2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 7
+
+
+ 291:Generated_Source\PSoC5/ZCD_compA.c ****     {    
+ 292:Generated_Source\PSoC5/ZCD_compA.c ****         /* if comparator output is high, negative offset adjust is required */
+ 293:Generated_Source\PSoC5/ZCD_compA.c ****         if ( cmpState != 0u )
+  52              		.loc 1 293 0
+  53 0010 7CB3     		cbz	r4, .L3
+ 294:Generated_Source\PSoC5/ZCD_compA.c ****         {
+ 295:Generated_Source\PSoC5/ZCD_compA.c ****             /* PSoC5A */
+ 296:Generated_Source\PSoC5/ZCD_compA.c ****             #if (CY_PSOC5A)
+ 297:Generated_Source\PSoC5/ZCD_compA.c ****                 ZCD_compA_TR |= ZCD_compA_CMP_TRIM1_DIR;
+ 298:Generated_Source\PSoC5/ZCD_compA.c ****             #endif /* CY_PSOC5A */
+ 299:Generated_Source\PSoC5/ZCD_compA.c ****             
+ 300:Generated_Source\PSoC5/ZCD_compA.c ****             /* PSoC3, PSoC5LP or later */
+ 301:Generated_Source\PSoC5/ZCD_compA.c ****             #if (CY_PSOC3 || CY_PSOC5LP)
+ 302:Generated_Source\PSoC5/ZCD_compA.c ****                 ZCD_compA_TR0 |= ZCD_compA_CMP_TR0_DIR;
+  54              		.loc 1 302 0
+  55 0012 1B4A     		ldr	r2, .L15+4
+  56 0014 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  57 0016 43F01003 		orr	r3, r3, #16
+  58 001a 1370     		strb	r3, [r2]
+  59 001c 29E0     		b	.L3
+  60              	.L2:
+ 303:Generated_Source\PSoC5/ZCD_compA.c ****             #endif /* CY_PSOC3 || CY_PSOC5LP */
+ 304:Generated_Source\PSoC5/ZCD_compA.c ****         }
+ 305:Generated_Source\PSoC5/ZCD_compA.c ****     }
+ 306:Generated_Source\PSoC5/ZCD_compA.c ****     else
+ 307:Generated_Source\PSoC5/ZCD_compA.c ****     {
+ 308:Generated_Source\PSoC5/ZCD_compA.c ****         /* if comparator output is low, positive offset adjust is required */
+ 309:Generated_Source\PSoC5/ZCD_compA.c ****         if ( cmpState == 0u )
+  61              		.loc 1 309 0
+  62 001e 24B9     		cbnz	r4, .L4
+ 310:Generated_Source\PSoC5/ZCD_compA.c ****         {
+ 311:Generated_Source\PSoC5/ZCD_compA.c ****             /* PSoC5A */
+ 312:Generated_Source\PSoC5/ZCD_compA.c ****             #if (CY_PSOC5A)
+ 313:Generated_Source\PSoC5/ZCD_compA.c ****                 ZCD_compA_TR |= ZCD_compA_CMP_TRIM2_DIR; 
+ 314:Generated_Source\PSoC5/ZCD_compA.c ****             #endif /* CY_PSOC5A */
+ 315:Generated_Source\PSoC5/ZCD_compA.c ****             
+ 316:Generated_Source\PSoC5/ZCD_compA.c ****             /* PSoC3, PSoC5LP or later */
+ 317:Generated_Source\PSoC5/ZCD_compA.c ****             #if (CY_PSOC3 || CY_PSOC5LP)
+ 318:Generated_Source\PSoC5/ZCD_compA.c ****                 ZCD_compA_TR1 |= ZCD_compA_CMP_TR1_DIR;
+  63              		.loc 1 318 0
+  64 0020 184A     		ldr	r2, .L15+8
+  65 0022 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  66 0024 43F01003 		orr	r3, r3, #16
+  67 0028 1370     		strb	r3, [r2]
+  68              	.L4:
+ 319:Generated_Source\PSoC5/ZCD_compA.c ****             #endif /* CY_PSOC3 || CY_PSOC5LP */
+ 320:Generated_Source\PSoC5/ZCD_compA.c ****         }
+ 321:Generated_Source\PSoC5/ZCD_compA.c ****     }
+ 322:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 323:Generated_Source\PSoC5/ZCD_compA.c ****     /* Increment trim value until compare output changes state */
+ 324:Generated_Source\PSoC5/ZCD_compA.c **** 	
+ 325:Generated_Source\PSoC5/ZCD_compA.c ****     /* PSoC5A */
+ 326:Generated_Source\PSoC5/ZCD_compA.c **** 	#if (CY_PSOC5A)
+ 327:Generated_Source\PSoC5/ZCD_compA.c **** 	    trimCntMax = 7u;
+ 328:Generated_Source\PSoC5/ZCD_compA.c ****     #endif
+ 329:Generated_Source\PSoC5/ZCD_compA.c **** 	
+ 330:Generated_Source\PSoC5/ZCD_compA.c **** 	/* PSoC3, PSoC5LP or later */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 8
+
+
+ 331:Generated_Source\PSoC5/ZCD_compA.c **** 	#if (CY_PSOC3 || CY_PSOC5LP)
+ 332:Generated_Source\PSoC5/ZCD_compA.c ****     	if(nibble == 0u)
+ 333:Generated_Source\PSoC5/ZCD_compA.c ****     	{
+ 334:Generated_Source\PSoC5/ZCD_compA.c ****     		trimCntMax = 15u;
+ 335:Generated_Source\PSoC5/ZCD_compA.c ****     	}
+ 336:Generated_Source\PSoC5/ZCD_compA.c ****     	else
+ 337:Generated_Source\PSoC5/ZCD_compA.c ****     	{
+ 338:Generated_Source\PSoC5/ZCD_compA.c ****     		trimCntMax = 7u;
+  69              		.loc 1 338 0
+  70 002a 0727     		movs	r7, #7
+  71              	.L9:
+  72              	.LVL2:
+ 339:Generated_Source\PSoC5/ZCD_compA.c ****     	}
+ 340:Generated_Source\PSoC5/ZCD_compA.c **** 	#endif
+ 341:Generated_Source\PSoC5/ZCD_compA.c **** 	
+ 342:Generated_Source\PSoC5/ZCD_compA.c ****     for ( trimCnt = 0u; trimCnt < trimCntMax; trimCnt++ )
+ 343:Generated_Source\PSoC5/ZCD_compA.c **** 	{
+ 344:Generated_Source\PSoC5/ZCD_compA.c ****         if (nibble == 0u)
+ 345:Generated_Source\PSoC5/ZCD_compA.c ****         {
+ 346:Generated_Source\PSoC5/ZCD_compA.c ****             /* PSoC5A */
+ 347:Generated_Source\PSoC5/ZCD_compA.c ****             #if (CY_PSOC5A)
+ 348:Generated_Source\PSoC5/ZCD_compA.c ****                 ZCD_compA_TR += 1u;
+ 349:Generated_Source\PSoC5/ZCD_compA.c ****             #endif /* CY_PSOC5A */
+ 350:Generated_Source\PSoC5/ZCD_compA.c ****             
+ 351:Generated_Source\PSoC5/ZCD_compA.c ****             /* PSoC3, PSoC5LP or later */
+ 352:Generated_Source\PSoC5/ZCD_compA.c ****             #if (CY_PSOC3 || CY_PSOC5LP)
+ 353:Generated_Source\PSoC5/ZCD_compA.c ****                 ZCD_compA_TR0 += 1u;
+ 354:Generated_Source\PSoC5/ZCD_compA.c ****             #endif /* CY_PSOC3 || CY_PSOC5LP */
+ 355:Generated_Source\PSoC5/ZCD_compA.c ****         }
+ 356:Generated_Source\PSoC5/ZCD_compA.c ****         else
+ 357:Generated_Source\PSoC5/ZCD_compA.c ****         {
+ 358:Generated_Source\PSoC5/ZCD_compA.c ****             /* PSoC5A */
+ 359:Generated_Source\PSoC5/ZCD_compA.c ****             #if (CY_PSOC5A)
+ 360:Generated_Source\PSoC5/ZCD_compA.c ****                 ZCD_compA_TR += 0x10u;
+ 361:Generated_Source\PSoC5/ZCD_compA.c ****             #endif /* CY_PSOC5A */
+ 362:Generated_Source\PSoC5/ZCD_compA.c ****             
+ 363:Generated_Source\PSoC5/ZCD_compA.c ****             /* PSoC3, PSoC5LP or later */
+ 364:Generated_Source\PSoC5/ZCD_compA.c ****             #if (CY_PSOC3 || CY_PSOC5LP)
+ 365:Generated_Source\PSoC5/ZCD_compA.c ****                 ZCD_compA_TR1 += 1u;
+  73              		.loc 1 365 0
+  74 002c DFF85490 		ldr	r9, .L15+8
+ 353:Generated_Source\PSoC5/ZCD_compA.c ****             #endif /* CY_PSOC3 || CY_PSOC5LP */
+  75              		.loc 1 353 0
+  76 0030 DFF84CA0 		ldr	r10, .L15+4
+ 338:Generated_Source\PSoC5/ZCD_compA.c ****     	}
+  77              		.loc 1 338 0
+  78 0034 0026     		movs	r6, #0
+  79              	.LVL3:
+  80              	.L8:
+ 344:Generated_Source\PSoC5/ZCD_compA.c ****         {
+  81              		.loc 1 344 0
+  82 0036 B8F1000F 		cmp	r8, #0
+  83 003a 06D1     		bne	.L5
+ 353:Generated_Source\PSoC5/ZCD_compA.c ****             #endif /* CY_PSOC3 || CY_PSOC5LP */
+  84              		.loc 1 353 0
+  85 003c 9AF80030 		ldrb	r3, [r10]	@ zero_extendqisi2
+  86 0040 0133     		adds	r3, r3, #1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 9
+
+
+  87 0042 DBB2     		uxtb	r3, r3
+  88 0044 8AF80030 		strb	r3, [r10]
+  89 0048 05E0     		b	.L6
+  90              	.L5:
+  91              		.loc 1 365 0
+  92 004a 99F80030 		ldrb	r3, [r9]	@ zero_extendqisi2
+  93 004e 0133     		adds	r3, r3, #1
+  94 0050 DBB2     		uxtb	r3, r3
+  95 0052 89F80030 		strb	r3, [r9]
+  96              	.L6:
+ 366:Generated_Source\PSoC5/ZCD_compA.c ****             #endif /* CY_PSOC3 || CY_PSOC5LP */
+ 367:Generated_Source\PSoC5/ZCD_compA.c ****         }
+ 368:Generated_Source\PSoC5/ZCD_compA.c ****         
+ 369:Generated_Source\PSoC5/ZCD_compA.c ****         CyDelayUs(10u);
+  97              		.loc 1 369 0
+  98 0056 0A20     		movs	r0, #10
+  99 0058 FFF7FEFF 		bl	CyDelayUs
+ 100              	.LVL4:
+ 370:Generated_Source\PSoC5/ZCD_compA.c ****         
+ 371:Generated_Source\PSoC5/ZCD_compA.c ****         /* Check for change in comparator output */
+ 372:Generated_Source\PSoC5/ZCD_compA.c ****         if ((ZCD_compA_WRK & ZCD_compA_CMP_OUT_MASK) != cmpState)
+ 101              		.loc 1 372 0
+ 102 005c 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 103 005e 03F00103 		and	r3, r3, #1
+ 104 0062 A342     		cmp	r3, r4
+ 105 0064 07D1     		bne	.L1
+ 106              	.LVL5:
+ 107 0066 0136     		adds	r6, r6, #1
+ 108              	.LVL6:
+ 342:Generated_Source\PSoC5/ZCD_compA.c **** 	{
+ 109              		.loc 1 342 0 discriminator 2
+ 110 0068 F3B2     		uxtb	r3, r6
+ 111 006a 9F42     		cmp	r7, r3
+ 112 006c E3D8     		bhi	.L8
+ 113 006e BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 114              	.LVL7:
+ 115              	.L3:
+ 334:Generated_Source\PSoC5/ZCD_compA.c ****     	}
+ 116              		.loc 1 334 0
+ 117 0072 0F27     		movs	r7, #15
+ 118 0074 DAE7     		b	.L9
+ 119              	.LVL8:
+ 120              	.L1:
+ 121 0076 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 122              	.LVL9:
+ 123              	.L16:
+ 124 007a 00BF     		.align	2
+ 125              	.L15:
+ 126 007c 965B0040 		.word	1073765270
+ 127 0080 30460040 		.word	1073759792
+ 128 0084 31460040 		.word	1073759793
+ 129              		.cfi_endproc
+ 130              	.LFE6:
+ 131              		.size	ZCD_compA_trimAdjust, .-ZCD_compA_trimAdjust
+ 132              		.section	.text.ZCD_compA_Enable,"ax",%progbits
+ 133              		.align	1
+ 134              		.global	ZCD_compA_Enable
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 10
+
+
+ 135              		.thumb
+ 136              		.thumb_func
+ 137              		.type	ZCD_compA_Enable, %function
+ 138              	ZCD_compA_Enable:
+ 139              	.LFB1:
+ 100:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_PWRMGR |= ZCD_compA_ACT_PWR_EN;
+ 140              		.loc 1 100 0
+ 141              		.cfi_startproc
+ 142              		@ args = 0, pretend = 0, frame = 0
+ 143              		@ frame_needed = 0, uses_anonymous_args = 0
+ 144              		@ link register save eliminated.
+ 101:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_STBY_PWRMGR |= ZCD_compA_STBY_PWR_EN;
+ 145              		.loc 1 101 0
+ 146 0000 044A     		ldr	r2, .L18
+ 147 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 148 0004 43F00103 		orr	r3, r3, #1
+ 149 0008 1370     		strb	r3, [r2]
+ 102:Generated_Source\PSoC5/ZCD_compA.c ****      
+ 150              		.loc 1 102 0
+ 151 000a 137C     		ldrb	r3, [r2, #16]	@ zero_extendqisi2
+ 152 000c 43F00103 		orr	r3, r3, #1
+ 153 0010 1374     		strb	r3, [r2, #16]
+ 154 0012 7047     		bx	lr
+ 155              	.L19:
+ 156              		.align	2
+ 157              	.L18:
+ 158 0014 A7430040 		.word	1073759143
+ 159              		.cfi_endproc
+ 160              	.LFE1:
+ 161              		.size	ZCD_compA_Enable, .-ZCD_compA_Enable
+ 162              		.section	.text.ZCD_compA_Stop,"ax",%progbits
+ 163              		.align	1
+ 164              		.global	ZCD_compA_Stop
+ 165              		.thumb
+ 166              		.thumb_func
+ 167              		.type	ZCD_compA_Stop, %function
+ 168              	ZCD_compA_Stop:
+ 169              	.LFB3:
+ 166:Generated_Source\PSoC5/ZCD_compA.c ****     /* Disable power to comparator */
+ 170              		.loc 1 166 0
+ 171              		.cfi_startproc
+ 172              		@ args = 0, pretend = 0, frame = 0
+ 173              		@ frame_needed = 0, uses_anonymous_args = 0
+ 174              		@ link register save eliminated.
+ 168:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_STBY_PWRMGR &= (uint8)(~ZCD_compA_STBY_PWR_EN);
+ 175              		.loc 1 168 0
+ 176 0000 044A     		ldr	r2, .L21
+ 177 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 178 0004 03F0FE03 		and	r3, r3, #254
+ 179 0008 1370     		strb	r3, [r2]
+ 169:Generated_Source\PSoC5/ZCD_compA.c ****     
+ 180              		.loc 1 169 0
+ 181 000a 137C     		ldrb	r3, [r2, #16]	@ zero_extendqisi2
+ 182 000c 03F0FE03 		and	r3, r3, #254
+ 183 0010 1374     		strb	r3, [r2, #16]
+ 184 0012 7047     		bx	lr
+ 185              	.L22:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 11
+
+
+ 186              		.align	2
+ 187              	.L21:
+ 188 0014 A7430040 		.word	1073759143
+ 189              		.cfi_endproc
+ 190              	.LFE3:
+ 191              		.size	ZCD_compA_Stop, .-ZCD_compA_Stop
+ 192              		.section	.text.ZCD_compA_SetSpeed,"ax",%progbits
+ 193              		.align	1
+ 194              		.global	ZCD_compA_SetSpeed
+ 195              		.thumb
+ 196              		.thumb_func
+ 197              		.type	ZCD_compA_SetSpeed, %function
+ 198              	ZCD_compA_SetSpeed:
+ 199              	.LFB4:
+ 198:Generated_Source\PSoC5/ZCD_compA.c ****     /* Clear and Set power level */    
+ 200              		.loc 1 198 0
+ 201              		.cfi_startproc
+ 202              		@ args = 0, pretend = 0, frame = 0
+ 203              		@ frame_needed = 0, uses_anonymous_args = 0
+ 204              		@ link register save eliminated.
+ 205              	.LVL10:
+ 200:Generated_Source\PSoC5/ZCD_compA.c ****                            (speed & ZCD_compA_PWR_MODE_MASK);
+ 206              		.loc 1 200 0
+ 207 0000 0F49     		ldr	r1, .L27
+ 204:Generated_Source\PSoC5/ZCD_compA.c ****     {
+ 208              		.loc 1 204 0
+ 209 0002 0128     		cmp	r0, #1
+ 200:Generated_Source\PSoC5/ZCD_compA.c ****                            (speed & ZCD_compA_PWR_MODE_MASK);
+ 210              		.loc 1 200 0
+ 211 0004 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 212 0006 03F0FC02 		and	r2, r3, #252
+ 213 000a 00F00303 		and	r3, r0, #3
+ 214 000e 43EA0203 		orr	r3, r3, r2
+ 215 0012 0B70     		strb	r3, [r1]
+ 216 0014 A1F59051 		sub	r1, r1, #4608
+ 217 0018 A1F11001 		sub	r1, r1, #16
+ 218 001c 094A     		ldr	r2, .L27+4
+ 204:Generated_Source\PSoC5/ZCD_compA.c ****     {
+ 219              		.loc 1 204 0
+ 220 001e 05D1     		bne	.L24
+ 221              	.LVL11:
+ 222              	.LBB4:
+ 223              	.LBB5:
+ 213:Generated_Source\PSoC5/ZCD_compA.c ****             ZCD_compA_TR1 = ZCD_compA_HS_TRIM_TR1;
+ 224              		.loc 1 213 0
+ 225 0020 094B     		ldr	r3, .L27+8
+ 226 0022 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 227 0024 DBB2     		uxtb	r3, r3
+ 228 0026 0B70     		strb	r3, [r1]
+ 214:Generated_Source\PSoC5/ZCD_compA.c ****         #endif /* CY_PSOC3 || CY_PSOC5LP */
+ 229              		.loc 1 214 0
+ 230 0028 084B     		ldr	r3, .L27+12
+ 231 002a 04E0     		b	.L26
+ 232              	.LVL12:
+ 233              	.L24:
+ 234              	.LBE5:
+ 235              	.LBE4:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 12
+
+
+ 226:Generated_Source\PSoC5/ZCD_compA.c ****             ZCD_compA_TR1 = ZCD_compA_LS_TRIM_TR1;
+ 236              		.loc 1 226 0
+ 237 002c 084B     		ldr	r3, .L27+16
+ 238 002e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 239 0030 DBB2     		uxtb	r3, r3
+ 240 0032 0B70     		strb	r3, [r1]
+ 227:Generated_Source\PSoC5/ZCD_compA.c ****         #endif /* CY_PSOC3 || CY_PSOC5LP */
+ 241              		.loc 1 227 0
+ 242 0034 074B     		ldr	r3, .L27+20
+ 243              	.L26:
+ 244 0036 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 245 0038 DBB2     		uxtb	r3, r3
+ 246 003a 1370     		strb	r3, [r2]
+ 247 003c 7047     		bx	lr
+ 248              	.L28:
+ 249 003e 00BF     		.align	2
+ 250              	.L27:
+ 251 0040 40580040 		.word	1073764416
+ 252 0044 31460040 		.word	1073759793
+ 253 0048 10010049 		.word	1224737040
+ 254 004c 14010049 		.word	1224737044
+ 255 0050 AD010049 		.word	1224737197
+ 256 0054 B5010049 		.word	1224737205
+ 257              		.cfi_endproc
+ 258              	.LFE4:
+ 259              		.size	ZCD_compA_SetSpeed, .-ZCD_compA_SetSpeed
+ 260              		.section	.text.ZCD_compA_Init,"ax",%progbits
+ 261              		.align	1
+ 262              		.global	ZCD_compA_Init
+ 263              		.thumb
+ 264              		.thumb_func
+ 265              		.type	ZCD_compA_Init, %function
+ 266              	ZCD_compA_Init:
+ 267              	.LFB0:
+  52:Generated_Source\PSoC5/ZCD_compA.c ****     /* Set default speed/power */
+ 268              		.loc 1 52 0
+ 269              		.cfi_startproc
+ 270              		@ args = 0, pretend = 0, frame = 0
+ 271              		@ frame_needed = 0, uses_anonymous_args = 0
+ 272 0000 08B5     		push	{r3, lr}
+ 273              		.cfi_def_cfa_offset 8
+ 274              		.cfi_offset 3, -8
+ 275              		.cfi_offset 14, -4
+  54:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 276              		.loc 1 54 0
+ 277 0002 0120     		movs	r0, #1
+ 278 0004 FFF7FEFF 		bl	ZCD_compA_SetSpeed
+ 279              	.LVL13:
+  60:Generated_Source\PSoC5/ZCD_compA.c ****     #endif /* ZCD_compA_DEFAULT_HYSTERESIS == 0u */
+ 280              		.loc 1 60 0
+ 281 0008 0C4B     		ldr	r3, .L30
+ 282 000a 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 283 000c 02F0DF02 		and	r2, r2, #223
+ 284 0010 1A70     		strb	r2, [r3]
+  66:Generated_Source\PSoC5/ZCD_compA.c ****         #else 
+ 285              		.loc 1 66 0
+ 286 0012 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 13
+
+
+ 287 0014 02F0FB02 		and	r2, r2, #251
+ 288 0018 1A70     		strb	r2, [r3]
+  73:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 289              		.loc 1 73 0
+ 290 001a 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 291 001c 42F00802 		orr	r2, r2, #8
+ 292 0020 1A70     		strb	r2, [r3]
+  76:Generated_Source\PSoC5/ZCD_compA.c ****     #if ( ZCD_compA_DEFAULT_BYPASS_SYNC == 0u )
+ 293              		.loc 1 76 0
+ 294 0022 93F88722 		ldrb	r2, [r3, #647]	@ zero_extendqisi2
+ 295 0026 02F0E702 		and	r2, r2, #231
+ 296 002a 83F88722 		strb	r2, [r3, #647]
+  78:Generated_Source\PSoC5/ZCD_compA.c ****     #else
+ 297              		.loc 1 78 0
+ 298 002e 93F88722 		ldrb	r2, [r3, #647]	@ zero_extendqisi2
+ 299 0032 42F00802 		orr	r2, r2, #8
+ 300 0036 83F88722 		strb	r2, [r3, #647]
+  76:Generated_Source\PSoC5/ZCD_compA.c ****     #if ( ZCD_compA_DEFAULT_BYPASS_SYNC == 0u )
+ 301              		.loc 1 76 0
+ 302 003a 08BD     		pop	{r3, pc}
+ 303              	.L31:
+ 304              		.align	2
+ 305              	.L30:
+ 306 003c 40580040 		.word	1073764416
+ 307              		.cfi_endproc
+ 308              	.LFE0:
+ 309              		.size	ZCD_compA_Init, .-ZCD_compA_Init
+ 310              		.section	.text.ZCD_compA_Start,"ax",%progbits
+ 311              		.align	1
+ 312              		.global	ZCD_compA_Start
+ 313              		.thumb
+ 314              		.thumb_func
+ 315              		.type	ZCD_compA_Start, %function
+ 316              	ZCD_compA_Start:
+ 317              	.LFB2:
+ 137:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 318              		.loc 1 137 0
+ 319              		.cfi_startproc
+ 320              		@ args = 0, pretend = 0, frame = 0
+ 321              		@ frame_needed = 0, uses_anonymous_args = 0
+ 322 0000 10B5     		push	{r4, lr}
+ 323              		.cfi_def_cfa_offset 8
+ 324              		.cfi_offset 4, -8
+ 325              		.cfi_offset 14, -4
+ 139:Generated_Source\PSoC5/ZCD_compA.c ****     {
+ 326              		.loc 1 139 0
+ 327 0002 054C     		ldr	r4, .L34
+ 328 0004 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 329 0006 1BB9     		cbnz	r3, .L33
+ 141:Generated_Source\PSoC5/ZCD_compA.c ****         
+ 330              		.loc 1 141 0
+ 331 0008 FFF7FEFF 		bl	ZCD_compA_Init
+ 332              	.LVL14:
+ 143:Generated_Source\PSoC5/ZCD_compA.c ****     }   
+ 333              		.loc 1 143 0
+ 334 000c 0123     		movs	r3, #1
+ 335 000e 2370     		strb	r3, [r4]
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 14
+
+
+ 336              	.L33:
+ 148:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 337              		.loc 1 148 0
+ 338 0010 BDE81040 		pop	{r4, lr}
+ 339              		.cfi_restore 14
+ 340              		.cfi_restore 4
+ 341              		.cfi_def_cfa_offset 0
+ 147:Generated_Source\PSoC5/ZCD_compA.c **** }
+ 342              		.loc 1 147 0
+ 343 0014 FFF7FEBF 		b	ZCD_compA_Enable
+ 344              	.LVL15:
+ 345              	.L35:
+ 346              		.align	2
+ 347              	.L34:
+ 348 0018 00000000 		.word	.LANCHOR0
+ 349              		.cfi_endproc
+ 350              	.LFE2:
+ 351              		.size	ZCD_compA_Start, .-ZCD_compA_Start
+ 352              		.section	.text.ZCD_compA_GetCompare,"ax",%progbits
+ 353              		.align	1
+ 354              		.global	ZCD_compA_GetCompare
+ 355              		.thumb
+ 356              		.thumb_func
+ 357              		.type	ZCD_compA_GetCompare, %function
+ 358              	ZCD_compA_GetCompare:
+ 359              	.LFB5:
+ 252:Generated_Source\PSoC5/ZCD_compA.c ****     return( ZCD_compA_WRK & ZCD_compA_CMP_OUT_MASK);
+ 360              		.loc 1 252 0
+ 361              		.cfi_startproc
+ 362              		@ args = 0, pretend = 0, frame = 0
+ 363              		@ frame_needed = 0, uses_anonymous_args = 0
+ 364              		@ link register save eliminated.
+ 253:Generated_Source\PSoC5/ZCD_compA.c **** }
+ 365              		.loc 1 253 0
+ 366 0000 024B     		ldr	r3, .L37
+ 367 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 254:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 368              		.loc 1 254 0
+ 369 0004 00F00100 		and	r0, r0, #1
+ 370 0008 7047     		bx	lr
+ 371              	.L38:
+ 372 000a 00BF     		.align	2
+ 373              	.L37:
+ 374 000c 965B0040 		.word	1073765270
+ 375              		.cfi_endproc
+ 376              	.LFE5:
+ 377              		.size	ZCD_compA_GetCompare, .-ZCD_compA_GetCompare
+ 378              		.section	.text.ZCD_compA_ZeroCal,"ax",%progbits
+ 379              		.align	1
+ 380              		.global	ZCD_compA_ZeroCal
+ 381              		.thumb
+ 382              		.thumb_func
+ 383              		.type	ZCD_compA_ZeroCal, %function
+ 384              	ZCD_compA_ZeroCal:
+ 385              	.LFB7:
+ 373:Generated_Source\PSoC5/ZCD_compA.c ****         {
+ 374:Generated_Source\PSoC5/ZCD_compA.c ****             break;      /* output changed state, trim phase is complete */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 15
+
+
+ 375:Generated_Source\PSoC5/ZCD_compA.c ****         }        
+ 376:Generated_Source\PSoC5/ZCD_compA.c ****     }    
+ 377:Generated_Source\PSoC5/ZCD_compA.c **** }
+ 378:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 379:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 380:Generated_Source\PSoC5/ZCD_compA.c **** /*******************************************************************************
+ 381:Generated_Source\PSoC5/ZCD_compA.c **** * Function Name: ZCD_compA_ZeroCal
+ 382:Generated_Source\PSoC5/ZCD_compA.c **** ********************************************************************************
+ 383:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 384:Generated_Source\PSoC5/ZCD_compA.c **** * Summary:
+ 385:Generated_Source\PSoC5/ZCD_compA.c **** *  This function calibrates the offset of the Analog Comparator.
+ 386:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 387:Generated_Source\PSoC5/ZCD_compA.c **** * Parameters:
+ 388:Generated_Source\PSoC5/ZCD_compA.c **** *  None
+ 389:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 390:Generated_Source\PSoC5/ZCD_compA.c **** * Return:
+ 391:Generated_Source\PSoC5/ZCD_compA.c **** *  (uint16)  value written in trim register when calibration complete.
+ 392:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 393:Generated_Source\PSoC5/ZCD_compA.c **** * Theory: 
+ 394:Generated_Source\PSoC5/ZCD_compA.c **** *  This function is used to optimize the calibration for user specific voltage
+ 395:Generated_Source\PSoC5/ZCD_compA.c **** *  range.  The comparator trim is adjusted to counter transistor offsets
+ 396:Generated_Source\PSoC5/ZCD_compA.c **** *   - offset is defined as positive if the output transitions to high before inP
+ 397:Generated_Source\PSoC5/ZCD_compA.c **** *     is greater than inN
+ 398:Generated_Source\PSoC5/ZCD_compA.c **** *   - offset is defined as negative if the output transitions to high after inP
+ 399:Generated_Source\PSoC5/ZCD_compA.c **** *     is greater than inP
+ 400:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 401:Generated_Source\PSoC5/ZCD_compA.c **** *  PSoC5A
+ 402:Generated_Source\PSoC5/ZCD_compA.c **** *  The Analog Comparator provides 1 byte for offset trim.  The byte contains two
+ 403:Generated_Source\PSoC5/ZCD_compA.c **** *  4 bit trim fields - one is a course trim and the other allows smaller
+ 404:Generated_Source\PSoC5/ZCD_compA.c **** *  offset adjustments only for slow modes.
+ 405:Generated_Source\PSoC5/ZCD_compA.c **** *  - low nibble - fine trim
+ 406:Generated_Source\PSoC5/ZCD_compA.c **** *  - high nibble - course trim
+ 407:Generated_Source\PSoC5/ZCD_compA.c **** *  PSoC3, PSoC5LP or later
+ 408:Generated_Source\PSoC5/ZCD_compA.c **** *  The Analog Comparator provides 2 bytes for offset trim.  The bytes contain two
+ 409:Generated_Source\PSoC5/ZCD_compA.c **** *  5 bit trim fields - one is a course trim and the other allows smaller
+ 410:Generated_Source\PSoC5/ZCD_compA.c **** *  offset adjustments only for slow modes.
+ 411:Generated_Source\PSoC5/ZCD_compA.c **** *  - TR0 - fine trim
+ 412:Generated_Source\PSoC5/ZCD_compA.c **** *  - TR1 - course trim
+ 413:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 414:Generated_Source\PSoC5/ZCD_compA.c **** *  Trim algorithm is a two phase process
+ 415:Generated_Source\PSoC5/ZCD_compA.c **** *  The first phase performs course offset adjustment
+ 416:Generated_Source\PSoC5/ZCD_compA.c **** *  The second phase serves one of two purposes depending on the outcome of the
+ 417:Generated_Source\PSoC5/ZCD_compA.c **** *  first phase
+ 418:Generated_Source\PSoC5/ZCD_compA.c **** *  - if the first trim value was maxed out without a comparator output 
+ 419:Generated_Source\PSoC5/ZCD_compA.c **** *    transition, more offset will be added by adjusting the second trim value.
+ 420:Generated_Source\PSoC5/ZCD_compA.c **** *  - if the first trim phase resulted in a comparator output transition, the
+ 421:Generated_Source\PSoC5/ZCD_compA.c **** *    second trim value will serve as fine trim (in the opposite direction)to
+ 422:Generated_Source\PSoC5/ZCD_compA.c **** *    ensure the offset is < 1 mV.
+ 423:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 424:Generated_Source\PSoC5/ZCD_compA.c **** * Trim Process:   
+ 425:Generated_Source\PSoC5/ZCD_compA.c **** *  1) User applies a voltage to the negative input.  Voltage should be in the
+ 426:Generated_Source\PSoC5/ZCD_compA.c **** *     comparator operating range or an average of the operating voltage range.
+ 427:Generated_Source\PSoC5/ZCD_compA.c **** *  2) Clear registers associated with analog routing to the positive input.
+ 428:Generated_Source\PSoC5/ZCD_compA.c **** *  3) Disable Hysteresis
+ 429:Generated_Source\PSoC5/ZCD_compA.c **** *  4) Set the calibration bit to short the negative and positive inputs to
+ 430:Generated_Source\PSoC5/ZCD_compA.c **** *     the users calibration voltage.
+ 431:Generated_Source\PSoC5/ZCD_compA.c **** *  5) Clear the TR register  ( TR = 0x00 )
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 16
+
+
+ 432:Generated_Source\PSoC5/ZCD_compA.c **** *  ** LOW MODES
+ 433:Generated_Source\PSoC5/ZCD_compA.c **** *  6) Check if compare output is high, if so, set the MSb of course trim field 
+ 434:Generated_Source\PSoC5/ZCD_compA.c **** *     to a 1.
+ 435:Generated_Source\PSoC5/ZCD_compA.c **** *  7) Increment the course trim field until the compare output changes
+ 436:Generated_Source\PSoC5/ZCD_compA.c **** *  8) Check if compare output is low, if so, set the MSb of fine trim field
+ 437:Generated_Source\PSoC5/ZCD_compA.c **** *     to a 1.
+ 438:Generated_Source\PSoC5/ZCD_compA.c **** *  9) Increment the fine trim field until the compare output changes
+ 439:Generated_Source\PSoC5/ZCD_compA.c **** *  ** FAST MODE - skip the steps 8,9
+ 440:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 441:Generated_Source\PSoC5/ZCD_compA.c **** * Side Effects:
+ 442:Generated_Source\PSoC5/ZCD_compA.c **** *  Routine clears analog routing associated with the comparator positive input.  
+ 443:Generated_Source\PSoC5/ZCD_compA.c **** *  This may affect routing of signals from other components that are connected
+ 444:Generated_Source\PSoC5/ZCD_compA.c **** *  to the positive input of the comparator.
+ 445:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 446:Generated_Source\PSoC5/ZCD_compA.c **** *******************************************************************************/
+ 447:Generated_Source\PSoC5/ZCD_compA.c **** uint16 ZCD_compA_ZeroCal(void) 
+ 448:Generated_Source\PSoC5/ZCD_compA.c **** {
+ 386              		.loc 1 448 0
+ 387              		.cfi_startproc
+ 388              		@ args = 0, pretend = 0, frame = 16
+ 389              		@ frame_needed = 0, uses_anonymous_args = 0
+ 390 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 391              		.cfi_def_cfa_offset 36
+ 392              		.cfi_offset 4, -36
+ 393              		.cfi_offset 5, -32
+ 394              		.cfi_offset 6, -28
+ 395              		.cfi_offset 7, -24
+ 396              		.cfi_offset 8, -20
+ 397              		.cfi_offset 9, -16
+ 398              		.cfi_offset 10, -12
+ 399              		.cfi_offset 11, -8
+ 400              		.cfi_offset 14, -4
+ 449:Generated_Source\PSoC5/ZCD_compA.c ****     uint8 tmpSW0;
+ 450:Generated_Source\PSoC5/ZCD_compA.c ****     uint8 tmpSW2;
+ 451:Generated_Source\PSoC5/ZCD_compA.c ****     uint8 tmpSW3;
+ 452:Generated_Source\PSoC5/ZCD_compA.c ****     uint8 tmpCR;
+ 453:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 454:Generated_Source\PSoC5/ZCD_compA.c ****     /* Save a copy of routing registers associated with inP */
+ 455:Generated_Source\PSoC5/ZCD_compA.c ****     tmpSW0 = ZCD_compA_SW0;
+ 456:Generated_Source\PSoC5/ZCD_compA.c ****     tmpSW2 = ZCD_compA_SW2;
+ 457:Generated_Source\PSoC5/ZCD_compA.c ****     tmpSW3 = ZCD_compA_SW3;
+ 401              		.loc 1 457 0
+ 402 0004 214A     		ldr	r2, .L43
+ 455:Generated_Source\PSoC5/ZCD_compA.c ****     tmpSW2 = ZCD_compA_SW2;
+ 403              		.loc 1 455 0
+ 404 0006 224E     		ldr	r6, .L43+4
+ 456:Generated_Source\PSoC5/ZCD_compA.c ****     tmpSW3 = ZCD_compA_SW3;
+ 405              		.loc 1 456 0
+ 406 0008 224D     		ldr	r5, .L43+8
+ 455:Generated_Source\PSoC5/ZCD_compA.c ****     tmpSW2 = ZCD_compA_SW2;
+ 407              		.loc 1 455 0
+ 408 000a 96F800A0 		ldrb	r10, [r6]	@ zero_extendqisi2
+ 456:Generated_Source\PSoC5/ZCD_compA.c ****     tmpSW3 = ZCD_compA_SW3;
+ 409              		.loc 1 456 0
+ 410 000e 95F80090 		ldrb	r9, [r5]	@ zero_extendqisi2
+ 411              		.loc 1 457 0
+ 412 0012 92F80080 		ldrb	r8, [r2]	@ zero_extendqisi2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 17
+
+
+ 458:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 459:Generated_Source\PSoC5/ZCD_compA.c ****      /* Clear routing for inP, retain routing for inN */
+ 460:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_SW0 = 0x00u;
+ 413              		.loc 1 460 0
+ 414 0016 0023     		movs	r3, #0
+ 457:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 415              		.loc 1 457 0
+ 416 0018 5FFA88F8 		uxtb	r8, r8
+ 461:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_SW2 = 0x00u;
+ 462:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_SW3 = tmpSW3 & (uint8)(~ZCD_compA_CMP_SW3_INPCTL_MASK);
+ 463:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 464:Generated_Source\PSoC5/ZCD_compA.c ****     /* Preserve original configuration
+ 465:Generated_Source\PSoC5/ZCD_compA.c ****      * - turn off Hysteresis
+ 466:Generated_Source\PSoC5/ZCD_compA.c ****      * - set calibration bit - shorts inN to inP
+ 467:Generated_Source\PSoC5/ZCD_compA.c ****     */
+ 468:Generated_Source\PSoC5/ZCD_compA.c ****     tmpCR = ZCD_compA_CR;
+ 417              		.loc 1 468 0
+ 418 001c 1E4C     		ldr	r4, .L43+12
+ 462:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 419              		.loc 1 462 0
+ 420 001e 08F0F601 		and	r1, r8, #246
+ 460:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_SW2 = 0x00u;
+ 421              		.loc 1 460 0
+ 422 0022 3370     		strb	r3, [r6]
+ 461:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_SW2 = 0x00u;
+ 423              		.loc 1 461 0
+ 424 0024 2B70     		strb	r3, [r5]
+ 462:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 425              		.loc 1 462 0
+ 426 0026 1170     		strb	r1, [r2]
+ 427              		.loc 1 468 0
+ 428 0028 94F800B0 		ldrb	fp, [r4]	@ zero_extendqisi2
+ 469:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_CR |= (ZCD_compA_CAL_ON | ZCD_compA_HYST_OFF);
+ 429              		.loc 1 469 0
+ 430 002c 2178     		ldrb	r1, [r4]	@ zero_extendqisi2
+ 470:Generated_Source\PSoC5/ZCD_compA.c ****     
+ 471:Generated_Source\PSoC5/ZCD_compA.c ****     /* Write default low values to trim register - no offset adjust */
+ 472:Generated_Source\PSoC5/ZCD_compA.c ****     /* PSoC5A */
+ 473:Generated_Source\PSoC5/ZCD_compA.c ****     #if (CY_PSOC5A)
+ 474:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_TR = ZCD_compA_DEFAULT_CMP_TRIM;
+ 475:Generated_Source\PSoC5/ZCD_compA.c ****     #endif /* CY_PSOC5A */
+ 476:Generated_Source\PSoC5/ZCD_compA.c ****     
+ 477:Generated_Source\PSoC5/ZCD_compA.c ****     /* PSoC3, PSoC5LP or later */
+ 478:Generated_Source\PSoC5/ZCD_compA.c ****     #if (CY_PSOC3 || CY_PSOC5LP)
+ 479:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_TR0 = ZCD_compA_DEFAULT_CMP_TRIM;
+ 480:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_TR1 = ZCD_compA_DEFAULT_CMP_TRIM;
+ 431              		.loc 1 480 0
+ 432 002e 1B4F     		ldr	r7, .L43+16
+ 469:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_CR |= (ZCD_compA_CAL_ON | ZCD_compA_HYST_OFF);
+ 433              		.loc 1 469 0
+ 434 0030 41F03001 		orr	r1, r1, #48
+ 435 0034 2170     		strb	r1, [r4]
+ 479:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_TR1 = ZCD_compA_DEFAULT_CMP_TRIM;
+ 436              		.loc 1 479 0
+ 437 0036 1A49     		ldr	r1, .L43+20
+ 448:Generated_Source\PSoC5/ZCD_compA.c ****     uint8 tmpSW0;
+ 438              		.loc 1 448 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 18
+
+
+ 439 0038 85B0     		sub	sp, sp, #20
+ 440              		.cfi_def_cfa_offset 56
+ 479:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_TR1 = ZCD_compA_DEFAULT_CMP_TRIM;
+ 441              		.loc 1 479 0
+ 442 003a 0B70     		strb	r3, [r1]
+ 443              		.loc 1 480 0
+ 444 003c 3B70     		strb	r3, [r7]
+ 481:Generated_Source\PSoC5/ZCD_compA.c ****     #endif /* CY_PSOC3 || CY_PSOC5LP */
+ 482:Generated_Source\PSoC5/ZCD_compA.c **** 	
+ 483:Generated_Source\PSoC5/ZCD_compA.c **** 	/* Two phase trim - slow modes, one phase trim - for fast */ 
+ 484:Generated_Source\PSoC5/ZCD_compA.c ****     if ( (ZCD_compA_CR & ZCD_compA_PWR_MODE_MASK) == ZCD_compA_PWR_MODE_FAST)
+ 445              		.loc 1 484 0
+ 446 003e 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+ 455:Generated_Source\PSoC5/ZCD_compA.c ****     tmpSW2 = ZCD_compA_SW2;
+ 447              		.loc 1 455 0
+ 448 0040 5FFA8AFA 		uxtb	r10, r10
+ 449              	.LVL16:
+ 450              		.loc 1 484 0
+ 451 0044 00F00300 		and	r0, r0, #3
+ 452 0048 0128     		cmp	r0, #1
+ 456:Generated_Source\PSoC5/ZCD_compA.c ****     tmpSW3 = ZCD_compA_SW3;
+ 453              		.loc 1 456 0
+ 454 004a 5FFA89F9 		uxtb	r9, r9
+ 455              	.LVL17:
+ 468:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_CR |= (ZCD_compA_CAL_ON | ZCD_compA_HYST_OFF);
+ 456              		.loc 1 468 0
+ 457 004e 5FFA8BFB 		uxtb	fp, fp
+ 458              	.LVL18:
+ 459 0052 0192     		str	r2, [sp, #4]
+ 460 0054 0291     		str	r1, [sp, #8]
+ 461              		.loc 1 484 0
+ 462 0056 04D0     		beq	.L42
+ 485:Generated_Source\PSoC5/ZCD_compA.c ****     {
+ 486:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_trimAdjust(0u);
+ 487:Generated_Source\PSoC5/ZCD_compA.c ****     }
+ 488:Generated_Source\PSoC5/ZCD_compA.c ****     else /* default to trim for fast modes */
+ 489:Generated_Source\PSoC5/ZCD_compA.c ****     {
+ 490:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_trimAdjust(1u);
+ 463              		.loc 1 490 0
+ 464 0058 0120     		movs	r0, #1
+ 465 005a 0393     		str	r3, [sp, #12]
+ 466 005c FFF7FEFF 		bl	ZCD_compA_trimAdjust
+ 467              	.LVL19:
+ 491:Generated_Source\PSoC5/ZCD_compA.c **** 		ZCD_compA_trimAdjust(0u);
+ 468              		.loc 1 491 0
+ 469 0060 039B     		ldr	r3, [sp, #12]
+ 470              	.L42:
+ 471 0062 1846     		mov	r0, r3
+ 472 0064 FFF7FEFF 		bl	ZCD_compA_trimAdjust
+ 473              	.LVL20:
+ 492:Generated_Source\PSoC5/ZCD_compA.c ****     }
+ 493:Generated_Source\PSoC5/ZCD_compA.c ****    
+ 494:Generated_Source\PSoC5/ZCD_compA.c ****     /* Restore Config Register */
+ 495:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_CR = tmpCR;
+ 474              		.loc 1 495 0
+ 475 0068 84F800B0 		strb	fp, [r4]
+ 496:Generated_Source\PSoC5/ZCD_compA.c ****     
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 19
+
+
+ 497:Generated_Source\PSoC5/ZCD_compA.c ****     /* Restore routing registers for inP */
+ 498:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_SW0 = tmpSW0;
+ 476              		.loc 1 498 0
+ 477 006c 86F800A0 		strb	r10, [r6]
+ 499:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_SW2 = tmpSW2;
+ 478              		.loc 1 499 0
+ 479 0070 85F80090 		strb	r9, [r5]
+ 500:Generated_Source\PSoC5/ZCD_compA.c ****     ZCD_compA_SW3 = tmpSW3;
+ 480              		.loc 1 500 0
+ 481 0074 019B     		ldr	r3, [sp, #4]
+ 482 0076 83F80080 		strb	r8, [r3]
+ 501:Generated_Source\PSoC5/ZCD_compA.c ****     
+ 502:Generated_Source\PSoC5/ZCD_compA.c ****     /* PSoC5A */
+ 503:Generated_Source\PSoC5/ZCD_compA.c ****     #if (CY_PSOC5A)
+ 504:Generated_Source\PSoC5/ZCD_compA.c ****         return (uint16) ZCD_compA_TR;
+ 505:Generated_Source\PSoC5/ZCD_compA.c ****     #endif /* CY_PSOC5A */
+ 506:Generated_Source\PSoC5/ZCD_compA.c ****     
+ 507:Generated_Source\PSoC5/ZCD_compA.c ****     /* PSoC3, PSoC5LP or later */
+ 508:Generated_Source\PSoC5/ZCD_compA.c ****     #if (CY_PSOC3 || CY_PSOC5LP)
+ 509:Generated_Source\PSoC5/ZCD_compA.c ****         return ((uint16)((uint16)ZCD_compA_TR1 << 8u) | (ZCD_compA_TR0));        
+ 483              		.loc 1 509 0
+ 484 007a 029B     		ldr	r3, [sp, #8]
+ 485 007c 3878     		ldrb	r0, [r7]	@ zero_extendqisi2
+ 486 007e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 510:Generated_Source\PSoC5/ZCD_compA.c ****     #endif /* CY_PSOC3 || CY_PSOC5LP */
+ 511:Generated_Source\PSoC5/ZCD_compA.c **** }
+ 487              		.loc 1 511 0
+ 488 0080 43EA0020 		orr	r0, r3, r0, lsl #8
+ 489 0084 05B0     		add	sp, sp, #20
+ 490              		.cfi_def_cfa_offset 36
+ 491              		@ sp needed
+ 492 0086 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 493              	.LVL21:
+ 494              	.L44:
+ 495 008a 00BF     		.align	2
+ 496              	.L43:
+ 497 008c C35A0040 		.word	1073765059
+ 498 0090 C05A0040 		.word	1073765056
+ 499 0094 C25A0040 		.word	1073765058
+ 500 0098 40580040 		.word	1073764416
+ 501 009c 31460040 		.word	1073759793
+ 502 00a0 30460040 		.word	1073759792
+ 503              		.cfi_endproc
+ 504              	.LFE7:
+ 505              		.size	ZCD_compA_ZeroCal, .-ZCD_compA_ZeroCal
+ 506              		.section	.text.ZCD_compA_LoadTrim,"ax",%progbits
+ 507              		.align	1
+ 508              		.global	ZCD_compA_LoadTrim
+ 509              		.thumb
+ 510              		.thumb_func
+ 511              		.type	ZCD_compA_LoadTrim, %function
+ 512              	ZCD_compA_LoadTrim:
+ 513              	.LFB8:
+ 512:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 513:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 514:Generated_Source\PSoC5/ZCD_compA.c **** /*******************************************************************************
+ 515:Generated_Source\PSoC5/ZCD_compA.c **** * Function Name: ZCD_compA_LoadTrim
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 20
+
+
+ 516:Generated_Source\PSoC5/ZCD_compA.c **** ********************************************************************************
+ 517:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 518:Generated_Source\PSoC5/ZCD_compA.c **** * Summary:
+ 519:Generated_Source\PSoC5/ZCD_compA.c **** *  This function stores a value in the Analog Comparator trim register.
+ 520:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 521:Generated_Source\PSoC5/ZCD_compA.c **** * Parameters:  
+ 522:Generated_Source\PSoC5/ZCD_compA.c **** *  uint8 trimVal - trim value.  This value is the same format as the value 
+ 523:Generated_Source\PSoC5/ZCD_compA.c **** *  returned by the _ZeroCal routine.
+ 524:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 525:Generated_Source\PSoC5/ZCD_compA.c **** * Return:
+ 526:Generated_Source\PSoC5/ZCD_compA.c **** *  None
+ 527:Generated_Source\PSoC5/ZCD_compA.c **** *
+ 528:Generated_Source\PSoC5/ZCD_compA.c **** *******************************************************************************/
+ 529:Generated_Source\PSoC5/ZCD_compA.c **** void ZCD_compA_LoadTrim(uint16 trimVal) 
+ 530:Generated_Source\PSoC5/ZCD_compA.c **** {
+ 514              		.loc 1 530 0
+ 515              		.cfi_startproc
+ 516              		@ args = 0, pretend = 0, frame = 0
+ 517              		@ frame_needed = 0, uses_anonymous_args = 0
+ 518              		@ link register save eliminated.
+ 519              	.LVL22:
+ 531:Generated_Source\PSoC5/ZCD_compA.c ****     /* Stores value in the Analog Comparator trim register */
+ 532:Generated_Source\PSoC5/ZCD_compA.c ****     /* PSoC5A */
+ 533:Generated_Source\PSoC5/ZCD_compA.c ****     #if (CY_PSOC5A)
+ 534:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_TR = (uint8) trimVal;
+ 535:Generated_Source\PSoC5/ZCD_compA.c ****     #endif /* CY_PSOC5A */
+ 536:Generated_Source\PSoC5/ZCD_compA.c ****     
+ 537:Generated_Source\PSoC5/ZCD_compA.c ****     /* PSoC3, PSoC5LP or later */
+ 538:Generated_Source\PSoC5/ZCD_compA.c ****     #if (CY_PSOC3 || CY_PSOC5LP)
+ 539:Generated_Source\PSoC5/ZCD_compA.c ****         /* Stores value in the Analog Comparator trim register for P-type load */
+ 540:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_TR0 = (uint8) trimVal;
+ 520              		.loc 1 540 0
+ 521 0000 024B     		ldr	r3, .L46
+ 522 0002 C2B2     		uxtb	r2, r0
+ 541:Generated_Source\PSoC5/ZCD_compA.c ****         
+ 542:Generated_Source\PSoC5/ZCD_compA.c ****         /* Stores value in the Analog Comparator trim register for N-type load */
+ 543:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_TR1 = (uint8) (trimVal >> 8); 
+ 523              		.loc 1 543 0
+ 524 0004 000A     		lsrs	r0, r0, #8
+ 525              	.LVL23:
+ 540:Generated_Source\PSoC5/ZCD_compA.c ****         
+ 526              		.loc 1 540 0
+ 527 0006 1A70     		strb	r2, [r3]
+ 528              		.loc 1 543 0
+ 529 0008 5870     		strb	r0, [r3, #1]
+ 530 000a 7047     		bx	lr
+ 531              	.L47:
+ 532              		.align	2
+ 533              	.L46:
+ 534 000c 30460040 		.word	1073759792
+ 535              		.cfi_endproc
+ 536              	.LFE8:
+ 537              		.size	ZCD_compA_LoadTrim, .-ZCD_compA_LoadTrim
+ 538              		.section	.text.ZCD_compA_PwrDwnOverrideEnable,"ax",%progbits
+ 539              		.align	1
+ 540              		.global	ZCD_compA_PwrDwnOverrideEnable
+ 541              		.thumb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 21
+
+
+ 542              		.thumb_func
+ 543              		.type	ZCD_compA_PwrDwnOverrideEnable, %function
+ 544              	ZCD_compA_PwrDwnOverrideEnable:
+ 545              	.LFB9:
+ 544:Generated_Source\PSoC5/ZCD_compA.c ****     #endif /* CY_PSOC3 || CY_PSOC5LP */
+ 545:Generated_Source\PSoC5/ZCD_compA.c **** }
+ 546:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 547:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 548:Generated_Source\PSoC5/ZCD_compA.c **** #if (CY_PSOC3 || CY_PSOC5LP)
+ 549:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 550:Generated_Source\PSoC5/ZCD_compA.c ****     /*******************************************************************************
+ 551:Generated_Source\PSoC5/ZCD_compA.c ****     * Function Name: ZCD_compA_PwrDwnOverrideEnable
+ 552:Generated_Source\PSoC5/ZCD_compA.c ****     ********************************************************************************
+ 553:Generated_Source\PSoC5/ZCD_compA.c ****     *
+ 554:Generated_Source\PSoC5/ZCD_compA.c ****     * Summary:
+ 555:Generated_Source\PSoC5/ZCD_compA.c ****     *  This is the power down over-ride feature. This function ignores sleep 
+ 556:Generated_Source\PSoC5/ZCD_compA.c ****     *  parameter and allows the component to stay active during sleep mode.
+ 557:Generated_Source\PSoC5/ZCD_compA.c ****     *
+ 558:Generated_Source\PSoC5/ZCD_compA.c ****     * Parameters:
+ 559:Generated_Source\PSoC5/ZCD_compA.c ****     *  None
+ 560:Generated_Source\PSoC5/ZCD_compA.c ****     *
+ 561:Generated_Source\PSoC5/ZCD_compA.c ****     * Return:
+ 562:Generated_Source\PSoC5/ZCD_compA.c ****     *  None
+ 563:Generated_Source\PSoC5/ZCD_compA.c ****     *
+ 564:Generated_Source\PSoC5/ZCD_compA.c ****     *******************************************************************************/
+ 565:Generated_Source\PSoC5/ZCD_compA.c ****     void ZCD_compA_PwrDwnOverrideEnable(void) 
+ 566:Generated_Source\PSoC5/ZCD_compA.c ****     {
+ 546              		.loc 1 566 0
+ 547              		.cfi_startproc
+ 548              		@ args = 0, pretend = 0, frame = 0
+ 549              		@ frame_needed = 0, uses_anonymous_args = 0
+ 550              		@ link register save eliminated.
+ 567:Generated_Source\PSoC5/ZCD_compA.c ****         /* Set the pd_override bit in CMP_CR register */
+ 568:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_CR |= ZCD_compA_PWRDWN_OVRD;
+ 551              		.loc 1 568 0
+ 552 0000 024A     		ldr	r2, .L49
+ 553 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 554 0004 43F00403 		orr	r3, r3, #4
+ 555 0008 1370     		strb	r3, [r2]
+ 556 000a 7047     		bx	lr
+ 557              	.L50:
+ 558              		.align	2
+ 559              	.L49:
+ 560 000c 40580040 		.word	1073764416
+ 561              		.cfi_endproc
+ 562              	.LFE9:
+ 563              		.size	ZCD_compA_PwrDwnOverrideEnable, .-ZCD_compA_PwrDwnOverrideEnable
+ 564              		.section	.text.ZCD_compA_PwrDwnOverrideDisable,"ax",%progbits
+ 565              		.align	1
+ 566              		.global	ZCD_compA_PwrDwnOverrideDisable
+ 567              		.thumb
+ 568              		.thumb_func
+ 569              		.type	ZCD_compA_PwrDwnOverrideDisable, %function
+ 570              	ZCD_compA_PwrDwnOverrideDisable:
+ 571              	.LFB10:
+ 569:Generated_Source\PSoC5/ZCD_compA.c ****     }
+ 570:Generated_Source\PSoC5/ZCD_compA.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 22
+
+
+ 571:Generated_Source\PSoC5/ZCD_compA.c **** 
+ 572:Generated_Source\PSoC5/ZCD_compA.c ****     /*******************************************************************************
+ 573:Generated_Source\PSoC5/ZCD_compA.c ****     * Function Name: ZCD_compA_PwrDwnOverrideDisable
+ 574:Generated_Source\PSoC5/ZCD_compA.c ****     ********************************************************************************
+ 575:Generated_Source\PSoC5/ZCD_compA.c ****     *
+ 576:Generated_Source\PSoC5/ZCD_compA.c ****     * Summary:
+ 577:Generated_Source\PSoC5/ZCD_compA.c ****     *  This is the power down over-ride feature. This allows the component to stay
+ 578:Generated_Source\PSoC5/ZCD_compA.c ****     *  inactive during sleep.
+ 579:Generated_Source\PSoC5/ZCD_compA.c ****     *
+ 580:Generated_Source\PSoC5/ZCD_compA.c ****     * Parameters:
+ 581:Generated_Source\PSoC5/ZCD_compA.c ****     *  None
+ 582:Generated_Source\PSoC5/ZCD_compA.c ****     *
+ 583:Generated_Source\PSoC5/ZCD_compA.c ****     * Return:
+ 584:Generated_Source\PSoC5/ZCD_compA.c ****     *  None
+ 585:Generated_Source\PSoC5/ZCD_compA.c ****     *
+ 586:Generated_Source\PSoC5/ZCD_compA.c ****     *******************************************************************************/
+ 587:Generated_Source\PSoC5/ZCD_compA.c ****     void ZCD_compA_PwrDwnOverrideDisable(void) 
+ 588:Generated_Source\PSoC5/ZCD_compA.c ****     {
+ 572              		.loc 1 588 0
+ 573              		.cfi_startproc
+ 574              		@ args = 0, pretend = 0, frame = 0
+ 575              		@ frame_needed = 0, uses_anonymous_args = 0
+ 576              		@ link register save eliminated.
+ 589:Generated_Source\PSoC5/ZCD_compA.c ****         /* Reset the pd_override bit in CMP_CR register */
+ 590:Generated_Source\PSoC5/ZCD_compA.c ****         ZCD_compA_CR &= (uint8)(~ZCD_compA_PWRDWN_OVRD);
+ 577              		.loc 1 590 0
+ 578 0000 024A     		ldr	r2, .L52
+ 579 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 580 0004 03F0FB03 		and	r3, r3, #251
+ 581 0008 1370     		strb	r3, [r2]
+ 582 000a 7047     		bx	lr
+ 583              	.L53:
+ 584              		.align	2
+ 585              	.L52:
+ 586 000c 40580040 		.word	1073764416
+ 587              		.cfi_endproc
+ 588              	.LFE10:
+ 589              		.size	ZCD_compA_PwrDwnOverrideDisable, .-ZCD_compA_PwrDwnOverrideDisable
+ 590              		.global	ZCD_compA_initVar
+ 591              		.bss
+ 592              		.set	.LANCHOR0,. + 0
+ 593              		.type	ZCD_compA_initVar, %object
+ 594              		.size	ZCD_compA_initVar, 1
+ 595              	ZCD_compA_initVar:
+ 596 0000 00       		.space	1
+ 597              		.text
+ 598              	.Letext0:
+ 599              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+ 600              		.file 3 "Generated_Source\\PSoC5\\CyLib.h"
+ 601              		.section	.debug_info,"",%progbits
+ 602              	.Ldebug_info0:
+ 603 0000 C7020000 		.4byte	0x2c7
+ 604 0004 0400     		.2byte	0x4
+ 605 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 606 000a 04       		.byte	0x4
+ 607 000b 01       		.uleb128 0x1
+ 608 000c F5000000 		.4byte	.LASF33
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 23
+
+
+ 609 0010 0C       		.byte	0xc
+ 610 0011 94010000 		.4byte	.LASF34
+ 611 0015 91020000 		.4byte	.LASF35
+ 612 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 613 001d 00000000 		.4byte	0
+ 614 0021 00000000 		.4byte	.Ldebug_line0
+ 615 0025 02       		.uleb128 0x2
+ 616 0026 01       		.byte	0x1
+ 617 0027 06       		.byte	0x6
+ 618 0028 BF020000 		.4byte	.LASF0
+ 619 002c 02       		.uleb128 0x2
+ 620 002d 01       		.byte	0x1
+ 621 002e 08       		.byte	0x8
+ 622 002f C8000000 		.4byte	.LASF1
+ 623 0033 02       		.uleb128 0x2
+ 624 0034 02       		.byte	0x2
+ 625 0035 05       		.byte	0x5
+ 626 0036 87020000 		.4byte	.LASF2
+ 627 003a 02       		.uleb128 0x2
+ 628 003b 02       		.byte	0x2
+ 629 003c 07       		.byte	0x7
+ 630 003d 5B000000 		.4byte	.LASF3
+ 631 0041 02       		.uleb128 0x2
+ 632 0042 04       		.byte	0x4
+ 633 0043 05       		.byte	0x5
+ 634 0044 B6020000 		.4byte	.LASF4
+ 635 0048 02       		.uleb128 0x2
+ 636 0049 04       		.byte	0x4
+ 637 004a 07       		.byte	0x7
+ 638 004b E3000000 		.4byte	.LASF5
+ 639 004f 02       		.uleb128 0x2
+ 640 0050 08       		.byte	0x8
+ 641 0051 05       		.byte	0x5
+ 642 0052 58020000 		.4byte	.LASF6
+ 643 0056 02       		.uleb128 0x2
+ 644 0057 08       		.byte	0x8
+ 645 0058 07       		.byte	0x7
+ 646 0059 F2010000 		.4byte	.LASF7
+ 647 005d 03       		.uleb128 0x3
+ 648 005e 04       		.byte	0x4
+ 649 005f 05       		.byte	0x5
+ 650 0060 696E7400 		.ascii	"int\000"
+ 651 0064 02       		.uleb128 0x2
+ 652 0065 04       		.byte	0x4
+ 653 0066 07       		.byte	0x7
+ 654 0067 DC010000 		.4byte	.LASF8
+ 655 006b 04       		.uleb128 0x4
+ 656 006c 8E010000 		.4byte	.LASF9
+ 657 0070 02       		.byte	0x2
+ 658 0071 9201     		.2byte	0x192
+ 659 0073 2C000000 		.4byte	0x2c
+ 660 0077 04       		.uleb128 0x4
+ 661 0078 CE010000 		.4byte	.LASF10
+ 662 007c 02       		.byte	0x2
+ 663 007d 9301     		.2byte	0x193
+ 664 007f 3A000000 		.4byte	0x3a
+ 665 0083 04       		.uleb128 0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 24
+
+
+ 666 0084 D5010000 		.4byte	.LASF11
+ 667 0088 02       		.byte	0x2
+ 668 0089 9401     		.2byte	0x194
+ 669 008b 48000000 		.4byte	0x48
+ 670 008f 02       		.uleb128 0x2
+ 671 0090 04       		.byte	0x4
+ 672 0091 04       		.byte	0x4
+ 673 0092 9B000000 		.4byte	.LASF12
+ 674 0096 02       		.uleb128 0x2
+ 675 0097 08       		.byte	0x8
+ 676 0098 04       		.byte	0x4
+ 677 0099 C7010000 		.4byte	.LASF13
+ 678 009d 02       		.uleb128 0x2
+ 679 009e 01       		.byte	0x1
+ 680 009f 08       		.byte	0x8
+ 681 00a0 70020000 		.4byte	.LASF14
+ 682 00a4 04       		.uleb128 0x4
+ 683 00a5 D6000000 		.4byte	.LASF15
+ 684 00a9 02       		.byte	0x2
+ 685 00aa 3C02     		.2byte	0x23c
+ 686 00ac B0000000 		.4byte	0xb0
+ 687 00b0 05       		.uleb128 0x5
+ 688 00b1 6B000000 		.4byte	0x6b
+ 689 00b5 02       		.uleb128 0x2
+ 690 00b6 04       		.byte	0x4
+ 691 00b7 07       		.byte	0x7
+ 692 00b8 44020000 		.4byte	.LASF16
+ 693 00bc 06       		.uleb128 0x6
+ 694 00bd 09020000 		.4byte	.LASF36
+ 695 00c1 01       		.byte	0x1
+ 696 00c2 C5       		.byte	0xc5
+ 697 00c3 01       		.byte	0x1
+ 698 00c4 D4000000 		.4byte	0xd4
+ 699 00c8 07       		.uleb128 0x7
+ 700 00c9 3E020000 		.4byte	.LASF37
+ 701 00cd 01       		.byte	0x1
+ 702 00ce C5       		.byte	0xc5
+ 703 00cf 6B000000 		.4byte	0x6b
+ 704 00d3 00       		.byte	0
+ 705 00d4 08       		.uleb128 0x8
+ 706 00d5 6E000000 		.4byte	.LASF38
+ 707 00d9 01       		.byte	0x1
+ 708 00da 1A01     		.2byte	0x11a
+ 709 00dc 00000000 		.4byte	.LFB6
+ 710 00e0 88000000 		.4byte	.LFE6-.LFB6
+ 711 00e4 01       		.uleb128 0x1
+ 712 00e5 9C       		.byte	0x9c
+ 713 00e6 3A010000 		.4byte	0x13a
+ 714 00ea 09       		.uleb128 0x9
+ 715 00eb DA020000 		.4byte	.LASF29
+ 716 00ef 01       		.byte	0x1
+ 717 00f0 1A01     		.2byte	0x11a
+ 718 00f2 6B000000 		.4byte	0x6b
+ 719 00f6 00000000 		.4byte	.LLST0
+ 720 00fa 0A       		.uleb128 0xa
+ 721 00fb DB000000 		.4byte	.LASF17
+ 722 00ff 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 25
+
+
+ 723 0100 1C01     		.2byte	0x11c
+ 724 0102 6B000000 		.4byte	0x6b
+ 725 0106 3A000000 		.4byte	.LLST1
+ 726 010a 0A       		.uleb128 0xa
+ 727 010b 4D020000 		.4byte	.LASF18
+ 728 010f 01       		.byte	0x1
+ 729 0110 1C01     		.2byte	0x11c
+ 730 0112 6B000000 		.4byte	0x6b
+ 731 0116 71000000 		.4byte	.LLST2
+ 732 011a 0A       		.uleb128 0xa
+ 733 011b E9010000 		.4byte	.LASF19
+ 734 011f 01       		.byte	0x1
+ 735 0120 1D01     		.2byte	0x11d
+ 736 0122 6B000000 		.4byte	0x6b
+ 737 0126 8F000000 		.4byte	.LLST3
+ 738 012a 0B       		.uleb128 0xb
+ 739 012b 5C000000 		.4byte	.LVL4
+ 740 012f BF020000 		.4byte	0x2bf
+ 741 0133 0C       		.uleb128 0xc
+ 742 0134 01       		.uleb128 0x1
+ 743 0135 50       		.byte	0x50
+ 744 0136 01       		.uleb128 0x1
+ 745 0137 3A       		.byte	0x3a
+ 746 0138 00       		.byte	0
+ 747 0139 00       		.byte	0
+ 748 013a 0D       		.uleb128 0xd
+ 749 013b 83000000 		.4byte	.LASF20
+ 750 013f 01       		.byte	0x1
+ 751 0140 63       		.byte	0x63
+ 752 0141 00000000 		.4byte	.LFB1
+ 753 0145 18000000 		.4byte	.LFE1-.LFB1
+ 754 0149 01       		.uleb128 0x1
+ 755 014a 9C       		.byte	0x9c
+ 756 014b 0D       		.uleb128 0xd
+ 757 014c CB020000 		.4byte	.LASF21
+ 758 0150 01       		.byte	0x1
+ 759 0151 A5       		.byte	0xa5
+ 760 0152 00000000 		.4byte	.LFB3
+ 761 0156 18000000 		.4byte	.LFE3-.LFB3
+ 762 015a 01       		.uleb128 0x1
+ 763 015b 9C       		.byte	0x9c
+ 764 015c 0E       		.uleb128 0xe
+ 765 015d BC000000 		.4byte	0xbc
+ 766 0161 00000000 		.4byte	.LFB4
+ 767 0165 58000000 		.4byte	.LFE4-.LFB4
+ 768 0169 01       		.uleb128 0x1
+ 769 016a 9C       		.byte	0x9c
+ 770 016b 8A010000 		.4byte	0x18a
+ 771 016f 0F       		.uleb128 0xf
+ 772 0170 C8000000 		.4byte	0xc8
+ 773 0174 01       		.uleb128 0x1
+ 774 0175 50       		.byte	0x50
+ 775 0176 10       		.uleb128 0x10
+ 776 0177 20000000 		.4byte	.LBB4
+ 777 017b 0C000000 		.4byte	.LBE4-.LBB4
+ 778 017f 11       		.uleb128 0x11
+ 779 0180 C8000000 		.4byte	0xc8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 26
+
+
+ 780 0184 A2000000 		.4byte	.LLST4
+ 781 0188 00       		.byte	0
+ 782 0189 00       		.byte	0
+ 783 018a 12       		.uleb128 0x12
+ 784 018b 1C020000 		.4byte	.LASF22
+ 785 018f 01       		.byte	0x1
+ 786 0190 33       		.byte	0x33
+ 787 0191 00000000 		.4byte	.LFB0
+ 788 0195 40000000 		.4byte	.LFE0-.LFB0
+ 789 0199 01       		.uleb128 0x1
+ 790 019a 9C       		.byte	0x9c
+ 791 019b AF010000 		.4byte	0x1af
+ 792 019f 0B       		.uleb128 0xb
+ 793 01a0 08000000 		.4byte	.LVL13
+ 794 01a4 BC000000 		.4byte	0xbc
+ 795 01a8 0C       		.uleb128 0xc
+ 796 01a9 01       		.uleb128 0x1
+ 797 01aa 50       		.byte	0x50
+ 798 01ab 01       		.uleb128 0x1
+ 799 01ac 31       		.byte	0x31
+ 800 01ad 00       		.byte	0
+ 801 01ae 00       		.byte	0
+ 802 01af 12       		.uleb128 0x12
+ 803 01b0 B7010000 		.4byte	.LASF23
+ 804 01b4 01       		.byte	0x1
+ 805 01b5 88       		.byte	0x88
+ 806 01b6 00000000 		.4byte	.LFB2
+ 807 01ba 1C000000 		.4byte	.LFE2-.LFB2
+ 808 01be 01       		.uleb128 0x1
+ 809 01bf 9C       		.byte	0x9c
+ 810 01c0 D7010000 		.4byte	0x1d7
+ 811 01c4 13       		.uleb128 0x13
+ 812 01c5 0C000000 		.4byte	.LVL14
+ 813 01c9 8A010000 		.4byte	0x18a
+ 814 01cd 14       		.uleb128 0x14
+ 815 01ce 18000000 		.4byte	.LVL15
+ 816 01d2 3A010000 		.4byte	0x13a
+ 817 01d6 00       		.byte	0
+ 818 01d7 15       		.uleb128 0x15
+ 819 01d8 46000000 		.4byte	.LASF39
+ 820 01dc 01       		.byte	0x1
+ 821 01dd FB       		.byte	0xfb
+ 822 01de 6B000000 		.4byte	0x6b
+ 823 01e2 00000000 		.4byte	.LFB5
+ 824 01e6 10000000 		.4byte	.LFE5-.LFB5
+ 825 01ea 01       		.uleb128 0x1
+ 826 01eb 9C       		.byte	0x9c
+ 827 01ec 16       		.uleb128 0x16
+ 828 01ed 75020000 		.4byte	.LASF40
+ 829 01f1 01       		.byte	0x1
+ 830 01f2 BF01     		.2byte	0x1bf
+ 831 01f4 77000000 		.4byte	0x77
+ 832 01f8 00000000 		.4byte	.LFB7
+ 833 01fc A4000000 		.4byte	.LFE7-.LFB7
+ 834 0200 01       		.uleb128 0x1
+ 835 0201 9C       		.byte	0x9c
+ 836 0202 63020000 		.4byte	0x263
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 27
+
+
+ 837 0206 0A       		.uleb128 0xa
+ 838 0207 94000000 		.4byte	.LASF24
+ 839 020b 01       		.byte	0x1
+ 840 020c C101     		.2byte	0x1c1
+ 841 020e 6B000000 		.4byte	0x6b
+ 842 0212 B6000000 		.4byte	.LLST5
+ 843 0216 0A       		.uleb128 0xa
+ 844 0217 2D000000 		.4byte	.LASF25
+ 845 021b 01       		.byte	0x1
+ 846 021c C201     		.2byte	0x1c2
+ 847 021e 6B000000 		.4byte	0x6b
+ 848 0222 C9000000 		.4byte	.LLST6
+ 849 0226 0A       		.uleb128 0xa
+ 850 0227 A1000000 		.4byte	.LASF26
+ 851 022b 01       		.byte	0x1
+ 852 022c C301     		.2byte	0x1c3
+ 853 022e 6B000000 		.4byte	0x6b
+ 854 0232 DC000000 		.4byte	.LLST7
+ 855 0236 0A       		.uleb128 0xa
+ 856 0237 08000000 		.4byte	.LASF27
+ 857 023b 01       		.byte	0x1
+ 858 023c C401     		.2byte	0x1c4
+ 859 023e 6B000000 		.4byte	0x6b
+ 860 0242 EF000000 		.4byte	.LLST8
+ 861 0246 17       		.uleb128 0x17
+ 862 0247 60000000 		.4byte	.LVL19
+ 863 024b D4000000 		.4byte	0xd4
+ 864 024f 59020000 		.4byte	0x259
+ 865 0253 0C       		.uleb128 0xc
+ 866 0254 01       		.uleb128 0x1
+ 867 0255 50       		.byte	0x50
+ 868 0256 01       		.uleb128 0x1
+ 869 0257 31       		.byte	0x31
+ 870 0258 00       		.byte	0
+ 871 0259 13       		.uleb128 0x13
+ 872 025a 68000000 		.4byte	.LVL20
+ 873 025e D4000000 		.4byte	0xd4
+ 874 0262 00       		.byte	0
+ 875 0263 18       		.uleb128 0x18
+ 876 0264 2B020000 		.4byte	.LASF28
+ 877 0268 01       		.byte	0x1
+ 878 0269 1102     		.2byte	0x211
+ 879 026b 00000000 		.4byte	.LFB8
+ 880 026f 10000000 		.4byte	.LFE8-.LFB8
+ 881 0273 01       		.uleb128 0x1
+ 882 0274 9C       		.byte	0x9c
+ 883 0275 8A020000 		.4byte	0x28a
+ 884 0279 09       		.uleb128 0x9
+ 885 027a 00000000 		.4byte	.LASF30
+ 886 027e 01       		.byte	0x1
+ 887 027f 1102     		.2byte	0x211
+ 888 0281 77000000 		.4byte	0x77
+ 889 0285 02010000 		.4byte	.LLST9
+ 890 0289 00       		.byte	0
+ 891 028a 19       		.uleb128 0x19
+ 892 028b 0E000000 		.4byte	.LASF31
+ 893 028f 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 28
+
+
+ 894 0290 3502     		.2byte	0x235
+ 895 0292 00000000 		.4byte	.LFB9
+ 896 0296 10000000 		.4byte	.LFE9-.LFB9
+ 897 029a 01       		.uleb128 0x1
+ 898 029b 9C       		.byte	0x9c
+ 899 029c 19       		.uleb128 0x19
+ 900 029d A8000000 		.4byte	.LASF32
+ 901 02a1 01       		.byte	0x1
+ 902 02a2 4B02     		.2byte	0x24b
+ 903 02a4 00000000 		.4byte	.LFB10
+ 904 02a8 10000000 		.4byte	.LFE10-.LFB10
+ 905 02ac 01       		.uleb128 0x1
+ 906 02ad 9C       		.byte	0x9c
+ 907 02ae 1A       		.uleb128 0x1a
+ 908 02af 34000000 		.4byte	.LASF41
+ 909 02b3 01       		.byte	0x1
+ 910 02b4 14       		.byte	0x14
+ 911 02b5 6B000000 		.4byte	0x6b
+ 912 02b9 05       		.uleb128 0x5
+ 913 02ba 03       		.byte	0x3
+ 914 02bb 00000000 		.4byte	ZCD_compA_initVar
+ 915 02bf 1B       		.uleb128 0x1b
+ 916 02c0 66020000 		.4byte	.LASF42
+ 917 02c4 66020000 		.4byte	.LASF42
+ 918 02c8 03       		.byte	0x3
+ 919 02c9 77       		.byte	0x77
+ 920 02ca 00       		.byte	0
+ 921              		.section	.debug_abbrev,"",%progbits
+ 922              	.Ldebug_abbrev0:
+ 923 0000 01       		.uleb128 0x1
+ 924 0001 11       		.uleb128 0x11
+ 925 0002 01       		.byte	0x1
+ 926 0003 25       		.uleb128 0x25
+ 927 0004 0E       		.uleb128 0xe
+ 928 0005 13       		.uleb128 0x13
+ 929 0006 0B       		.uleb128 0xb
+ 930 0007 03       		.uleb128 0x3
+ 931 0008 0E       		.uleb128 0xe
+ 932 0009 1B       		.uleb128 0x1b
+ 933 000a 0E       		.uleb128 0xe
+ 934 000b 55       		.uleb128 0x55
+ 935 000c 17       		.uleb128 0x17
+ 936 000d 11       		.uleb128 0x11
+ 937 000e 01       		.uleb128 0x1
+ 938 000f 10       		.uleb128 0x10
+ 939 0010 17       		.uleb128 0x17
+ 940 0011 00       		.byte	0
+ 941 0012 00       		.byte	0
+ 942 0013 02       		.uleb128 0x2
+ 943 0014 24       		.uleb128 0x24
+ 944 0015 00       		.byte	0
+ 945 0016 0B       		.uleb128 0xb
+ 946 0017 0B       		.uleb128 0xb
+ 947 0018 3E       		.uleb128 0x3e
+ 948 0019 0B       		.uleb128 0xb
+ 949 001a 03       		.uleb128 0x3
+ 950 001b 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 29
+
+
+ 951 001c 00       		.byte	0
+ 952 001d 00       		.byte	0
+ 953 001e 03       		.uleb128 0x3
+ 954 001f 24       		.uleb128 0x24
+ 955 0020 00       		.byte	0
+ 956 0021 0B       		.uleb128 0xb
+ 957 0022 0B       		.uleb128 0xb
+ 958 0023 3E       		.uleb128 0x3e
+ 959 0024 0B       		.uleb128 0xb
+ 960 0025 03       		.uleb128 0x3
+ 961 0026 08       		.uleb128 0x8
+ 962 0027 00       		.byte	0
+ 963 0028 00       		.byte	0
+ 964 0029 04       		.uleb128 0x4
+ 965 002a 16       		.uleb128 0x16
+ 966 002b 00       		.byte	0
+ 967 002c 03       		.uleb128 0x3
+ 968 002d 0E       		.uleb128 0xe
+ 969 002e 3A       		.uleb128 0x3a
+ 970 002f 0B       		.uleb128 0xb
+ 971 0030 3B       		.uleb128 0x3b
+ 972 0031 05       		.uleb128 0x5
+ 973 0032 49       		.uleb128 0x49
+ 974 0033 13       		.uleb128 0x13
+ 975 0034 00       		.byte	0
+ 976 0035 00       		.byte	0
+ 977 0036 05       		.uleb128 0x5
+ 978 0037 35       		.uleb128 0x35
+ 979 0038 00       		.byte	0
+ 980 0039 49       		.uleb128 0x49
+ 981 003a 13       		.uleb128 0x13
+ 982 003b 00       		.byte	0
+ 983 003c 00       		.byte	0
+ 984 003d 06       		.uleb128 0x6
+ 985 003e 2E       		.uleb128 0x2e
+ 986 003f 01       		.byte	0x1
+ 987 0040 3F       		.uleb128 0x3f
+ 988 0041 19       		.uleb128 0x19
+ 989 0042 03       		.uleb128 0x3
+ 990 0043 0E       		.uleb128 0xe
+ 991 0044 3A       		.uleb128 0x3a
+ 992 0045 0B       		.uleb128 0xb
+ 993 0046 3B       		.uleb128 0x3b
+ 994 0047 0B       		.uleb128 0xb
+ 995 0048 27       		.uleb128 0x27
+ 996 0049 19       		.uleb128 0x19
+ 997 004a 20       		.uleb128 0x20
+ 998 004b 0B       		.uleb128 0xb
+ 999 004c 01       		.uleb128 0x1
+ 1000 004d 13       		.uleb128 0x13
+ 1001 004e 00       		.byte	0
+ 1002 004f 00       		.byte	0
+ 1003 0050 07       		.uleb128 0x7
+ 1004 0051 05       		.uleb128 0x5
+ 1005 0052 00       		.byte	0
+ 1006 0053 03       		.uleb128 0x3
+ 1007 0054 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 30
+
+
+ 1008 0055 3A       		.uleb128 0x3a
+ 1009 0056 0B       		.uleb128 0xb
+ 1010 0057 3B       		.uleb128 0x3b
+ 1011 0058 0B       		.uleb128 0xb
+ 1012 0059 49       		.uleb128 0x49
+ 1013 005a 13       		.uleb128 0x13
+ 1014 005b 00       		.byte	0
+ 1015 005c 00       		.byte	0
+ 1016 005d 08       		.uleb128 0x8
+ 1017 005e 2E       		.uleb128 0x2e
+ 1018 005f 01       		.byte	0x1
+ 1019 0060 03       		.uleb128 0x3
+ 1020 0061 0E       		.uleb128 0xe
+ 1021 0062 3A       		.uleb128 0x3a
+ 1022 0063 0B       		.uleb128 0xb
+ 1023 0064 3B       		.uleb128 0x3b
+ 1024 0065 05       		.uleb128 0x5
+ 1025 0066 27       		.uleb128 0x27
+ 1026 0067 19       		.uleb128 0x19
+ 1027 0068 11       		.uleb128 0x11
+ 1028 0069 01       		.uleb128 0x1
+ 1029 006a 12       		.uleb128 0x12
+ 1030 006b 06       		.uleb128 0x6
+ 1031 006c 40       		.uleb128 0x40
+ 1032 006d 18       		.uleb128 0x18
+ 1033 006e 9742     		.uleb128 0x2117
+ 1034 0070 19       		.uleb128 0x19
+ 1035 0071 01       		.uleb128 0x1
+ 1036 0072 13       		.uleb128 0x13
+ 1037 0073 00       		.byte	0
+ 1038 0074 00       		.byte	0
+ 1039 0075 09       		.uleb128 0x9
+ 1040 0076 05       		.uleb128 0x5
+ 1041 0077 00       		.byte	0
+ 1042 0078 03       		.uleb128 0x3
+ 1043 0079 0E       		.uleb128 0xe
+ 1044 007a 3A       		.uleb128 0x3a
+ 1045 007b 0B       		.uleb128 0xb
+ 1046 007c 3B       		.uleb128 0x3b
+ 1047 007d 05       		.uleb128 0x5
+ 1048 007e 49       		.uleb128 0x49
+ 1049 007f 13       		.uleb128 0x13
+ 1050 0080 02       		.uleb128 0x2
+ 1051 0081 17       		.uleb128 0x17
+ 1052 0082 00       		.byte	0
+ 1053 0083 00       		.byte	0
+ 1054 0084 0A       		.uleb128 0xa
+ 1055 0085 34       		.uleb128 0x34
+ 1056 0086 00       		.byte	0
+ 1057 0087 03       		.uleb128 0x3
+ 1058 0088 0E       		.uleb128 0xe
+ 1059 0089 3A       		.uleb128 0x3a
+ 1060 008a 0B       		.uleb128 0xb
+ 1061 008b 3B       		.uleb128 0x3b
+ 1062 008c 05       		.uleb128 0x5
+ 1063 008d 49       		.uleb128 0x49
+ 1064 008e 13       		.uleb128 0x13
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 31
+
+
+ 1065 008f 02       		.uleb128 0x2
+ 1066 0090 17       		.uleb128 0x17
+ 1067 0091 00       		.byte	0
+ 1068 0092 00       		.byte	0
+ 1069 0093 0B       		.uleb128 0xb
+ 1070 0094 898201   		.uleb128 0x4109
+ 1071 0097 01       		.byte	0x1
+ 1072 0098 11       		.uleb128 0x11
+ 1073 0099 01       		.uleb128 0x1
+ 1074 009a 31       		.uleb128 0x31
+ 1075 009b 13       		.uleb128 0x13
+ 1076 009c 00       		.byte	0
+ 1077 009d 00       		.byte	0
+ 1078 009e 0C       		.uleb128 0xc
+ 1079 009f 8A8201   		.uleb128 0x410a
+ 1080 00a2 00       		.byte	0
+ 1081 00a3 02       		.uleb128 0x2
+ 1082 00a4 18       		.uleb128 0x18
+ 1083 00a5 9142     		.uleb128 0x2111
+ 1084 00a7 18       		.uleb128 0x18
+ 1085 00a8 00       		.byte	0
+ 1086 00a9 00       		.byte	0
+ 1087 00aa 0D       		.uleb128 0xd
+ 1088 00ab 2E       		.uleb128 0x2e
+ 1089 00ac 00       		.byte	0
+ 1090 00ad 3F       		.uleb128 0x3f
+ 1091 00ae 19       		.uleb128 0x19
+ 1092 00af 03       		.uleb128 0x3
+ 1093 00b0 0E       		.uleb128 0xe
+ 1094 00b1 3A       		.uleb128 0x3a
+ 1095 00b2 0B       		.uleb128 0xb
+ 1096 00b3 3B       		.uleb128 0x3b
+ 1097 00b4 0B       		.uleb128 0xb
+ 1098 00b5 27       		.uleb128 0x27
+ 1099 00b6 19       		.uleb128 0x19
+ 1100 00b7 11       		.uleb128 0x11
+ 1101 00b8 01       		.uleb128 0x1
+ 1102 00b9 12       		.uleb128 0x12
+ 1103 00ba 06       		.uleb128 0x6
+ 1104 00bb 40       		.uleb128 0x40
+ 1105 00bc 18       		.uleb128 0x18
+ 1106 00bd 9742     		.uleb128 0x2117
+ 1107 00bf 19       		.uleb128 0x19
+ 1108 00c0 00       		.byte	0
+ 1109 00c1 00       		.byte	0
+ 1110 00c2 0E       		.uleb128 0xe
+ 1111 00c3 2E       		.uleb128 0x2e
+ 1112 00c4 01       		.byte	0x1
+ 1113 00c5 31       		.uleb128 0x31
+ 1114 00c6 13       		.uleb128 0x13
+ 1115 00c7 11       		.uleb128 0x11
+ 1116 00c8 01       		.uleb128 0x1
+ 1117 00c9 12       		.uleb128 0x12
+ 1118 00ca 06       		.uleb128 0x6
+ 1119 00cb 40       		.uleb128 0x40
+ 1120 00cc 18       		.uleb128 0x18
+ 1121 00cd 9742     		.uleb128 0x2117
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 32
+
+
+ 1122 00cf 19       		.uleb128 0x19
+ 1123 00d0 01       		.uleb128 0x1
+ 1124 00d1 13       		.uleb128 0x13
+ 1125 00d2 00       		.byte	0
+ 1126 00d3 00       		.byte	0
+ 1127 00d4 0F       		.uleb128 0xf
+ 1128 00d5 05       		.uleb128 0x5
+ 1129 00d6 00       		.byte	0
+ 1130 00d7 31       		.uleb128 0x31
+ 1131 00d8 13       		.uleb128 0x13
+ 1132 00d9 02       		.uleb128 0x2
+ 1133 00da 18       		.uleb128 0x18
+ 1134 00db 00       		.byte	0
+ 1135 00dc 00       		.byte	0
+ 1136 00dd 10       		.uleb128 0x10
+ 1137 00de 0B       		.uleb128 0xb
+ 1138 00df 01       		.byte	0x1
+ 1139 00e0 11       		.uleb128 0x11
+ 1140 00e1 01       		.uleb128 0x1
+ 1141 00e2 12       		.uleb128 0x12
+ 1142 00e3 06       		.uleb128 0x6
+ 1143 00e4 00       		.byte	0
+ 1144 00e5 00       		.byte	0
+ 1145 00e6 11       		.uleb128 0x11
+ 1146 00e7 05       		.uleb128 0x5
+ 1147 00e8 00       		.byte	0
+ 1148 00e9 31       		.uleb128 0x31
+ 1149 00ea 13       		.uleb128 0x13
+ 1150 00eb 02       		.uleb128 0x2
+ 1151 00ec 17       		.uleb128 0x17
+ 1152 00ed 00       		.byte	0
+ 1153 00ee 00       		.byte	0
+ 1154 00ef 12       		.uleb128 0x12
+ 1155 00f0 2E       		.uleb128 0x2e
+ 1156 00f1 01       		.byte	0x1
+ 1157 00f2 3F       		.uleb128 0x3f
+ 1158 00f3 19       		.uleb128 0x19
+ 1159 00f4 03       		.uleb128 0x3
+ 1160 00f5 0E       		.uleb128 0xe
+ 1161 00f6 3A       		.uleb128 0x3a
+ 1162 00f7 0B       		.uleb128 0xb
+ 1163 00f8 3B       		.uleb128 0x3b
+ 1164 00f9 0B       		.uleb128 0xb
+ 1165 00fa 27       		.uleb128 0x27
+ 1166 00fb 19       		.uleb128 0x19
+ 1167 00fc 11       		.uleb128 0x11
+ 1168 00fd 01       		.uleb128 0x1
+ 1169 00fe 12       		.uleb128 0x12
+ 1170 00ff 06       		.uleb128 0x6
+ 1171 0100 40       		.uleb128 0x40
+ 1172 0101 18       		.uleb128 0x18
+ 1173 0102 9742     		.uleb128 0x2117
+ 1174 0104 19       		.uleb128 0x19
+ 1175 0105 01       		.uleb128 0x1
+ 1176 0106 13       		.uleb128 0x13
+ 1177 0107 00       		.byte	0
+ 1178 0108 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 33
+
+
+ 1179 0109 13       		.uleb128 0x13
+ 1180 010a 898201   		.uleb128 0x4109
+ 1181 010d 00       		.byte	0
+ 1182 010e 11       		.uleb128 0x11
+ 1183 010f 01       		.uleb128 0x1
+ 1184 0110 31       		.uleb128 0x31
+ 1185 0111 13       		.uleb128 0x13
+ 1186 0112 00       		.byte	0
+ 1187 0113 00       		.byte	0
+ 1188 0114 14       		.uleb128 0x14
+ 1189 0115 898201   		.uleb128 0x4109
+ 1190 0118 00       		.byte	0
+ 1191 0119 11       		.uleb128 0x11
+ 1192 011a 01       		.uleb128 0x1
+ 1193 011b 9542     		.uleb128 0x2115
+ 1194 011d 19       		.uleb128 0x19
+ 1195 011e 31       		.uleb128 0x31
+ 1196 011f 13       		.uleb128 0x13
+ 1197 0120 00       		.byte	0
+ 1198 0121 00       		.byte	0
+ 1199 0122 15       		.uleb128 0x15
+ 1200 0123 2E       		.uleb128 0x2e
+ 1201 0124 00       		.byte	0
+ 1202 0125 3F       		.uleb128 0x3f
+ 1203 0126 19       		.uleb128 0x19
+ 1204 0127 03       		.uleb128 0x3
+ 1205 0128 0E       		.uleb128 0xe
+ 1206 0129 3A       		.uleb128 0x3a
+ 1207 012a 0B       		.uleb128 0xb
+ 1208 012b 3B       		.uleb128 0x3b
+ 1209 012c 0B       		.uleb128 0xb
+ 1210 012d 27       		.uleb128 0x27
+ 1211 012e 19       		.uleb128 0x19
+ 1212 012f 49       		.uleb128 0x49
+ 1213 0130 13       		.uleb128 0x13
+ 1214 0131 11       		.uleb128 0x11
+ 1215 0132 01       		.uleb128 0x1
+ 1216 0133 12       		.uleb128 0x12
+ 1217 0134 06       		.uleb128 0x6
+ 1218 0135 40       		.uleb128 0x40
+ 1219 0136 18       		.uleb128 0x18
+ 1220 0137 9742     		.uleb128 0x2117
+ 1221 0139 19       		.uleb128 0x19
+ 1222 013a 00       		.byte	0
+ 1223 013b 00       		.byte	0
+ 1224 013c 16       		.uleb128 0x16
+ 1225 013d 2E       		.uleb128 0x2e
+ 1226 013e 01       		.byte	0x1
+ 1227 013f 3F       		.uleb128 0x3f
+ 1228 0140 19       		.uleb128 0x19
+ 1229 0141 03       		.uleb128 0x3
+ 1230 0142 0E       		.uleb128 0xe
+ 1231 0143 3A       		.uleb128 0x3a
+ 1232 0144 0B       		.uleb128 0xb
+ 1233 0145 3B       		.uleb128 0x3b
+ 1234 0146 05       		.uleb128 0x5
+ 1235 0147 27       		.uleb128 0x27
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 34
+
+
+ 1236 0148 19       		.uleb128 0x19
+ 1237 0149 49       		.uleb128 0x49
+ 1238 014a 13       		.uleb128 0x13
+ 1239 014b 11       		.uleb128 0x11
+ 1240 014c 01       		.uleb128 0x1
+ 1241 014d 12       		.uleb128 0x12
+ 1242 014e 06       		.uleb128 0x6
+ 1243 014f 40       		.uleb128 0x40
+ 1244 0150 18       		.uleb128 0x18
+ 1245 0151 9742     		.uleb128 0x2117
+ 1246 0153 19       		.uleb128 0x19
+ 1247 0154 01       		.uleb128 0x1
+ 1248 0155 13       		.uleb128 0x13
+ 1249 0156 00       		.byte	0
+ 1250 0157 00       		.byte	0
+ 1251 0158 17       		.uleb128 0x17
+ 1252 0159 898201   		.uleb128 0x4109
+ 1253 015c 01       		.byte	0x1
+ 1254 015d 11       		.uleb128 0x11
+ 1255 015e 01       		.uleb128 0x1
+ 1256 015f 31       		.uleb128 0x31
+ 1257 0160 13       		.uleb128 0x13
+ 1258 0161 01       		.uleb128 0x1
+ 1259 0162 13       		.uleb128 0x13
+ 1260 0163 00       		.byte	0
+ 1261 0164 00       		.byte	0
+ 1262 0165 18       		.uleb128 0x18
+ 1263 0166 2E       		.uleb128 0x2e
+ 1264 0167 01       		.byte	0x1
+ 1265 0168 3F       		.uleb128 0x3f
+ 1266 0169 19       		.uleb128 0x19
+ 1267 016a 03       		.uleb128 0x3
+ 1268 016b 0E       		.uleb128 0xe
+ 1269 016c 3A       		.uleb128 0x3a
+ 1270 016d 0B       		.uleb128 0xb
+ 1271 016e 3B       		.uleb128 0x3b
+ 1272 016f 05       		.uleb128 0x5
+ 1273 0170 27       		.uleb128 0x27
+ 1274 0171 19       		.uleb128 0x19
+ 1275 0172 11       		.uleb128 0x11
+ 1276 0173 01       		.uleb128 0x1
+ 1277 0174 12       		.uleb128 0x12
+ 1278 0175 06       		.uleb128 0x6
+ 1279 0176 40       		.uleb128 0x40
+ 1280 0177 18       		.uleb128 0x18
+ 1281 0178 9742     		.uleb128 0x2117
+ 1282 017a 19       		.uleb128 0x19
+ 1283 017b 01       		.uleb128 0x1
+ 1284 017c 13       		.uleb128 0x13
+ 1285 017d 00       		.byte	0
+ 1286 017e 00       		.byte	0
+ 1287 017f 19       		.uleb128 0x19
+ 1288 0180 2E       		.uleb128 0x2e
+ 1289 0181 00       		.byte	0
+ 1290 0182 3F       		.uleb128 0x3f
+ 1291 0183 19       		.uleb128 0x19
+ 1292 0184 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 35
+
+
+ 1293 0185 0E       		.uleb128 0xe
+ 1294 0186 3A       		.uleb128 0x3a
+ 1295 0187 0B       		.uleb128 0xb
+ 1296 0188 3B       		.uleb128 0x3b
+ 1297 0189 05       		.uleb128 0x5
+ 1298 018a 27       		.uleb128 0x27
+ 1299 018b 19       		.uleb128 0x19
+ 1300 018c 11       		.uleb128 0x11
+ 1301 018d 01       		.uleb128 0x1
+ 1302 018e 12       		.uleb128 0x12
+ 1303 018f 06       		.uleb128 0x6
+ 1304 0190 40       		.uleb128 0x40
+ 1305 0191 18       		.uleb128 0x18
+ 1306 0192 9742     		.uleb128 0x2117
+ 1307 0194 19       		.uleb128 0x19
+ 1308 0195 00       		.byte	0
+ 1309 0196 00       		.byte	0
+ 1310 0197 1A       		.uleb128 0x1a
+ 1311 0198 34       		.uleb128 0x34
+ 1312 0199 00       		.byte	0
+ 1313 019a 03       		.uleb128 0x3
+ 1314 019b 0E       		.uleb128 0xe
+ 1315 019c 3A       		.uleb128 0x3a
+ 1316 019d 0B       		.uleb128 0xb
+ 1317 019e 3B       		.uleb128 0x3b
+ 1318 019f 0B       		.uleb128 0xb
+ 1319 01a0 49       		.uleb128 0x49
+ 1320 01a1 13       		.uleb128 0x13
+ 1321 01a2 3F       		.uleb128 0x3f
+ 1322 01a3 19       		.uleb128 0x19
+ 1323 01a4 02       		.uleb128 0x2
+ 1324 01a5 18       		.uleb128 0x18
+ 1325 01a6 00       		.byte	0
+ 1326 01a7 00       		.byte	0
+ 1327 01a8 1B       		.uleb128 0x1b
+ 1328 01a9 2E       		.uleb128 0x2e
+ 1329 01aa 00       		.byte	0
+ 1330 01ab 3F       		.uleb128 0x3f
+ 1331 01ac 19       		.uleb128 0x19
+ 1332 01ad 3C       		.uleb128 0x3c
+ 1333 01ae 19       		.uleb128 0x19
+ 1334 01af 6E       		.uleb128 0x6e
+ 1335 01b0 0E       		.uleb128 0xe
+ 1336 01b1 03       		.uleb128 0x3
+ 1337 01b2 0E       		.uleb128 0xe
+ 1338 01b3 3A       		.uleb128 0x3a
+ 1339 01b4 0B       		.uleb128 0xb
+ 1340 01b5 3B       		.uleb128 0x3b
+ 1341 01b6 0B       		.uleb128 0xb
+ 1342 01b7 00       		.byte	0
+ 1343 01b8 00       		.byte	0
+ 1344 01b9 00       		.byte	0
+ 1345              		.section	.debug_loc,"",%progbits
+ 1346              	.Ldebug_loc0:
+ 1347              	.LLST0:
+ 1348 0000 00000000 		.4byte	.LVL0
+ 1349 0004 36000000 		.4byte	.LVL3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 36
+
+
+ 1350 0008 0100     		.2byte	0x1
+ 1351 000a 50       		.byte	0x50
+ 1352 000b 36000000 		.4byte	.LVL3
+ 1353 000f 72000000 		.4byte	.LVL7
+ 1354 0013 0400     		.2byte	0x4
+ 1355 0015 F3       		.byte	0xf3
+ 1356 0016 01       		.uleb128 0x1
+ 1357 0017 50       		.byte	0x50
+ 1358 0018 9F       		.byte	0x9f
+ 1359 0019 72000000 		.4byte	.LVL7
+ 1360 001d 76000000 		.4byte	.LVL8
+ 1361 0021 0100     		.2byte	0x1
+ 1362 0023 50       		.byte	0x50
+ 1363 0024 76000000 		.4byte	.LVL8
+ 1364 0028 88000000 		.4byte	.LFE6
+ 1365 002c 0400     		.2byte	0x4
+ 1366 002e F3       		.byte	0xf3
+ 1367 002f 01       		.uleb128 0x1
+ 1368 0030 50       		.byte	0x50
+ 1369 0031 9F       		.byte	0x9f
+ 1370 0032 00000000 		.4byte	0
+ 1371 0036 00000000 		.4byte	0
+ 1372              	.LLST1:
+ 1373 003a 2C000000 		.4byte	.LVL2
+ 1374 003e 36000000 		.4byte	.LVL3
+ 1375 0042 0200     		.2byte	0x2
+ 1376 0044 30       		.byte	0x30
+ 1377 0045 9F       		.byte	0x9f
+ 1378 0046 36000000 		.4byte	.LVL3
+ 1379 004a 66000000 		.4byte	.LVL5
+ 1380 004e 0100     		.2byte	0x1
+ 1381 0050 56       		.byte	0x56
+ 1382 0051 66000000 		.4byte	.LVL5
+ 1383 0055 68000000 		.4byte	.LVL6
+ 1384 0059 0300     		.2byte	0x3
+ 1385 005b 76       		.byte	0x76
+ 1386 005c 01       		.sleb128 1
+ 1387 005d 9F       		.byte	0x9f
+ 1388 005e 76000000 		.4byte	.LVL8
+ 1389 0062 7A000000 		.4byte	.LVL9
+ 1390 0066 0100     		.2byte	0x1
+ 1391 0068 56       		.byte	0x56
+ 1392 0069 00000000 		.4byte	0
+ 1393 006d 00000000 		.4byte	0
+ 1394              	.LLST2:
+ 1395 0071 2C000000 		.4byte	.LVL2
+ 1396 0075 72000000 		.4byte	.LVL7
+ 1397 0079 0100     		.2byte	0x1
+ 1398 007b 57       		.byte	0x57
+ 1399 007c 76000000 		.4byte	.LVL8
+ 1400 0080 7A000000 		.4byte	.LVL9
+ 1401 0084 0100     		.2byte	0x1
+ 1402 0086 57       		.byte	0x57
+ 1403 0087 00000000 		.4byte	0
+ 1404 008b 00000000 		.4byte	0
+ 1405              	.LLST3:
+ 1406 008f 0E000000 		.4byte	.LVL1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 37
+
+
+ 1407 0093 7A000000 		.4byte	.LVL9
+ 1408 0097 0100     		.2byte	0x1
+ 1409 0099 54       		.byte	0x54
+ 1410 009a 00000000 		.4byte	0
+ 1411 009e 00000000 		.4byte	0
+ 1412              	.LLST4:
+ 1413 00a2 20000000 		.4byte	.LVL11
+ 1414 00a6 2C000000 		.4byte	.LVL12
+ 1415 00aa 0200     		.2byte	0x2
+ 1416 00ac 31       		.byte	0x31
+ 1417 00ad 9F       		.byte	0x9f
+ 1418 00ae 00000000 		.4byte	0
+ 1419 00b2 00000000 		.4byte	0
+ 1420              	.LLST5:
+ 1421 00b6 44000000 		.4byte	.LVL16
+ 1422 00ba 8A000000 		.4byte	.LVL21
+ 1423 00be 0100     		.2byte	0x1
+ 1424 00c0 5A       		.byte	0x5a
+ 1425 00c1 00000000 		.4byte	0
+ 1426 00c5 00000000 		.4byte	0
+ 1427              	.LLST6:
+ 1428 00c9 4E000000 		.4byte	.LVL17
+ 1429 00cd 8A000000 		.4byte	.LVL21
+ 1430 00d1 0100     		.2byte	0x1
+ 1431 00d3 59       		.byte	0x59
+ 1432 00d4 00000000 		.4byte	0
+ 1433 00d8 00000000 		.4byte	0
+ 1434              	.LLST7:
+ 1435 00dc 4E000000 		.4byte	.LVL17
+ 1436 00e0 8A000000 		.4byte	.LVL21
+ 1437 00e4 0100     		.2byte	0x1
+ 1438 00e6 58       		.byte	0x58
+ 1439 00e7 00000000 		.4byte	0
+ 1440 00eb 00000000 		.4byte	0
+ 1441              	.LLST8:
+ 1442 00ef 52000000 		.4byte	.LVL18
+ 1443 00f3 8A000000 		.4byte	.LVL21
+ 1444 00f7 0100     		.2byte	0x1
+ 1445 00f9 5B       		.byte	0x5b
+ 1446 00fa 00000000 		.4byte	0
+ 1447 00fe 00000000 		.4byte	0
+ 1448              	.LLST9:
+ 1449 0102 00000000 		.4byte	.LVL22
+ 1450 0106 06000000 		.4byte	.LVL23
+ 1451 010a 0100     		.2byte	0x1
+ 1452 010c 50       		.byte	0x50
+ 1453 010d 06000000 		.4byte	.LVL23
+ 1454 0111 10000000 		.4byte	.LFE8
+ 1455 0115 0400     		.2byte	0x4
+ 1456 0117 F3       		.byte	0xf3
+ 1457 0118 01       		.uleb128 0x1
+ 1458 0119 50       		.byte	0x50
+ 1459 011a 9F       		.byte	0x9f
+ 1460 011b 00000000 		.4byte	0
+ 1461 011f 00000000 		.4byte	0
+ 1462              		.section	.debug_aranges,"",%progbits
+ 1463 0000 6C000000 		.4byte	0x6c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 38
+
+
+ 1464 0004 0200     		.2byte	0x2
+ 1465 0006 00000000 		.4byte	.Ldebug_info0
+ 1466 000a 04       		.byte	0x4
+ 1467 000b 00       		.byte	0
+ 1468 000c 0000     		.2byte	0
+ 1469 000e 0000     		.2byte	0
+ 1470 0010 00000000 		.4byte	.LFB6
+ 1471 0014 88000000 		.4byte	.LFE6-.LFB6
+ 1472 0018 00000000 		.4byte	.LFB1
+ 1473 001c 18000000 		.4byte	.LFE1-.LFB1
+ 1474 0020 00000000 		.4byte	.LFB3
+ 1475 0024 18000000 		.4byte	.LFE3-.LFB3
+ 1476 0028 00000000 		.4byte	.LFB4
+ 1477 002c 58000000 		.4byte	.LFE4-.LFB4
+ 1478 0030 00000000 		.4byte	.LFB0
+ 1479 0034 40000000 		.4byte	.LFE0-.LFB0
+ 1480 0038 00000000 		.4byte	.LFB2
+ 1481 003c 1C000000 		.4byte	.LFE2-.LFB2
+ 1482 0040 00000000 		.4byte	.LFB5
+ 1483 0044 10000000 		.4byte	.LFE5-.LFB5
+ 1484 0048 00000000 		.4byte	.LFB7
+ 1485 004c A4000000 		.4byte	.LFE7-.LFB7
+ 1486 0050 00000000 		.4byte	.LFB8
+ 1487 0054 10000000 		.4byte	.LFE8-.LFB8
+ 1488 0058 00000000 		.4byte	.LFB9
+ 1489 005c 10000000 		.4byte	.LFE9-.LFB9
+ 1490 0060 00000000 		.4byte	.LFB10
+ 1491 0064 10000000 		.4byte	.LFE10-.LFB10
+ 1492 0068 00000000 		.4byte	0
+ 1493 006c 00000000 		.4byte	0
+ 1494              		.section	.debug_ranges,"",%progbits
+ 1495              	.Ldebug_ranges0:
+ 1496 0000 00000000 		.4byte	.LFB6
+ 1497 0004 88000000 		.4byte	.LFE6
+ 1498 0008 00000000 		.4byte	.LFB1
+ 1499 000c 18000000 		.4byte	.LFE1
+ 1500 0010 00000000 		.4byte	.LFB3
+ 1501 0014 18000000 		.4byte	.LFE3
+ 1502 0018 00000000 		.4byte	.LFB4
+ 1503 001c 58000000 		.4byte	.LFE4
+ 1504 0020 00000000 		.4byte	.LFB0
+ 1505 0024 40000000 		.4byte	.LFE0
+ 1506 0028 00000000 		.4byte	.LFB2
+ 1507 002c 1C000000 		.4byte	.LFE2
+ 1508 0030 00000000 		.4byte	.LFB5
+ 1509 0034 10000000 		.4byte	.LFE5
+ 1510 0038 00000000 		.4byte	.LFB7
+ 1511 003c A4000000 		.4byte	.LFE7
+ 1512 0040 00000000 		.4byte	.LFB8
+ 1513 0044 10000000 		.4byte	.LFE8
+ 1514 0048 00000000 		.4byte	.LFB9
+ 1515 004c 10000000 		.4byte	.LFE9
+ 1516 0050 00000000 		.4byte	.LFB10
+ 1517 0054 10000000 		.4byte	.LFE10
+ 1518 0058 00000000 		.4byte	0
+ 1519 005c 00000000 		.4byte	0
+ 1520              		.section	.debug_line,"",%progbits
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 39
+
+
+ 1521              	.Ldebug_line0:
+ 1522 0000 96010000 		.section	.debug_str,"MS",%progbits,1
+ 1522      02005100 
+ 1522      00000201 
+ 1522      FB0E0D00 
+ 1522      01010101 
+ 1523              	.LASF30:
+ 1524 0000 7472696D 		.ascii	"trimVal\000"
+ 1524      56616C00 
+ 1525              	.LASF27:
+ 1526 0008 746D7043 		.ascii	"tmpCR\000"
+ 1526      5200
+ 1527              	.LASF31:
+ 1528 000e 5A43445F 		.ascii	"ZCD_compA_PwrDwnOverrideEnable\000"
+ 1528      636F6D70 
+ 1528      415F5077 
+ 1528      7244776E 
+ 1528      4F766572 
+ 1529              	.LASF25:
+ 1530 002d 746D7053 		.ascii	"tmpSW2\000"
+ 1530      573200
+ 1531              	.LASF41:
+ 1532 0034 5A43445F 		.ascii	"ZCD_compA_initVar\000"
+ 1532      636F6D70 
+ 1532      415F696E 
+ 1532      69745661 
+ 1532      7200
+ 1533              	.LASF39:
+ 1534 0046 5A43445F 		.ascii	"ZCD_compA_GetCompare\000"
+ 1534      636F6D70 
+ 1534      415F4765 
+ 1534      74436F6D 
+ 1534      70617265 
+ 1535              	.LASF3:
+ 1536 005b 73686F72 		.ascii	"short unsigned int\000"
+ 1536      7420756E 
+ 1536      7369676E 
+ 1536      65642069 
+ 1536      6E7400
+ 1537              	.LASF38:
+ 1538 006e 5A43445F 		.ascii	"ZCD_compA_trimAdjust\000"
+ 1538      636F6D70 
+ 1538      415F7472 
+ 1538      696D4164 
+ 1538      6A757374 
+ 1539              	.LASF20:
+ 1540 0083 5A43445F 		.ascii	"ZCD_compA_Enable\000"
+ 1540      636F6D70 
+ 1540      415F456E 
+ 1540      61626C65 
+ 1540      00
+ 1541              	.LASF24:
+ 1542 0094 746D7053 		.ascii	"tmpSW0\000"
+ 1542      573000
+ 1543              	.LASF12:
+ 1544 009b 666C6F61 		.ascii	"float\000"
+ 1544      7400
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 40
+
+
+ 1545              	.LASF26:
+ 1546 00a1 746D7053 		.ascii	"tmpSW3\000"
+ 1546      573300
+ 1547              	.LASF32:
+ 1548 00a8 5A43445F 		.ascii	"ZCD_compA_PwrDwnOverrideDisable\000"
+ 1548      636F6D70 
+ 1548      415F5077 
+ 1548      7244776E 
+ 1548      4F766572 
+ 1549              	.LASF1:
+ 1550 00c8 756E7369 		.ascii	"unsigned char\000"
+ 1550      676E6564 
+ 1550      20636861 
+ 1550      7200
+ 1551              	.LASF15:
+ 1552 00d6 72656738 		.ascii	"reg8\000"
+ 1552      00
+ 1553              	.LASF17:
+ 1554 00db 7472696D 		.ascii	"trimCnt\000"
+ 1554      436E7400 
+ 1555              	.LASF5:
+ 1556 00e3 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1556      20756E73 
+ 1556      69676E65 
+ 1556      6420696E 
+ 1556      7400
+ 1557              	.LASF33:
+ 1558 00f5 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1558      43393920 
+ 1558      352E342E 
+ 1558      31203230 
+ 1558      31363036 
+ 1559 0128 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1559      20726576 
+ 1559      6973696F 
+ 1559      6E203233 
+ 1559      37373135 
+ 1560 015b 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 1560      74643D67 
+ 1560      6E753939 
+ 1560      202D6666 
+ 1560      756E6374 
+ 1561              	.LASF9:
+ 1562 018e 75696E74 		.ascii	"uint8\000"
+ 1562      3800
+ 1563              	.LASF34:
+ 1564 0194 47656E65 		.ascii	"Generated_Source\\PSoC5\\ZCD_compA.c\000"
+ 1564      72617465 
+ 1564      645F536F 
+ 1564      75726365 
+ 1564      5C50536F 
+ 1565              	.LASF23:
+ 1566 01b7 5A43445F 		.ascii	"ZCD_compA_Start\000"
+ 1566      636F6D70 
+ 1566      415F5374 
+ 1566      61727400 
+ 1567              	.LASF13:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 41
+
+
+ 1568 01c7 646F7562 		.ascii	"double\000"
+ 1568      6C6500
+ 1569              	.LASF10:
+ 1570 01ce 75696E74 		.ascii	"uint16\000"
+ 1570      313600
+ 1571              	.LASF11:
+ 1572 01d5 75696E74 		.ascii	"uint32\000"
+ 1572      333200
+ 1573              	.LASF8:
+ 1574 01dc 756E7369 		.ascii	"unsigned int\000"
+ 1574      676E6564 
+ 1574      20696E74 
+ 1574      00
+ 1575              	.LASF19:
+ 1576 01e9 636D7053 		.ascii	"cmpState\000"
+ 1576      74617465 
+ 1576      00
+ 1577              	.LASF7:
+ 1578 01f2 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1578      206C6F6E 
+ 1578      6720756E 
+ 1578      7369676E 
+ 1578      65642069 
+ 1579              	.LASF36:
+ 1580 0209 5A43445F 		.ascii	"ZCD_compA_SetSpeed\000"
+ 1580      636F6D70 
+ 1580      415F5365 
+ 1580      74537065 
+ 1580      656400
+ 1581              	.LASF22:
+ 1582 021c 5A43445F 		.ascii	"ZCD_compA_Init\000"
+ 1582      636F6D70 
+ 1582      415F496E 
+ 1582      697400
+ 1583              	.LASF28:
+ 1584 022b 5A43445F 		.ascii	"ZCD_compA_LoadTrim\000"
+ 1584      636F6D70 
+ 1584      415F4C6F 
+ 1584      61645472 
+ 1584      696D00
+ 1585              	.LASF37:
+ 1586 023e 73706565 		.ascii	"speed\000"
+ 1586      6400
+ 1587              	.LASF16:
+ 1588 0244 73697A65 		.ascii	"sizetype\000"
+ 1588      74797065 
+ 1588      00
+ 1589              	.LASF18:
+ 1590 024d 7472696D 		.ascii	"trimCntMax\000"
+ 1590      436E744D 
+ 1590      617800
+ 1591              	.LASF6:
+ 1592 0258 6C6F6E67 		.ascii	"long long int\000"
+ 1592      206C6F6E 
+ 1592      6720696E 
+ 1592      7400
+ 1593              	.LASF42:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccFeB4tK.s 			page 42
+
+
+ 1594 0266 43794465 		.ascii	"CyDelayUs\000"
+ 1594      6C617955 
+ 1594      7300
+ 1595              	.LASF14:
+ 1596 0270 63686172 		.ascii	"char\000"
+ 1596      00
+ 1597              	.LASF40:
+ 1598 0275 5A43445F 		.ascii	"ZCD_compA_ZeroCal\000"
+ 1598      636F6D70 
+ 1598      415F5A65 
+ 1598      726F4361 
+ 1598      6C00
+ 1599              	.LASF2:
+ 1600 0287 73686F72 		.ascii	"short int\000"
+ 1600      7420696E 
+ 1600      7400
+ 1601              	.LASF35:
+ 1602 0291 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 1602      73657273 
+ 1602      5C636865 
+ 1602      6D695C55 
+ 1602      44335F51 
+ 1603              	.LASF4:
+ 1604 02b6 6C6F6E67 		.ascii	"long int\000"
+ 1604      20696E74 
+ 1604      00
+ 1605              	.LASF0:
+ 1606 02bf 7369676E 		.ascii	"signed char\000"
+ 1606      65642063 
+ 1606      68617200 
+ 1607              	.LASF21:
+ 1608 02cb 5A43445F 		.ascii	"ZCD_compA_Stop\000"
+ 1608      636F6D70 
+ 1608      415F5374 
+ 1608      6F7000
+ 1609              	.LASF29:
+ 1610 02da 6E696262 		.ascii	"nibble\000"
+ 1610      6C6500
+ 1611              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

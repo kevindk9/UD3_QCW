@@ -1,0 +1,2498 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"ZCD_counter.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.ZCD_counter_Enable,"ax",%progbits
+  20              		.align	1
+  21              		.global	ZCD_counter_Enable
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	ZCD_counter_Enable, %function
+  25              	ZCD_counter_Enable:
+  26              	.LFB1:
+  27              		.file 1 "Generated_Source\\PSoC5\\ZCD_counter.c"
+   1:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/ZCD_counter.c **** * File Name: ZCD_counter.c  
+   3:Generated_Source\PSoC5/ZCD_counter.c **** * Version 3.0
+   4:Generated_Source\PSoC5/ZCD_counter.c **** *
+   5:Generated_Source\PSoC5/ZCD_counter.c **** *  Description:
+   6:Generated_Source\PSoC5/ZCD_counter.c **** *     The Counter component consists of a 8, 16, 24 or 32-bit counter with
+   7:Generated_Source\PSoC5/ZCD_counter.c **** *     a selectable period between 2 and 2^Width - 1.  
+   8:Generated_Source\PSoC5/ZCD_counter.c **** *
+   9:Generated_Source\PSoC5/ZCD_counter.c **** *   Note:
+  10:Generated_Source\PSoC5/ZCD_counter.c **** *     None
+  11:Generated_Source\PSoC5/ZCD_counter.c **** *
+  12:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+  13:Generated_Source\PSoC5/ZCD_counter.c **** * Copyright 2008-2012, Cypress Semiconductor Corporation.  All rights reserved.
+  14:Generated_Source\PSoC5/ZCD_counter.c **** * You may use this file only in accordance with the license, terms, conditions, 
+  15:Generated_Source\PSoC5/ZCD_counter.c **** * disclaimers, and limitations in the end user license agreement accompanying 
+  16:Generated_Source\PSoC5/ZCD_counter.c **** * the software package with which this file was provided.
+  17:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+  18:Generated_Source\PSoC5/ZCD_counter.c **** 
+  19:Generated_Source\PSoC5/ZCD_counter.c **** #include "ZCD_counter.h"
+  20:Generated_Source\PSoC5/ZCD_counter.c **** 
+  21:Generated_Source\PSoC5/ZCD_counter.c **** uint8 ZCD_counter_initVar = 0u;
+  22:Generated_Source\PSoC5/ZCD_counter.c **** 
+  23:Generated_Source\PSoC5/ZCD_counter.c **** 
+  24:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+  25:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_Init
+  26:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+  27:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+  28:Generated_Source\PSoC5/ZCD_counter.c **** *     Initialize to the schematic state
+  29:Generated_Source\PSoC5/ZCD_counter.c **** * 
+  30:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 2
+
+
+  31:Generated_Source\PSoC5/ZCD_counter.c **** *  void  
+  32:Generated_Source\PSoC5/ZCD_counter.c **** *
+  33:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+  34:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+  35:Generated_Source\PSoC5/ZCD_counter.c **** *
+  36:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+  37:Generated_Source\PSoC5/ZCD_counter.c **** void ZCD_counter_Init(void) 
+  38:Generated_Source\PSoC5/ZCD_counter.c **** {
+  39:Generated_Source\PSoC5/ZCD_counter.c ****         #if (!ZCD_counter_UsingFixedFunction && !ZCD_counter_ControlRegRemoved)
+  40:Generated_Source\PSoC5/ZCD_counter.c ****             uint8 ctrl;
+  41:Generated_Source\PSoC5/ZCD_counter.c ****         #endif /* (!ZCD_counter_UsingFixedFunction && !ZCD_counter_ControlRegRemoved) */
+  42:Generated_Source\PSoC5/ZCD_counter.c ****         
+  43:Generated_Source\PSoC5/ZCD_counter.c ****         #if(!ZCD_counter_UsingFixedFunction) 
+  44:Generated_Source\PSoC5/ZCD_counter.c ****             /* Interrupt State Backup for Critical Region*/
+  45:Generated_Source\PSoC5/ZCD_counter.c ****             uint8 ZCD_counter_interruptState;
+  46:Generated_Source\PSoC5/ZCD_counter.c ****         #endif /* (!ZCD_counter_UsingFixedFunction) */
+  47:Generated_Source\PSoC5/ZCD_counter.c ****         
+  48:Generated_Source\PSoC5/ZCD_counter.c ****         #if (ZCD_counter_UsingFixedFunction)
+  49:Generated_Source\PSoC5/ZCD_counter.c ****             /* Clear all bits but the enable bit (if it's already set for Timer operation */
+  50:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_CONTROL &= ZCD_counter_CTRL_ENABLE;
+  51:Generated_Source\PSoC5/ZCD_counter.c ****             
+  52:Generated_Source\PSoC5/ZCD_counter.c ****             /* Clear the mode bits for continuous run mode */
+  53:Generated_Source\PSoC5/ZCD_counter.c ****             #if (CY_PSOC5A)
+  54:Generated_Source\PSoC5/ZCD_counter.c ****                 ZCD_counter_CONTROL2 &= ((uint8)(~ZCD_counter_CTRL_MODE_MASK));
+  55:Generated_Source\PSoC5/ZCD_counter.c ****             #endif /* (CY_PSOC5A) */
+  56:Generated_Source\PSoC5/ZCD_counter.c ****             #if (CY_PSOC3 || CY_PSOC5LP)
+  57:Generated_Source\PSoC5/ZCD_counter.c ****                 ZCD_counter_CONTROL3 &= ((uint8)(~ZCD_counter_CTRL_MODE_MASK));                
+  58:Generated_Source\PSoC5/ZCD_counter.c ****             #endif /* (CY_PSOC3 || CY_PSOC5LP) */
+  59:Generated_Source\PSoC5/ZCD_counter.c ****             /* Check if One Shot mode is enabled i.e. RunMode !=0*/
+  60:Generated_Source\PSoC5/ZCD_counter.c ****             #if (ZCD_counter_RunModeUsed != 0x0u)
+  61:Generated_Source\PSoC5/ZCD_counter.c ****                 /* Set 3rd bit of Control register to enable one shot mode */
+  62:Generated_Source\PSoC5/ZCD_counter.c ****                 ZCD_counter_CONTROL |= ZCD_counter_ONESHOT;
+  63:Generated_Source\PSoC5/ZCD_counter.c ****             #endif /* (ZCD_counter_RunModeUsed != 0x0u) */
+  64:Generated_Source\PSoC5/ZCD_counter.c ****             
+  65:Generated_Source\PSoC5/ZCD_counter.c ****             /* Set the IRQ to use the status register interrupts */
+  66:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_CONTROL2 |= ZCD_counter_CTRL2_IRQ_SEL;
+  67:Generated_Source\PSoC5/ZCD_counter.c ****             
+  68:Generated_Source\PSoC5/ZCD_counter.c ****             /* Clear and Set SYNCTC and SYNCCMP bits of RT1 register */
+  69:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_RT1 &= ((uint8)(~ZCD_counter_RT1_MASK));
+  70:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_RT1 |= ZCD_counter_SYNC;     
+  71:Generated_Source\PSoC5/ZCD_counter.c ****                     
+  72:Generated_Source\PSoC5/ZCD_counter.c ****             /*Enable DSI Sync all all inputs of the Timer*/
+  73:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_RT1 &= ((uint8)(~ZCD_counter_SYNCDSI_MASK));
+  74:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_RT1 |= ZCD_counter_SYNCDSI_EN;
+  75:Generated_Source\PSoC5/ZCD_counter.c **** 
+  76:Generated_Source\PSoC5/ZCD_counter.c ****         #else
+  77:Generated_Source\PSoC5/ZCD_counter.c ****             #if(!ZCD_counter_ControlRegRemoved)
+  78:Generated_Source\PSoC5/ZCD_counter.c ****             /* Set the default compare mode defined in the parameter */
+  79:Generated_Source\PSoC5/ZCD_counter.c ****             ctrl = ZCD_counter_CONTROL & ((uint8)(~ZCD_counter_CTRL_CMPMODE_MASK));
+  80:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_CONTROL = ctrl | ZCD_counter_DEFAULT_COMPARE_MODE;
+  81:Generated_Source\PSoC5/ZCD_counter.c ****             
+  82:Generated_Source\PSoC5/ZCD_counter.c ****             /* Set the default capture mode defined in the parameter */
+  83:Generated_Source\PSoC5/ZCD_counter.c ****             ctrl = ZCD_counter_CONTROL & ((uint8)(~ZCD_counter_CTRL_CAPMODE_MASK));
+  84:Generated_Source\PSoC5/ZCD_counter.c ****             
+  85:Generated_Source\PSoC5/ZCD_counter.c ****             #if( 0 != ZCD_counter_CAPTURE_MODE_CONF)
+  86:Generated_Source\PSoC5/ZCD_counter.c ****                 ZCD_counter_CONTROL = ctrl | ZCD_counter_DEFAULT_CAPTURE_MODE;
+  87:Generated_Source\PSoC5/ZCD_counter.c ****             #else
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 3
+
+
+  88:Generated_Source\PSoC5/ZCD_counter.c ****                 ZCD_counter_CONTROL = ctrl;
+  89:Generated_Source\PSoC5/ZCD_counter.c ****             #endif /* 0 != ZCD_counter_CAPTURE_MODE */ 
+  90:Generated_Source\PSoC5/ZCD_counter.c ****             
+  91:Generated_Source\PSoC5/ZCD_counter.c ****             #endif /* (!ZCD_counter_ControlRegRemoved) */
+  92:Generated_Source\PSoC5/ZCD_counter.c ****         #endif /* (ZCD_counter_UsingFixedFunction) */
+  93:Generated_Source\PSoC5/ZCD_counter.c ****         
+  94:Generated_Source\PSoC5/ZCD_counter.c ****         /* Clear all data in the FIFO's */
+  95:Generated_Source\PSoC5/ZCD_counter.c ****         #if (!ZCD_counter_UsingFixedFunction)
+  96:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_ClearFIFO();
+  97:Generated_Source\PSoC5/ZCD_counter.c ****         #endif /* (!ZCD_counter_UsingFixedFunction) */
+  98:Generated_Source\PSoC5/ZCD_counter.c ****         
+  99:Generated_Source\PSoC5/ZCD_counter.c ****         /* Set Initial values from Configuration */
+ 100:Generated_Source\PSoC5/ZCD_counter.c ****         ZCD_counter_WritePeriod(ZCD_counter_INIT_PERIOD_VALUE);
+ 101:Generated_Source\PSoC5/ZCD_counter.c ****         #if (!(ZCD_counter_UsingFixedFunction && (CY_PSOC5A)))
+ 102:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_WriteCounter(ZCD_counter_INIT_COUNTER_VALUE);
+ 103:Generated_Source\PSoC5/ZCD_counter.c ****         #endif /* (!(ZCD_counter_UsingFixedFunction && (CY_PSOC5A))) */
+ 104:Generated_Source\PSoC5/ZCD_counter.c ****         ZCD_counter_SetInterruptMode(ZCD_counter_INIT_INTERRUPTS_MASK);
+ 105:Generated_Source\PSoC5/ZCD_counter.c ****         
+ 106:Generated_Source\PSoC5/ZCD_counter.c ****         #if (!ZCD_counter_UsingFixedFunction)
+ 107:Generated_Source\PSoC5/ZCD_counter.c ****             /* Read the status register to clear the unwanted interrupts */
+ 108:Generated_Source\PSoC5/ZCD_counter.c ****             (void)ZCD_counter_ReadStatusRegister();
+ 109:Generated_Source\PSoC5/ZCD_counter.c ****             /* Set the compare value (only available to non-fixed function implementation */
+ 110:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_WriteCompare(ZCD_counter_INIT_COMPARE_VALUE);
+ 111:Generated_Source\PSoC5/ZCD_counter.c ****             /* Use the interrupt output of the status register for IRQ output */
+ 112:Generated_Source\PSoC5/ZCD_counter.c ****             
+ 113:Generated_Source\PSoC5/ZCD_counter.c ****             /* CyEnterCriticalRegion and CyExitCriticalRegion are used to mark following region cri
+ 114:Generated_Source\PSoC5/ZCD_counter.c ****             /* Enter Critical Region*/
+ 115:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_interruptState = CyEnterCriticalSection();
+ 116:Generated_Source\PSoC5/ZCD_counter.c ****             
+ 117:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_STATUS_AUX_CTRL |= ZCD_counter_STATUS_ACTL_INT_EN_MASK;
+ 118:Generated_Source\PSoC5/ZCD_counter.c ****             
+ 119:Generated_Source\PSoC5/ZCD_counter.c ****             /* Exit Critical Region*/
+ 120:Generated_Source\PSoC5/ZCD_counter.c ****             CyExitCriticalSection(ZCD_counter_interruptState);
+ 121:Generated_Source\PSoC5/ZCD_counter.c ****             
+ 122:Generated_Source\PSoC5/ZCD_counter.c ****         #endif /* (!ZCD_counter_UsingFixedFunction) */
+ 123:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 124:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 125:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 126:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 127:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_Enable
+ 128:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 129:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 130:Generated_Source\PSoC5/ZCD_counter.c **** *     Enable the Counter
+ 131:Generated_Source\PSoC5/ZCD_counter.c **** * 
+ 132:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 133:Generated_Source\PSoC5/ZCD_counter.c **** *  void  
+ 134:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 135:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 136:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+ 137:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 138:Generated_Source\PSoC5/ZCD_counter.c **** * Side Effects: 
+ 139:Generated_Source\PSoC5/ZCD_counter.c **** *   If the Enable mode is set to Hardware only then this function has no effect 
+ 140:Generated_Source\PSoC5/ZCD_counter.c **** *   on the operation of the counter.
+ 141:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 142:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 143:Generated_Source\PSoC5/ZCD_counter.c **** void ZCD_counter_Enable(void) 
+ 144:Generated_Source\PSoC5/ZCD_counter.c **** {
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 4
+
+
+  28              		.loc 1 144 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+ 145:Generated_Source\PSoC5/ZCD_counter.c ****     /* Globally Enable the Fixed Function Block chosen */
+ 146:Generated_Source\PSoC5/ZCD_counter.c ****     #if (ZCD_counter_UsingFixedFunction)
+ 147:Generated_Source\PSoC5/ZCD_counter.c ****         ZCD_counter_GLOBAL_ENABLE |= ZCD_counter_BLOCK_EN_MASK;
+ 148:Generated_Source\PSoC5/ZCD_counter.c ****         ZCD_counter_GLOBAL_STBY_ENABLE |= ZCD_counter_BLOCK_STBY_EN_MASK;
+ 149:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */  
+ 150:Generated_Source\PSoC5/ZCD_counter.c ****         
+ 151:Generated_Source\PSoC5/ZCD_counter.c ****     /* Enable the counter from the control register  */
+ 152:Generated_Source\PSoC5/ZCD_counter.c ****     /* If Fixed Function then make sure Mode is set correctly */
+ 153:Generated_Source\PSoC5/ZCD_counter.c ****     /* else make sure reset is clear */
+ 154:Generated_Source\PSoC5/ZCD_counter.c ****     #if(!ZCD_counter_ControlRegRemoved || ZCD_counter_UsingFixedFunction)
+ 155:Generated_Source\PSoC5/ZCD_counter.c ****         ZCD_counter_CONTROL |= ZCD_counter_CTRL_ENABLE;                
+  33              		.loc 1 155 0
+  34 0000 024A     		ldr	r2, .L2
+  35 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  36 0004 43F08003 		orr	r3, r3, #128
+  37 0008 1370     		strb	r3, [r2]
+  38 000a 7047     		bx	lr
+  39              	.L3:
+  40              		.align	2
+  41              	.L2:
+  42 000c 75640040 		.word	1073767541
+  43              		.cfi_endproc
+  44              	.LFE1:
+  45              		.size	ZCD_counter_Enable, .-ZCD_counter_Enable
+  46              		.section	.text.ZCD_counter_Stop,"ax",%progbits
+  47              		.align	1
+  48              		.global	ZCD_counter_Stop
+  49              		.thumb
+  50              		.thumb_func
+  51              		.type	ZCD_counter_Stop, %function
+  52              	ZCD_counter_Stop:
+  53              	.LFB3:
+ 156:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (!ZCD_counter_ControlRegRemoved || ZCD_counter_UsingFixedFunction) */
+ 157:Generated_Source\PSoC5/ZCD_counter.c ****     
+ 158:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 159:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 160:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 161:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 162:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_Start
+ 163:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 164:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 165:Generated_Source\PSoC5/ZCD_counter.c **** *  Enables the counter for operation 
+ 166:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 167:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 168:Generated_Source\PSoC5/ZCD_counter.c **** *  void  
+ 169:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 170:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 171:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+ 172:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 173:Generated_Source\PSoC5/ZCD_counter.c **** * Global variables:
+ 174:Generated_Source\PSoC5/ZCD_counter.c **** *  ZCD_counter_initVar: Is modified when this function is called for the  
+ 175:Generated_Source\PSoC5/ZCD_counter.c **** *   first time. Is used to ensure that initialization happens only once.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 5
+
+
+ 176:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 177:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 178:Generated_Source\PSoC5/ZCD_counter.c **** void ZCD_counter_Start(void) 
+ 179:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 180:Generated_Source\PSoC5/ZCD_counter.c ****     if(ZCD_counter_initVar == 0u)
+ 181:Generated_Source\PSoC5/ZCD_counter.c ****     {
+ 182:Generated_Source\PSoC5/ZCD_counter.c ****         ZCD_counter_Init();
+ 183:Generated_Source\PSoC5/ZCD_counter.c ****         
+ 184:Generated_Source\PSoC5/ZCD_counter.c ****         ZCD_counter_initVar = 1u; /* Clear this bit for Initialization */        
+ 185:Generated_Source\PSoC5/ZCD_counter.c ****     }
+ 186:Generated_Source\PSoC5/ZCD_counter.c ****     
+ 187:Generated_Source\PSoC5/ZCD_counter.c ****     /* Enable the Counter */
+ 188:Generated_Source\PSoC5/ZCD_counter.c ****     ZCD_counter_Enable();        
+ 189:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 190:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 191:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 192:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 193:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_Stop
+ 194:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 195:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 196:Generated_Source\PSoC5/ZCD_counter.c **** * Halts the counter, but does not change any modes or disable interrupts.
+ 197:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 198:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 199:Generated_Source\PSoC5/ZCD_counter.c **** *  void  
+ 200:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 201:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 202:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+ 203:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 204:Generated_Source\PSoC5/ZCD_counter.c **** * Side Effects: If the Enable mode is set to Hardware only then this function
+ 205:Generated_Source\PSoC5/ZCD_counter.c **** *               has no effect on the operation of the counter.
+ 206:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 207:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 208:Generated_Source\PSoC5/ZCD_counter.c **** void ZCD_counter_Stop(void) 
+ 209:Generated_Source\PSoC5/ZCD_counter.c **** {
+  54              		.loc 1 209 0
+  55              		.cfi_startproc
+  56              		@ args = 0, pretend = 0, frame = 0
+  57              		@ frame_needed = 0, uses_anonymous_args = 0
+  58              		@ link register save eliminated.
+ 210:Generated_Source\PSoC5/ZCD_counter.c ****     /* Disable Counter */
+ 211:Generated_Source\PSoC5/ZCD_counter.c ****     #if(!ZCD_counter_ControlRegRemoved || ZCD_counter_UsingFixedFunction)
+ 212:Generated_Source\PSoC5/ZCD_counter.c ****         ZCD_counter_CONTROL &= ((uint8)(~ZCD_counter_CTRL_ENABLE));        
+  59              		.loc 1 212 0
+  60 0000 024A     		ldr	r2, .L5
+  61 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  62 0004 03F07F03 		and	r3, r3, #127
+  63 0008 1370     		strb	r3, [r2]
+  64 000a 7047     		bx	lr
+  65              	.L6:
+  66              		.align	2
+  67              	.L5:
+  68 000c 75640040 		.word	1073767541
+  69              		.cfi_endproc
+  70              	.LFE3:
+  71              		.size	ZCD_counter_Stop, .-ZCD_counter_Stop
+  72              		.section	.text.ZCD_counter_SetInterruptMode,"ax",%progbits
+  73              		.align	1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 6
+
+
+  74              		.global	ZCD_counter_SetInterruptMode
+  75              		.thumb
+  76              		.thumb_func
+  77              		.type	ZCD_counter_SetInterruptMode, %function
+  78              	ZCD_counter_SetInterruptMode:
+  79              	.LFB4:
+ 213:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (!ZCD_counter_ControlRegRemoved || ZCD_counter_UsingFixedFunction) */
+ 214:Generated_Source\PSoC5/ZCD_counter.c ****     
+ 215:Generated_Source\PSoC5/ZCD_counter.c ****     /* Globally disable the Fixed Function Block chosen */
+ 216:Generated_Source\PSoC5/ZCD_counter.c ****     #if (ZCD_counter_UsingFixedFunction)
+ 217:Generated_Source\PSoC5/ZCD_counter.c ****         ZCD_counter_GLOBAL_ENABLE &= ((uint8)(~ZCD_counter_BLOCK_EN_MASK));
+ 218:Generated_Source\PSoC5/ZCD_counter.c ****         ZCD_counter_GLOBAL_STBY_ENABLE &= ((uint8)(~ZCD_counter_BLOCK_STBY_EN_MASK));
+ 219:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */
+ 220:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 221:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 222:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 223:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 224:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_SetInterruptMode
+ 225:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 226:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 227:Generated_Source\PSoC5/ZCD_counter.c **** * Configures which interrupt sources are enabled to generate the final interrupt
+ 228:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 229:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 230:Generated_Source\PSoC5/ZCD_counter.c **** *  InterruptsMask: This parameter is an or'd collection of the status bits
+ 231:Generated_Source\PSoC5/ZCD_counter.c **** *                   which will be allowed to generate the counters interrupt.   
+ 232:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 233:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 234:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+ 235:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 236:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 237:Generated_Source\PSoC5/ZCD_counter.c **** void ZCD_counter_SetInterruptMode(uint8 interruptsMask) 
+ 238:Generated_Source\PSoC5/ZCD_counter.c **** {
+  80              		.loc 1 238 0
+  81              		.cfi_startproc
+  82              		@ args = 0, pretend = 0, frame = 0
+  83              		@ frame_needed = 0, uses_anonymous_args = 0
+  84              		@ link register save eliminated.
+  85              	.LVL0:
+ 239:Generated_Source\PSoC5/ZCD_counter.c ****     ZCD_counter_STATUS_MASK = interruptsMask;
+  86              		.loc 1 239 0
+  87 0000 014B     		ldr	r3, .L8
+  88 0002 1870     		strb	r0, [r3]
+  89 0004 7047     		bx	lr
+  90              	.L9:
+  91 0006 00BF     		.align	2
+  92              	.L8:
+  93 0008 83640040 		.word	1073767555
+  94              		.cfi_endproc
+  95              	.LFE4:
+  96              		.size	ZCD_counter_SetInterruptMode, .-ZCD_counter_SetInterruptMode
+  97              		.section	.text.ZCD_counter_ReadStatusRegister,"ax",%progbits
+  98              		.align	1
+  99              		.global	ZCD_counter_ReadStatusRegister
+ 100              		.thumb
+ 101              		.thumb_func
+ 102              		.type	ZCD_counter_ReadStatusRegister, %function
+ 103              	ZCD_counter_ReadStatusRegister:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 7
+
+
+ 104              	.LFB5:
+ 240:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 241:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 242:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 243:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 244:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_ReadStatusRegister
+ 245:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 246:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 247:Generated_Source\PSoC5/ZCD_counter.c **** *   Reads the status register and returns it's state. This function should use
+ 248:Generated_Source\PSoC5/ZCD_counter.c **** *       defined types for the bit-field information as the bits in this
+ 249:Generated_Source\PSoC5/ZCD_counter.c **** *       register may be permuteable.
+ 250:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 251:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 252:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+ 253:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 254:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 255:Generated_Source\PSoC5/ZCD_counter.c **** *  (uint8) The contents of the status register
+ 256:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 257:Generated_Source\PSoC5/ZCD_counter.c **** * Side Effects:
+ 258:Generated_Source\PSoC5/ZCD_counter.c **** *   Status register bits may be clear on read. 
+ 259:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 260:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 261:Generated_Source\PSoC5/ZCD_counter.c **** uint8   ZCD_counter_ReadStatusRegister(void) 
+ 262:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 105              		.loc 1 262 0
+ 106              		.cfi_startproc
+ 107              		@ args = 0, pretend = 0, frame = 0
+ 108              		@ frame_needed = 0, uses_anonymous_args = 0
+ 109              		@ link register save eliminated.
+ 263:Generated_Source\PSoC5/ZCD_counter.c ****     return ZCD_counter_STATUS;
+ 110              		.loc 1 263 0
+ 111 0000 014B     		ldr	r3, .L11
+ 112 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 264:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 113              		.loc 1 264 0
+ 114 0004 7047     		bx	lr
+ 115              	.L12:
+ 116 0006 00BF     		.align	2
+ 117              	.L11:
+ 118 0008 63640040 		.word	1073767523
+ 119              		.cfi_endproc
+ 120              	.LFE5:
+ 121              		.size	ZCD_counter_ReadStatusRegister, .-ZCD_counter_ReadStatusRegister
+ 122              		.section	.text.ZCD_counter_ReadControlRegister,"ax",%progbits
+ 123              		.align	1
+ 124              		.global	ZCD_counter_ReadControlRegister
+ 125              		.thumb
+ 126              		.thumb_func
+ 127              		.type	ZCD_counter_ReadControlRegister, %function
+ 128              	ZCD_counter_ReadControlRegister:
+ 129              	.LFB6:
+ 265:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 266:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 267:Generated_Source\PSoC5/ZCD_counter.c **** #if(!ZCD_counter_ControlRegRemoved)
+ 268:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 269:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_ReadControlRegister
+ 270:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 8
+
+
+ 271:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 272:Generated_Source\PSoC5/ZCD_counter.c **** *   Reads the control register and returns it's state. This function should use
+ 273:Generated_Source\PSoC5/ZCD_counter.c **** *       defined types for the bit-field information as the bits in this
+ 274:Generated_Source\PSoC5/ZCD_counter.c **** *       register may be permuteable.
+ 275:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 276:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 277:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+ 278:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 279:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 280:Generated_Source\PSoC5/ZCD_counter.c **** *  (uint8) The contents of the control register
+ 281:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 282:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 283:Generated_Source\PSoC5/ZCD_counter.c **** uint8   ZCD_counter_ReadControlRegister(void) 
+ 284:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 130              		.loc 1 284 0
+ 131              		.cfi_startproc
+ 132              		@ args = 0, pretend = 0, frame = 0
+ 133              		@ frame_needed = 0, uses_anonymous_args = 0
+ 134              		@ link register save eliminated.
+ 285:Generated_Source\PSoC5/ZCD_counter.c ****     return ZCD_counter_CONTROL;
+ 135              		.loc 1 285 0
+ 136 0000 014B     		ldr	r3, .L14
+ 137 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 286:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 138              		.loc 1 286 0
+ 139 0004 7047     		bx	lr
+ 140              	.L15:
+ 141 0006 00BF     		.align	2
+ 142              	.L14:
+ 143 0008 75640040 		.word	1073767541
+ 144              		.cfi_endproc
+ 145              	.LFE6:
+ 146              		.size	ZCD_counter_ReadControlRegister, .-ZCD_counter_ReadControlRegister
+ 147              		.section	.text.ZCD_counter_WriteControlRegister,"ax",%progbits
+ 148              		.align	1
+ 149              		.global	ZCD_counter_WriteControlRegister
+ 150              		.thumb
+ 151              		.thumb_func
+ 152              		.type	ZCD_counter_WriteControlRegister, %function
+ 153              	ZCD_counter_WriteControlRegister:
+ 154              	.LFB7:
+ 287:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 288:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 289:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 290:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_WriteControlRegister
+ 291:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 292:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 293:Generated_Source\PSoC5/ZCD_counter.c **** *   Sets the bit-field of the control register.  This function should use
+ 294:Generated_Source\PSoC5/ZCD_counter.c **** *       defined types for the bit-field information as the bits in this
+ 295:Generated_Source\PSoC5/ZCD_counter.c **** *       register may be permuteable.
+ 296:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 297:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 298:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+ 299:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 300:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 301:Generated_Source\PSoC5/ZCD_counter.c **** *  (uint8) The contents of the control register
+ 302:Generated_Source\PSoC5/ZCD_counter.c **** *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 9
+
+
+ 303:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 304:Generated_Source\PSoC5/ZCD_counter.c **** void    ZCD_counter_WriteControlRegister(uint8 control) 
+ 305:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 155              		.loc 1 305 0
+ 156              		.cfi_startproc
+ 157              		@ args = 0, pretend = 0, frame = 0
+ 158              		@ frame_needed = 0, uses_anonymous_args = 0
+ 159              		@ link register save eliminated.
+ 160              	.LVL1:
+ 306:Generated_Source\PSoC5/ZCD_counter.c ****     ZCD_counter_CONTROL = control;
+ 161              		.loc 1 306 0
+ 162 0000 014B     		ldr	r3, .L17
+ 163 0002 1870     		strb	r0, [r3]
+ 164 0004 7047     		bx	lr
+ 165              	.L18:
+ 166 0006 00BF     		.align	2
+ 167              	.L17:
+ 168 0008 75640040 		.word	1073767541
+ 169              		.cfi_endproc
+ 170              	.LFE7:
+ 171              		.size	ZCD_counter_WriteControlRegister, .-ZCD_counter_WriteControlRegister
+ 172              		.section	.text.ZCD_counter_WriteCounter,"ax",%progbits
+ 173              		.align	1
+ 174              		.global	ZCD_counter_WriteCounter
+ 175              		.thumb
+ 176              		.thumb_func
+ 177              		.type	ZCD_counter_WriteCounter, %function
+ 178              	ZCD_counter_WriteCounter:
+ 179              	.LFB8:
+ 307:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 308:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 309:Generated_Source\PSoC5/ZCD_counter.c **** #endif  /* (!ZCD_counter_ControlRegRemoved) */
+ 310:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 311:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 312:Generated_Source\PSoC5/ZCD_counter.c **** #if (!(ZCD_counter_UsingFixedFunction && (CY_PSOC5A)))
+ 313:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 314:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_WriteCounter
+ 315:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 316:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 317:Generated_Source\PSoC5/ZCD_counter.c **** *   This funtion is used to set the counter to a specific value
+ 318:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 319:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 320:Generated_Source\PSoC5/ZCD_counter.c **** *  counter:  New counter value. 
+ 321:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 322:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 323:Generated_Source\PSoC5/ZCD_counter.c **** *  void 
+ 324:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 325:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 326:Generated_Source\PSoC5/ZCD_counter.c **** void ZCD_counter_WriteCounter(uint8 counter) \
+ 327:Generated_Source\PSoC5/ZCD_counter.c ****                                    
+ 328:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 180              		.loc 1 328 0
+ 181              		.cfi_startproc
+ 182              		@ args = 0, pretend = 0, frame = 0
+ 183              		@ frame_needed = 0, uses_anonymous_args = 0
+ 184              		@ link register save eliminated.
+ 185              	.LVL2:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 10
+
+
+ 329:Generated_Source\PSoC5/ZCD_counter.c ****     #if(ZCD_counter_UsingFixedFunction)
+ 330:Generated_Source\PSoC5/ZCD_counter.c ****         /* assert if block is already enabled */
+ 331:Generated_Source\PSoC5/ZCD_counter.c ****         CYASSERT (0u == (ZCD_counter_GLOBAL_ENABLE & ZCD_counter_BLOCK_EN_MASK));
+ 332:Generated_Source\PSoC5/ZCD_counter.c ****         /* If block is disabled, enable it and then write the counter */
+ 333:Generated_Source\PSoC5/ZCD_counter.c ****         ZCD_counter_GLOBAL_ENABLE |= ZCD_counter_BLOCK_EN_MASK;
+ 334:Generated_Source\PSoC5/ZCD_counter.c ****         CY_SET_REG16(ZCD_counter_COUNTER_LSB_PTR, (uint16)counter);
+ 335:Generated_Source\PSoC5/ZCD_counter.c ****         ZCD_counter_GLOBAL_ENABLE &= ((uint8)(~ZCD_counter_BLOCK_EN_MASK));
+ 336:Generated_Source\PSoC5/ZCD_counter.c ****     #else
+ 337:Generated_Source\PSoC5/ZCD_counter.c ****         CY_SET_REG8(ZCD_counter_COUNTER_LSB_PTR, counter);
+ 186              		.loc 1 337 0
+ 187 0000 014B     		ldr	r3, .L20
+ 188 0002 1870     		strb	r0, [r3]
+ 189 0004 7047     		bx	lr
+ 190              	.L21:
+ 191 0006 00BF     		.align	2
+ 192              	.L20:
+ 193 0008 00640040 		.word	1073767424
+ 194              		.cfi_endproc
+ 195              	.LFE8:
+ 196              		.size	ZCD_counter_WriteCounter, .-ZCD_counter_WriteCounter
+ 197              		.section	.text.ZCD_counter_ReadCounter,"ax",%progbits
+ 198              		.align	1
+ 199              		.global	ZCD_counter_ReadCounter
+ 200              		.thumb
+ 201              		.thumb_func
+ 202              		.type	ZCD_counter_ReadCounter, %function
+ 203              	ZCD_counter_ReadCounter:
+ 204              	.LFB9:
+ 338:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */
+ 339:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 340:Generated_Source\PSoC5/ZCD_counter.c **** #endif /* (!(ZCD_counter_UsingFixedFunction && (CY_PSOC5A))) */
+ 341:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 342:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 343:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 344:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_ReadCounter
+ 345:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 346:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 347:Generated_Source\PSoC5/ZCD_counter.c **** * Returns the current value of the counter.  It doesn't matter
+ 348:Generated_Source\PSoC5/ZCD_counter.c **** * if the counter is enabled or running.
+ 349:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 350:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 351:Generated_Source\PSoC5/ZCD_counter.c **** *  void:  
+ 352:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 353:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 354:Generated_Source\PSoC5/ZCD_counter.c **** *  (uint8) The present value of the counter.
+ 355:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 356:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 357:Generated_Source\PSoC5/ZCD_counter.c **** uint8 ZCD_counter_ReadCounter(void) 
+ 358:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 205              		.loc 1 358 0
+ 206              		.cfi_startproc
+ 207              		@ args = 0, pretend = 0, frame = 0
+ 208              		@ frame_needed = 0, uses_anonymous_args = 0
+ 209              		@ link register save eliminated.
+ 359:Generated_Source\PSoC5/ZCD_counter.c ****     /* Force capture by reading Accumulator */
+ 360:Generated_Source\PSoC5/ZCD_counter.c ****     /* Must first do a software capture to be able to read the counter */
+ 361:Generated_Source\PSoC5/ZCD_counter.c ****     /* It is up to the user code to make sure there isn't already captured data in the FIFO */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 11
+
+
+ 362:Generated_Source\PSoC5/ZCD_counter.c ****     #if(ZCD_counter_UsingFixedFunction)
+ 363:Generated_Source\PSoC5/ZCD_counter.c **** 		(void)CY_GET_REG16(ZCD_counter_COUNTER_LSB_PTR);
+ 364:Generated_Source\PSoC5/ZCD_counter.c **** 	#else
+ 365:Generated_Source\PSoC5/ZCD_counter.c **** 		(void)CY_GET_REG8(ZCD_counter_COUNTER_LSB_PTR_8BIT);
+ 210              		.loc 1 365 0
+ 211 0000 024B     		ldr	r3, .L23
+ 212 0002 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 366:Generated_Source\PSoC5/ZCD_counter.c **** 	#endif/* (ZCD_counter_UsingFixedFunction) */
+ 367:Generated_Source\PSoC5/ZCD_counter.c ****     
+ 368:Generated_Source\PSoC5/ZCD_counter.c ****     /* Read the data from the FIFO (or capture register for Fixed Function)*/
+ 369:Generated_Source\PSoC5/ZCD_counter.c ****     #if(ZCD_counter_UsingFixedFunction)
+ 370:Generated_Source\PSoC5/ZCD_counter.c ****         return ((uint8)CY_GET_REG16(ZCD_counter_STATICCOUNT_LSB_PTR));
+ 371:Generated_Source\PSoC5/ZCD_counter.c ****     #else
+ 372:Generated_Source\PSoC5/ZCD_counter.c ****         return (CY_GET_REG8(ZCD_counter_STATICCOUNT_LSB_PTR));
+ 213              		.loc 1 372 0
+ 214 0004 024B     		ldr	r3, .L23+4
+ 215 0006 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 373:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */
+ 374:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 216              		.loc 1 374 0
+ 217 0008 7047     		bx	lr
+ 218              	.L24:
+ 219 000a 00BF     		.align	2
+ 220              	.L23:
+ 221 000c 00640040 		.word	1073767424
+ 222 0010 40640040 		.word	1073767488
+ 223              		.cfi_endproc
+ 224              	.LFE9:
+ 225              		.size	ZCD_counter_ReadCounter, .-ZCD_counter_ReadCounter
+ 226              		.section	.text.ZCD_counter_ReadCapture,"ax",%progbits
+ 227              		.align	1
+ 228              		.global	ZCD_counter_ReadCapture
+ 229              		.thumb
+ 230              		.thumb_func
+ 231              		.type	ZCD_counter_ReadCapture, %function
+ 232              	ZCD_counter_ReadCapture:
+ 233              	.LFB10:
+ 375:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 376:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 377:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 378:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_ReadCapture
+ 379:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 380:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 381:Generated_Source\PSoC5/ZCD_counter.c **** *   This function returns the last value captured.
+ 382:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 383:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 384:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+ 385:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 386:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 387:Generated_Source\PSoC5/ZCD_counter.c **** *  (uint8) Present Capture value.
+ 388:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 389:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 390:Generated_Source\PSoC5/ZCD_counter.c **** uint8 ZCD_counter_ReadCapture(void) 
+ 391:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 234              		.loc 1 391 0
+ 235              		.cfi_startproc
+ 236              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 12
+
+
+ 237              		@ frame_needed = 0, uses_anonymous_args = 0
+ 238              		@ link register save eliminated.
+ 392:Generated_Source\PSoC5/ZCD_counter.c ****     #if(ZCD_counter_UsingFixedFunction)
+ 393:Generated_Source\PSoC5/ZCD_counter.c ****         return ((uint8)CY_GET_REG16(ZCD_counter_STATICCOUNT_LSB_PTR));
+ 394:Generated_Source\PSoC5/ZCD_counter.c ****     #else
+ 395:Generated_Source\PSoC5/ZCD_counter.c ****         return (CY_GET_REG8(ZCD_counter_STATICCOUNT_LSB_PTR));
+ 239              		.loc 1 395 0
+ 240 0000 014B     		ldr	r3, .L26
+ 241 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 396:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */
+ 397:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 242              		.loc 1 397 0
+ 243 0004 7047     		bx	lr
+ 244              	.L27:
+ 245 0006 00BF     		.align	2
+ 246              	.L26:
+ 247 0008 40640040 		.word	1073767488
+ 248              		.cfi_endproc
+ 249              	.LFE10:
+ 250              		.size	ZCD_counter_ReadCapture, .-ZCD_counter_ReadCapture
+ 251              		.section	.text.ZCD_counter_WritePeriod,"ax",%progbits
+ 252              		.align	1
+ 253              		.global	ZCD_counter_WritePeriod
+ 254              		.thumb
+ 255              		.thumb_func
+ 256              		.type	ZCD_counter_WritePeriod, %function
+ 257              	ZCD_counter_WritePeriod:
+ 258              	.LFB11:
+ 398:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 399:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 400:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 401:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_WritePeriod
+ 402:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 403:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 404:Generated_Source\PSoC5/ZCD_counter.c **** * Changes the period of the counter.  The new period 
+ 405:Generated_Source\PSoC5/ZCD_counter.c **** * will be loaded the next time terminal count is detected.
+ 406:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 407:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 408:Generated_Source\PSoC5/ZCD_counter.c **** *  period: (uint8) A value of 0 will result in
+ 409:Generated_Source\PSoC5/ZCD_counter.c **** *         the counter remaining at zero.  
+ 410:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 411:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 412:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+ 413:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 414:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 415:Generated_Source\PSoC5/ZCD_counter.c **** void ZCD_counter_WritePeriod(uint8 period) 
+ 416:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 259              		.loc 1 416 0
+ 260              		.cfi_startproc
+ 261              		@ args = 0, pretend = 0, frame = 0
+ 262              		@ frame_needed = 0, uses_anonymous_args = 0
+ 263              		@ link register save eliminated.
+ 264              	.LVL3:
+ 417:Generated_Source\PSoC5/ZCD_counter.c ****     #if(ZCD_counter_UsingFixedFunction)
+ 418:Generated_Source\PSoC5/ZCD_counter.c ****         CY_SET_REG16(ZCD_counter_PERIOD_LSB_PTR,(uint16)period);
+ 419:Generated_Source\PSoC5/ZCD_counter.c ****     #else
+ 420:Generated_Source\PSoC5/ZCD_counter.c ****         CY_SET_REG8(ZCD_counter_PERIOD_LSB_PTR, period);
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 13
+
+
+ 265              		.loc 1 420 0
+ 266 0000 014B     		ldr	r3, .L29
+ 267 0002 1870     		strb	r0, [r3]
+ 268 0004 7047     		bx	lr
+ 269              	.L30:
+ 270 0006 00BF     		.align	2
+ 271              	.L29:
+ 272 0008 20640040 		.word	1073767456
+ 273              		.cfi_endproc
+ 274              	.LFE11:
+ 275              		.size	ZCD_counter_WritePeriod, .-ZCD_counter_WritePeriod
+ 276              		.section	.text.ZCD_counter_ReadPeriod,"ax",%progbits
+ 277              		.align	1
+ 278              		.global	ZCD_counter_ReadPeriod
+ 279              		.thumb
+ 280              		.thumb_func
+ 281              		.type	ZCD_counter_ReadPeriod, %function
+ 282              	ZCD_counter_ReadPeriod:
+ 283              	.LFB12:
+ 421:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */
+ 422:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 423:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 424:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 425:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 426:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_ReadPeriod
+ 427:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 428:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 429:Generated_Source\PSoC5/ZCD_counter.c **** * Reads the current period value without affecting counter operation.
+ 430:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 431:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 432:Generated_Source\PSoC5/ZCD_counter.c **** *  void:  
+ 433:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 434:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 435:Generated_Source\PSoC5/ZCD_counter.c **** *  (uint8) Present period value.
+ 436:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 437:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 438:Generated_Source\PSoC5/ZCD_counter.c **** uint8 ZCD_counter_ReadPeriod(void) 
+ 439:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 284              		.loc 1 439 0
+ 285              		.cfi_startproc
+ 286              		@ args = 0, pretend = 0, frame = 0
+ 287              		@ frame_needed = 0, uses_anonymous_args = 0
+ 288              		@ link register save eliminated.
+ 440:Generated_Source\PSoC5/ZCD_counter.c ****     #if(ZCD_counter_UsingFixedFunction)
+ 441:Generated_Source\PSoC5/ZCD_counter.c ****         return ((uint8)CY_GET_REG16(ZCD_counter_PERIOD_LSB_PTR));
+ 442:Generated_Source\PSoC5/ZCD_counter.c ****     #else
+ 443:Generated_Source\PSoC5/ZCD_counter.c ****         return (CY_GET_REG8(ZCD_counter_PERIOD_LSB_PTR));
+ 289              		.loc 1 443 0
+ 290 0000 014B     		ldr	r3, .L32
+ 291 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 444:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */
+ 445:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 292              		.loc 1 445 0
+ 293 0004 7047     		bx	lr
+ 294              	.L33:
+ 295 0006 00BF     		.align	2
+ 296              	.L32:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 14
+
+
+ 297 0008 20640040 		.word	1073767456
+ 298              		.cfi_endproc
+ 299              	.LFE12:
+ 300              		.size	ZCD_counter_ReadPeriod, .-ZCD_counter_ReadPeriod
+ 301              		.section	.text.ZCD_counter_WriteCompare,"ax",%progbits
+ 302              		.align	1
+ 303              		.global	ZCD_counter_WriteCompare
+ 304              		.thumb
+ 305              		.thumb_func
+ 306              		.type	ZCD_counter_WriteCompare, %function
+ 307              	ZCD_counter_WriteCompare:
+ 308              	.LFB13:
+ 446:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 447:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 448:Generated_Source\PSoC5/ZCD_counter.c **** #if (!ZCD_counter_UsingFixedFunction)
+ 449:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 450:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_WriteCompare
+ 451:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 452:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 453:Generated_Source\PSoC5/ZCD_counter.c **** * Changes the compare value.  The compare output will 
+ 454:Generated_Source\PSoC5/ZCD_counter.c **** * reflect the new value on the next UDB clock.  The compare output will be 
+ 455:Generated_Source\PSoC5/ZCD_counter.c **** * driven high when the present counter value compares true based on the 
+ 456:Generated_Source\PSoC5/ZCD_counter.c **** * configured compare mode setting. 
+ 457:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 458:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 459:Generated_Source\PSoC5/ZCD_counter.c **** *  Compare:  New compare value. 
+ 460:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 461:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 462:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+ 463:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 464:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 465:Generated_Source\PSoC5/ZCD_counter.c **** void ZCD_counter_WriteCompare(uint8 compare) \
+ 466:Generated_Source\PSoC5/ZCD_counter.c ****                                    
+ 467:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 309              		.loc 1 467 0
+ 310              		.cfi_startproc
+ 311              		@ args = 0, pretend = 0, frame = 0
+ 312              		@ frame_needed = 0, uses_anonymous_args = 0
+ 313              		@ link register save eliminated.
+ 314              	.LVL4:
+ 468:Generated_Source\PSoC5/ZCD_counter.c ****     #if(ZCD_counter_UsingFixedFunction)
+ 469:Generated_Source\PSoC5/ZCD_counter.c ****         CY_SET_REG16(ZCD_counter_COMPARE_LSB_PTR, (uint16)compare);
+ 470:Generated_Source\PSoC5/ZCD_counter.c ****     #else
+ 471:Generated_Source\PSoC5/ZCD_counter.c ****         CY_SET_REG8(ZCD_counter_COMPARE_LSB_PTR, compare);
+ 315              		.loc 1 471 0
+ 316 0000 014B     		ldr	r3, .L35
+ 317 0002 1870     		strb	r0, [r3]
+ 318 0004 7047     		bx	lr
+ 319              	.L36:
+ 320 0006 00BF     		.align	2
+ 321              	.L35:
+ 322 0008 30640040 		.word	1073767472
+ 323              		.cfi_endproc
+ 324              	.LFE13:
+ 325              		.size	ZCD_counter_WriteCompare, .-ZCD_counter_WriteCompare
+ 326              		.section	.text.ZCD_counter_ReadCompare,"ax",%progbits
+ 327              		.align	1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 15
+
+
+ 328              		.global	ZCD_counter_ReadCompare
+ 329              		.thumb
+ 330              		.thumb_func
+ 331              		.type	ZCD_counter_ReadCompare, %function
+ 332              	ZCD_counter_ReadCompare:
+ 333              	.LFB14:
+ 472:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */
+ 473:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 474:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 475:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 476:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 477:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_ReadCompare
+ 478:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 479:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 480:Generated_Source\PSoC5/ZCD_counter.c **** * Returns the compare value.
+ 481:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 482:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 483:Generated_Source\PSoC5/ZCD_counter.c **** *  void:
+ 484:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 485:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ 486:Generated_Source\PSoC5/ZCD_counter.c **** *  (uint8) Present compare value.
+ 487:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 488:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 489:Generated_Source\PSoC5/ZCD_counter.c **** uint8 ZCD_counter_ReadCompare(void) 
+ 490:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 334              		.loc 1 490 0
+ 335              		.cfi_startproc
+ 336              		@ args = 0, pretend = 0, frame = 0
+ 337              		@ frame_needed = 0, uses_anonymous_args = 0
+ 338              		@ link register save eliminated.
+ 491:Generated_Source\PSoC5/ZCD_counter.c ****     return (CY_GET_REG8(ZCD_counter_COMPARE_LSB_PTR));
+ 339              		.loc 1 491 0
+ 340 0000 014B     		ldr	r3, .L38
+ 341 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 492:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 342              		.loc 1 492 0
+ 343 0004 7047     		bx	lr
+ 344              	.L39:
+ 345 0006 00BF     		.align	2
+ 346              	.L38:
+ 347 0008 30640040 		.word	1073767472
+ 348              		.cfi_endproc
+ 349              	.LFE14:
+ 350              		.size	ZCD_counter_ReadCompare, .-ZCD_counter_ReadCompare
+ 351              		.section	.text.ZCD_counter_ClearFIFO,"ax",%progbits
+ 352              		.align	1
+ 353              		.global	ZCD_counter_ClearFIFO
+ 354              		.thumb
+ 355              		.thumb_func
+ 356              		.type	ZCD_counter_ClearFIFO, %function
+ 357              	ZCD_counter_ClearFIFO:
+ 358              	.LFB15:
+ 493:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 494:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 495:Generated_Source\PSoC5/ZCD_counter.c **** #if (ZCD_counter_COMPARE_MODE_SOFTWARE)
+ 496:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 497:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_SetCompareMode
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 16
+
+
+ 498:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 499:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 500:Generated_Source\PSoC5/ZCD_counter.c **** *  Sets the software controlled Compare Mode.
+ 501:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 502:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:
+ 503:Generated_Source\PSoC5/ZCD_counter.c **** *  compareMode:  Compare Mode Enumerated Type.
+ 504:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 505:Generated_Source\PSoC5/ZCD_counter.c **** * Return:
+ 506:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+ 507:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 508:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 509:Generated_Source\PSoC5/ZCD_counter.c **** void ZCD_counter_SetCompareMode(uint8 compareMode) 
+ 510:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 511:Generated_Source\PSoC5/ZCD_counter.c ****     /* Clear the compare mode bits in the control register */
+ 512:Generated_Source\PSoC5/ZCD_counter.c ****     ZCD_counter_CONTROL &= ((uint8)(~ZCD_counter_CTRL_CMPMODE_MASK));
+ 513:Generated_Source\PSoC5/ZCD_counter.c ****     
+ 514:Generated_Source\PSoC5/ZCD_counter.c ****     /* Write the new setting */
+ 515:Generated_Source\PSoC5/ZCD_counter.c ****     ZCD_counter_CONTROL |= compareMode;
+ 516:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 517:Generated_Source\PSoC5/ZCD_counter.c **** #endif  /* (ZCD_counter_COMPARE_MODE_SOFTWARE) */
+ 518:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 519:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 520:Generated_Source\PSoC5/ZCD_counter.c **** #if (ZCD_counter_CAPTURE_MODE_SOFTWARE)
+ 521:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 522:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_SetCaptureMode
+ 523:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 524:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 525:Generated_Source\PSoC5/ZCD_counter.c **** *  Sets the software controlled Capture Mode.
+ 526:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 527:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:
+ 528:Generated_Source\PSoC5/ZCD_counter.c **** *  captureMode:  Capture Mode Enumerated Type.
+ 529:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 530:Generated_Source\PSoC5/ZCD_counter.c **** * Return:
+ 531:Generated_Source\PSoC5/ZCD_counter.c **** *  void
+ 532:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 533:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 534:Generated_Source\PSoC5/ZCD_counter.c **** void ZCD_counter_SetCaptureMode(uint8 captureMode) 
+ 535:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 536:Generated_Source\PSoC5/ZCD_counter.c ****     /* Clear the capture mode bits in the control register */
+ 537:Generated_Source\PSoC5/ZCD_counter.c ****     ZCD_counter_CONTROL &= ((uint8)(~ZCD_counter_CTRL_CAPMODE_MASK));
+ 538:Generated_Source\PSoC5/ZCD_counter.c ****     
+ 539:Generated_Source\PSoC5/ZCD_counter.c ****     /* Write the new setting */
+ 540:Generated_Source\PSoC5/ZCD_counter.c ****     ZCD_counter_CONTROL |= ((uint8)((uint8)captureMode << ZCD_counter_CTRL_CAPMODE0_SHIFT));
+ 541:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 542:Generated_Source\PSoC5/ZCD_counter.c **** #endif  /* (ZCD_counter_CAPTURE_MODE_SOFTWARE) */
+ 543:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 544:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 545:Generated_Source\PSoC5/ZCD_counter.c **** /*******************************************************************************
+ 546:Generated_Source\PSoC5/ZCD_counter.c **** * Function Name: ZCD_counter_ClearFIFO
+ 547:Generated_Source\PSoC5/ZCD_counter.c **** ********************************************************************************
+ 548:Generated_Source\PSoC5/ZCD_counter.c **** * Summary:
+ 549:Generated_Source\PSoC5/ZCD_counter.c **** *   This function clears all capture data from the capture FIFO
+ 550:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 551:Generated_Source\PSoC5/ZCD_counter.c **** * Parameters:  
+ 552:Generated_Source\PSoC5/ZCD_counter.c **** *  void:
+ 553:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 554:Generated_Source\PSoC5/ZCD_counter.c **** * Return: 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 17
+
+
+ 555:Generated_Source\PSoC5/ZCD_counter.c **** *  None
+ 556:Generated_Source\PSoC5/ZCD_counter.c **** *
+ 557:Generated_Source\PSoC5/ZCD_counter.c **** *******************************************************************************/
+ 558:Generated_Source\PSoC5/ZCD_counter.c **** void ZCD_counter_ClearFIFO(void) 
+ 559:Generated_Source\PSoC5/ZCD_counter.c **** {
+ 359              		.loc 1 559 0
+ 360              		.cfi_startproc
+ 361              		@ args = 0, pretend = 0, frame = 0
+ 362              		@ frame_needed = 0, uses_anonymous_args = 0
+ 363              		@ link register save eliminated.
+ 364              	.LBB16:
+ 365              	.LBB17:
+ 263:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 366              		.loc 1 263 0
+ 367 0000 034A     		ldr	r2, .L45
+ 368              	.LBE17:
+ 369              	.LBE16:
+ 370              	.LBB19:
+ 371              	.LBB20:
+ 395:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */
+ 372              		.loc 1 395 0
+ 373 0002 0449     		ldr	r1, .L45+4
+ 374              	.L41:
+ 375              	.LBE20:
+ 376              	.LBE19:
+ 377              	.LBB22:
+ 378              	.LBB18:
+ 263:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 379              		.loc 1 263 0
+ 380 0004 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 381              	.LBE18:
+ 382              	.LBE22:
+ 560:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 561:Generated_Source\PSoC5/ZCD_counter.c ****     while(0u != (ZCD_counter_ReadStatusRegister() & ZCD_counter_STATUS_FIFONEMP))
+ 383              		.loc 1 561 0
+ 384 0006 5B06     		lsls	r3, r3, #25
+ 385 0008 01D5     		bpl	.L44
+ 386              	.LBB23:
+ 387              	.LBB21:
+ 395:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */
+ 388              		.loc 1 395 0
+ 389 000a 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 390 000c FAE7     		b	.L41
+ 391              	.L44:
+ 392              	.LBE21:
+ 393              	.LBE23:
+ 562:Generated_Source\PSoC5/ZCD_counter.c ****     {
+ 563:Generated_Source\PSoC5/ZCD_counter.c ****         (void)ZCD_counter_ReadCapture();
+ 564:Generated_Source\PSoC5/ZCD_counter.c ****     }
+ 565:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 566:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 394              		.loc 1 566 0
+ 395 000e 7047     		bx	lr
+ 396              	.L46:
+ 397              		.align	2
+ 398              	.L45:
+ 399 0010 63640040 		.word	1073767523
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 18
+
+
+ 400 0014 40640040 		.word	1073767488
+ 401              		.cfi_endproc
+ 402              	.LFE15:
+ 403              		.size	ZCD_counter_ClearFIFO, .-ZCD_counter_ClearFIFO
+ 404              		.section	.text.ZCD_counter_Init,"ax",%progbits
+ 405              		.align	1
+ 406              		.global	ZCD_counter_Init
+ 407              		.thumb
+ 408              		.thumb_func
+ 409              		.type	ZCD_counter_Init, %function
+ 410              	ZCD_counter_Init:
+ 411              	.LFB0:
+  38:Generated_Source\PSoC5/ZCD_counter.c ****         #if (!ZCD_counter_UsingFixedFunction && !ZCD_counter_ControlRegRemoved)
+ 412              		.loc 1 38 0
+ 413              		.cfi_startproc
+ 414              		@ args = 0, pretend = 0, frame = 0
+ 415              		@ frame_needed = 0, uses_anonymous_args = 0
+ 416 0000 08B5     		push	{r3, lr}
+ 417              		.cfi_def_cfa_offset 8
+ 418              		.cfi_offset 3, -8
+ 419              		.cfi_offset 14, -4
+  79:Generated_Source\PSoC5/ZCD_counter.c ****             ZCD_counter_CONTROL = ctrl | ZCD_counter_DEFAULT_COMPARE_MODE;
+ 420              		.loc 1 79 0
+ 421 0002 124A     		ldr	r2, .L48
+ 422 0004 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 423              	.LVL5:
+  80:Generated_Source\PSoC5/ZCD_counter.c ****             
+ 424              		.loc 1 80 0
+ 425 0006 03F0F803 		and	r3, r3, #248
+ 426              	.LVL6:
+ 427 000a 43F00203 		orr	r3, r3, #2
+ 428 000e 1370     		strb	r3, [r2]
+  83:Generated_Source\PSoC5/ZCD_counter.c ****             
+ 429              		.loc 1 83 0
+ 430 0010 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 431 0012 03F0FC03 		and	r3, r3, #252
+ 432              	.LVL7:
+  88:Generated_Source\PSoC5/ZCD_counter.c ****             #endif /* 0 != ZCD_counter_CAPTURE_MODE */ 
+ 433              		.loc 1 88 0
+ 434 0016 1370     		strb	r3, [r2]
+  96:Generated_Source\PSoC5/ZCD_counter.c ****         #endif /* (!ZCD_counter_UsingFixedFunction) */
+ 435              		.loc 1 96 0
+ 436 0018 FFF7FEFF 		bl	ZCD_counter_ClearFIFO
+ 437              	.LVL8:
+ 438              	.LBB24:
+ 439              	.LBB25:
+ 420:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */
+ 440              		.loc 1 420 0
+ 441 001c 0C4A     		ldr	r2, .L48+4
+ 442 001e 0423     		movs	r3, #4
+ 443 0020 1370     		strb	r3, [r2]
+ 444              	.LVL9:
+ 445              	.LBE25:
+ 446              	.LBE24:
+ 447              	.LBB26:
+ 448              	.LBB27:
+ 337:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 19
+
+
+ 449              		.loc 1 337 0
+ 450 0022 02F8203C 		strb	r3, [r2, #-32]
+ 451              	.LVL10:
+ 452              	.LBE27:
+ 453              	.LBE26:
+ 454              	.LBB28:
+ 455              	.LBB29:
+ 239:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 456              		.loc 1 239 0
+ 457 0026 0B4B     		ldr	r3, .L48+8
+ 458 0028 0022     		movs	r2, #0
+ 459 002a 1A70     		strb	r2, [r3]
+ 460              	.LVL11:
+ 461              	.LBE29:
+ 462              	.LBE28:
+ 463              	.LBB30:
+ 464              	.LBB31:
+ 263:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 465              		.loc 1 263 0
+ 466 002c 203B     		subs	r3, r3, #32
+ 467 002e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 468              	.LVL12:
+ 469              	.LBE31:
+ 470              	.LBE30:
+ 471              	.LBB32:
+ 472              	.LBB33:
+ 471:Generated_Source\PSoC5/ZCD_counter.c ****     #endif /* (ZCD_counter_UsingFixedFunction) */
+ 473              		.loc 1 471 0
+ 474 0030 094B     		ldr	r3, .L48+12
+ 475 0032 0222     		movs	r2, #2
+ 476 0034 1A70     		strb	r2, [r3]
+ 477              	.LVL13:
+ 478              	.LBE33:
+ 479              	.LBE32:
+ 115:Generated_Source\PSoC5/ZCD_counter.c ****             
+ 480              		.loc 1 115 0
+ 481 0036 FFF7FEFF 		bl	CyEnterCriticalSection
+ 482              	.LVL14:
+ 117:Generated_Source\PSoC5/ZCD_counter.c ****             
+ 483              		.loc 1 117 0
+ 484 003a 084A     		ldr	r2, .L48+16
+ 485 003c 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 486 003e 43F01003 		orr	r3, r3, #16
+ 487 0042 1370     		strb	r3, [r2]
+ 123:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 488              		.loc 1 123 0
+ 489 0044 BDE80840 		pop	{r3, lr}
+ 490              		.cfi_restore 14
+ 491              		.cfi_restore 3
+ 492              		.cfi_def_cfa_offset 0
+ 120:Generated_Source\PSoC5/ZCD_counter.c ****             
+ 493              		.loc 1 120 0
+ 494 0048 FFF7FEBF 		b	CyExitCriticalSection
+ 495              	.LVL15:
+ 496              	.L49:
+ 497              		.align	2
+ 498              	.L48:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 20
+
+
+ 499 004c 75640040 		.word	1073767541
+ 500 0050 20640040 		.word	1073767456
+ 501 0054 83640040 		.word	1073767555
+ 502 0058 30640040 		.word	1073767472
+ 503 005c 93640040 		.word	1073767571
+ 504              		.cfi_endproc
+ 505              	.LFE0:
+ 506              		.size	ZCD_counter_Init, .-ZCD_counter_Init
+ 507              		.section	.text.ZCD_counter_Start,"ax",%progbits
+ 508              		.align	1
+ 509              		.global	ZCD_counter_Start
+ 510              		.thumb
+ 511              		.thumb_func
+ 512              		.type	ZCD_counter_Start, %function
+ 513              	ZCD_counter_Start:
+ 514              	.LFB2:
+ 179:Generated_Source\PSoC5/ZCD_counter.c ****     if(ZCD_counter_initVar == 0u)
+ 515              		.loc 1 179 0
+ 516              		.cfi_startproc
+ 517              		@ args = 0, pretend = 0, frame = 0
+ 518              		@ frame_needed = 0, uses_anonymous_args = 0
+ 519 0000 10B5     		push	{r4, lr}
+ 520              		.cfi_def_cfa_offset 8
+ 521              		.cfi_offset 4, -8
+ 522              		.cfi_offset 14, -4
+ 180:Generated_Source\PSoC5/ZCD_counter.c ****     {
+ 523              		.loc 1 180 0
+ 524 0002 054C     		ldr	r4, .L52
+ 525 0004 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 526 0006 1BB9     		cbnz	r3, .L51
+ 182:Generated_Source\PSoC5/ZCD_counter.c ****         
+ 527              		.loc 1 182 0
+ 528 0008 FFF7FEFF 		bl	ZCD_counter_Init
+ 529              	.LVL16:
+ 184:Generated_Source\PSoC5/ZCD_counter.c ****     }
+ 530              		.loc 1 184 0
+ 531 000c 0123     		movs	r3, #1
+ 532 000e 2370     		strb	r3, [r4]
+ 533              	.L51:
+ 189:Generated_Source\PSoC5/ZCD_counter.c **** 
+ 534              		.loc 1 189 0
+ 535 0010 BDE81040 		pop	{r4, lr}
+ 536              		.cfi_restore 14
+ 537              		.cfi_restore 4
+ 538              		.cfi_def_cfa_offset 0
+ 188:Generated_Source\PSoC5/ZCD_counter.c **** }
+ 539              		.loc 1 188 0
+ 540 0014 FFF7FEBF 		b	ZCD_counter_Enable
+ 541              	.LVL17:
+ 542              	.L53:
+ 543              		.align	2
+ 544              	.L52:
+ 545 0018 00000000 		.word	.LANCHOR0
+ 546              		.cfi_endproc
+ 547              	.LFE2:
+ 548              		.size	ZCD_counter_Start, .-ZCD_counter_Start
+ 549              		.global	ZCD_counter_initVar
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 21
+
+
+ 550              		.bss
+ 551              		.set	.LANCHOR0,. + 0
+ 552              		.type	ZCD_counter_initVar, %object
+ 553              		.size	ZCD_counter_initVar, 1
+ 554              	ZCD_counter_initVar:
+ 555 0000 00       		.space	1
+ 556              		.text
+ 557              	.Letext0:
+ 558              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+ 559              		.file 3 "Generated_Source\\PSoC5\\CyLib.h"
+ 560              		.section	.debug_info,"",%progbits
+ 561              	.Ldebug_info0:
+ 562 0000 A2030000 		.4byte	0x3a2
+ 563 0004 0400     		.2byte	0x4
+ 564 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 565 000a 04       		.byte	0x4
+ 566 000b 01       		.uleb128 0x1
+ 567 000c 57010000 		.4byte	.LASF39
+ 568 0010 0C       		.byte	0xc
+ 569 0011 00000000 		.4byte	.LASF40
+ 570 0015 32030000 		.4byte	.LASF41
+ 571 0019 30000000 		.4byte	.Ldebug_ranges0+0x30
+ 572 001d 00000000 		.4byte	0
+ 573 0021 00000000 		.4byte	.Ldebug_line0
+ 574 0025 02       		.uleb128 0x2
+ 575 0026 01       		.byte	0x1
+ 576 0027 06       		.byte	0x6
+ 577 0028 73030000 		.4byte	.LASF0
+ 578 002c 02       		.uleb128 0x2
+ 579 002d 01       		.byte	0x1
+ 580 002e 08       		.byte	0x8
+ 581 002f 21010000 		.4byte	.LASF1
+ 582 0033 02       		.uleb128 0x2
+ 583 0034 02       		.byte	0x2
+ 584 0035 05       		.byte	0x5
+ 585 0036 4D020000 		.4byte	.LASF2
+ 586 003a 02       		.uleb128 0x2
+ 587 003b 02       		.byte	0x2
+ 588 003c 07       		.byte	0x7
+ 589 003d 95000000 		.4byte	.LASF3
+ 590 0041 02       		.uleb128 0x2
+ 591 0042 04       		.byte	0x4
+ 592 0043 05       		.byte	0x5
+ 593 0044 57030000 		.4byte	.LASF4
+ 594 0048 02       		.uleb128 0x2
+ 595 0049 04       		.byte	0x4
+ 596 004a 07       		.byte	0x7
+ 597 004b 45010000 		.4byte	.LASF5
+ 598 004f 02       		.uleb128 0x2
+ 599 0050 08       		.byte	0x8
+ 600 0051 05       		.byte	0x5
+ 601 0052 CF020000 		.4byte	.LASF6
+ 602 0056 02       		.uleb128 0x2
+ 603 0057 08       		.byte	0x8
+ 604 0058 07       		.byte	0x7
+ 605 0059 F2000000 		.4byte	.LASF7
+ 606 005d 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 22
+
+
+ 607 005e 04       		.byte	0x4
+ 608 005f 05       		.byte	0x5
+ 609 0060 696E7400 		.ascii	"int\000"
+ 610 0064 02       		.uleb128 0x2
+ 611 0065 04       		.byte	0x4
+ 612 0066 07       		.byte	0x7
+ 613 0067 A8000000 		.4byte	.LASF8
+ 614 006b 04       		.uleb128 0x4
+ 615 006c F0010000 		.4byte	.LASF12
+ 616 0070 02       		.byte	0x2
+ 617 0071 9201     		.2byte	0x192
+ 618 0073 2C000000 		.4byte	0x2c
+ 619 0077 02       		.uleb128 0x2
+ 620 0078 04       		.byte	0x4
+ 621 0079 04       		.byte	0x4
+ 622 007a E4000000 		.4byte	.LASF9
+ 623 007e 02       		.uleb128 0x2
+ 624 007f 08       		.byte	0x8
+ 625 0080 04       		.byte	0x4
+ 626 0081 2D020000 		.4byte	.LASF10
+ 627 0085 02       		.uleb128 0x2
+ 628 0086 01       		.byte	0x1
+ 629 0087 08       		.byte	0x8
+ 630 0088 DD020000 		.4byte	.LASF11
+ 631 008c 04       		.uleb128 0x4
+ 632 008d 2F010000 		.4byte	.LASF13
+ 633 0091 02       		.byte	0x2
+ 634 0092 3C02     		.2byte	0x23c
+ 635 0094 98000000 		.4byte	0x98
+ 636 0098 05       		.uleb128 0x5
+ 637 0099 6B000000 		.4byte	0x6b
+ 638 009d 02       		.uleb128 0x2
+ 639 009e 04       		.byte	0x4
+ 640 009f 07       		.byte	0x7
+ 641 00a0 C6020000 		.4byte	.LASF14
+ 642 00a4 06       		.uleb128 0x6
+ 643 00a5 1A030000 		.4byte	.LASF15
+ 644 00a9 01       		.byte	0x1
+ 645 00aa 8601     		.2byte	0x186
+ 646 00ac 6B000000 		.4byte	0x6b
+ 647 00b0 01       		.byte	0x1
+ 648 00b1 06       		.uleb128 0x6
+ 649 00b2 56000000 		.4byte	.LASF16
+ 650 00b6 01       		.byte	0x1
+ 651 00b7 0501     		.2byte	0x105
+ 652 00b9 6B000000 		.4byte	0x6b
+ 653 00bd 01       		.byte	0x1
+ 654 00be 07       		.uleb128 0x7
+ 655 00bf 75000000 		.4byte	.LASF17
+ 656 00c3 01       		.byte	0x1
+ 657 00c4 D101     		.2byte	0x1d1
+ 658 00c6 01       		.byte	0x1
+ 659 00c7 D8000000 		.4byte	0xd8
+ 660 00cb 08       		.uleb128 0x8
+ 661 00cc 7F030000 		.4byte	.LASF19
+ 662 00d0 01       		.byte	0x1
+ 663 00d1 D101     		.2byte	0x1d1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 23
+
+
+ 664 00d3 6B000000 		.4byte	0x6b
+ 665 00d7 00       		.byte	0
+ 666 00d8 09       		.uleb128 0x9
+ 667 00d9 B5000000 		.4byte	.LASF18
+ 668 00dd 01       		.byte	0x1
+ 669 00de ED       		.byte	0xed
+ 670 00df 01       		.byte	0x1
+ 671 00e0 F0000000 		.4byte	0xf0
+ 672 00e4 0A       		.uleb128 0xa
+ 673 00e5 FE010000 		.4byte	.LASF20
+ 674 00e9 01       		.byte	0x1
+ 675 00ea ED       		.byte	0xed
+ 676 00eb 6B000000 		.4byte	0x6b
+ 677 00ef 00       		.byte	0
+ 678 00f0 07       		.uleb128 0x7
+ 679 00f1 34020000 		.4byte	.LASF21
+ 680 00f5 01       		.byte	0x1
+ 681 00f6 4601     		.2byte	0x146
+ 682 00f8 01       		.byte	0x1
+ 683 00f9 0A010000 		.4byte	0x10a
+ 684 00fd 08       		.uleb128 0x8
+ 685 00fe EA000000 		.4byte	.LASF22
+ 686 0102 01       		.byte	0x1
+ 687 0103 4601     		.2byte	0x146
+ 688 0105 6B000000 		.4byte	0x6b
+ 689 0109 00       		.byte	0
+ 690 010a 07       		.uleb128 0x7
+ 691 010b 09010000 		.4byte	.LASF23
+ 692 010f 01       		.byte	0x1
+ 693 0110 9F01     		.2byte	0x19f
+ 694 0112 01       		.byte	0x1
+ 695 0113 24010000 		.4byte	0x124
+ 696 0117 08       		.uleb128 0x8
+ 697 0118 8E000000 		.4byte	.LASF24
+ 698 011c 01       		.byte	0x1
+ 699 011d 9F01     		.2byte	0x19f
+ 700 011f 6B000000 		.4byte	0x6b
+ 701 0123 00       		.byte	0
+ 702 0124 0B       		.uleb128 0xb
+ 703 0125 60030000 		.4byte	.LASF25
+ 704 0129 01       		.byte	0x1
+ 705 012a 8F       		.byte	0x8f
+ 706 012b 00000000 		.4byte	.LFB1
+ 707 012f 10000000 		.4byte	.LFE1-.LFB1
+ 708 0133 01       		.uleb128 0x1
+ 709 0134 9C       		.byte	0x9c
+ 710 0135 0B       		.uleb128 0xb
+ 711 0136 B5020000 		.4byte	.LASF26
+ 712 013a 01       		.byte	0x1
+ 713 013b D0       		.byte	0xd0
+ 714 013c 00000000 		.4byte	.LFB3
+ 715 0140 10000000 		.4byte	.LFE3-.LFB3
+ 716 0144 01       		.uleb128 0x1
+ 717 0145 9C       		.byte	0x9c
+ 718 0146 0C       		.uleb128 0xc
+ 719 0147 D8000000 		.4byte	0xd8
+ 720 014b 00000000 		.4byte	.LFB4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 24
+
+
+ 721 014f 0C000000 		.4byte	.LFE4-.LFB4
+ 722 0153 01       		.uleb128 0x1
+ 723 0154 9C       		.byte	0x9c
+ 724 0155 61010000 		.4byte	0x161
+ 725 0159 0D       		.uleb128 0xd
+ 726 015a E4000000 		.4byte	0xe4
+ 727 015e 01       		.uleb128 0x1
+ 728 015f 50       		.byte	0x50
+ 729 0160 00       		.byte	0
+ 730 0161 0E       		.uleb128 0xe
+ 731 0162 B1000000 		.4byte	0xb1
+ 732 0166 00000000 		.4byte	.LFB5
+ 733 016a 0C000000 		.4byte	.LFE5-.LFB5
+ 734 016e 01       		.uleb128 0x1
+ 735 016f 9C       		.byte	0x9c
+ 736 0170 0F       		.uleb128 0xf
+ 737 0171 0D020000 		.4byte	.LASF27
+ 738 0175 01       		.byte	0x1
+ 739 0176 1B01     		.2byte	0x11b
+ 740 0178 6B000000 		.4byte	0x6b
+ 741 017c 00000000 		.4byte	.LFB6
+ 742 0180 0C000000 		.4byte	.LFE6-.LFB6
+ 743 0184 01       		.uleb128 0x1
+ 744 0185 9C       		.byte	0x9c
+ 745 0186 10       		.uleb128 0x10
+ 746 0187 F9020000 		.4byte	.LASF31
+ 747 018b 01       		.byte	0x1
+ 748 018c 3001     		.2byte	0x130
+ 749 018e 00000000 		.4byte	.LFB7
+ 750 0192 0C000000 		.4byte	.LFE7-.LFB7
+ 751 0196 01       		.uleb128 0x1
+ 752 0197 9C       		.byte	0x9c
+ 753 0198 AB010000 		.4byte	0x1ab
+ 754 019c 11       		.uleb128 0x11
+ 755 019d F6010000 		.4byte	.LASF42
+ 756 01a1 01       		.byte	0x1
+ 757 01a2 3001     		.2byte	0x130
+ 758 01a4 6B000000 		.4byte	0x6b
+ 759 01a8 01       		.uleb128 0x1
+ 760 01a9 50       		.byte	0x50
+ 761 01aa 00       		.byte	0
+ 762 01ab 0C       		.uleb128 0xc
+ 763 01ac F0000000 		.4byte	0xf0
+ 764 01b0 00000000 		.4byte	.LFB8
+ 765 01b4 0C000000 		.4byte	.LFE8-.LFB8
+ 766 01b8 01       		.uleb128 0x1
+ 767 01b9 9C       		.byte	0x9c
+ 768 01ba C6010000 		.4byte	0x1c6
+ 769 01be 0D       		.uleb128 0xd
+ 770 01bf FD000000 		.4byte	0xfd
+ 771 01c3 01       		.uleb128 0x1
+ 772 01c4 50       		.byte	0x50
+ 773 01c5 00       		.byte	0
+ 774 01c6 0F       		.uleb128 0xf
+ 775 01c7 87030000 		.4byte	.LASF28
+ 776 01cb 01       		.byte	0x1
+ 777 01cc 6501     		.2byte	0x165
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 25
+
+
+ 778 01ce 6B000000 		.4byte	0x6b
+ 779 01d2 00000000 		.4byte	.LFB9
+ 780 01d6 14000000 		.4byte	.LFE9-.LFB9
+ 781 01da 01       		.uleb128 0x1
+ 782 01db 9C       		.byte	0x9c
+ 783 01dc 0E       		.uleb128 0xe
+ 784 01dd A4000000 		.4byte	0xa4
+ 785 01e1 00000000 		.4byte	.LFB10
+ 786 01e5 0C000000 		.4byte	.LFE10-.LFB10
+ 787 01e9 01       		.uleb128 0x1
+ 788 01ea 9C       		.byte	0x9c
+ 789 01eb 0C       		.uleb128 0xc
+ 790 01ec 0A010000 		.4byte	0x10a
+ 791 01f0 00000000 		.4byte	.LFB11
+ 792 01f4 0C000000 		.4byte	.LFE11-.LFB11
+ 793 01f8 01       		.uleb128 0x1
+ 794 01f9 9C       		.byte	0x9c
+ 795 01fa 06020000 		.4byte	0x206
+ 796 01fe 0D       		.uleb128 0xd
+ 797 01ff 17010000 		.4byte	0x117
+ 798 0203 01       		.uleb128 0x1
+ 799 0204 50       		.byte	0x50
+ 800 0205 00       		.byte	0
+ 801 0206 0F       		.uleb128 0xf
+ 802 0207 E2020000 		.4byte	.LASF29
+ 803 020b 01       		.byte	0x1
+ 804 020c B601     		.2byte	0x1b6
+ 805 020e 6B000000 		.4byte	0x6b
+ 806 0212 00000000 		.4byte	.LFB12
+ 807 0216 0C000000 		.4byte	.LFE12-.LFB12
+ 808 021a 01       		.uleb128 0x1
+ 809 021b 9C       		.byte	0x9c
+ 810 021c 0C       		.uleb128 0xc
+ 811 021d BE000000 		.4byte	0xbe
+ 812 0221 00000000 		.4byte	.LFB13
+ 813 0225 0C000000 		.4byte	.LFE13-.LFB13
+ 814 0229 01       		.uleb128 0x1
+ 815 022a 9C       		.byte	0x9c
+ 816 022b 37020000 		.4byte	0x237
+ 817 022f 0D       		.uleb128 0xd
+ 818 0230 CB000000 		.4byte	0xcb
+ 819 0234 01       		.uleb128 0x1
+ 820 0235 50       		.byte	0x50
+ 821 0236 00       		.byte	0
+ 822 0237 0F       		.uleb128 0xf
+ 823 0238 98020000 		.4byte	.LASF30
+ 824 023c 01       		.byte	0x1
+ 825 023d E901     		.2byte	0x1e9
+ 826 023f 6B000000 		.4byte	0x6b
+ 827 0243 00000000 		.4byte	.LFB14
+ 828 0247 0C000000 		.4byte	.LFE14-.LFB14
+ 829 024b 01       		.uleb128 0x1
+ 830 024c 9C       		.byte	0x9c
+ 831 024d 10       		.uleb128 0x10
+ 832 024e 25000000 		.4byte	.LASF32
+ 833 0252 01       		.byte	0x1
+ 834 0253 2E02     		.2byte	0x22e
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 26
+
+
+ 835 0255 00000000 		.4byte	.LFB15
+ 836 0259 18000000 		.4byte	.LFE15-.LFB15
+ 837 025d 01       		.uleb128 0x1
+ 838 025e 9C       		.byte	0x9c
+ 839 025f 84020000 		.4byte	0x284
+ 840 0263 12       		.uleb128 0x12
+ 841 0264 B1000000 		.4byte	0xb1
+ 842 0268 00000000 		.4byte	.LBB16
+ 843 026c 00000000 		.4byte	.Ldebug_ranges0+0
+ 844 0270 01       		.byte	0x1
+ 845 0271 3102     		.2byte	0x231
+ 846 0273 12       		.uleb128 0x12
+ 847 0274 A4000000 		.4byte	0xa4
+ 848 0278 02000000 		.4byte	.LBB19
+ 849 027c 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 850 0280 01       		.byte	0x1
+ 851 0281 3302     		.2byte	0x233
+ 852 0283 00       		.byte	0
+ 853 0284 13       		.uleb128 0x13
+ 854 0285 34010000 		.4byte	.LASF33
+ 855 0289 01       		.byte	0x1
+ 856 028a 25       		.byte	0x25
+ 857 028b 00000000 		.4byte	.LFB0
+ 858 028f 60000000 		.4byte	.LFE0-.LFB0
+ 859 0293 01       		.uleb128 0x1
+ 860 0294 9C       		.byte	0x9c
+ 861 0295 56030000 		.4byte	0x356
+ 862 0299 14       		.uleb128 0x14
+ 863 029a B0020000 		.4byte	.LASF34
+ 864 029e 01       		.byte	0x1
+ 865 029f 28       		.byte	0x28
+ 866 02a0 6B000000 		.4byte	0x6b
+ 867 02a4 00000000 		.4byte	.LLST0
+ 868 02a8 14       		.uleb128 0x14
+ 869 02a9 3B000000 		.4byte	.LASF35
+ 870 02ad 01       		.byte	0x1
+ 871 02ae 2D       		.byte	0x2d
+ 872 02af 6B000000 		.4byte	0x6b
+ 873 02b3 23000000 		.4byte	.LLST1
+ 874 02b7 15       		.uleb128 0x15
+ 875 02b8 0A010000 		.4byte	0x10a
+ 876 02bc 1C000000 		.4byte	.LBB24
+ 877 02c0 06000000 		.4byte	.LBE24-.LBB24
+ 878 02c4 01       		.byte	0x1
+ 879 02c5 64       		.byte	0x64
+ 880 02c6 D4020000 		.4byte	0x2d4
+ 881 02ca 16       		.uleb128 0x16
+ 882 02cb 17010000 		.4byte	0x117
+ 883 02cf 36000000 		.4byte	.LLST2
+ 884 02d3 00       		.byte	0
+ 885 02d4 15       		.uleb128 0x15
+ 886 02d5 F0000000 		.4byte	0xf0
+ 887 02d9 22000000 		.4byte	.LBB26
+ 888 02dd 04000000 		.4byte	.LBE26-.LBB26
+ 889 02e1 01       		.byte	0x1
+ 890 02e2 66       		.byte	0x66
+ 891 02e3 F1020000 		.4byte	0x2f1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 27
+
+
+ 892 02e7 16       		.uleb128 0x16
+ 893 02e8 FD000000 		.4byte	0xfd
+ 894 02ec 4A000000 		.4byte	.LLST3
+ 895 02f0 00       		.byte	0
+ 896 02f1 15       		.uleb128 0x15
+ 897 02f2 D8000000 		.4byte	0xd8
+ 898 02f6 26000000 		.4byte	.LBB28
+ 899 02fa 06000000 		.4byte	.LBE28-.LBB28
+ 900 02fe 01       		.byte	0x1
+ 901 02ff 68       		.byte	0x68
+ 902 0300 0E030000 		.4byte	0x30e
+ 903 0304 16       		.uleb128 0x16
+ 904 0305 E4000000 		.4byte	0xe4
+ 905 0309 5E000000 		.4byte	.LLST4
+ 906 030d 00       		.byte	0
+ 907 030e 17       		.uleb128 0x17
+ 908 030f B1000000 		.4byte	0xb1
+ 909 0313 2C000000 		.4byte	.LBB30
+ 910 0317 04000000 		.4byte	.LBE30-.LBB30
+ 911 031b 01       		.byte	0x1
+ 912 031c 6C       		.byte	0x6c
+ 913 031d 15       		.uleb128 0x15
+ 914 031e BE000000 		.4byte	0xbe
+ 915 0322 30000000 		.4byte	.LBB32
+ 916 0326 06000000 		.4byte	.LBE32-.LBB32
+ 917 032a 01       		.byte	0x1
+ 918 032b 6E       		.byte	0x6e
+ 919 032c 3A030000 		.4byte	0x33a
+ 920 0330 16       		.uleb128 0x16
+ 921 0331 CB000000 		.4byte	0xcb
+ 922 0335 72000000 		.4byte	.LLST5
+ 923 0339 00       		.byte	0
+ 924 033a 18       		.uleb128 0x18
+ 925 033b 1C000000 		.4byte	.LVL8
+ 926 033f 4D020000 		.4byte	0x24d
+ 927 0343 18       		.uleb128 0x18
+ 928 0344 3A000000 		.4byte	.LVL14
+ 929 0348 8F030000 		.4byte	0x38f
+ 930 034c 19       		.uleb128 0x19
+ 931 034d 4C000000 		.4byte	.LVL15
+ 932 0351 9A030000 		.4byte	0x39a
+ 933 0355 00       		.byte	0
+ 934 0356 13       		.uleb128 0x13
+ 935 0357 D2000000 		.4byte	.LASF36
+ 936 035b 01       		.byte	0x1
+ 937 035c B2       		.byte	0xb2
+ 938 035d 00000000 		.4byte	.LFB2
+ 939 0361 1C000000 		.4byte	.LFE2-.LFB2
+ 940 0365 01       		.uleb128 0x1
+ 941 0366 9C       		.byte	0x9c
+ 942 0367 7E030000 		.4byte	0x37e
+ 943 036b 18       		.uleb128 0x18
+ 944 036c 0C000000 		.4byte	.LVL16
+ 945 0370 84020000 		.4byte	0x284
+ 946 0374 19       		.uleb128 0x19
+ 947 0375 18000000 		.4byte	.LVL17
+ 948 0379 24010000 		.4byte	0x124
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 28
+
+
+ 949 037d 00       		.byte	0
+ 950 037e 1A       		.uleb128 0x1a
+ 951 037f 6E020000 		.4byte	.LASF43
+ 952 0383 01       		.byte	0x1
+ 953 0384 15       		.byte	0x15
+ 954 0385 6B000000 		.4byte	0x6b
+ 955 0389 05       		.uleb128 0x5
+ 956 038a 03       		.byte	0x3
+ 957 038b 00000000 		.4byte	ZCD_counter_initVar
+ 958 038f 1B       		.uleb128 0x1b
+ 959 0390 57020000 		.4byte	.LASF37
+ 960 0394 57020000 		.4byte	.LASF37
+ 961 0398 03       		.byte	0x3
+ 962 0399 7D       		.byte	0x7d
+ 963 039a 1B       		.uleb128 0x1b
+ 964 039b 82020000 		.4byte	.LASF38
+ 965 039f 82020000 		.4byte	.LASF38
+ 966 03a3 03       		.byte	0x3
+ 967 03a4 7E       		.byte	0x7e
+ 968 03a5 00       		.byte	0
+ 969              		.section	.debug_abbrev,"",%progbits
+ 970              	.Ldebug_abbrev0:
+ 971 0000 01       		.uleb128 0x1
+ 972 0001 11       		.uleb128 0x11
+ 973 0002 01       		.byte	0x1
+ 974 0003 25       		.uleb128 0x25
+ 975 0004 0E       		.uleb128 0xe
+ 976 0005 13       		.uleb128 0x13
+ 977 0006 0B       		.uleb128 0xb
+ 978 0007 03       		.uleb128 0x3
+ 979 0008 0E       		.uleb128 0xe
+ 980 0009 1B       		.uleb128 0x1b
+ 981 000a 0E       		.uleb128 0xe
+ 982 000b 55       		.uleb128 0x55
+ 983 000c 17       		.uleb128 0x17
+ 984 000d 11       		.uleb128 0x11
+ 985 000e 01       		.uleb128 0x1
+ 986 000f 10       		.uleb128 0x10
+ 987 0010 17       		.uleb128 0x17
+ 988 0011 00       		.byte	0
+ 989 0012 00       		.byte	0
+ 990 0013 02       		.uleb128 0x2
+ 991 0014 24       		.uleb128 0x24
+ 992 0015 00       		.byte	0
+ 993 0016 0B       		.uleb128 0xb
+ 994 0017 0B       		.uleb128 0xb
+ 995 0018 3E       		.uleb128 0x3e
+ 996 0019 0B       		.uleb128 0xb
+ 997 001a 03       		.uleb128 0x3
+ 998 001b 0E       		.uleb128 0xe
+ 999 001c 00       		.byte	0
+ 1000 001d 00       		.byte	0
+ 1001 001e 03       		.uleb128 0x3
+ 1002 001f 24       		.uleb128 0x24
+ 1003 0020 00       		.byte	0
+ 1004 0021 0B       		.uleb128 0xb
+ 1005 0022 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 29
+
+
+ 1006 0023 3E       		.uleb128 0x3e
+ 1007 0024 0B       		.uleb128 0xb
+ 1008 0025 03       		.uleb128 0x3
+ 1009 0026 08       		.uleb128 0x8
+ 1010 0027 00       		.byte	0
+ 1011 0028 00       		.byte	0
+ 1012 0029 04       		.uleb128 0x4
+ 1013 002a 16       		.uleb128 0x16
+ 1014 002b 00       		.byte	0
+ 1015 002c 03       		.uleb128 0x3
+ 1016 002d 0E       		.uleb128 0xe
+ 1017 002e 3A       		.uleb128 0x3a
+ 1018 002f 0B       		.uleb128 0xb
+ 1019 0030 3B       		.uleb128 0x3b
+ 1020 0031 05       		.uleb128 0x5
+ 1021 0032 49       		.uleb128 0x49
+ 1022 0033 13       		.uleb128 0x13
+ 1023 0034 00       		.byte	0
+ 1024 0035 00       		.byte	0
+ 1025 0036 05       		.uleb128 0x5
+ 1026 0037 35       		.uleb128 0x35
+ 1027 0038 00       		.byte	0
+ 1028 0039 49       		.uleb128 0x49
+ 1029 003a 13       		.uleb128 0x13
+ 1030 003b 00       		.byte	0
+ 1031 003c 00       		.byte	0
+ 1032 003d 06       		.uleb128 0x6
+ 1033 003e 2E       		.uleb128 0x2e
+ 1034 003f 00       		.byte	0
+ 1035 0040 3F       		.uleb128 0x3f
+ 1036 0041 19       		.uleb128 0x19
+ 1037 0042 03       		.uleb128 0x3
+ 1038 0043 0E       		.uleb128 0xe
+ 1039 0044 3A       		.uleb128 0x3a
+ 1040 0045 0B       		.uleb128 0xb
+ 1041 0046 3B       		.uleb128 0x3b
+ 1042 0047 05       		.uleb128 0x5
+ 1043 0048 27       		.uleb128 0x27
+ 1044 0049 19       		.uleb128 0x19
+ 1045 004a 49       		.uleb128 0x49
+ 1046 004b 13       		.uleb128 0x13
+ 1047 004c 20       		.uleb128 0x20
+ 1048 004d 0B       		.uleb128 0xb
+ 1049 004e 00       		.byte	0
+ 1050 004f 00       		.byte	0
+ 1051 0050 07       		.uleb128 0x7
+ 1052 0051 2E       		.uleb128 0x2e
+ 1053 0052 01       		.byte	0x1
+ 1054 0053 3F       		.uleb128 0x3f
+ 1055 0054 19       		.uleb128 0x19
+ 1056 0055 03       		.uleb128 0x3
+ 1057 0056 0E       		.uleb128 0xe
+ 1058 0057 3A       		.uleb128 0x3a
+ 1059 0058 0B       		.uleb128 0xb
+ 1060 0059 3B       		.uleb128 0x3b
+ 1061 005a 05       		.uleb128 0x5
+ 1062 005b 27       		.uleb128 0x27
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 30
+
+
+ 1063 005c 19       		.uleb128 0x19
+ 1064 005d 20       		.uleb128 0x20
+ 1065 005e 0B       		.uleb128 0xb
+ 1066 005f 01       		.uleb128 0x1
+ 1067 0060 13       		.uleb128 0x13
+ 1068 0061 00       		.byte	0
+ 1069 0062 00       		.byte	0
+ 1070 0063 08       		.uleb128 0x8
+ 1071 0064 05       		.uleb128 0x5
+ 1072 0065 00       		.byte	0
+ 1073 0066 03       		.uleb128 0x3
+ 1074 0067 0E       		.uleb128 0xe
+ 1075 0068 3A       		.uleb128 0x3a
+ 1076 0069 0B       		.uleb128 0xb
+ 1077 006a 3B       		.uleb128 0x3b
+ 1078 006b 05       		.uleb128 0x5
+ 1079 006c 49       		.uleb128 0x49
+ 1080 006d 13       		.uleb128 0x13
+ 1081 006e 00       		.byte	0
+ 1082 006f 00       		.byte	0
+ 1083 0070 09       		.uleb128 0x9
+ 1084 0071 2E       		.uleb128 0x2e
+ 1085 0072 01       		.byte	0x1
+ 1086 0073 3F       		.uleb128 0x3f
+ 1087 0074 19       		.uleb128 0x19
+ 1088 0075 03       		.uleb128 0x3
+ 1089 0076 0E       		.uleb128 0xe
+ 1090 0077 3A       		.uleb128 0x3a
+ 1091 0078 0B       		.uleb128 0xb
+ 1092 0079 3B       		.uleb128 0x3b
+ 1093 007a 0B       		.uleb128 0xb
+ 1094 007b 27       		.uleb128 0x27
+ 1095 007c 19       		.uleb128 0x19
+ 1096 007d 20       		.uleb128 0x20
+ 1097 007e 0B       		.uleb128 0xb
+ 1098 007f 01       		.uleb128 0x1
+ 1099 0080 13       		.uleb128 0x13
+ 1100 0081 00       		.byte	0
+ 1101 0082 00       		.byte	0
+ 1102 0083 0A       		.uleb128 0xa
+ 1103 0084 05       		.uleb128 0x5
+ 1104 0085 00       		.byte	0
+ 1105 0086 03       		.uleb128 0x3
+ 1106 0087 0E       		.uleb128 0xe
+ 1107 0088 3A       		.uleb128 0x3a
+ 1108 0089 0B       		.uleb128 0xb
+ 1109 008a 3B       		.uleb128 0x3b
+ 1110 008b 0B       		.uleb128 0xb
+ 1111 008c 49       		.uleb128 0x49
+ 1112 008d 13       		.uleb128 0x13
+ 1113 008e 00       		.byte	0
+ 1114 008f 00       		.byte	0
+ 1115 0090 0B       		.uleb128 0xb
+ 1116 0091 2E       		.uleb128 0x2e
+ 1117 0092 00       		.byte	0
+ 1118 0093 3F       		.uleb128 0x3f
+ 1119 0094 19       		.uleb128 0x19
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 31
+
+
+ 1120 0095 03       		.uleb128 0x3
+ 1121 0096 0E       		.uleb128 0xe
+ 1122 0097 3A       		.uleb128 0x3a
+ 1123 0098 0B       		.uleb128 0xb
+ 1124 0099 3B       		.uleb128 0x3b
+ 1125 009a 0B       		.uleb128 0xb
+ 1126 009b 27       		.uleb128 0x27
+ 1127 009c 19       		.uleb128 0x19
+ 1128 009d 11       		.uleb128 0x11
+ 1129 009e 01       		.uleb128 0x1
+ 1130 009f 12       		.uleb128 0x12
+ 1131 00a0 06       		.uleb128 0x6
+ 1132 00a1 40       		.uleb128 0x40
+ 1133 00a2 18       		.uleb128 0x18
+ 1134 00a3 9742     		.uleb128 0x2117
+ 1135 00a5 19       		.uleb128 0x19
+ 1136 00a6 00       		.byte	0
+ 1137 00a7 00       		.byte	0
+ 1138 00a8 0C       		.uleb128 0xc
+ 1139 00a9 2E       		.uleb128 0x2e
+ 1140 00aa 01       		.byte	0x1
+ 1141 00ab 31       		.uleb128 0x31
+ 1142 00ac 13       		.uleb128 0x13
+ 1143 00ad 11       		.uleb128 0x11
+ 1144 00ae 01       		.uleb128 0x1
+ 1145 00af 12       		.uleb128 0x12
+ 1146 00b0 06       		.uleb128 0x6
+ 1147 00b1 40       		.uleb128 0x40
+ 1148 00b2 18       		.uleb128 0x18
+ 1149 00b3 9742     		.uleb128 0x2117
+ 1150 00b5 19       		.uleb128 0x19
+ 1151 00b6 01       		.uleb128 0x1
+ 1152 00b7 13       		.uleb128 0x13
+ 1153 00b8 00       		.byte	0
+ 1154 00b9 00       		.byte	0
+ 1155 00ba 0D       		.uleb128 0xd
+ 1156 00bb 05       		.uleb128 0x5
+ 1157 00bc 00       		.byte	0
+ 1158 00bd 31       		.uleb128 0x31
+ 1159 00be 13       		.uleb128 0x13
+ 1160 00bf 02       		.uleb128 0x2
+ 1161 00c0 18       		.uleb128 0x18
+ 1162 00c1 00       		.byte	0
+ 1163 00c2 00       		.byte	0
+ 1164 00c3 0E       		.uleb128 0xe
+ 1165 00c4 2E       		.uleb128 0x2e
+ 1166 00c5 00       		.byte	0
+ 1167 00c6 31       		.uleb128 0x31
+ 1168 00c7 13       		.uleb128 0x13
+ 1169 00c8 11       		.uleb128 0x11
+ 1170 00c9 01       		.uleb128 0x1
+ 1171 00ca 12       		.uleb128 0x12
+ 1172 00cb 06       		.uleb128 0x6
+ 1173 00cc 40       		.uleb128 0x40
+ 1174 00cd 18       		.uleb128 0x18
+ 1175 00ce 9742     		.uleb128 0x2117
+ 1176 00d0 19       		.uleb128 0x19
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 32
+
+
+ 1177 00d1 00       		.byte	0
+ 1178 00d2 00       		.byte	0
+ 1179 00d3 0F       		.uleb128 0xf
+ 1180 00d4 2E       		.uleb128 0x2e
+ 1181 00d5 00       		.byte	0
+ 1182 00d6 3F       		.uleb128 0x3f
+ 1183 00d7 19       		.uleb128 0x19
+ 1184 00d8 03       		.uleb128 0x3
+ 1185 00d9 0E       		.uleb128 0xe
+ 1186 00da 3A       		.uleb128 0x3a
+ 1187 00db 0B       		.uleb128 0xb
+ 1188 00dc 3B       		.uleb128 0x3b
+ 1189 00dd 05       		.uleb128 0x5
+ 1190 00de 27       		.uleb128 0x27
+ 1191 00df 19       		.uleb128 0x19
+ 1192 00e0 49       		.uleb128 0x49
+ 1193 00e1 13       		.uleb128 0x13
+ 1194 00e2 11       		.uleb128 0x11
+ 1195 00e3 01       		.uleb128 0x1
+ 1196 00e4 12       		.uleb128 0x12
+ 1197 00e5 06       		.uleb128 0x6
+ 1198 00e6 40       		.uleb128 0x40
+ 1199 00e7 18       		.uleb128 0x18
+ 1200 00e8 9742     		.uleb128 0x2117
+ 1201 00ea 19       		.uleb128 0x19
+ 1202 00eb 00       		.byte	0
+ 1203 00ec 00       		.byte	0
+ 1204 00ed 10       		.uleb128 0x10
+ 1205 00ee 2E       		.uleb128 0x2e
+ 1206 00ef 01       		.byte	0x1
+ 1207 00f0 3F       		.uleb128 0x3f
+ 1208 00f1 19       		.uleb128 0x19
+ 1209 00f2 03       		.uleb128 0x3
+ 1210 00f3 0E       		.uleb128 0xe
+ 1211 00f4 3A       		.uleb128 0x3a
+ 1212 00f5 0B       		.uleb128 0xb
+ 1213 00f6 3B       		.uleb128 0x3b
+ 1214 00f7 05       		.uleb128 0x5
+ 1215 00f8 27       		.uleb128 0x27
+ 1216 00f9 19       		.uleb128 0x19
+ 1217 00fa 11       		.uleb128 0x11
+ 1218 00fb 01       		.uleb128 0x1
+ 1219 00fc 12       		.uleb128 0x12
+ 1220 00fd 06       		.uleb128 0x6
+ 1221 00fe 40       		.uleb128 0x40
+ 1222 00ff 18       		.uleb128 0x18
+ 1223 0100 9742     		.uleb128 0x2117
+ 1224 0102 19       		.uleb128 0x19
+ 1225 0103 01       		.uleb128 0x1
+ 1226 0104 13       		.uleb128 0x13
+ 1227 0105 00       		.byte	0
+ 1228 0106 00       		.byte	0
+ 1229 0107 11       		.uleb128 0x11
+ 1230 0108 05       		.uleb128 0x5
+ 1231 0109 00       		.byte	0
+ 1232 010a 03       		.uleb128 0x3
+ 1233 010b 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 33
+
+
+ 1234 010c 3A       		.uleb128 0x3a
+ 1235 010d 0B       		.uleb128 0xb
+ 1236 010e 3B       		.uleb128 0x3b
+ 1237 010f 05       		.uleb128 0x5
+ 1238 0110 49       		.uleb128 0x49
+ 1239 0111 13       		.uleb128 0x13
+ 1240 0112 02       		.uleb128 0x2
+ 1241 0113 18       		.uleb128 0x18
+ 1242 0114 00       		.byte	0
+ 1243 0115 00       		.byte	0
+ 1244 0116 12       		.uleb128 0x12
+ 1245 0117 1D       		.uleb128 0x1d
+ 1246 0118 00       		.byte	0
+ 1247 0119 31       		.uleb128 0x31
+ 1248 011a 13       		.uleb128 0x13
+ 1249 011b 52       		.uleb128 0x52
+ 1250 011c 01       		.uleb128 0x1
+ 1251 011d 55       		.uleb128 0x55
+ 1252 011e 17       		.uleb128 0x17
+ 1253 011f 58       		.uleb128 0x58
+ 1254 0120 0B       		.uleb128 0xb
+ 1255 0121 59       		.uleb128 0x59
+ 1256 0122 05       		.uleb128 0x5
+ 1257 0123 00       		.byte	0
+ 1258 0124 00       		.byte	0
+ 1259 0125 13       		.uleb128 0x13
+ 1260 0126 2E       		.uleb128 0x2e
+ 1261 0127 01       		.byte	0x1
+ 1262 0128 3F       		.uleb128 0x3f
+ 1263 0129 19       		.uleb128 0x19
+ 1264 012a 03       		.uleb128 0x3
+ 1265 012b 0E       		.uleb128 0xe
+ 1266 012c 3A       		.uleb128 0x3a
+ 1267 012d 0B       		.uleb128 0xb
+ 1268 012e 3B       		.uleb128 0x3b
+ 1269 012f 0B       		.uleb128 0xb
+ 1270 0130 27       		.uleb128 0x27
+ 1271 0131 19       		.uleb128 0x19
+ 1272 0132 11       		.uleb128 0x11
+ 1273 0133 01       		.uleb128 0x1
+ 1274 0134 12       		.uleb128 0x12
+ 1275 0135 06       		.uleb128 0x6
+ 1276 0136 40       		.uleb128 0x40
+ 1277 0137 18       		.uleb128 0x18
+ 1278 0138 9742     		.uleb128 0x2117
+ 1279 013a 19       		.uleb128 0x19
+ 1280 013b 01       		.uleb128 0x1
+ 1281 013c 13       		.uleb128 0x13
+ 1282 013d 00       		.byte	0
+ 1283 013e 00       		.byte	0
+ 1284 013f 14       		.uleb128 0x14
+ 1285 0140 34       		.uleb128 0x34
+ 1286 0141 00       		.byte	0
+ 1287 0142 03       		.uleb128 0x3
+ 1288 0143 0E       		.uleb128 0xe
+ 1289 0144 3A       		.uleb128 0x3a
+ 1290 0145 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 34
+
+
+ 1291 0146 3B       		.uleb128 0x3b
+ 1292 0147 0B       		.uleb128 0xb
+ 1293 0148 49       		.uleb128 0x49
+ 1294 0149 13       		.uleb128 0x13
+ 1295 014a 02       		.uleb128 0x2
+ 1296 014b 17       		.uleb128 0x17
+ 1297 014c 00       		.byte	0
+ 1298 014d 00       		.byte	0
+ 1299 014e 15       		.uleb128 0x15
+ 1300 014f 1D       		.uleb128 0x1d
+ 1301 0150 01       		.byte	0x1
+ 1302 0151 31       		.uleb128 0x31
+ 1303 0152 13       		.uleb128 0x13
+ 1304 0153 11       		.uleb128 0x11
+ 1305 0154 01       		.uleb128 0x1
+ 1306 0155 12       		.uleb128 0x12
+ 1307 0156 06       		.uleb128 0x6
+ 1308 0157 58       		.uleb128 0x58
+ 1309 0158 0B       		.uleb128 0xb
+ 1310 0159 59       		.uleb128 0x59
+ 1311 015a 0B       		.uleb128 0xb
+ 1312 015b 01       		.uleb128 0x1
+ 1313 015c 13       		.uleb128 0x13
+ 1314 015d 00       		.byte	0
+ 1315 015e 00       		.byte	0
+ 1316 015f 16       		.uleb128 0x16
+ 1317 0160 05       		.uleb128 0x5
+ 1318 0161 00       		.byte	0
+ 1319 0162 31       		.uleb128 0x31
+ 1320 0163 13       		.uleb128 0x13
+ 1321 0164 02       		.uleb128 0x2
+ 1322 0165 17       		.uleb128 0x17
+ 1323 0166 00       		.byte	0
+ 1324 0167 00       		.byte	0
+ 1325 0168 17       		.uleb128 0x17
+ 1326 0169 1D       		.uleb128 0x1d
+ 1327 016a 00       		.byte	0
+ 1328 016b 31       		.uleb128 0x31
+ 1329 016c 13       		.uleb128 0x13
+ 1330 016d 11       		.uleb128 0x11
+ 1331 016e 01       		.uleb128 0x1
+ 1332 016f 12       		.uleb128 0x12
+ 1333 0170 06       		.uleb128 0x6
+ 1334 0171 58       		.uleb128 0x58
+ 1335 0172 0B       		.uleb128 0xb
+ 1336 0173 59       		.uleb128 0x59
+ 1337 0174 0B       		.uleb128 0xb
+ 1338 0175 00       		.byte	0
+ 1339 0176 00       		.byte	0
+ 1340 0177 18       		.uleb128 0x18
+ 1341 0178 898201   		.uleb128 0x4109
+ 1342 017b 00       		.byte	0
+ 1343 017c 11       		.uleb128 0x11
+ 1344 017d 01       		.uleb128 0x1
+ 1345 017e 31       		.uleb128 0x31
+ 1346 017f 13       		.uleb128 0x13
+ 1347 0180 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 35
+
+
+ 1348 0181 00       		.byte	0
+ 1349 0182 19       		.uleb128 0x19
+ 1350 0183 898201   		.uleb128 0x4109
+ 1351 0186 00       		.byte	0
+ 1352 0187 11       		.uleb128 0x11
+ 1353 0188 01       		.uleb128 0x1
+ 1354 0189 9542     		.uleb128 0x2115
+ 1355 018b 19       		.uleb128 0x19
+ 1356 018c 31       		.uleb128 0x31
+ 1357 018d 13       		.uleb128 0x13
+ 1358 018e 00       		.byte	0
+ 1359 018f 00       		.byte	0
+ 1360 0190 1A       		.uleb128 0x1a
+ 1361 0191 34       		.uleb128 0x34
+ 1362 0192 00       		.byte	0
+ 1363 0193 03       		.uleb128 0x3
+ 1364 0194 0E       		.uleb128 0xe
+ 1365 0195 3A       		.uleb128 0x3a
+ 1366 0196 0B       		.uleb128 0xb
+ 1367 0197 3B       		.uleb128 0x3b
+ 1368 0198 0B       		.uleb128 0xb
+ 1369 0199 49       		.uleb128 0x49
+ 1370 019a 13       		.uleb128 0x13
+ 1371 019b 3F       		.uleb128 0x3f
+ 1372 019c 19       		.uleb128 0x19
+ 1373 019d 02       		.uleb128 0x2
+ 1374 019e 18       		.uleb128 0x18
+ 1375 019f 00       		.byte	0
+ 1376 01a0 00       		.byte	0
+ 1377 01a1 1B       		.uleb128 0x1b
+ 1378 01a2 2E       		.uleb128 0x2e
+ 1379 01a3 00       		.byte	0
+ 1380 01a4 3F       		.uleb128 0x3f
+ 1381 01a5 19       		.uleb128 0x19
+ 1382 01a6 3C       		.uleb128 0x3c
+ 1383 01a7 19       		.uleb128 0x19
+ 1384 01a8 6E       		.uleb128 0x6e
+ 1385 01a9 0E       		.uleb128 0xe
+ 1386 01aa 03       		.uleb128 0x3
+ 1387 01ab 0E       		.uleb128 0xe
+ 1388 01ac 3A       		.uleb128 0x3a
+ 1389 01ad 0B       		.uleb128 0xb
+ 1390 01ae 3B       		.uleb128 0x3b
+ 1391 01af 0B       		.uleb128 0xb
+ 1392 01b0 00       		.byte	0
+ 1393 01b1 00       		.byte	0
+ 1394 01b2 00       		.byte	0
+ 1395              		.section	.debug_loc,"",%progbits
+ 1396              	.Ldebug_loc0:
+ 1397              	.LLST0:
+ 1398 0000 06000000 		.4byte	.LVL5
+ 1399 0004 0A000000 		.4byte	.LVL6
+ 1400 0008 0600     		.2byte	0x6
+ 1401 000a 73       		.byte	0x73
+ 1402 000b 00       		.sleb128 0
+ 1403 000c 09       		.byte	0x9
+ 1404 000d F8       		.byte	0xf8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 36
+
+
+ 1405 000e 1A       		.byte	0x1a
+ 1406 000f 9F       		.byte	0x9f
+ 1407 0010 16000000 		.4byte	.LVL7
+ 1408 0014 1B000000 		.4byte	.LVL8-1
+ 1409 0018 0100     		.2byte	0x1
+ 1410 001a 53       		.byte	0x53
+ 1411 001b 00000000 		.4byte	0
+ 1412 001f 00000000 		.4byte	0
+ 1413              	.LLST1:
+ 1414 0023 3A000000 		.4byte	.LVL14
+ 1415 0027 4B000000 		.4byte	.LVL15-1
+ 1416 002b 0100     		.2byte	0x1
+ 1417 002d 50       		.byte	0x50
+ 1418 002e 00000000 		.4byte	0
+ 1419 0032 00000000 		.4byte	0
+ 1420              	.LLST2:
+ 1421 0036 1C000000 		.4byte	.LVL8
+ 1422 003a 22000000 		.4byte	.LVL9
+ 1423 003e 0200     		.2byte	0x2
+ 1424 0040 34       		.byte	0x34
+ 1425 0041 9F       		.byte	0x9f
+ 1426 0042 00000000 		.4byte	0
+ 1427 0046 00000000 		.4byte	0
+ 1428              	.LLST3:
+ 1429 004a 22000000 		.4byte	.LVL9
+ 1430 004e 26000000 		.4byte	.LVL10
+ 1431 0052 0200     		.2byte	0x2
+ 1432 0054 34       		.byte	0x34
+ 1433 0055 9F       		.byte	0x9f
+ 1434 0056 00000000 		.4byte	0
+ 1435 005a 00000000 		.4byte	0
+ 1436              	.LLST4:
+ 1437 005e 26000000 		.4byte	.LVL10
+ 1438 0062 2C000000 		.4byte	.LVL11
+ 1439 0066 0200     		.2byte	0x2
+ 1440 0068 30       		.byte	0x30
+ 1441 0069 9F       		.byte	0x9f
+ 1442 006a 00000000 		.4byte	0
+ 1443 006e 00000000 		.4byte	0
+ 1444              	.LLST5:
+ 1445 0072 30000000 		.4byte	.LVL12
+ 1446 0076 36000000 		.4byte	.LVL13
+ 1447 007a 0200     		.2byte	0x2
+ 1448 007c 32       		.byte	0x32
+ 1449 007d 9F       		.byte	0x9f
+ 1450 007e 00000000 		.4byte	0
+ 1451 0082 00000000 		.4byte	0
+ 1452              		.section	.debug_aranges,"",%progbits
+ 1453 0000 94000000 		.4byte	0x94
+ 1454 0004 0200     		.2byte	0x2
+ 1455 0006 00000000 		.4byte	.Ldebug_info0
+ 1456 000a 04       		.byte	0x4
+ 1457 000b 00       		.byte	0
+ 1458 000c 0000     		.2byte	0
+ 1459 000e 0000     		.2byte	0
+ 1460 0010 00000000 		.4byte	.LFB1
+ 1461 0014 10000000 		.4byte	.LFE1-.LFB1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 37
+
+
+ 1462 0018 00000000 		.4byte	.LFB3
+ 1463 001c 10000000 		.4byte	.LFE3-.LFB3
+ 1464 0020 00000000 		.4byte	.LFB4
+ 1465 0024 0C000000 		.4byte	.LFE4-.LFB4
+ 1466 0028 00000000 		.4byte	.LFB5
+ 1467 002c 0C000000 		.4byte	.LFE5-.LFB5
+ 1468 0030 00000000 		.4byte	.LFB6
+ 1469 0034 0C000000 		.4byte	.LFE6-.LFB6
+ 1470 0038 00000000 		.4byte	.LFB7
+ 1471 003c 0C000000 		.4byte	.LFE7-.LFB7
+ 1472 0040 00000000 		.4byte	.LFB8
+ 1473 0044 0C000000 		.4byte	.LFE8-.LFB8
+ 1474 0048 00000000 		.4byte	.LFB9
+ 1475 004c 14000000 		.4byte	.LFE9-.LFB9
+ 1476 0050 00000000 		.4byte	.LFB10
+ 1477 0054 0C000000 		.4byte	.LFE10-.LFB10
+ 1478 0058 00000000 		.4byte	.LFB11
+ 1479 005c 0C000000 		.4byte	.LFE11-.LFB11
+ 1480 0060 00000000 		.4byte	.LFB12
+ 1481 0064 0C000000 		.4byte	.LFE12-.LFB12
+ 1482 0068 00000000 		.4byte	.LFB13
+ 1483 006c 0C000000 		.4byte	.LFE13-.LFB13
+ 1484 0070 00000000 		.4byte	.LFB14
+ 1485 0074 0C000000 		.4byte	.LFE14-.LFB14
+ 1486 0078 00000000 		.4byte	.LFB15
+ 1487 007c 18000000 		.4byte	.LFE15-.LFB15
+ 1488 0080 00000000 		.4byte	.LFB0
+ 1489 0084 60000000 		.4byte	.LFE0-.LFB0
+ 1490 0088 00000000 		.4byte	.LFB2
+ 1491 008c 1C000000 		.4byte	.LFE2-.LFB2
+ 1492 0090 00000000 		.4byte	0
+ 1493 0094 00000000 		.4byte	0
+ 1494              		.section	.debug_ranges,"",%progbits
+ 1495              	.Ldebug_ranges0:
+ 1496 0000 00000000 		.4byte	.LBB16
+ 1497 0004 02000000 		.4byte	.LBE16
+ 1498 0008 04000000 		.4byte	.LBB22
+ 1499 000c 06000000 		.4byte	.LBE22
+ 1500 0010 00000000 		.4byte	0
+ 1501 0014 00000000 		.4byte	0
+ 1502 0018 02000000 		.4byte	.LBB19
+ 1503 001c 04000000 		.4byte	.LBE19
+ 1504 0020 0A000000 		.4byte	.LBB23
+ 1505 0024 0E000000 		.4byte	.LBE23
+ 1506 0028 00000000 		.4byte	0
+ 1507 002c 00000000 		.4byte	0
+ 1508 0030 00000000 		.4byte	.LFB1
+ 1509 0034 10000000 		.4byte	.LFE1
+ 1510 0038 00000000 		.4byte	.LFB3
+ 1511 003c 10000000 		.4byte	.LFE3
+ 1512 0040 00000000 		.4byte	.LFB4
+ 1513 0044 0C000000 		.4byte	.LFE4
+ 1514 0048 00000000 		.4byte	.LFB5
+ 1515 004c 0C000000 		.4byte	.LFE5
+ 1516 0050 00000000 		.4byte	.LFB6
+ 1517 0054 0C000000 		.4byte	.LFE6
+ 1518 0058 00000000 		.4byte	.LFB7
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 38
+
+
+ 1519 005c 0C000000 		.4byte	.LFE7
+ 1520 0060 00000000 		.4byte	.LFB8
+ 1521 0064 0C000000 		.4byte	.LFE8
+ 1522 0068 00000000 		.4byte	.LFB9
+ 1523 006c 14000000 		.4byte	.LFE9
+ 1524 0070 00000000 		.4byte	.LFB10
+ 1525 0074 0C000000 		.4byte	.LFE10
+ 1526 0078 00000000 		.4byte	.LFB11
+ 1527 007c 0C000000 		.4byte	.LFE11
+ 1528 0080 00000000 		.4byte	.LFB12
+ 1529 0084 0C000000 		.4byte	.LFE12
+ 1530 0088 00000000 		.4byte	.LFB13
+ 1531 008c 0C000000 		.4byte	.LFE13
+ 1532 0090 00000000 		.4byte	.LFB14
+ 1533 0094 0C000000 		.4byte	.LFE14
+ 1534 0098 00000000 		.4byte	.LFB15
+ 1535 009c 18000000 		.4byte	.LFE15
+ 1536 00a0 00000000 		.4byte	.LFB0
+ 1537 00a4 60000000 		.4byte	.LFE0
+ 1538 00a8 00000000 		.4byte	.LFB2
+ 1539 00ac 1C000000 		.4byte	.LFE2
+ 1540 00b0 00000000 		.4byte	0
+ 1541 00b4 00000000 		.4byte	0
+ 1542              		.section	.debug_line,"",%progbits
+ 1543              	.Ldebug_line0:
+ 1544 0000 AE010000 		.section	.debug_str,"MS",%progbits,1
+ 1544      02005300 
+ 1544      00000201 
+ 1544      FB0E0D00 
+ 1544      01010101 
+ 1545              	.LASF40:
+ 1546 0000 47656E65 		.ascii	"Generated_Source\\PSoC5\\ZCD_counter.c\000"
+ 1546      72617465 
+ 1546      645F536F 
+ 1546      75726365 
+ 1546      5C50536F 
+ 1547              	.LASF32:
+ 1548 0025 5A43445F 		.ascii	"ZCD_counter_ClearFIFO\000"
+ 1548      636F756E 
+ 1548      7465725F 
+ 1548      436C6561 
+ 1548      72464946 
+ 1549              	.LASF35:
+ 1550 003b 5A43445F 		.ascii	"ZCD_counter_interruptState\000"
+ 1550      636F756E 
+ 1550      7465725F 
+ 1550      696E7465 
+ 1550      72727570 
+ 1551              	.LASF16:
+ 1552 0056 5A43445F 		.ascii	"ZCD_counter_ReadStatusRegister\000"
+ 1552      636F756E 
+ 1552      7465725F 
+ 1552      52656164 
+ 1552      53746174 
+ 1553              	.LASF17:
+ 1554 0075 5A43445F 		.ascii	"ZCD_counter_WriteCompare\000"
+ 1554      636F756E 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 39
+
+
+ 1554      7465725F 
+ 1554      57726974 
+ 1554      65436F6D 
+ 1555              	.LASF24:
+ 1556 008e 70657269 		.ascii	"period\000"
+ 1556      6F6400
+ 1557              	.LASF3:
+ 1558 0095 73686F72 		.ascii	"short unsigned int\000"
+ 1558      7420756E 
+ 1558      7369676E 
+ 1558      65642069 
+ 1558      6E7400
+ 1559              	.LASF8:
+ 1560 00a8 756E7369 		.ascii	"unsigned int\000"
+ 1560      676E6564 
+ 1560      20696E74 
+ 1560      00
+ 1561              	.LASF18:
+ 1562 00b5 5A43445F 		.ascii	"ZCD_counter_SetInterruptMode\000"
+ 1562      636F756E 
+ 1562      7465725F 
+ 1562      53657449 
+ 1562      6E746572 
+ 1563              	.LASF36:
+ 1564 00d2 5A43445F 		.ascii	"ZCD_counter_Start\000"
+ 1564      636F756E 
+ 1564      7465725F 
+ 1564      53746172 
+ 1564      7400
+ 1565              	.LASF9:
+ 1566 00e4 666C6F61 		.ascii	"float\000"
+ 1566      7400
+ 1567              	.LASF22:
+ 1568 00ea 636F756E 		.ascii	"counter\000"
+ 1568      74657200 
+ 1569              	.LASF7:
+ 1570 00f2 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1570      206C6F6E 
+ 1570      6720756E 
+ 1570      7369676E 
+ 1570      65642069 
+ 1571              	.LASF23:
+ 1572 0109 5A43445F 		.ascii	"ZCD_counter_WritePeriod\000"
+ 1572      636F756E 
+ 1572      7465725F 
+ 1572      57726974 
+ 1572      65506572 
+ 1573              	.LASF1:
+ 1574 0121 756E7369 		.ascii	"unsigned char\000"
+ 1574      676E6564 
+ 1574      20636861 
+ 1574      7200
+ 1575              	.LASF13:
+ 1576 012f 72656738 		.ascii	"reg8\000"
+ 1576      00
+ 1577              	.LASF33:
+ 1578 0134 5A43445F 		.ascii	"ZCD_counter_Init\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 40
+
+
+ 1578      636F756E 
+ 1578      7465725F 
+ 1578      496E6974 
+ 1578      00
+ 1579              	.LASF5:
+ 1580 0145 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1580      20756E73 
+ 1580      69676E65 
+ 1580      6420696E 
+ 1580      7400
+ 1581              	.LASF39:
+ 1582 0157 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1582      43393920 
+ 1582      352E342E 
+ 1582      31203230 
+ 1582      31363036 
+ 1583 018a 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1583      20726576 
+ 1583      6973696F 
+ 1583      6E203233 
+ 1583      37373135 
+ 1584 01bd 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 1584      74643D67 
+ 1584      6E753939 
+ 1584      202D6666 
+ 1584      756E6374 
+ 1585              	.LASF12:
+ 1586 01f0 75696E74 		.ascii	"uint8\000"
+ 1586      3800
+ 1587              	.LASF42:
+ 1588 01f6 636F6E74 		.ascii	"control\000"
+ 1588      726F6C00 
+ 1589              	.LASF20:
+ 1590 01fe 696E7465 		.ascii	"interruptsMask\000"
+ 1590      72727570 
+ 1590      74734D61 
+ 1590      736B00
+ 1591              	.LASF27:
+ 1592 020d 5A43445F 		.ascii	"ZCD_counter_ReadControlRegister\000"
+ 1592      636F756E 
+ 1592      7465725F 
+ 1592      52656164 
+ 1592      436F6E74 
+ 1593              	.LASF10:
+ 1594 022d 646F7562 		.ascii	"double\000"
+ 1594      6C6500
+ 1595              	.LASF21:
+ 1596 0234 5A43445F 		.ascii	"ZCD_counter_WriteCounter\000"
+ 1596      636F756E 
+ 1596      7465725F 
+ 1596      57726974 
+ 1596      65436F75 
+ 1597              	.LASF2:
+ 1598 024d 73686F72 		.ascii	"short int\000"
+ 1598      7420696E 
+ 1598      7400
+ 1599              	.LASF37:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 41
+
+
+ 1600 0257 4379456E 		.ascii	"CyEnterCriticalSection\000"
+ 1600      74657243 
+ 1600      72697469 
+ 1600      63616C53 
+ 1600      65637469 
+ 1601              	.LASF43:
+ 1602 026e 5A43445F 		.ascii	"ZCD_counter_initVar\000"
+ 1602      636F756E 
+ 1602      7465725F 
+ 1602      696E6974 
+ 1602      56617200 
+ 1603              	.LASF38:
+ 1604 0282 43794578 		.ascii	"CyExitCriticalSection\000"
+ 1604      69744372 
+ 1604      69746963 
+ 1604      616C5365 
+ 1604      6374696F 
+ 1605              	.LASF30:
+ 1606 0298 5A43445F 		.ascii	"ZCD_counter_ReadCompare\000"
+ 1606      636F756E 
+ 1606      7465725F 
+ 1606      52656164 
+ 1606      436F6D70 
+ 1607              	.LASF34:
+ 1608 02b0 6374726C 		.ascii	"ctrl\000"
+ 1608      00
+ 1609              	.LASF26:
+ 1610 02b5 5A43445F 		.ascii	"ZCD_counter_Stop\000"
+ 1610      636F756E 
+ 1610      7465725F 
+ 1610      53746F70 
+ 1610      00
+ 1611              	.LASF14:
+ 1612 02c6 73697A65 		.ascii	"sizetype\000"
+ 1612      74797065 
+ 1612      00
+ 1613              	.LASF6:
+ 1614 02cf 6C6F6E67 		.ascii	"long long int\000"
+ 1614      206C6F6E 
+ 1614      6720696E 
+ 1614      7400
+ 1615              	.LASF11:
+ 1616 02dd 63686172 		.ascii	"char\000"
+ 1616      00
+ 1617              	.LASF29:
+ 1618 02e2 5A43445F 		.ascii	"ZCD_counter_ReadPeriod\000"
+ 1618      636F756E 
+ 1618      7465725F 
+ 1618      52656164 
+ 1618      50657269 
+ 1619              	.LASF31:
+ 1620 02f9 5A43445F 		.ascii	"ZCD_counter_WriteControlRegister\000"
+ 1620      636F756E 
+ 1620      7465725F 
+ 1620      57726974 
+ 1620      65436F6E 
+ 1621              	.LASF15:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cchg1ETq.s 			page 42
+
+
+ 1622 031a 5A43445F 		.ascii	"ZCD_counter_ReadCapture\000"
+ 1622      636F756E 
+ 1622      7465725F 
+ 1622      52656164 
+ 1622      43617074 
+ 1623              	.LASF41:
+ 1624 0332 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 1624      73657273 
+ 1624      5C636865 
+ 1624      6D695C55 
+ 1624      44335F51 
+ 1625              	.LASF4:
+ 1626 0357 6C6F6E67 		.ascii	"long int\000"
+ 1626      20696E74 
+ 1626      00
+ 1627              	.LASF25:
+ 1628 0360 5A43445F 		.ascii	"ZCD_counter_Enable\000"
+ 1628      636F756E 
+ 1628      7465725F 
+ 1628      456E6162 
+ 1628      6C6500
+ 1629              	.LASF0:
+ 1630 0373 7369676E 		.ascii	"signed char\000"
+ 1630      65642063 
+ 1630      68617200 
+ 1631              	.LASF19:
+ 1632 037f 636F6D70 		.ascii	"compare\000"
+ 1632      61726500 
+ 1633              	.LASF28:
+ 1634 0387 5A43445F 		.ascii	"ZCD_counter_ReadCounter\000"
+ 1634      636F756E 
+ 1634      7465725F 
+ 1634      52656164 
+ 1634      436F756E 
+ 1635              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

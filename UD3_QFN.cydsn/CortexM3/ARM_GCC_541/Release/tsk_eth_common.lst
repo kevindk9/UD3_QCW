@@ -1,0 +1,2912 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"tsk_eth_common.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.process_midi,"ax",%progbits
+  20              		.align	1
+  21              		.global	process_midi
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	process_midi, %function
+  25              	process_midi:
+  26              	.LFB68:
+  27              		.file 1 "..\\common\\ud3core\\tasks\\tsk_eth_common.c"
+   1:..\common\ud3core\tasks/tsk_eth_common.c **** /* ========================================
+   2:..\common\ud3core\tasks/tsk_eth_common.c ****  *
+   3:..\common\ud3core\tasks/tsk_eth_common.c ****  * Copyright YOUR COMPANY, THE YEAR
+   4:..\common\ud3core\tasks/tsk_eth_common.c ****  * All Rights Reserved
+   5:..\common\ud3core\tasks/tsk_eth_common.c ****  * UNPUBLISHED, LICENSED SOFTWARE.
+   6:..\common\ud3core\tasks/tsk_eth_common.c ****  *
+   7:..\common\ud3core\tasks/tsk_eth_common.c ****  * CONFIDENTIAL AND PROPRIETARY INFORMATION
+   8:..\common\ud3core\tasks/tsk_eth_common.c ****  * WHICH IS THE PROPERTY OF your company.
+   9:..\common\ud3core\tasks/tsk_eth_common.c ****  *
+  10:..\common\ud3core\tasks/tsk_eth_common.c ****  * ========================================
+  11:..\common\ud3core\tasks/tsk_eth_common.c **** */
+  12:..\common\ud3core\tasks/tsk_eth_common.c **** 
+  13:..\common\ud3core\tasks/tsk_eth_common.c **** /* [] END OF FILE */
+  14:..\common\ud3core\tasks/tsk_eth_common.c **** #include "tsk_eth_common.h"
+  15:..\common\ud3core\tasks/tsk_eth_common.c **** #include "cyapicallbacks.h"
+  16:..\common\ud3core\tasks/tsk_eth_common.c **** #include <cytypes.h>
+  17:..\common\ud3core\tasks/tsk_eth_common.c **** #include <device.h>
+  18:..\common\ud3core\tasks/tsk_eth_common.c **** #include "telemetry.h"
+  19:..\common\ud3core\tasks/tsk_eth_common.c **** #include "alarmevent.h"
+  20:..\common\ud3core\tasks/tsk_eth_common.c **** #include "cli_common.h"
+  21:..\common\ud3core\tasks/tsk_eth_common.c **** #include "tasks/tsk_midi.h"
+  22:..\common\ud3core\tasks/tsk_eth_common.c **** #include "tasks/tsk_sid.h"
+  23:..\common\ud3core\tasks/tsk_eth_common.c **** #include "tasks/tsk_fault.h"
+  24:..\common\ud3core\tasks/tsk_eth_common.c **** #include "clock.h"
+  25:..\common\ud3core\tasks/tsk_eth_common.c **** #include "SidFilter.h"
+  26:..\common\ud3core\tasks/tsk_eth_common.c **** 
+  27:..\common\ud3core\tasks/tsk_eth_common.c **** typedef struct{
+  28:..\common\ud3core\tasks/tsk_eth_common.c ****     uint8_t cmd;
+  29:..\common\ud3core\tasks/tsk_eth_common.c ****     int8_t message_size;
+  30:..\common\ud3core\tasks/tsk_eth_common.c ****     uint8_t bytes_received;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 2
+
+
+  31:..\common\ud3core\tasks/tsk_eth_common.c ****     uint8_t msg[3];
+  32:..\common\ud3core\tasks/tsk_eth_common.c **** } midi_cmd;
+  33:..\common\ud3core\tasks/tsk_eth_common.c **** 
+  34:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_NOTE_OFF           0x80
+  35:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_NOTE_ON            0x90
+  36:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_KEY_PRESSURE       0xA0
+  37:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_CC                 0xB0
+  38:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_PC                 0xC0
+  39:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_CP                 0xD0
+  40:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_PB                 0xE0
+  41:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_FUNCTION           0xF0
+  42:..\common\ud3core\tasks/tsk_eth_common.c **** 
+  43:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_SYSEX_START        0xF0
+  44:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_SONG_POSITION      0xF2
+  45:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_SONG_SELECT        0xF3
+  46:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_BUS_SELECT         0xF5
+  47:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_TUNE_REQUEST       0xF6
+  48:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_SYSEX_END          0xF7
+  49:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_START_SONG         0xFA
+  50:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_CONTINUE_SONG      0xFB
+  51:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_STOP_SONG          0xFC
+  52:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_ACTIVE_SENSING     0xFE
+  53:..\common\ud3core\tasks/tsk_eth_common.c **** #define MIDI_SYSTEM_RESET       0xFF
+  54:..\common\ud3core\tasks/tsk_eth_common.c **** 
+  55:..\common\ud3core\tasks/tsk_eth_common.c **** #define MAX_SYSEX_SIZE          32
+  56:..\common\ud3core\tasks/tsk_eth_common.c **** 
+  57:..\common\ud3core\tasks/tsk_eth_common.c **** #define DATA_NOT_READY          -1
+  58:..\common\ud3core\tasks/tsk_eth_common.c **** 
+  59:..\common\ud3core\tasks/tsk_eth_common.c **** 
+  60:..\common\ud3core\tasks/tsk_eth_common.c **** void process_midi(uint8_t* ptr, uint16_t len) {
+  28              		.loc 1 60 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+  34              		.cfi_def_cfa_offset 24
+  35              		.cfi_offset 3, -24
+  36              		.cfi_offset 4, -20
+  37              		.cfi_offset 5, -16
+  38              		.cfi_offset 6, -12
+  39              		.cfi_offset 7, -8
+  40              		.cfi_offset 14, -4
+  41              		.loc 1 60 0
+  42 0002 0746     		mov	r7, r0
+  43 0004 0D46     		mov	r5, r1
+  44 0006 304C     		ldr	r4, .L27
+  45              	.LBB2:
+  61:..\common\ud3core\tasks/tsk_eth_common.c ****     static midi_cmd state = {.message_size = DATA_NOT_READY};
+  62:..\common\ud3core\tasks/tsk_eth_common.c ****  
+  63:..\common\ud3core\tasks/tsk_eth_common.c **** 	while (len) {
+  64:..\common\ud3core\tasks/tsk_eth_common.c **** 		uint8_t c = *ptr;
+  65:..\common\ud3core\tasks/tsk_eth_common.c ****         uint8_t c_masked = c & 0xF0;
+  66:..\common\ud3core\tasks/tsk_eth_common.c ****         len--;
+  67:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+  68:..\common\ud3core\tasks/tsk_eth_common.c **** 
+  69:..\common\ud3core\tasks/tsk_eth_common.c **** 		if (c & 0x80) {  //MSB set  Reset
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 3
+
+
+  70:..\common\ud3core\tasks/tsk_eth_common.c ****             state.bytes_received = 0;
+  71:..\common\ud3core\tasks/tsk_eth_common.c ****             switch(c_masked){
+  72:..\common\ud3core\tasks/tsk_eth_common.c ****                 case MIDI_PC:
+  73:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.cmd = c;
+  74:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.message_size = 1;
+  75:..\common\ud3core\tasks/tsk_eth_common.c ****                 break;
+  76:..\common\ud3core\tasks/tsk_eth_common.c ****                 case MIDI_CP:
+  77:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.cmd = c;
+  78:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.message_size = 1;
+  79:..\common\ud3core\tasks/tsk_eth_common.c ****                 break;
+  80:..\common\ud3core\tasks/tsk_eth_common.c ****                 case MIDI_FUNCTION:
+  81:..\common\ud3core\tasks/tsk_eth_common.c ****                 
+  82:..\common\ud3core\tasks/tsk_eth_common.c ****                     switch(c){
+  83:..\common\ud3core\tasks/tsk_eth_common.c ****                         case MIDI_SYSEX_START:
+  84:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.cmd = c;
+  85:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.bytes_received = 0;
+  86:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.message_size = MAX_SYSEX_SIZE;
+  87:..\common\ud3core\tasks/tsk_eth_common.c ****                         break;
+  88:..\common\ud3core\tasks/tsk_eth_common.c ****                         case MIDI_SYSEX_END:
+  89:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.message_size = state.bytes_received;
+  90:..\common\ud3core\tasks/tsk_eth_common.c ****                         break;
+  91:..\common\ud3core\tasks/tsk_eth_common.c ****                         case MIDI_SONG_POSITION:
+  92:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.cmd = c;
+  93:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.message_size = 2;
+  94:..\common\ud3core\tasks/tsk_eth_common.c ****                         break;
+  95:..\common\ud3core\tasks/tsk_eth_common.c ****                         case MIDI_SONG_SELECT:
+  96:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.cmd = c;
+  97:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.message_size = 1;
+  98:..\common\ud3core\tasks/tsk_eth_common.c ****                         break;
+  99:..\common\ud3core\tasks/tsk_eth_common.c ****                         case MIDI_BUS_SELECT:
+ 100:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.cmd = c;
+ 101:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.message_size = 1;
+ 102:..\common\ud3core\tasks/tsk_eth_common.c ****                         break;
+ 103:..\common\ud3core\tasks/tsk_eth_common.c ****                         default:
+ 104:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.cmd = c;
+ 105:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.message_size = 0;
+ 106:..\common\ud3core\tasks/tsk_eth_common.c ****                         break;
+ 107:..\common\ud3core\tasks/tsk_eth_common.c ****                     }
+ 108:..\common\ud3core\tasks/tsk_eth_common.c ****                 break;
+ 109:..\common\ud3core\tasks/tsk_eth_common.c ****                 default:
+ 110:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.cmd = c;
+ 111:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.message_size = 2;
+ 112:..\common\ud3core\tasks/tsk_eth_common.c ****                 break;
+ 113:..\common\ud3core\tasks/tsk_eth_common.c ****             }
+ 114:..\common\ud3core\tasks/tsk_eth_common.c ****         }else{
+ 115:..\common\ud3core\tasks/tsk_eth_common.c ****                 if(state.bytes_received < state.message_size && state.cmd != MIDI_SYSEX_START){
+ 116:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.msg[state.bytes_received + 1] = c;
+ 117:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.bytes_received++;
+ 118:..\common\ud3core\tasks/tsk_eth_common.c ****                 } else if(state.bytes_received < state.message_size && state.cmd == MIDI_SYSEX_STAR
+ 119:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.bytes_received++;
+ 120:..\common\ud3core\tasks/tsk_eth_common.c ****                 }
+ 121:..\common\ud3core\tasks/tsk_eth_common.c ****  
+ 122:..\common\ud3core\tasks/tsk_eth_common.c ****                 if(state.message_size != DATA_NOT_READY && state.bytes_received == state.message_si
+ 123:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.msg[0] = state.cmd;
+ 124:..\common\ud3core\tasks/tsk_eth_common.c ****                     queue_midi_message(state.msg);
+ 125:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.bytes_received = 0;
+  46              		.loc 1 125 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 4
+
+
+  47 0008 0026     		movs	r6, #0
+  48              	.LVL1:
+  49              	.L2:
+  50              	.LBE2:
+  63:..\common\ud3core\tasks/tsk_eth_common.c **** 		uint8_t c = *ptr;
+  51              		.loc 1 63 0
+  52 000a 002D     		cmp	r5, #0
+  53 000c 5AD0     		beq	.L26
+  54              	.LBB3:
+  64:..\common\ud3core\tasks/tsk_eth_common.c ****         uint8_t c_masked = c & 0xF0;
+  55              		.loc 1 64 0
+  56 000e 17F8013B 		ldrb	r3, [r7], #1	@ zero_extendqisi2
+  57              	.LVL2:
+  66:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+  58              		.loc 1 66 0
+  59 0012 013D     		subs	r5, r5, #1
+  60              	.LVL3:
+  69:..\common\ud3core\tasks/tsk_eth_common.c ****             state.bytes_received = 0;
+  61              		.loc 1 69 0
+  62 0014 1A06     		lsls	r2, r3, #24
+  66:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+  63              		.loc 1 66 0
+  64 0016 ADB2     		uxth	r5, r5
+  65              	.LVL4:
+  69:..\common\ud3core\tasks/tsk_eth_common.c ****             state.bytes_received = 0;
+  66              		.loc 1 69 0
+  67 0018 34D5     		bpl	.L3
+  71:..\common\ud3core\tasks/tsk_eth_common.c ****                 case MIDI_PC:
+  68              		.loc 1 71 0
+  69 001a 03F0F002 		and	r2, r3, #240
+  70 001e D02A     		cmp	r2, #208
+  70:..\common\ud3core\tasks/tsk_eth_common.c ****             switch(c_masked){
+  71              		.loc 1 70 0
+  72 0020 A670     		strb	r6, [r4, #2]
+  71:..\common\ud3core\tasks/tsk_eth_common.c ****                 case MIDI_PC:
+  73              		.loc 1 71 0
+  74 0022 06D0     		beq	.L5
+  75 0024 F02A     		cmp	r2, #240
+  76 0026 07D0     		beq	.L6
+  77 0028 C02A     		cmp	r2, #192
+  73:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.message_size = 1;
+  78              		.loc 1 73 0
+  79 002a 2370     		strb	r3, [r4]
+  71:..\common\ud3core\tasks/tsk_eth_common.c ****                 case MIDI_PC:
+  80              		.loc 1 71 0
+  81 002c 28D1     		bne	.L21
+  82 002e 01E0     		b	.L24
+  83              	.L13:
+  96:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.message_size = 1;
+  84              		.loc 1 96 0
+  85 0030 F323     		movs	r3, #243
+  86              	.LVL5:
+  87              	.L5:
+  77:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.message_size = 1;
+  88              		.loc 1 77 0
+  89 0032 2370     		strb	r3, [r4]
+  90              	.L24:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 5
+
+
+  78:..\common\ud3core\tasks/tsk_eth_common.c ****                 break;
+  91              		.loc 1 78 0
+  92 0034 0123     		movs	r3, #1
+  93 0036 43E0     		b	.L22
+  94              	.LVL6:
+  95              	.L6:
+  82:..\common\ud3core\tasks/tsk_eth_common.c ****                         case MIDI_SYSEX_START:
+  96              		.loc 1 82 0
+  97 0038 A3F1F002 		sub	r2, r3, #240
+  98 003c 072A     		cmp	r2, #7
+  99 003e 1CD8     		bhi	.L9
+ 100 0040 01A1     		adr	r1, .L11
+ 101 0042 51F822F0 		ldr	pc, [r1, r2, lsl #2]
+ 102 0046 00BF     		.p2align 2
+ 103              	.L11:
+ 104 0048 69000000 		.word	.L10+1
+ 105 004c 7B000000 		.word	.L9+1
+ 106 0050 71000000 		.word	.L12+1
+ 107 0054 31000000 		.word	.L13+1
+ 108 0058 7B000000 		.word	.L9+1
+ 109 005c 77000000 		.word	.L14+1
+ 110 0060 7B000000 		.word	.L9+1
+ 111 0064 7D000000 		.word	.L23+1
+ 112              		.p2align 1
+ 113              	.L10:
+  84:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.bytes_received = 0;
+ 114              		.loc 1 84 0
+ 115 0068 F023     		movs	r3, #240
+ 116              	.LVL7:
+ 117 006a 2370     		strb	r3, [r4]
+  86:..\common\ud3core\tasks/tsk_eth_common.c ****                         break;
+ 118              		.loc 1 86 0
+ 119 006c 2023     		movs	r3, #32
+ 120 006e 27E0     		b	.L22
+ 121              	.LVL8:
+ 122              	.L12:
+  92:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.message_size = 2;
+ 123              		.loc 1 92 0
+ 124 0070 F223     		movs	r3, #242
+ 125              	.LVL9:
+ 126 0072 2370     		strb	r3, [r4]
+ 127 0074 04E0     		b	.L21
+ 128              	.LVL10:
+ 129              	.L14:
+ 100:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.message_size = 1;
+ 130              		.loc 1 100 0
+ 131 0076 F523     		movs	r3, #245
+ 132              	.LVL11:
+ 133 0078 DBE7     		b	.L5
+ 134              	.LVL12:
+ 135              	.L9:
+ 104:..\common\ud3core\tasks/tsk_eth_common.c ****                             state.message_size = 0;
+ 136              		.loc 1 104 0
+ 137 007a 2370     		strb	r3, [r4]
+ 138              	.L23:
+ 105:..\common\ud3core\tasks/tsk_eth_common.c ****                         break;
+ 139              		.loc 1 105 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 6
+
+
+ 140 007c 6670     		strb	r6, [r4, #1]
+ 106:..\common\ud3core\tasks/tsk_eth_common.c ****                     }
+ 141              		.loc 1 106 0
+ 142 007e C4E7     		b	.L2
+ 143              	.LVL13:
+ 144              	.L21:
+ 111:..\common\ud3core\tasks/tsk_eth_common.c ****                 break;
+ 145              		.loc 1 111 0
+ 146 0080 0223     		movs	r3, #2
+ 147 0082 1DE0     		b	.L22
+ 148              	.LVL14:
+ 149              	.L3:
+ 115:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.msg[state.bytes_received + 1] = c;
+ 150              		.loc 1 115 0
+ 151 0084 A278     		ldrb	r2, [r4, #2]	@ zero_extendqisi2
+ 152 0086 94F90110 		ldrsb	r1, [r4, #1]
+ 153 008a 8A42     		cmp	r2, r1
+ 154 008c 07DA     		bge	.L16
+ 115:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.msg[state.bytes_received + 1] = c;
+ 155              		.loc 1 115 0 is_stmt 0 discriminator 1
+ 156 008e 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+ 157 0090 F028     		cmp	r0, #240
+ 158 0092 02F10100 		add	r0, r2, #1
+ 116:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.bytes_received++;
+ 159              		.loc 1 116 0 is_stmt 1 discriminator 1
+ 160 0096 1CBF     		itt	ne
+ 161 0098 1219     		addne	r2, r2, r4
+ 162 009a 1371     		strbne	r3, [r2, #4]
+ 119:..\common\ud3core\tasks/tsk_eth_common.c ****                 }
+ 163              		.loc 1 119 0 discriminator 1
+ 164 009c A070     		strb	r0, [r4, #2]
+ 165              	.L16:
+ 122:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.msg[0] = state.cmd;
+ 166              		.loc 1 122 0
+ 167 009e 4B1C     		adds	r3, r1, #1
+ 168              	.LVL15:
+ 169 00a0 B3D0     		beq	.L2
+ 122:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.msg[0] = state.cmd;
+ 170              		.loc 1 122 0 is_stmt 0 discriminator 1
+ 171 00a2 A378     		ldrb	r3, [r4, #2]	@ zero_extendqisi2
+ 172 00a4 9942     		cmp	r1, r3
+ 173 00a6 B0D1     		bne	.L2
+ 123:..\common\ud3core\tasks/tsk_eth_common.c ****                     queue_midi_message(state.msg);
+ 174              		.loc 1 123 0 is_stmt 1
+ 175 00a8 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 124:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.bytes_received = 0;
+ 176              		.loc 1 124 0
+ 177 00aa 0848     		ldr	r0, .L27+4
+ 123:..\common\ud3core\tasks/tsk_eth_common.c ****                     queue_midi_message(state.msg);
+ 178              		.loc 1 123 0
+ 179 00ac E370     		strb	r3, [r4, #3]
+ 124:..\common\ud3core\tasks/tsk_eth_common.c ****                     state.bytes_received = 0;
+ 180              		.loc 1 124 0
+ 181 00ae FFF7FEFF 		bl	queue_midi_message
+ 182              	.LVL16:
+ 126:..\common\ud3core\tasks/tsk_eth_common.c ****                     if((state.cmd & 0xF0) == MIDI_FUNCTION){
+ 183              		.loc 1 126 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 7
+
+
+ 184 00b2 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 125:..\common\ud3core\tasks/tsk_eth_common.c ****                     if((state.cmd & 0xF0) == MIDI_FUNCTION){
+ 185              		.loc 1 125 0
+ 186 00b4 A670     		strb	r6, [r4, #2]
+ 187              		.loc 1 126 0
+ 188 00b6 03F0F003 		and	r3, r3, #240
+ 189 00ba F02B     		cmp	r3, #240
+ 190 00bc A5D1     		bne	.L2
+ 127:..\common\ud3core\tasks/tsk_eth_common.c ****                         state.message_size = DATA_NOT_READY;
+ 191              		.loc 1 127 0
+ 192 00be FF23     		movs	r3, #255
+ 193              	.L22:
+ 194 00c0 6370     		strb	r3, [r4, #1]
+ 195 00c2 A2E7     		b	.L2
+ 196              	.L26:
+ 197              	.LBE3:
+ 128:..\common\ud3core\tasks/tsk_eth_common.c ****                     }
+ 129:..\common\ud3core\tasks/tsk_eth_common.c ****                 }
+ 130:..\common\ud3core\tasks/tsk_eth_common.c ****         }
+ 131:..\common\ud3core\tasks/tsk_eth_common.c ****     }
+ 132:..\common\ud3core\tasks/tsk_eth_common.c **** }
+ 198              		.loc 1 132 0
+ 199 00c4 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 200              	.LVL17:
+ 201              	.L28:
+ 202 00c6 00BF     		.align	2
+ 203              	.L27:
+ 204 00c8 00000000 		.word	.LANCHOR0
+ 205 00cc 03000000 		.word	.LANCHOR0+3
+ 206              		.cfi_endproc
+ 207              	.LFE68:
+ 208              		.size	process_midi, .-process_midi
+ 209              		.section	.text.process_min_sid,"ax",%progbits
+ 210              		.align	1
+ 211              		.global	process_min_sid
+ 212              		.thumb
+ 213              		.thumb_func
+ 214              		.type	process_min_sid, %function
+ 215              	process_min_sid:
+ 216              	.LFB69:
+ 133:..\common\ud3core\tasks/tsk_eth_common.c **** 
+ 134:..\common\ud3core\tasks/tsk_eth_common.c **** 
+ 135:..\common\ud3core\tasks/tsk_eth_common.c **** #define SID_BYTES       29
+ 136:..\common\ud3core\tasks/tsk_eth_common.c **** 
+ 137:..\common\ud3core\tasks/tsk_eth_common.c **** #define SID_COMMAND_VOLUME       0
+ 138:..\common\ud3core\tasks/tsk_eth_common.c **** #define SID_COMMAND_NOISE_VOLUME 1
+ 139:..\common\ud3core\tasks/tsk_eth_common.c **** #define SID_COMMAND_HPV_ENABLE   2
+ 140:..\common\ud3core\tasks/tsk_eth_common.c **** 
+ 141:..\common\ud3core\tasks/tsk_eth_common.c **** void process_min_sid(uint8_t* ptr, uint16_t len) {
+ 217              		.loc 1 141 0
+ 218              		.cfi_startproc
+ 219              		@ args = 0, pretend = 0, frame = 64
+ 220              		@ frame_needed = 0, uses_anonymous_args = 0
+ 221              	.LVL18:
+ 222 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 223              		.cfi_def_cfa_offset 36
+ 224              		.cfi_offset 4, -36
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 8
+
+
+ 225              		.cfi_offset 5, -32
+ 226              		.cfi_offset 6, -28
+ 227              		.cfi_offset 7, -24
+ 228              		.cfi_offset 8, -20
+ 229              		.cfi_offset 9, -16
+ 230              		.cfi_offset 10, -12
+ 231              		.cfi_offset 11, -8
+ 232              		.cfi_offset 14, -4
+ 142:..\common\ud3core\tasks/tsk_eth_common.c ****     uint8_t n_frames = *ptr;
+ 233              		.loc 1 142 0
+ 234 0004 0578     		ldrb	r5, [r0]	@ zero_extendqisi2
+ 235              	.LVL19:
+ 143:..\common\ud3core\tasks/tsk_eth_common.c ****     len--;
+ 236              		.loc 1 143 0
+ 237 0006 0139     		subs	r1, r1, #1
+ 238              	.LVL20:
+ 141:..\common\ud3core\tasks/tsk_eth_common.c ****     uint8_t n_frames = *ptr;
+ 239              		.loc 1 141 0
+ 240 0008 91B0     		sub	sp, sp, #68
+ 241              		.cfi_def_cfa_offset 104
+ 242              		.loc 1 143 0
+ 243 000a 89B2     		uxth	r1, r1
+ 244              	.LVL21:
+ 144:..\common\ud3core\tasks/tsk_eth_common.c ****     ptr++;
+ 145:..\common\ud3core\tasks/tsk_eth_common.c ****     if (n_frames == 0 && len == 4) {
+ 245              		.loc 1 145 0
+ 246 000c CDB9     		cbnz	r5, .L30
+ 247              		.loc 1 145 0 is_stmt 0 discriminator 1
+ 248 000e 0429     		cmp	r1, #4
+ 249 0010 17D1     		bne	.L30
+ 250              	.LVL22:
+ 251              	.LBB4:
+ 146:..\common\ud3core\tasks/tsk_eth_common.c ****         uint8_t command = ptr[0];
+ 147:..\common\ud3core\tasks/tsk_eth_common.c ****         uint8_t channel = ptr[1];
+ 148:..\common\ud3core\tasks/tsk_eth_common.c ****         uint16_t value = (ptr[2] << 8) | ptr[3];
+ 252              		.loc 1 148 0 is_stmt 1
+ 253 0012 C278     		ldrb	r2, [r0, #3]	@ zero_extendqisi2
+ 254 0014 0379     		ldrb	r3, [r0, #4]	@ zero_extendqisi2
+ 255 0016 43EA0223 		orr	r3, r3, r2, lsl #8
+ 256              	.LVL23:
+ 149:..\common\ud3core\tasks/tsk_eth_common.c ****         switch (command) {
+ 257              		.loc 1 149 0
+ 258 001a 4278     		ldrb	r2, [r0, #1]	@ zero_extendqisi2
+ 259 001c 012A     		cmp	r2, #1
+ 260 001e 0DD0     		beq	.L31
+ 261 0020 07D3     		bcc	.L32
+ 262 0022 022A     		cmp	r2, #2
+ 263 0024 0DD1     		bne	.L30
+ 150:..\common\ud3core\tasks/tsk_eth_common.c ****             case SID_COMMAND_VOLUME:
+ 151:..\common\ud3core\tasks/tsk_eth_common.c ****                 SID_filterData.channelVolume[channel] = value;
+ 152:..\common\ud3core\tasks/tsk_eth_common.c ****                 return;
+ 153:..\common\ud3core\tasks/tsk_eth_common.c ****             case SID_COMMAND_NOISE_VOLUME:
+ 154:..\common\ud3core\tasks/tsk_eth_common.c ****                 SID_filterData.noiseVolume = value;
+ 155:..\common\ud3core\tasks/tsk_eth_common.c ****                 return;
+ 156:..\common\ud3core\tasks/tsk_eth_common.c ****             case SID_COMMAND_HPV_ENABLE:
+ 157:..\common\ud3core\tasks/tsk_eth_common.c ****                 SID_filterData.hpvEnabledGlobally = value != 0;
+ 264              		.loc 1 157 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 9
+
+
+ 265 0026 0033     		adds	r3, r3, #0
+ 266 0028 664A     		ldr	r2, .L76
+ 267 002a 18BF     		it	ne
+ 268 002c 0123     		movne	r3, #1
+ 269              	.LVL24:
+ 270 002e 1362     		str	r3, [r2, #32]
+ 271              	.LVL25:
+ 158:..\common\ud3core\tasks/tsk_eth_common.c ****                 return;
+ 272              		.loc 1 158 0
+ 273 0030 C4E0     		b	.L29
+ 274              	.LVL26:
+ 275              	.L32:
+ 151:..\common\ud3core\tasks/tsk_eth_common.c ****                 return;
+ 276              		.loc 1 151 0
+ 277 0032 8178     		ldrb	r1, [r0, #2]	@ zero_extendqisi2
+ 278              	.LVL27:
+ 279 0034 634A     		ldr	r2, .L76
+ 280 0036 42F82130 		str	r3, [r2, r1, lsl #2]
+ 281              	.LVL28:
+ 152:..\common\ud3core\tasks/tsk_eth_common.c ****             case SID_COMMAND_NOISE_VOLUME:
+ 282              		.loc 1 152 0
+ 283 003a BFE0     		b	.L29
+ 284              	.LVL29:
+ 285              	.L31:
+ 154:..\common\ud3core\tasks/tsk_eth_common.c ****                 return;
+ 286              		.loc 1 154 0
+ 287 003c 614A     		ldr	r2, .L76
+ 288 003e D361     		str	r3, [r2, #28]
+ 289              	.LVL30:
+ 155:..\common\ud3core\tasks/tsk_eth_common.c ****             case SID_COMMAND_HPV_ENABLE:
+ 290              		.loc 1 155 0
+ 291 0040 BCE0     		b	.L29
+ 292              	.LVL31:
+ 293              	.L30:
+ 294              	.LBE4:
+ 159:..\common\ud3core\tasks/tsk_eth_common.c ****         }
+ 160:..\common\ud3core\tasks/tsk_eth_common.c ****     }
+ 161:..\common\ud3core\tasks/tsk_eth_common.c ****     
+ 162:..\common\ud3core\tasks/tsk_eth_common.c ****     if(len!=(SID_BYTES*n_frames)){
+ 295              		.loc 1 162 0
+ 296 0042 1D23     		movs	r3, #29
+ 297 0044 6B43     		muls	r3, r5, r3
+ 298 0046 9942     		cmp	r1, r3
+ 299 0048 04D1     		bne	.L35
+ 144:..\common\ud3core\tasks/tsk_eth_common.c ****     if (n_frames == 0 && len == 4) {
+ 300              		.loc 1 144 0
+ 301 004a 441C     		adds	r4, r0, #1
+ 302              	.LBB5:
+ 303              	.LBB6:
+ 163:..\common\ud3core\tasks/tsk_eth_common.c ****         alarm_push(ALM_PRIO_WARN,"SID: Malformed SID frame", ALM_NO_VALUE);
+ 164:..\common\ud3core\tasks/tsk_eth_common.c ****         return;
+ 165:..\common\ud3core\tasks/tsk_eth_common.c ****     }
+ 166:..\common\ud3core\tasks/tsk_eth_common.c ****     
+ 167:..\common\ud3core\tasks/tsk_eth_common.c ****     SIDFrame_t SID_frame;
+ 168:..\common\ud3core\tasks/tsk_eth_common.c ****     
+ 169:..\common\ud3core\tasks/tsk_eth_common.c ****     //TODO add filter stuff?
+ 170:..\common\ud3core\tasks/tsk_eth_common.c ****     
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 10
+
+
+ 171:..\common\ud3core\tasks/tsk_eth_common.c ****     //uint16_t master_pw; //TODO: whats this used for?
+ 172:..\common\ud3core\tasks/tsk_eth_common.c **** 
+ 173:..\common\ud3core\tasks/tsk_eth_common.c ****     while(n_frames){
+ 174:..\common\ud3core\tasks/tsk_eth_common.c ****         uint32_t freq_tempFp8;
+ 175:..\common\ud3core\tasks/tsk_eth_common.c ****         for(uint32_t i = 0;i<N_SIDCHANNEL;i++){
+ 176:..\common\ud3core\tasks/tsk_eth_common.c ****             //SID_FREQLO1
+ 177:..\common\ud3core\tasks/tsk_eth_common.c ****             freq_tempFp8 = *ptr;
+ 178:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 179:..\common\ud3core\tasks/tsk_eth_common.c ****             ptr++;
+ 180:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 181:..\common\ud3core\tasks/tsk_eth_common.c ****             //SID_FREQHI1
+ 182:..\common\ud3core\tasks/tsk_eth_common.c ****             freq_tempFp8 |= ((uint16_t)*ptr << 8);
+ 183:..\common\ud3core\tasks/tsk_eth_common.c ****             freq_tempFp8 = (freq_tempFp8<<15)/2179;
+ 184:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 185:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.frequency_dHz[i] = (freq_tempFp8 * 10) >> 8;
+ 304              		.loc 1 185 0
+ 305 004c 40F68306 		movw	r6, #2179
+ 306              	.LBE6:
+ 186:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 187:..\common\ud3core\tasks/tsk_eth_common.c ****             ptr++;
+ 188:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 189:..\common\ud3core\tasks/tsk_eth_common.c ****             //SID_PWLO1
+ 190:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.pulsewidth[i] = (*ptr & 0xff);
+ 191:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 192:..\common\ud3core\tasks/tsk_eth_common.c ****             ptr++;
+ 193:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 194:..\common\ud3core\tasks/tsk_eth_common.c ****             //SID_PWHI1
+ 195:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 196:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.pulsewidth[i] = (SID_frame.pulsewidth[i] & 0xff) + (((uint16_t)*ptr << 8) & 0
+ 197:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 198:..\common\ud3core\tasks/tsk_eth_common.c ****             ptr++;
+ 199:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 200:..\common\ud3core\tasks/tsk_eth_common.c ****             //SID_CR1
+ 201:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 202:..\common\ud3core\tasks/tsk_eth_common.c ****             //start of with a clear flag set
+ 203:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.flags[i] = 0;
+ 204:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 205:..\common\ud3core\tasks/tsk_eth_common.c ****             //is noise bit set?
+ 206:..\common\ud3core\tasks/tsk_eth_common.c ****             if(*ptr & 0x80) SID_frame.flags[i] |= SID_FRAME_FLAG_NOISE;
+ 207:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 208:..\common\ud3core\tasks/tsk_eth_common.c ****             //is SQR bit set?
+ 209:..\common\ud3core\tasks/tsk_eth_common.c ****             if(*ptr & 0x40) SID_frame.flags[i] |= SID_FRAME_FLAG_SQUARE;
+ 210:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 211:..\common\ud3core\tasks/tsk_eth_common.c ****             //is SAW bit set?
+ 212:..\common\ud3core\tasks/tsk_eth_common.c ****             if(*ptr & 0x20) SID_frame.flags[i] |= SID_FRAME_FLAG_SAWTOOTH;
+ 213:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 214:..\common\ud3core\tasks/tsk_eth_common.c ****             //is TRI bit set?
+ 215:..\common\ud3core\tasks/tsk_eth_common.c ****             if(*ptr & 0x10) SID_frame.flags[i] |= SID_FRAME_FLAG_TRIANGLE;
+ 216:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 217:..\common\ud3core\tasks/tsk_eth_common.c ****             //is TEST bit set?
+ 218:..\common\ud3core\tasks/tsk_eth_common.c ****             if(*ptr & 0x08) SID_frame.flags[i] |= SID_FRAME_FLAG_TEST;
+ 219:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 220:..\common\ud3core\tasks/tsk_eth_common.c ****             //is RING bit set?
+ 221:..\common\ud3core\tasks/tsk_eth_common.c ****             if(*ptr & 0x04) SID_frame.flags[i] |= SID_FRAME_FLAG_RING;
+ 222:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 223:..\common\ud3core\tasks/tsk_eth_common.c ****             //is SYNC bit set?
+ 224:..\common\ud3core\tasks/tsk_eth_common.c ****             if(*ptr & 0x02) SID_frame.flags[i] |= SID_FRAME_FLAG_SYNC;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 11
+
+
+ 225:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 226:..\common\ud3core\tasks/tsk_eth_common.c ****             //is GATE bit set?
+ 227:..\common\ud3core\tasks/tsk_eth_common.c ****             if(*ptr & 0x01) SID_frame.flags[i] |= SID_FRAME_FLAG_GATE;
+ 228:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 229:..\common\ud3core\tasks/tsk_eth_common.c ****             ptr++;
+ 230:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 231:..\common\ud3core\tasks/tsk_eth_common.c ****             //SID_AD1
+ 232:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.attack[i] = (*ptr >> 4) & 0x0F;
+ 233:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.decay[i] = (*ptr) & 0x0F;
+ 234:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 235:..\common\ud3core\tasks/tsk_eth_common.c ****             ptr++;
+ 236:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 237:..\common\ud3core\tasks/tsk_eth_common.c ****             //SID_SR1
+ 238:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.sustain[i] = ((*ptr & 0xF0) >> 1);
+ 239:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.release[i] = (*ptr) & 0x0F;
+ 240:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 241:..\common\ud3core\tasks/tsk_eth_common.c ****             ptr++;
+ 242:..\common\ud3core\tasks/tsk_eth_common.c ****         }
+ 243:..\common\ud3core\tasks/tsk_eth_common.c ****         //SID_FCLO
+ 244:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 245:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+ 246:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 247:..\common\ud3core\tasks/tsk_eth_common.c ****         //SID_FCHI
+ 248:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 249:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+ 250:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 251:..\common\ud3core\tasks/tsk_eth_common.c ****         //SID_Res_Filt
+ 252:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 253:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+ 254:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 255:..\common\ud3core\tasks/tsk_eth_common.c ****         //SID_Mode_Vol
+ 256:..\common\ud3core\tasks/tsk_eth_common.c ****         if(*ptr & 0x80) SID_frame.flags[2] |= SID_FRAME_FLAG_CH3OFF;
+ 257:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+ 258:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 259:..\common\ud3core\tasks/tsk_eth_common.c ****         //SID_UD_TIME0
+ 260:..\common\ud3core\tasks/tsk_eth_common.c ****         SID_frame.next_frame = *ptr<<24;
+ 261:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 262:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+ 263:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 264:..\common\ud3core\tasks/tsk_eth_common.c ****         //SID_UD_TIME1
+ 265:..\common\ud3core\tasks/tsk_eth_common.c ****         SID_frame.next_frame |= *ptr<<16;
+ 266:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 267:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+ 268:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 269:..\common\ud3core\tasks/tsk_eth_common.c ****         //SID_UD_TIME2
+ 270:..\common\ud3core\tasks/tsk_eth_common.c ****         SID_frame.next_frame |= *ptr<<8;
+ 271:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 272:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+ 273:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 274:..\common\ud3core\tasks/tsk_eth_common.c ****         //SID_UD_TIME3
+ 275:..\common\ud3core\tasks/tsk_eth_common.c ****         SID_frame.next_frame |= *ptr;
+ 276:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 277:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+ 278:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 279:..\common\ud3core\tasks/tsk_eth_common.c ****         n_frames--;
+ 280:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 281:..\common\ud3core\tasks/tsk_eth_common.c ****         int32_t diff = SID_frame.next_frame - l_time;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 12
+
+
+ 307              		.loc 1 281 0
+ 308 0050 5D4F     		ldr	r7, .L76+4
+ 309 0052 9DE0     		b	.L36
+ 310              	.L35:
+ 311              	.LBE5:
+ 163:..\common\ud3core\tasks/tsk_eth_common.c ****         alarm_push(ALM_PRIO_WARN,"SID: Malformed SID frame", ALM_NO_VALUE);
+ 312              		.loc 1 163 0
+ 313 0054 4FF00042 		mov	r2, #-2147483648
+ 314 0058 5C49     		ldr	r1, .L76+8
+ 315              	.LVL32:
+ 316 005a 0120     		movs	r0, #1
+ 317              	.LVL33:
+ 318 005c FFF7FEFF 		bl	alarm_push
+ 319              	.LVL34:
+ 164:..\common\ud3core\tasks/tsk_eth_common.c ****     }
+ 320              		.loc 1 164 0
+ 321 0060 ACE0     		b	.L29
+ 322              	.LVL35:
+ 323              	.L45:
+ 324              	.LBB9:
+ 325              	.LBB7:
+ 183:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 326              		.loc 1 183 0
+ 327 0062 1088     		ldrh	r0, [r2]	@ unaligned
+ 196:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 328              		.loc 1 196 0
+ 329 0064 92F803B0 		ldrb	fp, [r2, #3]	@ zero_extendqisi2
+ 183:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 330              		.loc 1 183 0
+ 331 0068 C003     		lsls	r0, r0, #15
+ 332              	.LVL36:
+ 185:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 333              		.loc 1 185 0
+ 334 006a B0FBF6F0 		udiv	r0, r0, r6
+ 335              	.LVL37:
+ 336 006e 09FB00F0 		mul	r0, r9, r0
+ 337 0072 000A     		lsrs	r0, r0, #8
+ 338 0074 CEF82000 		str	r0, [lr, #32]
+ 196:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 339              		.loc 1 196 0
+ 340 0078 9078     		ldrb	r0, [r2, #2]	@ zero_extendqisi2
+ 341 007a 0732     		adds	r2, r2, #7
+ 342              	.LVL38:
+ 343 007c 00EB0B20 		add	r0, r0, fp, lsl #8
+ 344 0080 CEF82C00 		str	r0, [lr, #44]
+ 206:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 345              		.loc 1 206 0
+ 346 0084 12F8030C 		ldrb	r0, [r2, #-3]	@ zero_extendqisi2
+ 203:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 347              		.loc 1 203 0
+ 348 0088 A3F80080 		strh	r8, [r3]	@ movhi
+ 206:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 349              		.loc 1 206 0
+ 350 008c 10F0800F 		tst	r0, #128
+ 351 0090 18BF     		it	ne
+ 352 0092 A3F800C0 		strhne	ip, [r3]	@ movhi
+ 209:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 13
+
+
+ 353              		.loc 1 209 0
+ 354 0096 10F0400F 		tst	r0, #64
+ 355 009a 18BF     		it	ne
+ 356 009c B3F800B0 		ldrhne	fp, [r3]
+ 357 00a0 0EF1040E 		add	lr, lr, #4
+ 358 00a4 1CBF     		itt	ne
+ 359 00a6 4BF0020B 		orrne	fp, fp, #2
+ 360 00aa A3F800B0 		strhne	fp, [r3]	@ movhi
+ 212:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 361              		.loc 1 212 0
+ 362 00ae 10F0200F 		tst	r0, #32
+ 363 00b2 18BF     		it	ne
+ 364 00b4 B3F800B0 		ldrhne	fp, [r3]
+ 365 00b8 03F10203 		add	r3, r3, #2
+ 366 00bc 1CBF     		itt	ne
+ 367 00be 4BF0040B 		orrne	fp, fp, #4
+ 368 00c2 23F802BC 		strhne	fp, [r3, #-2]	@ movhi
+ 215:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 369              		.loc 1 215 0
+ 370 00c6 10F0100F 		tst	r0, #16
+ 371 00ca 1EBF     		ittt	ne
+ 372 00cc 33F802BC 		ldrhne	fp, [r3, #-2]
+ 373 00d0 4BF0080B 		orrne	fp, fp, #8
+ 374 00d4 23F802BC 		strhne	fp, [r3, #-2]	@ movhi
+ 218:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 375              		.loc 1 218 0
+ 376 00d8 10F0080F 		tst	r0, #8
+ 377 00dc 1EBF     		ittt	ne
+ 378 00de 33F802BC 		ldrhne	fp, [r3, #-2]
+ 379 00e2 4BF0100B 		orrne	fp, fp, #16
+ 380 00e6 23F802BC 		strhne	fp, [r3, #-2]	@ movhi
+ 221:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 381              		.loc 1 221 0
+ 382 00ea 10F0040F 		tst	r0, #4
+ 383 00ee 1EBF     		ittt	ne
+ 384 00f0 33F802BC 		ldrhne	fp, [r3, #-2]
+ 385 00f4 4BF0200B 		orrne	fp, fp, #32
+ 386 00f8 23F802BC 		strhne	fp, [r3, #-2]	@ movhi
+ 224:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 387              		.loc 1 224 0
+ 388 00fc 10F0020F 		tst	r0, #2
+ 389 0100 1EBF     		ittt	ne
+ 390 0102 33F802BC 		ldrhne	fp, [r3, #-2]
+ 391 0106 4BF0400B 		orrne	fp, fp, #64
+ 392 010a 23F802BC 		strhne	fp, [r3, #-2]	@ movhi
+ 227:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 393              		.loc 1 227 0
+ 394 010e C007     		lsls	r0, r0, #31
+ 395 0110 42BF     		ittt	mi
+ 396 0112 33F8020C 		ldrhmi	r0, [r3, #-2]
+ 397 0116 40F08000 		orrmi	r0, r0, #128
+ 398 011a 23F8020C 		strhmi	r0, [r3, #-2]	@ movhi
+ 232:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.decay[i] = (*ptr) & 0x0F;
+ 399              		.loc 1 232 0
+ 400 011e 12F8020C 		ldrb	r0, [r2, #-2]	@ zero_extendqisi2
+ 401 0122 4FEA101B 		lsr	fp, r0, #4
+ 233:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 14
+
+
+ 402              		.loc 1 233 0
+ 403 0126 00F00F00 		and	r0, r0, #15
+ 404 012a 5881     		strh	r0, [r3, #10]	@ movhi
+ 238:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.release[i] = (*ptr) & 0x0F;
+ 405              		.loc 1 238 0
+ 406 012c 12F8010C 		ldrb	r0, [r2, #-1]	@ zero_extendqisi2
+ 232:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.decay[i] = (*ptr) & 0x0F;
+ 407              		.loc 1 232 0
+ 408 0130 A3F804B0 		strh	fp, [r3, #4]	@ movhi
+ 238:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.release[i] = (*ptr) & 0x0F;
+ 409              		.loc 1 238 0
+ 410 0134 4FEA600B 		asr	fp, r0, #1
+ 411 0138 0BF0780B 		and	fp, fp, #120
+ 239:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 412              		.loc 1 239 0
+ 413 013c 00F00F00 		and	r0, r0, #15
+ 175:..\common\ud3core\tasks/tsk_eth_common.c ****             //SID_FREQLO1
+ 414              		.loc 1 175 0
+ 415 0140 5245     		cmp	r2, r10
+ 238:..\common\ud3core\tasks/tsk_eth_common.c ****             SID_frame.release[i] = (*ptr) & 0x0F;
+ 416              		.loc 1 238 0
+ 417 0142 A3F810B0 		strh	fp, [r3, #16]	@ movhi
+ 239:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 418              		.loc 1 239 0
+ 419 0146 D882     		strh	r0, [r3, #22]	@ movhi
+ 420              	.LVL39:
+ 175:..\common\ud3core\tasks/tsk_eth_common.c ****             //SID_FREQLO1
+ 421              		.loc 1 175 0
+ 422 0148 8BD1     		bne	.L45
+ 423              	.LBE7:
+ 256:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+ 424              		.loc 1 256 0
+ 425 014a 94F91830 		ldrsb	r3, [r4, #24]
+ 275:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 426              		.loc 1 275 0
+ 427 014e A27E     		ldrb	r2, [r4, #26]	@ zero_extendqisi2
+ 428              	.LVL40:
+ 256:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+ 429              		.loc 1 256 0
+ 430 0150 002B     		cmp	r3, #0
+ 431 0152 B8BF     		it	lt
+ 432 0154 BDF80830 		ldrhlt	r3, [sp, #8]
+ 275:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 433              		.loc 1 275 0
+ 434 0158 4FEA0242 		lsl	r2, r2, #16
+ 256:..\common\ud3core\tasks/tsk_eth_common.c ****         ptr++;
+ 435              		.loc 1 256 0
+ 436 015c BCBF     		itt	lt
+ 437 015e 43F48073 		orrlt	r3, r3, #256
+ 438 0162 ADF80830 		strhlt	r3, [sp, #8]	@ movhi
+ 275:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 439              		.loc 1 275 0
+ 440 0166 637E     		ldrb	r3, [r4, #25]	@ zero_extendqisi2
+ 279:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 441              		.loc 1 279 0
+ 442 0168 013D     		subs	r5, r5, #1
+ 443              	.LVL41:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 15
+
+
+ 275:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 444              		.loc 1 275 0
+ 445 016a 42EA0362 		orr	r2, r2, r3, lsl #24
+ 446 016e 237F     		ldrb	r3, [r4, #28]	@ zero_extendqisi2
+ 279:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 447              		.loc 1 279 0
+ 448 0170 EDB2     		uxtb	r5, r5
+ 275:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 449              		.loc 1 275 0
+ 450 0172 1A43     		orrs	r2, r2, r3
+ 451 0174 E37E     		ldrb	r3, [r4, #27]	@ zero_extendqisi2
+ 452 0176 1D34     		adds	r4, r4, #29
+ 453              	.LVL42:
+ 454 0178 42EA0322 		orr	r2, r2, r3, lsl #8
+ 455              		.loc 1 281 0
+ 456 017c 3B68     		ldr	r3, [r7]
+ 275:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 457              		.loc 1 275 0
+ 458 017e 0F92     		str	r2, [sp, #60]
+ 459              		.loc 1 281 0
+ 460 0180 D21A     		subs	r2, r2, r3
+ 461              	.LVL43:
+ 282:..\common\ud3core\tasks/tsk_eth_common.c ****         if(diff<-1000){
+ 462              		.loc 1 282 0
+ 463 0182 12F57A7F 		cmn	r2, #1000
+ 464 0186 12DA     		bge	.L47
+ 283:..\common\ud3core\tasks/tsk_eth_common.c ****             alarm_push(ALM_PRIO_WARN,"SID: Old SID frame received", diff);
+ 465              		.loc 1 283 0
+ 466 0188 1149     		ldr	r1, .L76+12
+ 467 018a 0120     		movs	r0, #1
+ 468 018c FFF7FEFF 		bl	alarm_push
+ 469              	.LVL44:
+ 470              	.L36:
+ 471              	.LBE9:
+ 173:..\common\ud3core\tasks/tsk_eth_common.c ****         uint32_t freq_tempFp8;
+ 472              		.loc 1 173 0
+ 473 0190 A5B1     		cbz	r5, .L29
+ 474 0192 0DF1040E 		add	lr, sp, #4
+ 475 0196 04F1150A 		add	r10, r4, #21
+ 476 019a 7346     		mov	r3, lr
+ 477 019c 2246     		mov	r2, r4
+ 478 019e 7146     		mov	r1, lr
+ 479              	.LBB10:
+ 480              	.LBB8:
+ 185:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 481              		.loc 1 185 0
+ 482 01a0 4FF00A09 		mov	r9, #10
+ 203:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 483              		.loc 1 203 0
+ 484 01a4 4FF00008 		mov	r8, #0
+ 206:..\common\ud3core\tasks/tsk_eth_common.c ****             
+ 485              		.loc 1 206 0
+ 486 01a8 4FF0010C 		mov	ip, #1
+ 487 01ac 59E7     		b	.L45
+ 488              	.LVL45:
+ 489              	.L47:
+ 490              	.LBE8:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 16
+
+
+ 284:..\common\ud3core\tasks/tsk_eth_common.c ****         }else{   
+ 285:..\common\ud3core\tasks/tsk_eth_common.c ****             xQueueSend(qSID,&SID_frame,0);
+ 491              		.loc 1 285 0
+ 492 01ae 0948     		ldr	r0, .L76+16
+ 493 01b0 0023     		movs	r3, #0
+ 494 01b2 1A46     		mov	r2, r3
+ 495              	.LVL46:
+ 496 01b4 0068     		ldr	r0, [r0]
+ 497 01b6 FFF7FEFF 		bl	xQueueGenericSend
+ 498              	.LVL47:
+ 499 01ba E9E7     		b	.L36
+ 500              	.LVL48:
+ 501              	.L29:
+ 502              	.LBE10:
+ 286:..\common\ud3core\tasks/tsk_eth_common.c ****         }
+ 287:..\common\ud3core\tasks/tsk_eth_common.c ****         
+ 288:..\common\ud3core\tasks/tsk_eth_common.c ****     }
+ 289:..\common\ud3core\tasks/tsk_eth_common.c ****    
+ 290:..\common\ud3core\tasks/tsk_eth_common.c **** }
+ 503              		.loc 1 290 0
+ 504 01bc 11B0     		add	sp, sp, #68
+ 505              		.cfi_def_cfa_offset 36
+ 506              		@ sp needed
+ 507 01be BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 508              	.LVL49:
+ 509              	.L77:
+ 510 01c2 00BF     		.align	2
+ 511              	.L76:
+ 512 01c4 00000000 		.word	SID_filterData
+ 513 01c8 00000000 		.word	l_time
+ 514 01cc 00000000 		.word	.LC0
+ 515 01d0 19000000 		.word	.LC1
+ 516 01d4 00000000 		.word	qSID
+ 517              		.cfi_endproc
+ 518              	.LFE69:
+ 519              		.size	process_min_sid, .-process_min_sid
+ 520              		.comm	interrupter,12,4
+ 521              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 522              	.LC0:
+ 523 0000 5349443A 		.ascii	"SID: Malformed SID frame\000"
+ 523      204D616C 
+ 523      666F726D 
+ 523      65642053 
+ 523      49442066 
+ 524              	.LC1:
+ 525 0019 5349443A 		.ascii	"SID: Old SID frame received\000"
+ 525      204F6C64 
+ 525      20534944 
+ 525      20667261 
+ 525      6D652072 
+ 526              		.data
+ 527              		.set	.LANCHOR0,. + 0
+ 528              		.type	state.9812, %object
+ 529              		.size	state.9812, 6
+ 530              	state.9812:
+ 531 0000 00       		.space	1
+ 532 0001 FF       		.byte	-1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 17
+
+
+ 533 0002 00000000 		.space	4
+ 534              		.text
+ 535              	.Letext0:
+ 536              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 537              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 538              		.file 4 "..\\common\\rtos\\portable\\GCC\\ARM_CM3/portmacro.h"
+ 539              		.file 5 "..\\common\\rtos\\include/queue.h"
+ 540              		.file 6 "..\\common\\rtos\\include/timers.h"
+ 541              		.file 7 "..\\common\\ud3core/interrupter.h"
+ 542              		.file 8 "..\\common\\ud3core/tasks/tsk_sid.h"
+ 543              		.file 9 "Generated_Source\\PSoC5/core_cm3.h"
+ 544              		.file 10 "..\\common\\vms/SidFilter.h"
+ 545              		.file 11 "..\\common\\ud3core/clock.h"
+ 546              		.file 12 "..\\common\\ud3core/tasks/tsk_midi.h"
+ 547              		.file 13 "..\\common\\ud3core/alarmevent.h"
+ 548              		.section	.debug_info,"",%progbits
+ 549              	.Ldebug_info0:
+ 550 0000 47050000 		.4byte	0x547
+ 551 0004 0400     		.2byte	0x4
+ 552 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 553 000a 04       		.byte	0x4
+ 554 000b 01       		.uleb128 0x1
+ 555 000c DC000000 		.4byte	.LASF82
+ 556 0010 0C       		.byte	0xc
+ 557 0011 92000000 		.4byte	.LASF83
+ 558 0015 3A040000 		.4byte	.LASF84
+ 559 0019 58000000 		.4byte	.Ldebug_ranges0+0x58
+ 560 001d 00000000 		.4byte	0
+ 561 0021 00000000 		.4byte	.Ldebug_line0
+ 562 0025 02       		.uleb128 0x2
+ 563 0026 04       		.byte	0x4
+ 564 0027 07       		.byte	0x7
+ 565 0028 FE020000 		.4byte	.LASF0
+ 566 002c 03       		.uleb128 0x3
+ 567 002d 77030000 		.4byte	.LASF2
+ 568 0031 02       		.byte	0x2
+ 569 0032 1B       		.byte	0x1b
+ 570 0033 37000000 		.4byte	0x37
+ 571 0037 02       		.uleb128 0x2
+ 572 0038 01       		.byte	0x1
+ 573 0039 06       		.byte	0x6
+ 574 003a B5020000 		.4byte	.LASF1
+ 575 003e 03       		.uleb128 0x3
+ 576 003f 5A020000 		.4byte	.LASF3
+ 577 0043 02       		.byte	0x2
+ 578 0044 1D       		.byte	0x1d
+ 579 0045 49000000 		.4byte	0x49
+ 580 0049 02       		.uleb128 0x2
+ 581 004a 01       		.byte	0x1
+ 582 004b 08       		.byte	0x8
+ 583 004c 95020000 		.4byte	.LASF4
+ 584 0050 02       		.uleb128 0x2
+ 585 0051 02       		.byte	0x2
+ 586 0052 05       		.byte	0x5
+ 587 0053 7A000000 		.4byte	.LASF5
+ 588 0057 03       		.uleb128 0x3
+ 589 0058 86010000 		.4byte	.LASF6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 18
+
+
+ 590 005c 02       		.byte	0x2
+ 591 005d 2B       		.byte	0x2b
+ 592 005e 62000000 		.4byte	0x62
+ 593 0062 02       		.uleb128 0x2
+ 594 0063 02       		.byte	0x2
+ 595 0064 07       		.byte	0x7
+ 596 0065 64030000 		.4byte	.LASF7
+ 597 0069 03       		.uleb128 0x3
+ 598 006a FC030000 		.4byte	.LASF8
+ 599 006e 02       		.byte	0x2
+ 600 006f 3F       		.byte	0x3f
+ 601 0070 74000000 		.4byte	0x74
+ 602 0074 02       		.uleb128 0x2
+ 603 0075 04       		.byte	0x4
+ 604 0076 05       		.byte	0x5
+ 605 0077 51020000 		.4byte	.LASF9
+ 606 007b 03       		.uleb128 0x3
+ 607 007c D1000000 		.4byte	.LASF10
+ 608 0080 02       		.byte	0x2
+ 609 0081 41       		.byte	0x41
+ 610 0082 86000000 		.4byte	0x86
+ 611 0086 02       		.uleb128 0x2
+ 612 0087 04       		.byte	0x4
+ 613 0088 07       		.byte	0x7
+ 614 0089 42030000 		.4byte	.LASF11
+ 615 008d 02       		.uleb128 0x2
+ 616 008e 08       		.byte	0x8
+ 617 008f 05       		.byte	0x5
+ 618 0090 3A020000 		.4byte	.LASF12
+ 619 0094 02       		.uleb128 0x2
+ 620 0095 08       		.byte	0x8
+ 621 0096 07       		.byte	0x7
+ 622 0097 5F040000 		.4byte	.LASF13
+ 623 009b 04       		.uleb128 0x4
+ 624 009c 04       		.byte	0x4
+ 625 009d 05       		.byte	0x5
+ 626 009e 696E7400 		.ascii	"int\000"
+ 627 00a2 03       		.uleb128 0x3
+ 628 00a3 52000000 		.4byte	.LASF14
+ 629 00a7 03       		.byte	0x3
+ 630 00a8 14       		.byte	0x14
+ 631 00a9 2C000000 		.4byte	0x2c
+ 632 00ad 03       		.uleb128 0x3
+ 633 00ae D9010000 		.4byte	.LASF15
+ 634 00b2 03       		.byte	0x3
+ 635 00b3 18       		.byte	0x18
+ 636 00b4 3E000000 		.4byte	0x3e
+ 637 00b8 03       		.uleb128 0x3
+ 638 00b9 22030000 		.4byte	.LASF16
+ 639 00bd 03       		.byte	0x3
+ 640 00be 24       		.byte	0x24
+ 641 00bf 57000000 		.4byte	0x57
+ 642 00c3 03       		.uleb128 0x3
+ 643 00c4 98030000 		.4byte	.LASF17
+ 644 00c8 03       		.byte	0x3
+ 645 00c9 2C       		.byte	0x2c
+ 646 00ca 69000000 		.4byte	0x69
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 19
+
+
+ 647 00ce 03       		.uleb128 0x3
+ 648 00cf 10020000 		.4byte	.LASF18
+ 649 00d3 03       		.byte	0x3
+ 650 00d4 30       		.byte	0x30
+ 651 00d5 7B000000 		.4byte	0x7b
+ 652 00d9 02       		.uleb128 0x2
+ 653 00da 04       		.byte	0x4
+ 654 00db 04       		.byte	0x4
+ 655 00dc 34020000 		.4byte	.LASF19
+ 656 00e0 02       		.uleb128 0x2
+ 657 00e1 08       		.byte	0x8
+ 658 00e2 04       		.byte	0x4
+ 659 00e3 C5030000 		.4byte	.LASF20
+ 660 00e7 02       		.uleb128 0x2
+ 661 00e8 01       		.byte	0x1
+ 662 00e9 08       		.byte	0x8
+ 663 00ea 93030000 		.4byte	.LASF21
+ 664 00ee 02       		.uleb128 0x2
+ 665 00ef 04       		.byte	0x4
+ 666 00f0 07       		.byte	0x7
+ 667 00f1 89000000 		.4byte	.LASF22
+ 668 00f5 05       		.uleb128 0x5
+ 669 00f6 CE000000 		.4byte	0xce
+ 670 00fa 03       		.uleb128 0x3
+ 671 00fb 37030000 		.4byte	.LASF23
+ 672 00ff 04       		.byte	0x4
+ 673 0100 38       		.byte	0x38
+ 674 0101 74000000 		.4byte	0x74
+ 675 0105 06       		.uleb128 0x6
+ 676 0106 04       		.byte	0x4
+ 677 0107 AD000000 		.4byte	0xad
+ 678 010b 03       		.uleb128 0x3
+ 679 010c 64020000 		.4byte	.LASF24
+ 680 0110 05       		.byte	0x5
+ 681 0111 31       		.byte	0x31
+ 682 0112 16010000 		.4byte	0x116
+ 683 0116 06       		.uleb128 0x6
+ 684 0117 04       		.byte	0x4
+ 685 0118 1C010000 		.4byte	0x11c
+ 686 011c 07       		.uleb128 0x7
+ 687 011d 54030000 		.4byte	.LASF26
+ 688 0121 03       		.uleb128 0x3
+ 689 0122 6C000000 		.4byte	.LASF25
+ 690 0126 06       		.byte	0x6
+ 691 0127 4E       		.byte	0x4e
+ 692 0128 2C010000 		.4byte	0x12c
+ 693 012c 06       		.uleb128 0x6
+ 694 012d 04       		.byte	0x4
+ 695 012e 32010000 		.4byte	0x132
+ 696 0132 07       		.uleb128 0x7
+ 697 0133 EC030000 		.4byte	.LASF27
+ 698 0137 08       		.uleb128 0x8
+ 699 0138 A1010000 		.4byte	.LASF30
+ 700 013c 01       		.byte	0x1
+ 701 013d 49000000 		.4byte	0x49
+ 702 0141 07       		.byte	0x7
+ 703 0142 38       		.byte	0x38
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 20
+
+
+ 704 0143 54010000 		.4byte	0x154
+ 705 0147 09       		.uleb128 0x9
+ 706 0148 E0030000 		.4byte	.LASF28
+ 707 014c 00       		.byte	0
+ 708 014d 09       		.uleb128 0x9
+ 709 014e 97040000 		.4byte	.LASF29
+ 710 0152 01       		.byte	0x1
+ 711 0153 00       		.byte	0
+ 712 0154 08       		.uleb128 0x8
+ 713 0155 F3010000 		.4byte	.LASF31
+ 714 0159 01       		.byte	0x1
+ 715 015a 49000000 		.4byte	0x49
+ 716 015e 07       		.byte	0x7
+ 717 015f 3D       		.byte	0x3d
+ 718 0160 77010000 		.4byte	0x177
+ 719 0164 09       		.uleb128 0x9
+ 720 0165 C7020000 		.4byte	.LASF32
+ 721 0169 00       		.byte	0
+ 722 016a 09       		.uleb128 0x9
+ 723 016b 7A020000 		.4byte	.LASF33
+ 724 016f 01       		.byte	0x1
+ 725 0170 09       		.uleb128 0x9
+ 726 0171 A3020000 		.4byte	.LASF34
+ 727 0175 02       		.byte	0x2
+ 728 0176 00       		.byte	0
+ 729 0177 08       		.uleb128 0x8
+ 730 0178 E1010000 		.4byte	.LASF35
+ 731 017c 01       		.byte	0x1
+ 732 017d 49000000 		.4byte	0x49
+ 733 0181 07       		.byte	0x7
+ 734 0182 43       		.byte	0x43
+ 735 0183 94010000 		.4byte	0x194
+ 736 0187 09       		.uleb128 0x9
+ 737 0188 B1010000 		.4byte	.LASF36
+ 738 018c 00       		.byte	0
+ 739 018d 09       		.uleb128 0x9
+ 740 018e 11000000 		.4byte	.LASF37
+ 741 0192 01       		.byte	0x1
+ 742 0193 00       		.byte	0
+ 743 0194 08       		.uleb128 0x8
+ 744 0195 0B030000 		.4byte	.LASF38
+ 745 0199 01       		.byte	0x1
+ 746 019a 49000000 		.4byte	0x49
+ 747 019e 07       		.byte	0x7
+ 748 019f 49       		.byte	0x49
+ 749 01a0 B1010000 		.4byte	0x1b1
+ 750 01a4 09       		.uleb128 0x9
+ 751 01a5 B9030000 		.4byte	.LASF39
+ 752 01a9 00       		.byte	0
+ 753 01aa 09       		.uleb128 0x9
+ 754 01ab 36000000 		.4byte	.LASF40
+ 755 01af 01       		.byte	0x1
+ 756 01b0 00       		.byte	0
+ 757 01b1 0A       		.uleb128 0xa
+ 758 01b2 0C       		.byte	0xc
+ 759 01b3 07       		.byte	0x7
+ 760 01b4 4E       		.byte	0x4e
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 21
+
+
+ 761 01b5 0D020000 		.4byte	0x20d
+ 762 01b9 0B       		.uleb128 0xb
+ 763 01ba 707700   		.ascii	"pw\000"
+ 764 01bd 07       		.byte	0x7
+ 765 01be 50       		.byte	0x50
+ 766 01bf B8000000 		.4byte	0xb8
+ 767 01c3 00       		.byte	0
+ 768 01c4 0B       		.uleb128 0xb
+ 769 01c5 70726400 		.ascii	"prd\000"
+ 770 01c9 07       		.byte	0x7
+ 771 01ca 51       		.byte	0x51
+ 772 01cb B8000000 		.4byte	0xb8
+ 773 01cf 02       		.byte	0x2
+ 774 01d0 0C       		.uleb128 0xc
+ 775 01d1 75010000 		.4byte	.LASF41
+ 776 01d5 07       		.byte	0x7
+ 777 01d6 52       		.byte	0x52
+ 778 01d7 54010000 		.4byte	0x154
+ 779 01db 04       		.byte	0x4
+ 780 01dc 0C       		.uleb128 0xc
+ 781 01dd 04020000 		.4byte	.LASF42
+ 782 01e1 07       		.byte	0x7
+ 783 01e2 53       		.byte	0x53
+ 784 01e3 77010000 		.4byte	0x177
+ 785 01e7 05       		.byte	0x5
+ 786 01e8 0B       		.uleb128 0xb
+ 787 01e9 6D6F6400 		.ascii	"mod\000"
+ 788 01ed 07       		.byte	0x7
+ 789 01ee 54       		.byte	0x54
+ 790 01ef 94010000 		.4byte	0x194
+ 791 01f3 06       		.byte	0x6
+ 792 01f4 0C       		.uleb128 0xc
+ 793 01f5 48020000 		.4byte	.LASF43
+ 794 01f9 07       		.byte	0x7
+ 795 01fa 55       		.byte	0x55
+ 796 01fb 37010000 		.4byte	0x137
+ 797 01ff 07       		.byte	0x7
+ 798 0200 0C       		.uleb128 0xc
+ 799 0201 06040000 		.4byte	.LASF44
+ 800 0205 07       		.byte	0x7
+ 801 0206 56       		.byte	0x56
+ 802 0207 21010000 		.4byte	0x121
+ 803 020b 08       		.byte	0x8
+ 804 020c 00       		.byte	0
+ 805 020d 03       		.uleb128 0x3
+ 806 020e 80030000 		.4byte	.LASF45
+ 807 0212 07       		.byte	0x7
+ 808 0213 57       		.byte	0x57
+ 809 0214 B1010000 		.4byte	0x1b1
+ 810 0218 05       		.uleb128 0x5
+ 811 0219 C3000000 		.4byte	0xc3
+ 812 021d 0A       		.uleb128 0xa
+ 813 021e 3C       		.byte	0x3c
+ 814 021f 08       		.byte	0x8
+ 815 0220 43       		.byte	0x43
+ 816 0221 86020000 		.4byte	0x286
+ 817 0225 0C       		.uleb128 0xc
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 22
+
+
+ 818 0226 C1020000 		.4byte	.LASF46
+ 819 022a 08       		.byte	0x8
+ 820 022b 44       		.byte	0x44
+ 821 022c 86020000 		.4byte	0x286
+ 822 0230 00       		.byte	0
+ 823 0231 0C       		.uleb128 0xc
+ 824 0232 0A000000 		.4byte	.LASF47
+ 825 0236 08       		.byte	0x8
+ 826 0237 46       		.byte	0x46
+ 827 0238 86020000 		.4byte	0x286
+ 828 023c 06       		.byte	0x6
+ 829 023d 0C       		.uleb128 0xc
+ 830 023e BA010000 		.4byte	.LASF48
+ 831 0242 08       		.byte	0x8
+ 832 0243 47       		.byte	0x47
+ 833 0244 86020000 		.4byte	0x286
+ 834 0248 0C       		.byte	0xc
+ 835 0249 0C       		.uleb128 0xc
+ 836 024a A8030000 		.4byte	.LASF49
+ 837 024e 08       		.byte	0x8
+ 838 024f 48       		.byte	0x48
+ 839 0250 86020000 		.4byte	0x286
+ 840 0254 12       		.byte	0x12
+ 841 0255 0C       		.uleb128 0xc
+ 842 0256 72020000 		.4byte	.LASF50
+ 843 025a 08       		.byte	0x8
+ 844 025b 49       		.byte	0x49
+ 845 025c 86020000 		.4byte	0x286
+ 846 0260 18       		.byte	0x18
+ 847 0261 0C       		.uleb128 0xc
+ 848 0262 87020000 		.4byte	.LASF51
+ 849 0266 08       		.byte	0x8
+ 850 0267 4B       		.byte	0x4b
+ 851 0268 96020000 		.4byte	0x296
+ 852 026c 20       		.byte	0x20
+ 853 026d 0C       		.uleb128 0xc
+ 854 026e 8C040000 		.4byte	.LASF52
+ 855 0272 08       		.byte	0x8
+ 856 0273 4C       		.byte	0x4c
+ 857 0274 96020000 		.4byte	0x296
+ 858 0278 2C       		.byte	0x2c
+ 859 0279 0C       		.uleb128 0xc
+ 860 027a BB000000 		.4byte	.LASF53
+ 861 027e 08       		.byte	0x8
+ 862 027f 51       		.byte	0x51
+ 863 0280 CE000000 		.4byte	0xce
+ 864 0284 38       		.byte	0x38
+ 865 0285 00       		.byte	0
+ 866 0286 0D       		.uleb128 0xd
+ 867 0287 B8000000 		.4byte	0xb8
+ 868 028b 96020000 		.4byte	0x296
+ 869 028f 0E       		.uleb128 0xe
+ 870 0290 EE000000 		.4byte	0xee
+ 871 0294 02       		.byte	0x2
+ 872 0295 00       		.byte	0
+ 873 0296 0D       		.uleb128 0xd
+ 874 0297 CE000000 		.4byte	0xce
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 23
+
+
+ 875 029b A6020000 		.4byte	0x2a6
+ 876 029f 0E       		.uleb128 0xe
+ 877 02a0 EE000000 		.4byte	0xee
+ 878 02a4 02       		.byte	0x2
+ 879 02a5 00       		.byte	0
+ 880 02a6 03       		.uleb128 0x3
+ 881 02a7 C6000000 		.4byte	.LASF54
+ 882 02ab 08       		.byte	0x8
+ 883 02ac 52       		.byte	0x52
+ 884 02ad 1D020000 		.4byte	0x21d
+ 885 02b1 0A       		.uleb128 0xa
+ 886 02b2 24       		.byte	0x24
+ 887 02b3 08       		.byte	0x8
+ 888 02b4 68       		.byte	0x68
+ 889 02b5 F6020000 		.4byte	0x2f6
+ 890 02b9 0C       		.uleb128 0xc
+ 891 02ba 76040000 		.4byte	.LASF55
+ 892 02be 08       		.byte	0x8
+ 893 02bf 6A       		.byte	0x6a
+ 894 02c0 96020000 		.4byte	0x296
+ 895 02c4 00       		.byte	0
+ 896 02c5 0C       		.uleb128 0xc
+ 897 02c6 2B000000 		.4byte	.LASF56
+ 898 02ca 08       		.byte	0x8
+ 899 02cb 6B       		.byte	0x6b
+ 900 02cc 96020000 		.4byte	0x296
+ 901 02d0 0C       		.byte	0xc
+ 902 02d1 0C       		.uleb128 0xc
+ 903 02d2 C1020000 		.4byte	.LASF46
+ 904 02d6 08       		.byte	0x8
+ 905 02d7 6E       		.byte	0x6e
+ 906 02d8 CE000000 		.4byte	0xce
+ 907 02dc 18       		.byte	0x18
+ 908 02dd 0C       		.uleb128 0xc
+ 909 02de 2B030000 		.4byte	.LASF57
+ 910 02e2 08       		.byte	0x8
+ 911 02e3 70       		.byte	0x70
+ 912 02e4 CE000000 		.4byte	0xce
+ 913 02e8 1C       		.byte	0x1c
+ 914 02e9 0C       		.uleb128 0xc
+ 915 02ea C6010000 		.4byte	.LASF58
+ 916 02ee 08       		.byte	0x8
+ 917 02ef 71       		.byte	0x71
+ 918 02f0 CE000000 		.4byte	0xce
+ 919 02f4 20       		.byte	0x20
+ 920 02f5 00       		.byte	0
+ 921 02f6 03       		.uleb128 0x3
+ 922 02f7 1B000000 		.4byte	.LASF59
+ 923 02fb 08       		.byte	0x8
+ 924 02fc 72       		.byte	0x72
+ 925 02fd B1020000 		.4byte	0x2b1
+ 926 0301 0A       		.uleb128 0xa
+ 927 0302 06       		.byte	0x6
+ 928 0303 01       		.byte	0x1
+ 929 0304 1B       		.byte	0x1b
+ 930 0305 3A030000 		.4byte	0x33a
+ 931 0309 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 24
+
+
+ 932 030a 636D6400 		.ascii	"cmd\000"
+ 933 030e 01       		.byte	0x1
+ 934 030f 1C       		.byte	0x1c
+ 935 0310 AD000000 		.4byte	0xad
+ 936 0314 00       		.byte	0
+ 937 0315 0C       		.uleb128 0xc
+ 938 0316 D5020000 		.4byte	.LASF60
+ 939 031a 01       		.byte	0x1
+ 940 031b 1D       		.byte	0x1d
+ 941 031c A2000000 		.4byte	0xa2
+ 942 0320 01       		.byte	0x1
+ 943 0321 0C       		.uleb128 0xc
+ 944 0322 EF020000 		.4byte	.LASF61
+ 945 0326 01       		.byte	0x1
+ 946 0327 1E       		.byte	0x1e
+ 947 0328 AD000000 		.4byte	0xad
+ 948 032c 02       		.byte	0x2
+ 949 032d 0B       		.uleb128 0xb
+ 950 032e 6D736700 		.ascii	"msg\000"
+ 951 0332 01       		.byte	0x1
+ 952 0333 1F       		.byte	0x1f
+ 953 0334 3A030000 		.4byte	0x33a
+ 954 0338 03       		.byte	0x3
+ 955 0339 00       		.byte	0
+ 956 033a 0D       		.uleb128 0xd
+ 957 033b AD000000 		.4byte	0xad
+ 958 033f 4A030000 		.4byte	0x34a
+ 959 0343 0E       		.uleb128 0xe
+ 960 0344 EE000000 		.4byte	0xee
+ 961 0348 02       		.byte	0x2
+ 962 0349 00       		.byte	0
+ 963 034a 03       		.uleb128 0x3
+ 964 034b 13040000 		.4byte	.LASF62
+ 965 034f 01       		.byte	0x1
+ 966 0350 20       		.byte	0x20
+ 967 0351 01030000 		.4byte	0x301
+ 968 0355 0F       		.uleb128 0xf
+ 969 0356 59000000 		.4byte	.LASF65
+ 970 035a 01       		.byte	0x1
+ 971 035b 3C       		.byte	0x3c
+ 972 035c 00000000 		.4byte	.LFB68
+ 973 0360 D0000000 		.4byte	.LFE68-.LFB68
+ 974 0364 01       		.uleb128 0x1
+ 975 0365 9C       		.byte	0x9c
+ 976 0366 CF030000 		.4byte	0x3cf
+ 977 036a 10       		.uleb128 0x10
+ 978 036b 70747200 		.ascii	"ptr\000"
+ 979 036f 01       		.byte	0x1
+ 980 0370 3C       		.byte	0x3c
+ 981 0371 05010000 		.4byte	0x105
+ 982 0375 00000000 		.4byte	.LLST0
+ 983 0379 10       		.uleb128 0x10
+ 984 037a 6C656E00 		.ascii	"len\000"
+ 985 037e 01       		.byte	0x1
+ 986 037f 3C       		.byte	0x3c
+ 987 0380 B8000000 		.4byte	0xb8
+ 988 0384 36000000 		.4byte	.LLST1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 25
+
+
+ 989 0388 11       		.uleb128 0x11
+ 990 0389 66000000 		.4byte	.LASF63
+ 991 038d 01       		.byte	0x1
+ 992 038e 3D       		.byte	0x3d
+ 993 038f 4A030000 		.4byte	0x34a
+ 994 0393 05       		.uleb128 0x5
+ 995 0394 03       		.byte	0x3
+ 996 0395 00000000 		.4byte	state.9812
+ 997 0399 12       		.uleb128 0x12
+ 998 039a 00000000 		.4byte	.Ldebug_ranges0+0
+ 999 039e 13       		.uleb128 0x13
+ 1000 039f 6300     		.ascii	"c\000"
+ 1001 03a1 01       		.byte	0x1
+ 1002 03a2 40       		.byte	0x40
+ 1003 03a3 AD000000 		.4byte	0xad
+ 1004 03a7 5F000000 		.4byte	.LLST2
+ 1005 03ab 14       		.uleb128 0x14
+ 1006 03ac 19020000 		.4byte	.LASF64
+ 1007 03b0 01       		.byte	0x1
+ 1008 03b1 41       		.byte	0x41
+ 1009 03b2 AD000000 		.4byte	0xad
+ 1010 03b6 D3000000 		.4byte	.LLST3
+ 1011 03ba 15       		.uleb128 0x15
+ 1012 03bb B2000000 		.4byte	.LVL16
+ 1013 03bf 28050000 		.4byte	0x528
+ 1014 03c3 16       		.uleb128 0x16
+ 1015 03c4 01       		.uleb128 0x1
+ 1016 03c5 50       		.byte	0x50
+ 1017 03c6 05       		.uleb128 0x5
+ 1018 03c7 03       		.byte	0x3
+ 1019 03c8 03000000 		.4byte	.LANCHOR0+3
+ 1020 03cc 00       		.byte	0
+ 1021 03cd 00       		.byte	0
+ 1022 03ce 00       		.byte	0
+ 1023 03cf 0F       		.uleb128 0xf
+ 1024 03d0 91010000 		.4byte	.LASF66
+ 1025 03d4 01       		.byte	0x1
+ 1026 03d5 8D       		.byte	0x8d
+ 1027 03d6 00000000 		.4byte	.LFB69
+ 1028 03da D8010000 		.4byte	.LFE69-.LFB69
+ 1029 03de 01       		.uleb128 0x1
+ 1030 03df 9C       		.byte	0x9c
+ 1031 03e0 EA040000 		.4byte	0x4ea
+ 1032 03e4 10       		.uleb128 0x10
+ 1033 03e5 70747200 		.ascii	"ptr\000"
+ 1034 03e9 01       		.byte	0x1
+ 1035 03ea 8D       		.byte	0x8d
+ 1036 03eb 05010000 		.4byte	0x105
+ 1037 03ef 6E010000 		.4byte	.LLST4
+ 1038 03f3 10       		.uleb128 0x10
+ 1039 03f4 6C656E00 		.ascii	"len\000"
+ 1040 03f8 01       		.byte	0x1
+ 1041 03f9 8D       		.byte	0x8d
+ 1042 03fa B8000000 		.4byte	0xb8
+ 1043 03fe A9010000 		.4byte	.LLST5
+ 1044 0402 14       		.uleb128 0x14
+ 1045 0403 B0030000 		.4byte	.LASF67
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 26
+
+
+ 1046 0407 01       		.byte	0x1
+ 1047 0408 8E       		.byte	0x8e
+ 1048 0409 AD000000 		.4byte	0xad
+ 1049 040d E0010000 		.4byte	.LLST6
+ 1050 0411 11       		.uleb128 0x11
+ 1051 0412 00000000 		.4byte	.LASF68
+ 1052 0416 01       		.byte	0x1
+ 1053 0417 A7       		.byte	0xa7
+ 1054 0418 A6020000 		.4byte	0x2a6
+ 1055 041c 03       		.uleb128 0x3
+ 1056 041d 91       		.byte	0x91
+ 1057 041e 9C7F     		.sleb128 -100
+ 1058 0420 17       		.uleb128 0x17
+ 1059 0421 12000000 		.4byte	.LBB4
+ 1060 0425 30000000 		.4byte	.LBE4-.LBB4
+ 1061 0429 5B040000 		.4byte	0x45b
+ 1062 042d 14       		.uleb128 0x14
+ 1063 042e 84040000 		.4byte	.LASF69
+ 1064 0432 01       		.byte	0x1
+ 1065 0433 92       		.byte	0x92
+ 1066 0434 AD000000 		.4byte	0xad
+ 1067 0438 FE010000 		.4byte	.LLST7
+ 1068 043c 14       		.uleb128 0x14
+ 1069 043d A0030000 		.4byte	.LASF70
+ 1070 0441 01       		.byte	0x1
+ 1071 0442 93       		.byte	0x93
+ 1072 0443 AD000000 		.4byte	0xad
+ 1073 0447 2A020000 		.4byte	.LLST8
+ 1074 044b 14       		.uleb128 0x14
+ 1075 044c C0010000 		.4byte	.LASF71
+ 1076 0450 01       		.byte	0x1
+ 1077 0451 94       		.byte	0x94
+ 1078 0452 B8000000 		.4byte	0xb8
+ 1079 0456 56020000 		.4byte	.LLST9
+ 1080 045a 00       		.byte	0
+ 1081 045b 18       		.uleb128 0x18
+ 1082 045c 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 1083 0460 C9040000 		.4byte	0x4c9
+ 1084 0464 14       		.uleb128 0x14
+ 1085 0465 E2020000 		.4byte	.LASF72
+ 1086 0469 01       		.byte	0x1
+ 1087 046a AE       		.byte	0xae
+ 1088 046b CE000000 		.4byte	0xce
+ 1089 046f 90020000 		.4byte	.LLST10
+ 1090 0473 19       		.uleb128 0x19
+ 1091 0474 A4040000 		.4byte	.LASF73
+ 1092 0478 01       		.byte	0x1
+ 1093 0479 1901     		.2byte	0x119
+ 1094 047b C3000000 		.4byte	0xc3
+ 1095 047f AF020000 		.4byte	.LLST11
+ 1096 0483 18       		.uleb128 0x18
+ 1097 0484 38000000 		.4byte	.Ldebug_ranges0+0x38
+ 1098 0488 96040000 		.4byte	0x496
+ 1099 048c 1A       		.uleb128 0x1a
+ 1100 048d 6900     		.ascii	"i\000"
+ 1101 048f 01       		.byte	0x1
+ 1102 0490 AF       		.byte	0xaf
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 27
+
+
+ 1103 0491 CE000000 		.4byte	0xce
+ 1104 0495 00       		.byte	0
+ 1105 0496 1B       		.uleb128 0x1b
+ 1106 0497 90010000 		.4byte	.LVL44
+ 1107 049b 33050000 		.4byte	0x533
+ 1108 049f B2040000 		.4byte	0x4b2
+ 1109 04a3 16       		.uleb128 0x16
+ 1110 04a4 01       		.uleb128 0x1
+ 1111 04a5 50       		.byte	0x50
+ 1112 04a6 01       		.uleb128 0x1
+ 1113 04a7 31       		.byte	0x31
+ 1114 04a8 16       		.uleb128 0x16
+ 1115 04a9 01       		.uleb128 0x1
+ 1116 04aa 51       		.byte	0x51
+ 1117 04ab 05       		.uleb128 0x5
+ 1118 04ac 03       		.byte	0x3
+ 1119 04ad 19000000 		.4byte	.LC1
+ 1120 04b1 00       		.byte	0
+ 1121 04b2 15       		.uleb128 0x15
+ 1122 04b3 BA010000 		.4byte	.LVL47
+ 1123 04b7 3E050000 		.4byte	0x53e
+ 1124 04bb 16       		.uleb128 0x16
+ 1125 04bc 01       		.uleb128 0x1
+ 1126 04bd 52       		.byte	0x52
+ 1127 04be 02       		.uleb128 0x2
+ 1128 04bf 78       		.byte	0x78
+ 1129 04c0 00       		.sleb128 0
+ 1130 04c1 16       		.uleb128 0x16
+ 1131 04c2 01       		.uleb128 0x1
+ 1132 04c3 53       		.byte	0x53
+ 1133 04c4 02       		.uleb128 0x2
+ 1134 04c5 78       		.byte	0x78
+ 1135 04c6 00       		.sleb128 0
+ 1136 04c7 00       		.byte	0
+ 1137 04c8 00       		.byte	0
+ 1138 04c9 15       		.uleb128 0x15
+ 1139 04ca 60000000 		.4byte	.LVL34
+ 1140 04ce 33050000 		.4byte	0x533
+ 1141 04d2 16       		.uleb128 0x16
+ 1142 04d3 01       		.uleb128 0x1
+ 1143 04d4 50       		.byte	0x50
+ 1144 04d5 01       		.uleb128 0x1
+ 1145 04d6 31       		.byte	0x31
+ 1146 04d7 16       		.uleb128 0x16
+ 1147 04d8 01       		.uleb128 0x1
+ 1148 04d9 51       		.byte	0x51
+ 1149 04da 05       		.uleb128 0x5
+ 1150 04db 03       		.byte	0x3
+ 1151 04dc 00000000 		.4byte	.LC0
+ 1152 04e0 16       		.uleb128 0x16
+ 1153 04e1 01       		.uleb128 0x1
+ 1154 04e2 52       		.byte	0x52
+ 1155 04e3 04       		.uleb128 0x4
+ 1156 04e4 40       		.byte	0x40
+ 1157 04e5 4B       		.byte	0x4b
+ 1158 04e6 24       		.byte	0x24
+ 1159 04e7 1F       		.byte	0x1f
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 28
+
+
+ 1160 04e8 00       		.byte	0
+ 1161 04e9 00       		.byte	0
+ 1162 04ea 1C       		.uleb128 0x1c
+ 1163 04eb CC030000 		.4byte	.LASF74
+ 1164 04ef 09       		.byte	0x9
+ 1165 04f0 1207     		.2byte	0x712
+ 1166 04f2 18020000 		.4byte	0x218
+ 1167 04f6 1D       		.uleb128 0x1d
+ 1168 04f7 7A010000 		.4byte	.LASF75
+ 1169 04fb 07       		.byte	0x7
+ 1170 04fc 59       		.byte	0x59
+ 1171 04fd 0D020000 		.4byte	0x20d
+ 1172 0501 05       		.uleb128 0x5
+ 1173 0502 03       		.byte	0x3
+ 1174 0503 00000000 		.4byte	interrupter
+ 1175 0507 1E       		.uleb128 0x1e
+ 1176 0508 84000000 		.4byte	.LASF76
+ 1177 050c 08       		.byte	0x8
+ 1178 050d 76       		.byte	0x76
+ 1179 050e 0B010000 		.4byte	0x10b
+ 1180 0512 1E       		.uleb128 0x1e
+ 1181 0513 43000000 		.4byte	.LASF77
+ 1182 0517 0A       		.byte	0xa
+ 1183 0518 07       		.byte	0x7
+ 1184 0519 F6020000 		.4byte	0x2f6
+ 1185 051d 1E       		.uleb128 0x1e
+ 1186 051e D9030000 		.4byte	.LASF78
+ 1187 0522 0B       		.byte	0xb
+ 1188 0523 1E       		.byte	0x1e
+ 1189 0524 F5000000 		.4byte	0xf5
+ 1190 0528 1F       		.uleb128 0x1f
+ 1191 0529 1C040000 		.4byte	.LASF79
+ 1192 052d 1C040000 		.4byte	.LASF79
+ 1193 0531 0C       		.byte	0xc
+ 1194 0532 46       		.byte	0x46
+ 1195 0533 1F       		.uleb128 0x1f
+ 1196 0534 2F040000 		.4byte	.LASF80
+ 1197 0538 2F040000 		.4byte	.LASF80
+ 1198 053c 0D       		.byte	0xd
+ 1199 053d 2C       		.byte	0x2c
+ 1200 053e 20       		.uleb128 0x20
+ 1201 053f 22020000 		.4byte	.LASF81
+ 1202 0543 22020000 		.4byte	.LASF81
+ 1203 0547 05       		.byte	0x5
+ 1204 0548 8F02     		.2byte	0x28f
+ 1205 054a 00       		.byte	0
+ 1206              		.section	.debug_abbrev,"",%progbits
+ 1207              	.Ldebug_abbrev0:
+ 1208 0000 01       		.uleb128 0x1
+ 1209 0001 11       		.uleb128 0x11
+ 1210 0002 01       		.byte	0x1
+ 1211 0003 25       		.uleb128 0x25
+ 1212 0004 0E       		.uleb128 0xe
+ 1213 0005 13       		.uleb128 0x13
+ 1214 0006 0B       		.uleb128 0xb
+ 1215 0007 03       		.uleb128 0x3
+ 1216 0008 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 29
+
+
+ 1217 0009 1B       		.uleb128 0x1b
+ 1218 000a 0E       		.uleb128 0xe
+ 1219 000b 55       		.uleb128 0x55
+ 1220 000c 17       		.uleb128 0x17
+ 1221 000d 11       		.uleb128 0x11
+ 1222 000e 01       		.uleb128 0x1
+ 1223 000f 10       		.uleb128 0x10
+ 1224 0010 17       		.uleb128 0x17
+ 1225 0011 00       		.byte	0
+ 1226 0012 00       		.byte	0
+ 1227 0013 02       		.uleb128 0x2
+ 1228 0014 24       		.uleb128 0x24
+ 1229 0015 00       		.byte	0
+ 1230 0016 0B       		.uleb128 0xb
+ 1231 0017 0B       		.uleb128 0xb
+ 1232 0018 3E       		.uleb128 0x3e
+ 1233 0019 0B       		.uleb128 0xb
+ 1234 001a 03       		.uleb128 0x3
+ 1235 001b 0E       		.uleb128 0xe
+ 1236 001c 00       		.byte	0
+ 1237 001d 00       		.byte	0
+ 1238 001e 03       		.uleb128 0x3
+ 1239 001f 16       		.uleb128 0x16
+ 1240 0020 00       		.byte	0
+ 1241 0021 03       		.uleb128 0x3
+ 1242 0022 0E       		.uleb128 0xe
+ 1243 0023 3A       		.uleb128 0x3a
+ 1244 0024 0B       		.uleb128 0xb
+ 1245 0025 3B       		.uleb128 0x3b
+ 1246 0026 0B       		.uleb128 0xb
+ 1247 0027 49       		.uleb128 0x49
+ 1248 0028 13       		.uleb128 0x13
+ 1249 0029 00       		.byte	0
+ 1250 002a 00       		.byte	0
+ 1251 002b 04       		.uleb128 0x4
+ 1252 002c 24       		.uleb128 0x24
+ 1253 002d 00       		.byte	0
+ 1254 002e 0B       		.uleb128 0xb
+ 1255 002f 0B       		.uleb128 0xb
+ 1256 0030 3E       		.uleb128 0x3e
+ 1257 0031 0B       		.uleb128 0xb
+ 1258 0032 03       		.uleb128 0x3
+ 1259 0033 08       		.uleb128 0x8
+ 1260 0034 00       		.byte	0
+ 1261 0035 00       		.byte	0
+ 1262 0036 05       		.uleb128 0x5
+ 1263 0037 35       		.uleb128 0x35
+ 1264 0038 00       		.byte	0
+ 1265 0039 49       		.uleb128 0x49
+ 1266 003a 13       		.uleb128 0x13
+ 1267 003b 00       		.byte	0
+ 1268 003c 00       		.byte	0
+ 1269 003d 06       		.uleb128 0x6
+ 1270 003e 0F       		.uleb128 0xf
+ 1271 003f 00       		.byte	0
+ 1272 0040 0B       		.uleb128 0xb
+ 1273 0041 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 30
+
+
+ 1274 0042 49       		.uleb128 0x49
+ 1275 0043 13       		.uleb128 0x13
+ 1276 0044 00       		.byte	0
+ 1277 0045 00       		.byte	0
+ 1278 0046 07       		.uleb128 0x7
+ 1279 0047 13       		.uleb128 0x13
+ 1280 0048 00       		.byte	0
+ 1281 0049 03       		.uleb128 0x3
+ 1282 004a 0E       		.uleb128 0xe
+ 1283 004b 3C       		.uleb128 0x3c
+ 1284 004c 19       		.uleb128 0x19
+ 1285 004d 00       		.byte	0
+ 1286 004e 00       		.byte	0
+ 1287 004f 08       		.uleb128 0x8
+ 1288 0050 04       		.uleb128 0x4
+ 1289 0051 01       		.byte	0x1
+ 1290 0052 03       		.uleb128 0x3
+ 1291 0053 0E       		.uleb128 0xe
+ 1292 0054 0B       		.uleb128 0xb
+ 1293 0055 0B       		.uleb128 0xb
+ 1294 0056 49       		.uleb128 0x49
+ 1295 0057 13       		.uleb128 0x13
+ 1296 0058 3A       		.uleb128 0x3a
+ 1297 0059 0B       		.uleb128 0xb
+ 1298 005a 3B       		.uleb128 0x3b
+ 1299 005b 0B       		.uleb128 0xb
+ 1300 005c 01       		.uleb128 0x1
+ 1301 005d 13       		.uleb128 0x13
+ 1302 005e 00       		.byte	0
+ 1303 005f 00       		.byte	0
+ 1304 0060 09       		.uleb128 0x9
+ 1305 0061 28       		.uleb128 0x28
+ 1306 0062 00       		.byte	0
+ 1307 0063 03       		.uleb128 0x3
+ 1308 0064 0E       		.uleb128 0xe
+ 1309 0065 1C       		.uleb128 0x1c
+ 1310 0066 0B       		.uleb128 0xb
+ 1311 0067 00       		.byte	0
+ 1312 0068 00       		.byte	0
+ 1313 0069 0A       		.uleb128 0xa
+ 1314 006a 13       		.uleb128 0x13
+ 1315 006b 01       		.byte	0x1
+ 1316 006c 0B       		.uleb128 0xb
+ 1317 006d 0B       		.uleb128 0xb
+ 1318 006e 3A       		.uleb128 0x3a
+ 1319 006f 0B       		.uleb128 0xb
+ 1320 0070 3B       		.uleb128 0x3b
+ 1321 0071 0B       		.uleb128 0xb
+ 1322 0072 01       		.uleb128 0x1
+ 1323 0073 13       		.uleb128 0x13
+ 1324 0074 00       		.byte	0
+ 1325 0075 00       		.byte	0
+ 1326 0076 0B       		.uleb128 0xb
+ 1327 0077 0D       		.uleb128 0xd
+ 1328 0078 00       		.byte	0
+ 1329 0079 03       		.uleb128 0x3
+ 1330 007a 08       		.uleb128 0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 31
+
+
+ 1331 007b 3A       		.uleb128 0x3a
+ 1332 007c 0B       		.uleb128 0xb
+ 1333 007d 3B       		.uleb128 0x3b
+ 1334 007e 0B       		.uleb128 0xb
+ 1335 007f 49       		.uleb128 0x49
+ 1336 0080 13       		.uleb128 0x13
+ 1337 0081 38       		.uleb128 0x38
+ 1338 0082 0B       		.uleb128 0xb
+ 1339 0083 00       		.byte	0
+ 1340 0084 00       		.byte	0
+ 1341 0085 0C       		.uleb128 0xc
+ 1342 0086 0D       		.uleb128 0xd
+ 1343 0087 00       		.byte	0
+ 1344 0088 03       		.uleb128 0x3
+ 1345 0089 0E       		.uleb128 0xe
+ 1346 008a 3A       		.uleb128 0x3a
+ 1347 008b 0B       		.uleb128 0xb
+ 1348 008c 3B       		.uleb128 0x3b
+ 1349 008d 0B       		.uleb128 0xb
+ 1350 008e 49       		.uleb128 0x49
+ 1351 008f 13       		.uleb128 0x13
+ 1352 0090 38       		.uleb128 0x38
+ 1353 0091 0B       		.uleb128 0xb
+ 1354 0092 00       		.byte	0
+ 1355 0093 00       		.byte	0
+ 1356 0094 0D       		.uleb128 0xd
+ 1357 0095 01       		.uleb128 0x1
+ 1358 0096 01       		.byte	0x1
+ 1359 0097 49       		.uleb128 0x49
+ 1360 0098 13       		.uleb128 0x13
+ 1361 0099 01       		.uleb128 0x1
+ 1362 009a 13       		.uleb128 0x13
+ 1363 009b 00       		.byte	0
+ 1364 009c 00       		.byte	0
+ 1365 009d 0E       		.uleb128 0xe
+ 1366 009e 21       		.uleb128 0x21
+ 1367 009f 00       		.byte	0
+ 1368 00a0 49       		.uleb128 0x49
+ 1369 00a1 13       		.uleb128 0x13
+ 1370 00a2 2F       		.uleb128 0x2f
+ 1371 00a3 0B       		.uleb128 0xb
+ 1372 00a4 00       		.byte	0
+ 1373 00a5 00       		.byte	0
+ 1374 00a6 0F       		.uleb128 0xf
+ 1375 00a7 2E       		.uleb128 0x2e
+ 1376 00a8 01       		.byte	0x1
+ 1377 00a9 3F       		.uleb128 0x3f
+ 1378 00aa 19       		.uleb128 0x19
+ 1379 00ab 03       		.uleb128 0x3
+ 1380 00ac 0E       		.uleb128 0xe
+ 1381 00ad 3A       		.uleb128 0x3a
+ 1382 00ae 0B       		.uleb128 0xb
+ 1383 00af 3B       		.uleb128 0x3b
+ 1384 00b0 0B       		.uleb128 0xb
+ 1385 00b1 27       		.uleb128 0x27
+ 1386 00b2 19       		.uleb128 0x19
+ 1387 00b3 11       		.uleb128 0x11
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 32
+
+
+ 1388 00b4 01       		.uleb128 0x1
+ 1389 00b5 12       		.uleb128 0x12
+ 1390 00b6 06       		.uleb128 0x6
+ 1391 00b7 40       		.uleb128 0x40
+ 1392 00b8 18       		.uleb128 0x18
+ 1393 00b9 9742     		.uleb128 0x2117
+ 1394 00bb 19       		.uleb128 0x19
+ 1395 00bc 01       		.uleb128 0x1
+ 1396 00bd 13       		.uleb128 0x13
+ 1397 00be 00       		.byte	0
+ 1398 00bf 00       		.byte	0
+ 1399 00c0 10       		.uleb128 0x10
+ 1400 00c1 05       		.uleb128 0x5
+ 1401 00c2 00       		.byte	0
+ 1402 00c3 03       		.uleb128 0x3
+ 1403 00c4 08       		.uleb128 0x8
+ 1404 00c5 3A       		.uleb128 0x3a
+ 1405 00c6 0B       		.uleb128 0xb
+ 1406 00c7 3B       		.uleb128 0x3b
+ 1407 00c8 0B       		.uleb128 0xb
+ 1408 00c9 49       		.uleb128 0x49
+ 1409 00ca 13       		.uleb128 0x13
+ 1410 00cb 02       		.uleb128 0x2
+ 1411 00cc 17       		.uleb128 0x17
+ 1412 00cd 00       		.byte	0
+ 1413 00ce 00       		.byte	0
+ 1414 00cf 11       		.uleb128 0x11
+ 1415 00d0 34       		.uleb128 0x34
+ 1416 00d1 00       		.byte	0
+ 1417 00d2 03       		.uleb128 0x3
+ 1418 00d3 0E       		.uleb128 0xe
+ 1419 00d4 3A       		.uleb128 0x3a
+ 1420 00d5 0B       		.uleb128 0xb
+ 1421 00d6 3B       		.uleb128 0x3b
+ 1422 00d7 0B       		.uleb128 0xb
+ 1423 00d8 49       		.uleb128 0x49
+ 1424 00d9 13       		.uleb128 0x13
+ 1425 00da 02       		.uleb128 0x2
+ 1426 00db 18       		.uleb128 0x18
+ 1427 00dc 00       		.byte	0
+ 1428 00dd 00       		.byte	0
+ 1429 00de 12       		.uleb128 0x12
+ 1430 00df 0B       		.uleb128 0xb
+ 1431 00e0 01       		.byte	0x1
+ 1432 00e1 55       		.uleb128 0x55
+ 1433 00e2 17       		.uleb128 0x17
+ 1434 00e3 00       		.byte	0
+ 1435 00e4 00       		.byte	0
+ 1436 00e5 13       		.uleb128 0x13
+ 1437 00e6 34       		.uleb128 0x34
+ 1438 00e7 00       		.byte	0
+ 1439 00e8 03       		.uleb128 0x3
+ 1440 00e9 08       		.uleb128 0x8
+ 1441 00ea 3A       		.uleb128 0x3a
+ 1442 00eb 0B       		.uleb128 0xb
+ 1443 00ec 3B       		.uleb128 0x3b
+ 1444 00ed 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 33
+
+
+ 1445 00ee 49       		.uleb128 0x49
+ 1446 00ef 13       		.uleb128 0x13
+ 1447 00f0 02       		.uleb128 0x2
+ 1448 00f1 17       		.uleb128 0x17
+ 1449 00f2 00       		.byte	0
+ 1450 00f3 00       		.byte	0
+ 1451 00f4 14       		.uleb128 0x14
+ 1452 00f5 34       		.uleb128 0x34
+ 1453 00f6 00       		.byte	0
+ 1454 00f7 03       		.uleb128 0x3
+ 1455 00f8 0E       		.uleb128 0xe
+ 1456 00f9 3A       		.uleb128 0x3a
+ 1457 00fa 0B       		.uleb128 0xb
+ 1458 00fb 3B       		.uleb128 0x3b
+ 1459 00fc 0B       		.uleb128 0xb
+ 1460 00fd 49       		.uleb128 0x49
+ 1461 00fe 13       		.uleb128 0x13
+ 1462 00ff 02       		.uleb128 0x2
+ 1463 0100 17       		.uleb128 0x17
+ 1464 0101 00       		.byte	0
+ 1465 0102 00       		.byte	0
+ 1466 0103 15       		.uleb128 0x15
+ 1467 0104 898201   		.uleb128 0x4109
+ 1468 0107 01       		.byte	0x1
+ 1469 0108 11       		.uleb128 0x11
+ 1470 0109 01       		.uleb128 0x1
+ 1471 010a 31       		.uleb128 0x31
+ 1472 010b 13       		.uleb128 0x13
+ 1473 010c 00       		.byte	0
+ 1474 010d 00       		.byte	0
+ 1475 010e 16       		.uleb128 0x16
+ 1476 010f 8A8201   		.uleb128 0x410a
+ 1477 0112 00       		.byte	0
+ 1478 0113 02       		.uleb128 0x2
+ 1479 0114 18       		.uleb128 0x18
+ 1480 0115 9142     		.uleb128 0x2111
+ 1481 0117 18       		.uleb128 0x18
+ 1482 0118 00       		.byte	0
+ 1483 0119 00       		.byte	0
+ 1484 011a 17       		.uleb128 0x17
+ 1485 011b 0B       		.uleb128 0xb
+ 1486 011c 01       		.byte	0x1
+ 1487 011d 11       		.uleb128 0x11
+ 1488 011e 01       		.uleb128 0x1
+ 1489 011f 12       		.uleb128 0x12
+ 1490 0120 06       		.uleb128 0x6
+ 1491 0121 01       		.uleb128 0x1
+ 1492 0122 13       		.uleb128 0x13
+ 1493 0123 00       		.byte	0
+ 1494 0124 00       		.byte	0
+ 1495 0125 18       		.uleb128 0x18
+ 1496 0126 0B       		.uleb128 0xb
+ 1497 0127 01       		.byte	0x1
+ 1498 0128 55       		.uleb128 0x55
+ 1499 0129 17       		.uleb128 0x17
+ 1500 012a 01       		.uleb128 0x1
+ 1501 012b 13       		.uleb128 0x13
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 34
+
+
+ 1502 012c 00       		.byte	0
+ 1503 012d 00       		.byte	0
+ 1504 012e 19       		.uleb128 0x19
+ 1505 012f 34       		.uleb128 0x34
+ 1506 0130 00       		.byte	0
+ 1507 0131 03       		.uleb128 0x3
+ 1508 0132 0E       		.uleb128 0xe
+ 1509 0133 3A       		.uleb128 0x3a
+ 1510 0134 0B       		.uleb128 0xb
+ 1511 0135 3B       		.uleb128 0x3b
+ 1512 0136 05       		.uleb128 0x5
+ 1513 0137 49       		.uleb128 0x49
+ 1514 0138 13       		.uleb128 0x13
+ 1515 0139 02       		.uleb128 0x2
+ 1516 013a 17       		.uleb128 0x17
+ 1517 013b 00       		.byte	0
+ 1518 013c 00       		.byte	0
+ 1519 013d 1A       		.uleb128 0x1a
+ 1520 013e 34       		.uleb128 0x34
+ 1521 013f 00       		.byte	0
+ 1522 0140 03       		.uleb128 0x3
+ 1523 0141 08       		.uleb128 0x8
+ 1524 0142 3A       		.uleb128 0x3a
+ 1525 0143 0B       		.uleb128 0xb
+ 1526 0144 3B       		.uleb128 0x3b
+ 1527 0145 0B       		.uleb128 0xb
+ 1528 0146 49       		.uleb128 0x49
+ 1529 0147 13       		.uleb128 0x13
+ 1530 0148 00       		.byte	0
+ 1531 0149 00       		.byte	0
+ 1532 014a 1B       		.uleb128 0x1b
+ 1533 014b 898201   		.uleb128 0x4109
+ 1534 014e 01       		.byte	0x1
+ 1535 014f 11       		.uleb128 0x11
+ 1536 0150 01       		.uleb128 0x1
+ 1537 0151 31       		.uleb128 0x31
+ 1538 0152 13       		.uleb128 0x13
+ 1539 0153 01       		.uleb128 0x1
+ 1540 0154 13       		.uleb128 0x13
+ 1541 0155 00       		.byte	0
+ 1542 0156 00       		.byte	0
+ 1543 0157 1C       		.uleb128 0x1c
+ 1544 0158 34       		.uleb128 0x34
+ 1545 0159 00       		.byte	0
+ 1546 015a 03       		.uleb128 0x3
+ 1547 015b 0E       		.uleb128 0xe
+ 1548 015c 3A       		.uleb128 0x3a
+ 1549 015d 0B       		.uleb128 0xb
+ 1550 015e 3B       		.uleb128 0x3b
+ 1551 015f 05       		.uleb128 0x5
+ 1552 0160 49       		.uleb128 0x49
+ 1553 0161 13       		.uleb128 0x13
+ 1554 0162 3F       		.uleb128 0x3f
+ 1555 0163 19       		.uleb128 0x19
+ 1556 0164 3C       		.uleb128 0x3c
+ 1557 0165 19       		.uleb128 0x19
+ 1558 0166 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 35
+
+
+ 1559 0167 00       		.byte	0
+ 1560 0168 1D       		.uleb128 0x1d
+ 1561 0169 34       		.uleb128 0x34
+ 1562 016a 00       		.byte	0
+ 1563 016b 03       		.uleb128 0x3
+ 1564 016c 0E       		.uleb128 0xe
+ 1565 016d 3A       		.uleb128 0x3a
+ 1566 016e 0B       		.uleb128 0xb
+ 1567 016f 3B       		.uleb128 0x3b
+ 1568 0170 0B       		.uleb128 0xb
+ 1569 0171 49       		.uleb128 0x49
+ 1570 0172 13       		.uleb128 0x13
+ 1571 0173 3F       		.uleb128 0x3f
+ 1572 0174 19       		.uleb128 0x19
+ 1573 0175 02       		.uleb128 0x2
+ 1574 0176 18       		.uleb128 0x18
+ 1575 0177 00       		.byte	0
+ 1576 0178 00       		.byte	0
+ 1577 0179 1E       		.uleb128 0x1e
+ 1578 017a 34       		.uleb128 0x34
+ 1579 017b 00       		.byte	0
+ 1580 017c 03       		.uleb128 0x3
+ 1581 017d 0E       		.uleb128 0xe
+ 1582 017e 3A       		.uleb128 0x3a
+ 1583 017f 0B       		.uleb128 0xb
+ 1584 0180 3B       		.uleb128 0x3b
+ 1585 0181 0B       		.uleb128 0xb
+ 1586 0182 49       		.uleb128 0x49
+ 1587 0183 13       		.uleb128 0x13
+ 1588 0184 3F       		.uleb128 0x3f
+ 1589 0185 19       		.uleb128 0x19
+ 1590 0186 3C       		.uleb128 0x3c
+ 1591 0187 19       		.uleb128 0x19
+ 1592 0188 00       		.byte	0
+ 1593 0189 00       		.byte	0
+ 1594 018a 1F       		.uleb128 0x1f
+ 1595 018b 2E       		.uleb128 0x2e
+ 1596 018c 00       		.byte	0
+ 1597 018d 3F       		.uleb128 0x3f
+ 1598 018e 19       		.uleb128 0x19
+ 1599 018f 3C       		.uleb128 0x3c
+ 1600 0190 19       		.uleb128 0x19
+ 1601 0191 6E       		.uleb128 0x6e
+ 1602 0192 0E       		.uleb128 0xe
+ 1603 0193 03       		.uleb128 0x3
+ 1604 0194 0E       		.uleb128 0xe
+ 1605 0195 3A       		.uleb128 0x3a
+ 1606 0196 0B       		.uleb128 0xb
+ 1607 0197 3B       		.uleb128 0x3b
+ 1608 0198 0B       		.uleb128 0xb
+ 1609 0199 00       		.byte	0
+ 1610 019a 00       		.byte	0
+ 1611 019b 20       		.uleb128 0x20
+ 1612 019c 2E       		.uleb128 0x2e
+ 1613 019d 00       		.byte	0
+ 1614 019e 3F       		.uleb128 0x3f
+ 1615 019f 19       		.uleb128 0x19
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 36
+
+
+ 1616 01a0 3C       		.uleb128 0x3c
+ 1617 01a1 19       		.uleb128 0x19
+ 1618 01a2 6E       		.uleb128 0x6e
+ 1619 01a3 0E       		.uleb128 0xe
+ 1620 01a4 03       		.uleb128 0x3
+ 1621 01a5 0E       		.uleb128 0xe
+ 1622 01a6 3A       		.uleb128 0x3a
+ 1623 01a7 0B       		.uleb128 0xb
+ 1624 01a8 3B       		.uleb128 0x3b
+ 1625 01a9 05       		.uleb128 0x5
+ 1626 01aa 00       		.byte	0
+ 1627 01ab 00       		.byte	0
+ 1628 01ac 00       		.byte	0
+ 1629              		.section	.debug_loc,"",%progbits
+ 1630              	.Ldebug_loc0:
+ 1631              	.LLST0:
+ 1632 0000 00000000 		.4byte	.LVL0
+ 1633 0004 0A000000 		.4byte	.LVL1
+ 1634 0008 0100     		.2byte	0x1
+ 1635 000a 50       		.byte	0x50
+ 1636 000b 0A000000 		.4byte	.LVL1
+ 1637 000f 12000000 		.4byte	.LVL2
+ 1638 0013 0100     		.2byte	0x1
+ 1639 0015 57       		.byte	0x57
+ 1640 0016 12000000 		.4byte	.LVL2
+ 1641 001a 18000000 		.4byte	.LVL4
+ 1642 001e 0300     		.2byte	0x3
+ 1643 0020 77       		.byte	0x77
+ 1644 0021 7F       		.sleb128 -1
+ 1645 0022 9F       		.byte	0x9f
+ 1646 0023 18000000 		.4byte	.LVL4
+ 1647 0027 C6000000 		.4byte	.LVL17
+ 1648 002b 0100     		.2byte	0x1
+ 1649 002d 57       		.byte	0x57
+ 1650 002e 00000000 		.4byte	0
+ 1651 0032 00000000 		.4byte	0
+ 1652              	.LLST1:
+ 1653 0036 00000000 		.4byte	.LVL0
+ 1654 003a 0A000000 		.4byte	.LVL1
+ 1655 003e 0100     		.2byte	0x1
+ 1656 0040 51       		.byte	0x51
+ 1657 0041 0A000000 		.4byte	.LVL1
+ 1658 0045 14000000 		.4byte	.LVL3
+ 1659 0049 0100     		.2byte	0x1
+ 1660 004b 55       		.byte	0x55
+ 1661 004c 18000000 		.4byte	.LVL4
+ 1662 0050 C6000000 		.4byte	.LVL17
+ 1663 0054 0100     		.2byte	0x1
+ 1664 0056 55       		.byte	0x55
+ 1665 0057 00000000 		.4byte	0
+ 1666 005b 00000000 		.4byte	0
+ 1667              	.LLST2:
+ 1668 005f 12000000 		.4byte	.LVL2
+ 1669 0063 32000000 		.4byte	.LVL5
+ 1670 0067 0100     		.2byte	0x1
+ 1671 0069 53       		.byte	0x53
+ 1672 006a 38000000 		.4byte	.LVL6
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 37
+
+
+ 1673 006e 6A000000 		.4byte	.LVL7
+ 1674 0072 0100     		.2byte	0x1
+ 1675 0074 53       		.byte	0x53
+ 1676 0075 6A000000 		.4byte	.LVL7
+ 1677 0079 70000000 		.4byte	.LVL8
+ 1678 007d 0400     		.2byte	0x4
+ 1679 007f 72       		.byte	0x72
+ 1680 0080 F001     		.sleb128 240
+ 1681 0082 9F       		.byte	0x9f
+ 1682 0083 70000000 		.4byte	.LVL8
+ 1683 0087 72000000 		.4byte	.LVL9
+ 1684 008b 0100     		.2byte	0x1
+ 1685 008d 53       		.byte	0x53
+ 1686 008e 72000000 		.4byte	.LVL9
+ 1687 0092 76000000 		.4byte	.LVL10
+ 1688 0096 0400     		.2byte	0x4
+ 1689 0098 72       		.byte	0x72
+ 1690 0099 F001     		.sleb128 240
+ 1691 009b 9F       		.byte	0x9f
+ 1692 009c 76000000 		.4byte	.LVL10
+ 1693 00a0 78000000 		.4byte	.LVL11
+ 1694 00a4 0100     		.2byte	0x1
+ 1695 00a6 53       		.byte	0x53
+ 1696 00a7 78000000 		.4byte	.LVL11
+ 1697 00ab 7A000000 		.4byte	.LVL12
+ 1698 00af 0400     		.2byte	0x4
+ 1699 00b1 72       		.byte	0x72
+ 1700 00b2 F001     		.sleb128 240
+ 1701 00b4 9F       		.byte	0x9f
+ 1702 00b5 7A000000 		.4byte	.LVL12
+ 1703 00b9 80000000 		.4byte	.LVL13
+ 1704 00bd 0100     		.2byte	0x1
+ 1705 00bf 53       		.byte	0x53
+ 1706 00c0 84000000 		.4byte	.LVL14
+ 1707 00c4 A0000000 		.4byte	.LVL15
+ 1708 00c8 0100     		.2byte	0x1
+ 1709 00ca 53       		.byte	0x53
+ 1710 00cb 00000000 		.4byte	0
+ 1711 00cf 00000000 		.4byte	0
+ 1712              	.LLST3:
+ 1713 00d3 12000000 		.4byte	.LVL2
+ 1714 00d7 32000000 		.4byte	.LVL5
+ 1715 00db 0600     		.2byte	0x6
+ 1716 00dd 73       		.byte	0x73
+ 1717 00de 00       		.sleb128 0
+ 1718 00df 09       		.byte	0x9
+ 1719 00e0 F0       		.byte	0xf0
+ 1720 00e1 1A       		.byte	0x1a
+ 1721 00e2 9F       		.byte	0x9f
+ 1722 00e3 38000000 		.4byte	.LVL6
+ 1723 00e7 6A000000 		.4byte	.LVL7
+ 1724 00eb 0600     		.2byte	0x6
+ 1725 00ed 73       		.byte	0x73
+ 1726 00ee 00       		.sleb128 0
+ 1727 00ef 09       		.byte	0x9
+ 1728 00f0 F0       		.byte	0xf0
+ 1729 00f1 1A       		.byte	0x1a
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 38
+
+
+ 1730 00f2 9F       		.byte	0x9f
+ 1731 00f3 6A000000 		.4byte	.LVL7
+ 1732 00f7 70000000 		.4byte	.LVL8
+ 1733 00fb 0700     		.2byte	0x7
+ 1734 00fd 72       		.byte	0x72
+ 1735 00fe F001     		.sleb128 240
+ 1736 0100 09       		.byte	0x9
+ 1737 0101 F0       		.byte	0xf0
+ 1738 0102 1A       		.byte	0x1a
+ 1739 0103 9F       		.byte	0x9f
+ 1740 0104 70000000 		.4byte	.LVL8
+ 1741 0108 72000000 		.4byte	.LVL9
+ 1742 010c 0600     		.2byte	0x6
+ 1743 010e 73       		.byte	0x73
+ 1744 010f 00       		.sleb128 0
+ 1745 0110 09       		.byte	0x9
+ 1746 0111 F0       		.byte	0xf0
+ 1747 0112 1A       		.byte	0x1a
+ 1748 0113 9F       		.byte	0x9f
+ 1749 0114 72000000 		.4byte	.LVL9
+ 1750 0118 76000000 		.4byte	.LVL10
+ 1751 011c 0700     		.2byte	0x7
+ 1752 011e 72       		.byte	0x72
+ 1753 011f F001     		.sleb128 240
+ 1754 0121 09       		.byte	0x9
+ 1755 0122 F0       		.byte	0xf0
+ 1756 0123 1A       		.byte	0x1a
+ 1757 0124 9F       		.byte	0x9f
+ 1758 0125 76000000 		.4byte	.LVL10
+ 1759 0129 78000000 		.4byte	.LVL11
+ 1760 012d 0600     		.2byte	0x6
+ 1761 012f 73       		.byte	0x73
+ 1762 0130 00       		.sleb128 0
+ 1763 0131 09       		.byte	0x9
+ 1764 0132 F0       		.byte	0xf0
+ 1765 0133 1A       		.byte	0x1a
+ 1766 0134 9F       		.byte	0x9f
+ 1767 0135 78000000 		.4byte	.LVL11
+ 1768 0139 7A000000 		.4byte	.LVL12
+ 1769 013d 0700     		.2byte	0x7
+ 1770 013f 72       		.byte	0x72
+ 1771 0140 F001     		.sleb128 240
+ 1772 0142 09       		.byte	0x9
+ 1773 0143 F0       		.byte	0xf0
+ 1774 0144 1A       		.byte	0x1a
+ 1775 0145 9F       		.byte	0x9f
+ 1776 0146 7A000000 		.4byte	.LVL12
+ 1777 014a 80000000 		.4byte	.LVL13
+ 1778 014e 0600     		.2byte	0x6
+ 1779 0150 73       		.byte	0x73
+ 1780 0151 00       		.sleb128 0
+ 1781 0152 09       		.byte	0x9
+ 1782 0153 F0       		.byte	0xf0
+ 1783 0154 1A       		.byte	0x1a
+ 1784 0155 9F       		.byte	0x9f
+ 1785 0156 84000000 		.4byte	.LVL14
+ 1786 015a A0000000 		.4byte	.LVL15
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 39
+
+
+ 1787 015e 0600     		.2byte	0x6
+ 1788 0160 73       		.byte	0x73
+ 1789 0161 00       		.sleb128 0
+ 1790 0162 09       		.byte	0x9
+ 1791 0163 F0       		.byte	0xf0
+ 1792 0164 1A       		.byte	0x1a
+ 1793 0165 9F       		.byte	0x9f
+ 1794 0166 00000000 		.4byte	0
+ 1795 016a 00000000 		.4byte	0
+ 1796              	.LLST4:
+ 1797 016e 00000000 		.4byte	.LVL18
+ 1798 0172 0C000000 		.4byte	.LVL21
+ 1799 0176 0100     		.2byte	0x1
+ 1800 0178 50       		.byte	0x50
+ 1801 0179 0C000000 		.4byte	.LVL21
+ 1802 017d 5C000000 		.4byte	.LVL33
+ 1803 0181 0300     		.2byte	0x3
+ 1804 0183 70       		.byte	0x70
+ 1805 0184 01       		.sleb128 1
+ 1806 0185 9F       		.byte	0x9f
+ 1807 0186 5C000000 		.4byte	.LVL33
+ 1808 018a 62000000 		.4byte	.LVL35
+ 1809 018e 0600     		.2byte	0x6
+ 1810 0190 F3       		.byte	0xf3
+ 1811 0191 01       		.uleb128 0x1
+ 1812 0192 50       		.byte	0x50
+ 1813 0193 23       		.byte	0x23
+ 1814 0194 01       		.uleb128 0x1
+ 1815 0195 9F       		.byte	0x9f
+ 1816 0196 78010000 		.4byte	.LVL42
+ 1817 019a BC010000 		.4byte	.LVL48
+ 1818 019e 0100     		.2byte	0x1
+ 1819 01a0 54       		.byte	0x54
+ 1820 01a1 00000000 		.4byte	0
+ 1821 01a5 00000000 		.4byte	0
+ 1822              	.LLST5:
+ 1823 01a9 00000000 		.4byte	.LVL18
+ 1824 01ad 08000000 		.4byte	.LVL20
+ 1825 01b1 0100     		.2byte	0x1
+ 1826 01b3 51       		.byte	0x51
+ 1827 01b4 08000000 		.4byte	.LVL20
+ 1828 01b8 0C000000 		.4byte	.LVL21
+ 1829 01bc 0400     		.2byte	0x4
+ 1830 01be F3       		.byte	0xf3
+ 1831 01bf 01       		.uleb128 0x1
+ 1832 01c0 51       		.byte	0x51
+ 1833 01c1 9F       		.byte	0x9f
+ 1834 01c2 0C000000 		.4byte	.LVL21
+ 1835 01c6 34000000 		.4byte	.LVL27
+ 1836 01ca 0100     		.2byte	0x1
+ 1837 01cc 51       		.byte	0x51
+ 1838 01cd 3C000000 		.4byte	.LVL29
+ 1839 01d1 5A000000 		.4byte	.LVL32
+ 1840 01d5 0100     		.2byte	0x1
+ 1841 01d7 51       		.byte	0x51
+ 1842 01d8 00000000 		.4byte	0
+ 1843 01dc 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 40
+
+
+ 1844              	.LLST6:
+ 1845 01e0 06000000 		.4byte	.LVL19
+ 1846 01e4 6A010000 		.4byte	.LVL41
+ 1847 01e8 0100     		.2byte	0x1
+ 1848 01ea 55       		.byte	0x55
+ 1849 01eb 78010000 		.4byte	.LVL42
+ 1850 01ef C2010000 		.4byte	.LVL49
+ 1851 01f3 0100     		.2byte	0x1
+ 1852 01f5 55       		.byte	0x55
+ 1853 01f6 00000000 		.4byte	0
+ 1854 01fa 00000000 		.4byte	0
+ 1855              	.LLST7:
+ 1856 01fe 12000000 		.4byte	.LVL22
+ 1857 0202 30000000 		.4byte	.LVL25
+ 1858 0206 0200     		.2byte	0x2
+ 1859 0208 70       		.byte	0x70
+ 1860 0209 01       		.sleb128 1
+ 1861 020a 32000000 		.4byte	.LVL26
+ 1862 020e 3A000000 		.4byte	.LVL28
+ 1863 0212 0200     		.2byte	0x2
+ 1864 0214 70       		.byte	0x70
+ 1865 0215 01       		.sleb128 1
+ 1866 0216 3C000000 		.4byte	.LVL29
+ 1867 021a 40000000 		.4byte	.LVL30
+ 1868 021e 0200     		.2byte	0x2
+ 1869 0220 70       		.byte	0x70
+ 1870 0221 01       		.sleb128 1
+ 1871 0222 00000000 		.4byte	0
+ 1872 0226 00000000 		.4byte	0
+ 1873              	.LLST8:
+ 1874 022a 12000000 		.4byte	.LVL22
+ 1875 022e 30000000 		.4byte	.LVL25
+ 1876 0232 0200     		.2byte	0x2
+ 1877 0234 70       		.byte	0x70
+ 1878 0235 02       		.sleb128 2
+ 1879 0236 32000000 		.4byte	.LVL26
+ 1880 023a 3A000000 		.4byte	.LVL28
+ 1881 023e 0200     		.2byte	0x2
+ 1882 0240 70       		.byte	0x70
+ 1883 0241 02       		.sleb128 2
+ 1884 0242 3C000000 		.4byte	.LVL29
+ 1885 0246 40000000 		.4byte	.LVL30
+ 1886 024a 0200     		.2byte	0x2
+ 1887 024c 70       		.byte	0x70
+ 1888 024d 02       		.sleb128 2
+ 1889 024e 00000000 		.4byte	0
+ 1890 0252 00000000 		.4byte	0
+ 1891              	.LLST9:
+ 1892 0256 1A000000 		.4byte	.LVL23
+ 1893 025a 2E000000 		.4byte	.LVL24
+ 1894 025e 0100     		.2byte	0x1
+ 1895 0260 53       		.byte	0x53
+ 1896 0261 2E000000 		.4byte	.LVL24
+ 1897 0265 30000000 		.4byte	.LVL25
+ 1898 0269 1200     		.2byte	0x12
+ 1899 026b 70       		.byte	0x70
+ 1900 026c 03       		.sleb128 3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 41
+
+
+ 1901 026d 94       		.byte	0x94
+ 1902 026e 01       		.byte	0x1
+ 1903 026f 08       		.byte	0x8
+ 1904 0270 FF       		.byte	0xff
+ 1905 0271 1A       		.byte	0x1a
+ 1906 0272 38       		.byte	0x38
+ 1907 0273 24       		.byte	0x24
+ 1908 0274 70       		.byte	0x70
+ 1909 0275 04       		.sleb128 4
+ 1910 0276 94       		.byte	0x94
+ 1911 0277 01       		.byte	0x1
+ 1912 0278 08       		.byte	0x8
+ 1913 0279 FF       		.byte	0xff
+ 1914 027a 1A       		.byte	0x1a
+ 1915 027b 21       		.byte	0x21
+ 1916 027c 9F       		.byte	0x9f
+ 1917 027d 32000000 		.4byte	.LVL26
+ 1918 0281 42000000 		.4byte	.LVL31
+ 1919 0285 0100     		.2byte	0x1
+ 1920 0287 53       		.byte	0x53
+ 1921 0288 00000000 		.4byte	0
+ 1922 028c 00000000 		.4byte	0
+ 1923              	.LLST10:
+ 1924 0290 6A000000 		.4byte	.LVL36
+ 1925 0294 6E000000 		.4byte	.LVL37
+ 1926 0298 0D00     		.2byte	0xd
+ 1927 029a 70       		.byte	0x70
+ 1928 029b 00       		.sleb128 0
+ 1929 029c F7       		.byte	0xf7
+ 1930 029d 25       		.uleb128 0x25
+ 1931 029e 0A       		.byte	0xa
+ 1932 029f 8308     		.2byte	0x883
+ 1933 02a1 F7       		.byte	0xf7
+ 1934 02a2 25       		.uleb128 0x25
+ 1935 02a3 1B       		.byte	0x1b
+ 1936 02a4 F7       		.byte	0xf7
+ 1937 02a5 00       		.uleb128 0
+ 1938 02a6 9F       		.byte	0x9f
+ 1939 02a7 00000000 		.4byte	0
+ 1940 02ab 00000000 		.4byte	0
+ 1941              	.LLST11:
+ 1942 02af 82010000 		.4byte	.LVL43
+ 1943 02b3 8F010000 		.4byte	.LVL44-1
+ 1944 02b7 0100     		.2byte	0x1
+ 1945 02b9 52       		.byte	0x52
+ 1946 02ba AE010000 		.4byte	.LVL45
+ 1947 02be B4010000 		.4byte	.LVL46
+ 1948 02c2 0100     		.2byte	0x1
+ 1949 02c4 52       		.byte	0x52
+ 1950 02c5 00000000 		.4byte	0
+ 1951 02c9 00000000 		.4byte	0
+ 1952              		.section	.debug_aranges,"",%progbits
+ 1953 0000 24000000 		.4byte	0x24
+ 1954 0004 0200     		.2byte	0x2
+ 1955 0006 00000000 		.4byte	.Ldebug_info0
+ 1956 000a 04       		.byte	0x4
+ 1957 000b 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 42
+
+
+ 1958 000c 0000     		.2byte	0
+ 1959 000e 0000     		.2byte	0
+ 1960 0010 00000000 		.4byte	.LFB68
+ 1961 0014 D0000000 		.4byte	.LFE68-.LFB68
+ 1962 0018 00000000 		.4byte	.LFB69
+ 1963 001c D8010000 		.4byte	.LFE69-.LFB69
+ 1964 0020 00000000 		.4byte	0
+ 1965 0024 00000000 		.4byte	0
+ 1966              		.section	.debug_ranges,"",%progbits
+ 1967              	.Ldebug_ranges0:
+ 1968 0000 08000000 		.4byte	.LBB2
+ 1969 0004 0A000000 		.4byte	.LBE2
+ 1970 0008 0E000000 		.4byte	.LBB3
+ 1971 000c C4000000 		.4byte	.LBE3
+ 1972 0010 00000000 		.4byte	0
+ 1973 0014 00000000 		.4byte	0
+ 1974 0018 4C000000 		.4byte	.LBB5
+ 1975 001c 54000000 		.4byte	.LBE5
+ 1976 0020 62000000 		.4byte	.LBB9
+ 1977 0024 90010000 		.4byte	.LBE9
+ 1978 0028 A0010000 		.4byte	.LBB10
+ 1979 002c BC010000 		.4byte	.LBE10
+ 1980 0030 00000000 		.4byte	0
+ 1981 0034 00000000 		.4byte	0
+ 1982 0038 4C000000 		.4byte	.LBB6
+ 1983 003c 50000000 		.4byte	.LBE6
+ 1984 0040 62000000 		.4byte	.LBB7
+ 1985 0044 4A010000 		.4byte	.LBE7
+ 1986 0048 A0010000 		.4byte	.LBB8
+ 1987 004c AE010000 		.4byte	.LBE8
+ 1988 0050 00000000 		.4byte	0
+ 1989 0054 00000000 		.4byte	0
+ 1990 0058 00000000 		.4byte	.LFB68
+ 1991 005c D0000000 		.4byte	.LFE68
+ 1992 0060 00000000 		.4byte	.LFB69
+ 1993 0064 D8010000 		.4byte	.LFE69
+ 1994 0068 00000000 		.4byte	0
+ 1995 006c 00000000 		.4byte	0
+ 1996              		.section	.debug_line,"",%progbits
+ 1997              	.Ldebug_line0:
+ 1998 0000 22030000 		.section	.debug_str,"MS",%progbits,1
+ 1998      02003802 
+ 1998      00000201 
+ 1998      FB0E0D00 
+ 1998      01010101 
+ 1999              	.LASF68:
+ 2000 0000 5349445F 		.ascii	"SID_frame\000"
+ 2000      6672616D 
+ 2000      6500
+ 2001              	.LASF47:
+ 2002 000a 61747461 		.ascii	"attack\000"
+ 2002      636B00
+ 2003              	.LASF37:
+ 2004 0011 42555253 		.ascii	"BURST_OFF\000"
+ 2004      545F4F46 
+ 2004      4600
+ 2005              	.LASF59:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 43
+
+
+ 2006 001b 53494446 		.ascii	"SIDFilterData_t\000"
+ 2006      696C7465 
+ 2006      72446174 
+ 2006      615F7400 
+ 2007              	.LASF56:
+ 2008 002b 68707645 		.ascii	"hpvEnabled\000"
+ 2008      6E61626C 
+ 2008      656400
+ 2009              	.LASF40:
+ 2010 0036 494E5452 		.ascii	"INTR_MOD_CUR\000"
+ 2010      5F4D4F44 
+ 2010      5F435552 
+ 2010      00
+ 2011              	.LASF77:
+ 2012 0043 5349445F 		.ascii	"SID_filterData\000"
+ 2012      66696C74 
+ 2012      65724461 
+ 2012      746100
+ 2013              	.LASF14:
+ 2014 0052 696E7438 		.ascii	"int8_t\000"
+ 2014      5F7400
+ 2015              	.LASF65:
+ 2016 0059 70726F63 		.ascii	"process_midi\000"
+ 2016      6573735F 
+ 2016      6D696469 
+ 2016      00
+ 2017              	.LASF63:
+ 2018 0066 73746174 		.ascii	"state\000"
+ 2018      6500
+ 2019              	.LASF25:
+ 2020 006c 54696D65 		.ascii	"TimerHandle_t\000"
+ 2020      7248616E 
+ 2020      646C655F 
+ 2020      7400
+ 2021              	.LASF5:
+ 2022 007a 73686F72 		.ascii	"short int\000"
+ 2022      7420696E 
+ 2022      7400
+ 2023              	.LASF76:
+ 2024 0084 71534944 		.ascii	"qSID\000"
+ 2024      00
+ 2025              	.LASF22:
+ 2026 0089 73697A65 		.ascii	"sizetype\000"
+ 2026      74797065 
+ 2026      00
+ 2027              	.LASF83:
+ 2028 0092 2E2E5C63 		.ascii	"..\\common\\ud3core\\tasks\\tsk_eth_common.c\000"
+ 2028      6F6D6D6F 
+ 2028      6E5C7564 
+ 2028      33636F72 
+ 2028      655C7461 
+ 2029              	.LASF53:
+ 2030 00bb 6E657874 		.ascii	"next_frame\000"
+ 2030      5F667261 
+ 2030      6D6500
+ 2031              	.LASF54:
+ 2032 00c6 53494446 		.ascii	"SIDFrame_t\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 44
+
+
+ 2032      72616D65 
+ 2032      5F7400
+ 2033              	.LASF10:
+ 2034 00d1 5F5F7569 		.ascii	"__uint32_t\000"
+ 2034      6E743332 
+ 2034      5F7400
+ 2035              	.LASF82:
+ 2036 00dc 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2036      43393920 
+ 2036      352E342E 
+ 2036      31203230 
+ 2036      31363036 
+ 2037 010f 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2037      20726576 
+ 2037      6973696F 
+ 2037      6E203233 
+ 2037      37373135 
+ 2038 0142 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 2038      74643D67 
+ 2038      6E753939 
+ 2038      202D6666 
+ 2038      756E6374 
+ 2039              	.LASF41:
+ 2040 0175 6D6F6465 		.ascii	"mode\000"
+ 2040      00
+ 2041              	.LASF75:
+ 2042 017a 696E7465 		.ascii	"interrupter\000"
+ 2042      72727570 
+ 2042      74657200 
+ 2043              	.LASF6:
+ 2044 0186 5F5F7569 		.ascii	"__uint16_t\000"
+ 2044      6E743136 
+ 2044      5F7400
+ 2045              	.LASF66:
+ 2046 0191 70726F63 		.ascii	"process_min_sid\000"
+ 2046      6573735F 
+ 2046      6D696E5F 
+ 2046      73696400 
+ 2047              	.LASF30:
+ 2048 01a1 696E7465 		.ascii	"interrupter_DMA\000"
+ 2048      72727570 
+ 2048      7465725F 
+ 2048      444D4100 
+ 2049              	.LASF36:
+ 2050 01b1 42555253 		.ascii	"BURST_ON\000"
+ 2050      545F4F4E 
+ 2050      00
+ 2051              	.LASF48:
+ 2052 01ba 64656361 		.ascii	"decay\000"
+ 2052      7900
+ 2053              	.LASF71:
+ 2054 01c0 76616C75 		.ascii	"value\000"
+ 2054      6500
+ 2055              	.LASF58:
+ 2056 01c6 68707645 		.ascii	"hpvEnabledGlobally\000"
+ 2056      6E61626C 
+ 2056      6564476C 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 45
+
+
+ 2056      6F62616C 
+ 2056      6C7900
+ 2057              	.LASF15:
+ 2058 01d9 75696E74 		.ascii	"uint8_t\000"
+ 2058      385F7400 
+ 2059              	.LASF35:
+ 2060 01e1 696E7465 		.ascii	"interrupter_burst\000"
+ 2060      72727570 
+ 2060      7465725F 
+ 2060      62757273 
+ 2060      7400
+ 2061              	.LASF31:
+ 2062 01f3 696E7465 		.ascii	"interrupter_mode\000"
+ 2062      72727570 
+ 2062      7465725F 
+ 2062      6D6F6465 
+ 2062      00
+ 2063              	.LASF42:
+ 2064 0204 62757273 		.ascii	"burst_state\000"
+ 2064      745F7374 
+ 2064      61746500 
+ 2065              	.LASF18:
+ 2066 0210 75696E74 		.ascii	"uint32_t\000"
+ 2066      33325F74 
+ 2066      00
+ 2067              	.LASF64:
+ 2068 0219 635F6D61 		.ascii	"c_masked\000"
+ 2068      736B6564 
+ 2068      00
+ 2069              	.LASF81:
+ 2070 0222 78517565 		.ascii	"xQueueGenericSend\000"
+ 2070      75654765 
+ 2070      6E657269 
+ 2070      6353656E 
+ 2070      6400
+ 2071              	.LASF19:
+ 2072 0234 666C6F61 		.ascii	"float\000"
+ 2072      7400
+ 2073              	.LASF12:
+ 2074 023a 6C6F6E67 		.ascii	"long long int\000"
+ 2074      206C6F6E 
+ 2074      6720696E 
+ 2074      7400
+ 2075              	.LASF43:
+ 2076 0248 646D615F 		.ascii	"dma_mode\000"
+ 2076      6D6F6465 
+ 2076      00
+ 2077              	.LASF9:
+ 2078 0251 6C6F6E67 		.ascii	"long int\000"
+ 2078      20696E74 
+ 2078      00
+ 2079              	.LASF3:
+ 2080 025a 5F5F7569 		.ascii	"__uint8_t\000"
+ 2080      6E74385F 
+ 2080      7400
+ 2081              	.LASF24:
+ 2082 0264 51756575 		.ascii	"QueueHandle_t\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 46
+
+
+ 2082      6548616E 
+ 2082      646C655F 
+ 2082      7400
+ 2083              	.LASF50:
+ 2084 0272 72656C65 		.ascii	"release\000"
+ 2084      61736500 
+ 2085              	.LASF33:
+ 2086 027a 494E5452 		.ascii	"INTR_MODE_TR\000"
+ 2086      5F4D4F44 
+ 2086      455F5452 
+ 2086      00
+ 2087              	.LASF51:
+ 2088 0287 66726571 		.ascii	"frequency_dHz\000"
+ 2088      75656E63 
+ 2088      795F6448 
+ 2088      7A00
+ 2089              	.LASF4:
+ 2090 0295 756E7369 		.ascii	"unsigned char\000"
+ 2090      676E6564 
+ 2090      20636861 
+ 2090      7200
+ 2091              	.LASF34:
+ 2092 02a3 494E5452 		.ascii	"INTR_MODE_BLOCKED\000"
+ 2092      5F4D4F44 
+ 2092      455F424C 
+ 2092      4F434B45 
+ 2092      4400
+ 2093              	.LASF1:
+ 2094 02b5 7369676E 		.ascii	"signed char\000"
+ 2094      65642063 
+ 2094      68617200 
+ 2095              	.LASF46:
+ 2096 02c1 666C6167 		.ascii	"flags\000"
+ 2096      7300
+ 2097              	.LASF32:
+ 2098 02c7 494E5452 		.ascii	"INTR_MODE_OFF\000"
+ 2098      5F4D4F44 
+ 2098      455F4F46 
+ 2098      4600
+ 2099              	.LASF60:
+ 2100 02d5 6D657373 		.ascii	"message_size\000"
+ 2100      6167655F 
+ 2100      73697A65 
+ 2100      00
+ 2101              	.LASF72:
+ 2102 02e2 66726571 		.ascii	"freq_tempFp8\000"
+ 2102      5F74656D 
+ 2102      70467038 
+ 2102      00
+ 2103              	.LASF61:
+ 2104 02ef 62797465 		.ascii	"bytes_received\000"
+ 2104      735F7265 
+ 2104      63656976 
+ 2104      656400
+ 2105              	.LASF0:
+ 2106 02fe 756E7369 		.ascii	"unsigned int\000"
+ 2106      676E6564 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 47
+
+
+ 2106      20696E74 
+ 2106      00
+ 2107              	.LASF38:
+ 2108 030b 696E7465 		.ascii	"interrupter_modulation\000"
+ 2108      72727570 
+ 2108      7465725F 
+ 2108      6D6F6475 
+ 2108      6C617469 
+ 2109              	.LASF16:
+ 2110 0322 75696E74 		.ascii	"uint16_t\000"
+ 2110      31365F74 
+ 2110      00
+ 2111              	.LASF57:
+ 2112 032b 6E6F6973 		.ascii	"noiseVolume\000"
+ 2112      65566F6C 
+ 2112      756D6500 
+ 2113              	.LASF23:
+ 2114 0337 42617365 		.ascii	"BaseType_t\000"
+ 2114      54797065 
+ 2114      5F7400
+ 2115              	.LASF11:
+ 2116 0342 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2116      20756E73 
+ 2116      69676E65 
+ 2116      6420696E 
+ 2116      7400
+ 2117              	.LASF26:
+ 2118 0354 51756575 		.ascii	"QueueDefinition\000"
+ 2118      65446566 
+ 2118      696E6974 
+ 2118      696F6E00 
+ 2119              	.LASF7:
+ 2120 0364 73686F72 		.ascii	"short unsigned int\000"
+ 2120      7420756E 
+ 2120      7369676E 
+ 2120      65642069 
+ 2120      6E7400
+ 2121              	.LASF2:
+ 2122 0377 5F5F696E 		.ascii	"__int8_t\000"
+ 2122      74385F74 
+ 2122      00
+ 2123              	.LASF45:
+ 2124 0380 696E7465 		.ascii	"interrupter_params\000"
+ 2124      72727570 
+ 2124      7465725F 
+ 2124      70617261 
+ 2124      6D7300
+ 2125              	.LASF21:
+ 2126 0393 63686172 		.ascii	"char\000"
+ 2126      00
+ 2127              	.LASF17:
+ 2128 0398 696E7433 		.ascii	"int32_t\000"
+ 2128      325F7400 
+ 2129              	.LASF70:
+ 2130 03a0 6368616E 		.ascii	"channel\000"
+ 2130      6E656C00 
+ 2131              	.LASF49:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 48
+
+
+ 2132 03a8 73757374 		.ascii	"sustain\000"
+ 2132      61696E00 
+ 2133              	.LASF67:
+ 2134 03b0 6E5F6672 		.ascii	"n_frames\000"
+ 2134      616D6573 
+ 2134      00
+ 2135              	.LASF39:
+ 2136 03b9 494E5452 		.ascii	"INTR_MOD_PW\000"
+ 2136      5F4D4F44 
+ 2136      5F505700 
+ 2137              	.LASF20:
+ 2138 03c5 646F7562 		.ascii	"double\000"
+ 2138      6C6500
+ 2139              	.LASF74:
+ 2140 03cc 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 2140      52784275 
+ 2140      66666572 
+ 2140      00
+ 2141              	.LASF78:
+ 2142 03d9 6C5F7469 		.ascii	"l_time\000"
+ 2142      6D6500
+ 2143              	.LASF28:
+ 2144 03e0 494E5452 		.ascii	"INTR_DMA_TR\000"
+ 2144      5F444D41 
+ 2144      5F545200 
+ 2145              	.LASF27:
+ 2146 03ec 746D7254 		.ascii	"tmrTimerControl\000"
+ 2146      696D6572 
+ 2146      436F6E74 
+ 2146      726F6C00 
+ 2147              	.LASF8:
+ 2148 03fc 5F5F696E 		.ascii	"__int32_t\000"
+ 2148      7433325F 
+ 2148      7400
+ 2149              	.LASF44:
+ 2150 0406 78427572 		.ascii	"xBurst_Timer\000"
+ 2150      73745F54 
+ 2150      696D6572 
+ 2150      00
+ 2151              	.LASF62:
+ 2152 0413 6D696469 		.ascii	"midi_cmd\000"
+ 2152      5F636D64 
+ 2152      00
+ 2153              	.LASF79:
+ 2154 041c 71756575 		.ascii	"queue_midi_message\000"
+ 2154      655F6D69 
+ 2154      64695F6D 
+ 2154      65737361 
+ 2154      676500
+ 2155              	.LASF80:
+ 2156 042f 616C6172 		.ascii	"alarm_push\000"
+ 2156      6D5F7075 
+ 2156      736800
+ 2157              	.LASF84:
+ 2158 043a 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 2158      73657273 
+ 2158      5C636865 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccw63Ndb.s 			page 49
+
+
+ 2158      6D695C55 
+ 2158      44335F51 
+ 2159              	.LASF13:
+ 2160 045f 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2160      206C6F6E 
+ 2160      6720756E 
+ 2160      7369676E 
+ 2160      65642069 
+ 2161              	.LASF55:
+ 2162 0476 6368616E 		.ascii	"channelVolume\000"
+ 2162      6E656C56 
+ 2162      6F6C756D 
+ 2162      6500
+ 2163              	.LASF69:
+ 2164 0484 636F6D6D 		.ascii	"command\000"
+ 2164      616E6400 
+ 2165              	.LASF52:
+ 2166 048c 70756C73 		.ascii	"pulsewidth\000"
+ 2166      65776964 
+ 2166      746800
+ 2167              	.LASF29:
+ 2168 0497 494E5452 		.ascii	"INTR_DMA_DDS\000"
+ 2168      5F444D41 
+ 2168      5F444453 
+ 2168      00
+ 2169              	.LASF73:
+ 2170 04a4 64696666 		.ascii	"diff\000"
+ 2170      00
+ 2171              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

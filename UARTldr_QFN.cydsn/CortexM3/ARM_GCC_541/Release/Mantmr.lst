@@ -1,0 +1,2840 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"Mantmr.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.Mantmr_Enable,"ax",%progbits
+  20              		.align	1
+  21              		.global	Mantmr_Enable
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	Mantmr_Enable, %function
+  25              	Mantmr_Enable:
+  26              	.LFB2:
+  27              		.file 1 "Generated_Source\\PSoC5\\Mantmr.c"
+   1:Generated_Source\PSoC5/Mantmr.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/Mantmr.c **** * File Name: Mantmr.c
+   3:Generated_Source\PSoC5/Mantmr.c **** * Version 3.30
+   4:Generated_Source\PSoC5/Mantmr.c **** *
+   5:Generated_Source\PSoC5/Mantmr.c **** * Description:
+   6:Generated_Source\PSoC5/Mantmr.c **** *  The PWM User Module consist of an 8 or 16-bit counter with two 8 or 16-bit
+   7:Generated_Source\PSoC5/Mantmr.c **** *  comparitors. Each instance of this user module is capable of generating
+   8:Generated_Source\PSoC5/Mantmr.c **** *  two PWM outputs with the same period. The pulse width is selectable between
+   9:Generated_Source\PSoC5/Mantmr.c **** *  1 and 255/65535. The period is selectable between 2 and 255/65536 clocks.
+  10:Generated_Source\PSoC5/Mantmr.c **** *  The compare value output may be configured to be active when the present
+  11:Generated_Source\PSoC5/Mantmr.c **** *  counter is less than or less than/equal to the compare value.
+  12:Generated_Source\PSoC5/Mantmr.c **** *  A terminal count output is also provided. It generates a pulse one clock
+  13:Generated_Source\PSoC5/Mantmr.c **** *  width wide when the counter is equal to zero.
+  14:Generated_Source\PSoC5/Mantmr.c **** *
+  15:Generated_Source\PSoC5/Mantmr.c **** * Note:
+  16:Generated_Source\PSoC5/Mantmr.c **** *
+  17:Generated_Source\PSoC5/Mantmr.c **** *******************************************************************************
+  18:Generated_Source\PSoC5/Mantmr.c **** * Copyright 2008-2014, Cypress Semiconductor Corporation.  All rights reserved.
+  19:Generated_Source\PSoC5/Mantmr.c **** * You may use this file only in accordance with the license, terms, conditions,
+  20:Generated_Source\PSoC5/Mantmr.c **** * disclaimers, and limitations in the end user license agreement accompanying
+  21:Generated_Source\PSoC5/Mantmr.c **** * the software package with which this file was provided.
+  22:Generated_Source\PSoC5/Mantmr.c **** ********************************************************************************/
+  23:Generated_Source\PSoC5/Mantmr.c **** 
+  24:Generated_Source\PSoC5/Mantmr.c **** #include "Mantmr.h"
+  25:Generated_Source\PSoC5/Mantmr.c **** 
+  26:Generated_Source\PSoC5/Mantmr.c **** /* Error message for removed <resource> through optimization */
+  27:Generated_Source\PSoC5/Mantmr.c **** #ifdef Mantmr_PWMUDB_genblk1_ctrlreg__REMOVED
+  28:Generated_Source\PSoC5/Mantmr.c ****     #error PWM_v3_30 detected with a constant 0 for the enable or \
+  29:Generated_Source\PSoC5/Mantmr.c ****          constant 1 for reset. This will prevent the component from operating.
+  30:Generated_Source\PSoC5/Mantmr.c **** #endif /* Mantmr_PWMUDB_genblk1_ctrlreg__REMOVED */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 2
+
+
+  31:Generated_Source\PSoC5/Mantmr.c **** 
+  32:Generated_Source\PSoC5/Mantmr.c **** uint8 Mantmr_initVar = 0u;
+  33:Generated_Source\PSoC5/Mantmr.c **** 
+  34:Generated_Source\PSoC5/Mantmr.c **** 
+  35:Generated_Source\PSoC5/Mantmr.c **** /*******************************************************************************
+  36:Generated_Source\PSoC5/Mantmr.c **** * Function Name: Mantmr_Start
+  37:Generated_Source\PSoC5/Mantmr.c **** ********************************************************************************
+  38:Generated_Source\PSoC5/Mantmr.c **** *
+  39:Generated_Source\PSoC5/Mantmr.c **** * Summary:
+  40:Generated_Source\PSoC5/Mantmr.c **** *  The start function initializes the pwm with the default values, the
+  41:Generated_Source\PSoC5/Mantmr.c **** *  enables the counter to begin counting.  It does not enable interrupts,
+  42:Generated_Source\PSoC5/Mantmr.c **** *  the EnableInt command should be called if interrupt generation is required.
+  43:Generated_Source\PSoC5/Mantmr.c **** *
+  44:Generated_Source\PSoC5/Mantmr.c **** * Parameters:
+  45:Generated_Source\PSoC5/Mantmr.c **** *  None
+  46:Generated_Source\PSoC5/Mantmr.c **** *
+  47:Generated_Source\PSoC5/Mantmr.c **** * Return:
+  48:Generated_Source\PSoC5/Mantmr.c **** *  None
+  49:Generated_Source\PSoC5/Mantmr.c **** *
+  50:Generated_Source\PSoC5/Mantmr.c **** * Global variables:
+  51:Generated_Source\PSoC5/Mantmr.c **** *  Mantmr_initVar: Is modified when this function is called for the
+  52:Generated_Source\PSoC5/Mantmr.c **** *   first time. Is used to ensure that initialization happens only once.
+  53:Generated_Source\PSoC5/Mantmr.c **** *
+  54:Generated_Source\PSoC5/Mantmr.c **** *******************************************************************************/
+  55:Generated_Source\PSoC5/Mantmr.c **** void Mantmr_Start(void) 
+  56:Generated_Source\PSoC5/Mantmr.c **** {
+  57:Generated_Source\PSoC5/Mantmr.c ****     /* If not Initialized then initialize all required hardware and software */
+  58:Generated_Source\PSoC5/Mantmr.c ****     if(Mantmr_initVar == 0u)
+  59:Generated_Source\PSoC5/Mantmr.c ****     {
+  60:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_Init();
+  61:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_initVar = 1u;
+  62:Generated_Source\PSoC5/Mantmr.c ****     }
+  63:Generated_Source\PSoC5/Mantmr.c ****     Mantmr_Enable();
+  64:Generated_Source\PSoC5/Mantmr.c **** 
+  65:Generated_Source\PSoC5/Mantmr.c **** }
+  66:Generated_Source\PSoC5/Mantmr.c **** 
+  67:Generated_Source\PSoC5/Mantmr.c **** 
+  68:Generated_Source\PSoC5/Mantmr.c **** /*******************************************************************************
+  69:Generated_Source\PSoC5/Mantmr.c **** * Function Name: Mantmr_Init
+  70:Generated_Source\PSoC5/Mantmr.c **** ********************************************************************************
+  71:Generated_Source\PSoC5/Mantmr.c **** *
+  72:Generated_Source\PSoC5/Mantmr.c **** * Summary:
+  73:Generated_Source\PSoC5/Mantmr.c **** *  Initialize component's parameters to the parameters set by user in the
+  74:Generated_Source\PSoC5/Mantmr.c **** *  customizer of the component placed onto schematic. Usually called in
+  75:Generated_Source\PSoC5/Mantmr.c **** *  Mantmr_Start().
+  76:Generated_Source\PSoC5/Mantmr.c **** *
+  77:Generated_Source\PSoC5/Mantmr.c **** * Parameters:
+  78:Generated_Source\PSoC5/Mantmr.c **** *  None
+  79:Generated_Source\PSoC5/Mantmr.c **** *
+  80:Generated_Source\PSoC5/Mantmr.c **** * Return:
+  81:Generated_Source\PSoC5/Mantmr.c **** *  None
+  82:Generated_Source\PSoC5/Mantmr.c **** *
+  83:Generated_Source\PSoC5/Mantmr.c **** *******************************************************************************/
+  84:Generated_Source\PSoC5/Mantmr.c **** void Mantmr_Init(void) 
+  85:Generated_Source\PSoC5/Mantmr.c **** {
+  86:Generated_Source\PSoC5/Mantmr.c ****     #if (Mantmr_UsingFixedFunction || Mantmr_UseControl)
+  87:Generated_Source\PSoC5/Mantmr.c ****         uint8 ctrl;
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 3
+
+
+  88:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (Mantmr_UsingFixedFunction || Mantmr_UseControl) */
+  89:Generated_Source\PSoC5/Mantmr.c **** 
+  90:Generated_Source\PSoC5/Mantmr.c ****     #if(!Mantmr_UsingFixedFunction)
+  91:Generated_Source\PSoC5/Mantmr.c ****         #if(Mantmr_UseStatus)
+  92:Generated_Source\PSoC5/Mantmr.c ****             /* Interrupt State Backup for Critical Region*/
+  93:Generated_Source\PSoC5/Mantmr.c ****             uint8 Mantmr_interruptState;
+  94:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_UseStatus) */
+  95:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (!Mantmr_UsingFixedFunction) */
+  96:Generated_Source\PSoC5/Mantmr.c **** 
+  97:Generated_Source\PSoC5/Mantmr.c ****     #if (Mantmr_UsingFixedFunction)
+  98:Generated_Source\PSoC5/Mantmr.c ****         /* You are allowed to write the compare value (FF only) */
+  99:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_CONTROL |= Mantmr_CFG0_MODE;
+ 100:Generated_Source\PSoC5/Mantmr.c ****         #if (Mantmr_DeadBand2_4)
+ 101:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_CONTROL |= Mantmr_CFG0_DB;
+ 102:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_DeadBand2_4) */
+ 103:Generated_Source\PSoC5/Mantmr.c **** 
+ 104:Generated_Source\PSoC5/Mantmr.c ****         ctrl = Mantmr_CONTROL3 & ((uint8 )(~Mantmr_CTRL_CMPMODE1_MASK));
+ 105:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_CONTROL3 = ctrl | Mantmr_DEFAULT_COMPARE1_MODE;
+ 106:Generated_Source\PSoC5/Mantmr.c **** 
+ 107:Generated_Source\PSoC5/Mantmr.c ****          /* Clear and Set SYNCTC and SYNCCMP bits of RT1 register */
+ 108:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_RT1 &= ((uint8)(~Mantmr_RT1_MASK));
+ 109:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_RT1 |= Mantmr_SYNC;
+ 110:Generated_Source\PSoC5/Mantmr.c **** 
+ 111:Generated_Source\PSoC5/Mantmr.c ****         /*Enable DSI Sync all all inputs of the PWM*/
+ 112:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_RT1 &= ((uint8)(~Mantmr_SYNCDSI_MASK));
+ 113:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_RT1 |= Mantmr_SYNCDSI_EN;
+ 114:Generated_Source\PSoC5/Mantmr.c **** 
+ 115:Generated_Source\PSoC5/Mantmr.c ****     #elif (Mantmr_UseControl)
+ 116:Generated_Source\PSoC5/Mantmr.c ****         /* Set the default compare mode defined in the parameter */
+ 117:Generated_Source\PSoC5/Mantmr.c ****         ctrl = Mantmr_CONTROL & ((uint8)(~Mantmr_CTRL_CMPMODE2_MASK)) &
+ 118:Generated_Source\PSoC5/Mantmr.c ****                 ((uint8)(~Mantmr_CTRL_CMPMODE1_MASK));
+ 119:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_CONTROL = ctrl | Mantmr_DEFAULT_COMPARE2_MODE |
+ 120:Generated_Source\PSoC5/Mantmr.c ****                                    Mantmr_DEFAULT_COMPARE1_MODE;
+ 121:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (Mantmr_UsingFixedFunction) */
+ 122:Generated_Source\PSoC5/Mantmr.c **** 
+ 123:Generated_Source\PSoC5/Mantmr.c ****     #if (!Mantmr_UsingFixedFunction)
+ 124:Generated_Source\PSoC5/Mantmr.c ****         #if (Mantmr_Resolution == 8)
+ 125:Generated_Source\PSoC5/Mantmr.c ****             /* Set FIFO 0 to 1 byte register for period*/
+ 126:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_AUX_CONTROLDP0 |= (Mantmr_AUX_CTRL_FIFO0_CLR);
+ 127:Generated_Source\PSoC5/Mantmr.c ****         #else /* (Mantmr_Resolution == 16)*/
+ 128:Generated_Source\PSoC5/Mantmr.c ****             /* Set FIFO 0 to 1 byte register for period */
+ 129:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_AUX_CONTROLDP0 |= (Mantmr_AUX_CTRL_FIFO0_CLR);
+ 130:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_AUX_CONTROLDP1 |= (Mantmr_AUX_CTRL_FIFO0_CLR);
+ 131:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_Resolution == 8) */
+ 132:Generated_Source\PSoC5/Mantmr.c **** 
+ 133:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_WriteCounter(Mantmr_INIT_PERIOD_VALUE);
+ 134:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (!Mantmr_UsingFixedFunction) */
+ 135:Generated_Source\PSoC5/Mantmr.c **** 
+ 136:Generated_Source\PSoC5/Mantmr.c ****     Mantmr_WritePeriod(Mantmr_INIT_PERIOD_VALUE);
+ 137:Generated_Source\PSoC5/Mantmr.c **** 
+ 138:Generated_Source\PSoC5/Mantmr.c ****         #if (Mantmr_UseOneCompareMode)
+ 139:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_WriteCompare(Mantmr_INIT_COMPARE_VALUE1);
+ 140:Generated_Source\PSoC5/Mantmr.c ****         #else
+ 141:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_WriteCompare1(Mantmr_INIT_COMPARE_VALUE1);
+ 142:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_WriteCompare2(Mantmr_INIT_COMPARE_VALUE2);
+ 143:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_UseOneCompareMode) */
+ 144:Generated_Source\PSoC5/Mantmr.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 4
+
+
+ 145:Generated_Source\PSoC5/Mantmr.c ****         #if (Mantmr_KillModeMinTime)
+ 146:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_WriteKillTime(Mantmr_MinimumKillTime);
+ 147:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_KillModeMinTime) */
+ 148:Generated_Source\PSoC5/Mantmr.c **** 
+ 149:Generated_Source\PSoC5/Mantmr.c ****         #if (Mantmr_DeadBandUsed)
+ 150:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_WriteDeadTime(Mantmr_INIT_DEAD_TIME);
+ 151:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_DeadBandUsed) */
+ 152:Generated_Source\PSoC5/Mantmr.c **** 
+ 153:Generated_Source\PSoC5/Mantmr.c ****     #if (Mantmr_UseStatus || Mantmr_UsingFixedFunction)
+ 154:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_SetInterruptMode(Mantmr_INIT_INTERRUPTS_MODE);
+ 155:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (Mantmr_UseStatus || Mantmr_UsingFixedFunction) */
+ 156:Generated_Source\PSoC5/Mantmr.c **** 
+ 157:Generated_Source\PSoC5/Mantmr.c ****     #if (Mantmr_UsingFixedFunction)
+ 158:Generated_Source\PSoC5/Mantmr.c ****         /* Globally Enable the Fixed Function Block chosen */
+ 159:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_GLOBAL_ENABLE |= Mantmr_BLOCK_EN_MASK;
+ 160:Generated_Source\PSoC5/Mantmr.c ****         /* Set the Interrupt source to come from the status register */
+ 161:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_CONTROL2 |= Mantmr_CTRL2_IRQ_SEL;
+ 162:Generated_Source\PSoC5/Mantmr.c ****     #else
+ 163:Generated_Source\PSoC5/Mantmr.c ****         #if(Mantmr_UseStatus)
+ 164:Generated_Source\PSoC5/Mantmr.c **** 
+ 165:Generated_Source\PSoC5/Mantmr.c ****             /* CyEnterCriticalRegion and CyExitCriticalRegion are used to mark following region cri
+ 166:Generated_Source\PSoC5/Mantmr.c ****             /* Enter Critical Region*/
+ 167:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_interruptState = CyEnterCriticalSection();
+ 168:Generated_Source\PSoC5/Mantmr.c ****             /* Use the interrupt output of the status register for IRQ output */
+ 169:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_STATUS_AUX_CTRL |= Mantmr_STATUS_ACTL_INT_EN_MASK;
+ 170:Generated_Source\PSoC5/Mantmr.c **** 
+ 171:Generated_Source\PSoC5/Mantmr.c ****              /* Exit Critical Region*/
+ 172:Generated_Source\PSoC5/Mantmr.c ****             CyExitCriticalSection(Mantmr_interruptState);
+ 173:Generated_Source\PSoC5/Mantmr.c **** 
+ 174:Generated_Source\PSoC5/Mantmr.c ****             /* Clear the FIFO to enable the Mantmr_STATUS_FIFOFULL
+ 175:Generated_Source\PSoC5/Mantmr.c ****                    bit to be set on FIFO full. */
+ 176:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_ClearFIFO();
+ 177:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_UseStatus) */
+ 178:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (Mantmr_UsingFixedFunction) */
+ 179:Generated_Source\PSoC5/Mantmr.c **** }
+ 180:Generated_Source\PSoC5/Mantmr.c **** 
+ 181:Generated_Source\PSoC5/Mantmr.c **** 
+ 182:Generated_Source\PSoC5/Mantmr.c **** /*******************************************************************************
+ 183:Generated_Source\PSoC5/Mantmr.c **** * Function Name: Mantmr_Enable
+ 184:Generated_Source\PSoC5/Mantmr.c **** ********************************************************************************
+ 185:Generated_Source\PSoC5/Mantmr.c **** *
+ 186:Generated_Source\PSoC5/Mantmr.c **** * Summary:
+ 187:Generated_Source\PSoC5/Mantmr.c **** *  Enables the PWM block operation
+ 188:Generated_Source\PSoC5/Mantmr.c **** *
+ 189:Generated_Source\PSoC5/Mantmr.c **** * Parameters:
+ 190:Generated_Source\PSoC5/Mantmr.c **** *  None
+ 191:Generated_Source\PSoC5/Mantmr.c **** *
+ 192:Generated_Source\PSoC5/Mantmr.c **** * Return:
+ 193:Generated_Source\PSoC5/Mantmr.c **** *  None
+ 194:Generated_Source\PSoC5/Mantmr.c **** *
+ 195:Generated_Source\PSoC5/Mantmr.c **** * Side Effects:
+ 196:Generated_Source\PSoC5/Mantmr.c **** *  This works only if software enable mode is chosen
+ 197:Generated_Source\PSoC5/Mantmr.c **** *
+ 198:Generated_Source\PSoC5/Mantmr.c **** *******************************************************************************/
+ 199:Generated_Source\PSoC5/Mantmr.c **** void Mantmr_Enable(void) 
+ 200:Generated_Source\PSoC5/Mantmr.c **** {
+  28              		.loc 1 200 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 5
+
+
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+ 201:Generated_Source\PSoC5/Mantmr.c ****     /* Globally Enable the Fixed Function Block chosen */
+ 202:Generated_Source\PSoC5/Mantmr.c ****     #if (Mantmr_UsingFixedFunction)
+ 203:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_GLOBAL_ENABLE |= Mantmr_BLOCK_EN_MASK;
+ 204:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_GLOBAL_STBY_ENABLE |= Mantmr_BLOCK_STBY_EN_MASK;
+ 205:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (Mantmr_UsingFixedFunction) */
+ 206:Generated_Source\PSoC5/Mantmr.c **** 
+ 207:Generated_Source\PSoC5/Mantmr.c ****     /* Enable the PWM from the control register  */
+ 208:Generated_Source\PSoC5/Mantmr.c ****     #if (Mantmr_UseControl || Mantmr_UsingFixedFunction)
+ 209:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_CONTROL |= Mantmr_CTRL_ENABLE;
+  33              		.loc 1 209 0
+  34 0000 024A     		ldr	r2, .L2
+  35 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  36 0004 43F08003 		orr	r3, r3, #128
+  37 0008 1370     		strb	r3, [r2]
+  38 000a 7047     		bx	lr
+  39              	.L3:
+  40              		.align	2
+  41              	.L2:
+  42 000c 78640040 		.word	1073767544
+  43              		.cfi_endproc
+  44              	.LFE2:
+  45              		.size	Mantmr_Enable, .-Mantmr_Enable
+  46              		.section	.text.Mantmr_Stop,"ax",%progbits
+  47              		.align	1
+  48              		.global	Mantmr_Stop
+  49              		.thumb
+  50              		.thumb_func
+  51              		.type	Mantmr_Stop, %function
+  52              	Mantmr_Stop:
+  53              	.LFB3:
+ 210:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (Mantmr_UseControl || Mantmr_UsingFixedFunction) */
+ 211:Generated_Source\PSoC5/Mantmr.c **** }
+ 212:Generated_Source\PSoC5/Mantmr.c **** 
+ 213:Generated_Source\PSoC5/Mantmr.c **** 
+ 214:Generated_Source\PSoC5/Mantmr.c **** /*******************************************************************************
+ 215:Generated_Source\PSoC5/Mantmr.c **** * Function Name: Mantmr_Stop
+ 216:Generated_Source\PSoC5/Mantmr.c **** ********************************************************************************
+ 217:Generated_Source\PSoC5/Mantmr.c **** *
+ 218:Generated_Source\PSoC5/Mantmr.c **** * Summary:
+ 219:Generated_Source\PSoC5/Mantmr.c **** *  The stop function halts the PWM, but does not change any modes or disable
+ 220:Generated_Source\PSoC5/Mantmr.c **** *  interrupts.
+ 221:Generated_Source\PSoC5/Mantmr.c **** *
+ 222:Generated_Source\PSoC5/Mantmr.c **** * Parameters:
+ 223:Generated_Source\PSoC5/Mantmr.c **** *  None
+ 224:Generated_Source\PSoC5/Mantmr.c **** *
+ 225:Generated_Source\PSoC5/Mantmr.c **** * Return:
+ 226:Generated_Source\PSoC5/Mantmr.c **** *  None
+ 227:Generated_Source\PSoC5/Mantmr.c **** *
+ 228:Generated_Source\PSoC5/Mantmr.c **** * Side Effects:
+ 229:Generated_Source\PSoC5/Mantmr.c **** *  If the Enable mode is set to Hardware only then this function
+ 230:Generated_Source\PSoC5/Mantmr.c **** *  has no effect on the operation of the PWM
+ 231:Generated_Source\PSoC5/Mantmr.c **** *
+ 232:Generated_Source\PSoC5/Mantmr.c **** *******************************************************************************/
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 6
+
+
+ 233:Generated_Source\PSoC5/Mantmr.c **** void Mantmr_Stop(void) 
+ 234:Generated_Source\PSoC5/Mantmr.c **** {
+  54              		.loc 1 234 0
+  55              		.cfi_startproc
+  56              		@ args = 0, pretend = 0, frame = 0
+  57              		@ frame_needed = 0, uses_anonymous_args = 0
+  58              		@ link register save eliminated.
+ 235:Generated_Source\PSoC5/Mantmr.c ****     #if (Mantmr_UseControl || Mantmr_UsingFixedFunction)
+ 236:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_CONTROL &= ((uint8)(~Mantmr_CTRL_ENABLE));
+  59              		.loc 1 236 0
+  60 0000 024A     		ldr	r2, .L5
+  61 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  62 0004 03F07F03 		and	r3, r3, #127
+  63 0008 1370     		strb	r3, [r2]
+  64 000a 7047     		bx	lr
+  65              	.L6:
+  66              		.align	2
+  67              	.L5:
+  68 000c 78640040 		.word	1073767544
+  69              		.cfi_endproc
+  70              	.LFE3:
+  71              		.size	Mantmr_Stop, .-Mantmr_Stop
+  72              		.section	.text.Mantmr_WriteCounter,"ax",%progbits
+  73              		.align	1
+  74              		.global	Mantmr_WriteCounter
+  75              		.thumb
+  76              		.thumb_func
+  77              		.type	Mantmr_WriteCounter, %function
+  78              	Mantmr_WriteCounter:
+  79              	.LFB4:
+ 237:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (Mantmr_UseControl || Mantmr_UsingFixedFunction) */
+ 238:Generated_Source\PSoC5/Mantmr.c **** 
+ 239:Generated_Source\PSoC5/Mantmr.c ****     /* Globally disable the Fixed Function Block chosen */
+ 240:Generated_Source\PSoC5/Mantmr.c ****     #if (Mantmr_UsingFixedFunction)
+ 241:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_GLOBAL_ENABLE &= ((uint8)(~Mantmr_BLOCK_EN_MASK));
+ 242:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_GLOBAL_STBY_ENABLE &= ((uint8)(~Mantmr_BLOCK_STBY_EN_MASK));
+ 243:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (Mantmr_UsingFixedFunction) */
+ 244:Generated_Source\PSoC5/Mantmr.c **** }
+ 245:Generated_Source\PSoC5/Mantmr.c **** 
+ 246:Generated_Source\PSoC5/Mantmr.c **** #if (Mantmr_UseOneCompareMode)
+ 247:Generated_Source\PSoC5/Mantmr.c ****     #if (Mantmr_CompareMode1SW)
+ 248:Generated_Source\PSoC5/Mantmr.c **** 
+ 249:Generated_Source\PSoC5/Mantmr.c **** 
+ 250:Generated_Source\PSoC5/Mantmr.c ****         /*******************************************************************************
+ 251:Generated_Source\PSoC5/Mantmr.c ****         * Function Name: Mantmr_SetCompareMode
+ 252:Generated_Source\PSoC5/Mantmr.c ****         ********************************************************************************
+ 253:Generated_Source\PSoC5/Mantmr.c ****         *
+ 254:Generated_Source\PSoC5/Mantmr.c ****         * Summary:
+ 255:Generated_Source\PSoC5/Mantmr.c ****         *  This function writes the Compare Mode for the pwm output when in Dither mode,
+ 256:Generated_Source\PSoC5/Mantmr.c ****         *  Center Align Mode or One Output Mode.
+ 257:Generated_Source\PSoC5/Mantmr.c ****         *
+ 258:Generated_Source\PSoC5/Mantmr.c ****         * Parameters:
+ 259:Generated_Source\PSoC5/Mantmr.c ****         *  comparemode:  The new compare mode for the PWM output. Use the compare types
+ 260:Generated_Source\PSoC5/Mantmr.c ****         *                defined in the H file as input arguments.
+ 261:Generated_Source\PSoC5/Mantmr.c ****         *
+ 262:Generated_Source\PSoC5/Mantmr.c ****         * Return:
+ 263:Generated_Source\PSoC5/Mantmr.c ****         *  None
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 7
+
+
+ 264:Generated_Source\PSoC5/Mantmr.c ****         *
+ 265:Generated_Source\PSoC5/Mantmr.c ****         *******************************************************************************/
+ 266:Generated_Source\PSoC5/Mantmr.c ****         void Mantmr_SetCompareMode(uint8 comparemode) 
+ 267:Generated_Source\PSoC5/Mantmr.c ****         {
+ 268:Generated_Source\PSoC5/Mantmr.c ****             #if(Mantmr_UsingFixedFunction)
+ 269:Generated_Source\PSoC5/Mantmr.c **** 
+ 270:Generated_Source\PSoC5/Mantmr.c ****                 #if(0 != Mantmr_CTRL_CMPMODE1_SHIFT)
+ 271:Generated_Source\PSoC5/Mantmr.c ****                     uint8 comparemodemasked = ((uint8)((uint8)comparemode << Mantmr_CTRL_CMPMODE1_S
+ 272:Generated_Source\PSoC5/Mantmr.c ****                 #else
+ 273:Generated_Source\PSoC5/Mantmr.c ****                     uint8 comparemodemasked = comparemode;
+ 274:Generated_Source\PSoC5/Mantmr.c ****                 #endif /* (0 != Mantmr_CTRL_CMPMODE1_SHIFT) */
+ 275:Generated_Source\PSoC5/Mantmr.c **** 
+ 276:Generated_Source\PSoC5/Mantmr.c ****                 Mantmr_CONTROL3 &= ((uint8)(~Mantmr_CTRL_CMPMODE1_MASK)); /*Clear Existing Data */
+ 277:Generated_Source\PSoC5/Mantmr.c ****                 Mantmr_CONTROL3 |= comparemodemasked;
+ 278:Generated_Source\PSoC5/Mantmr.c **** 
+ 279:Generated_Source\PSoC5/Mantmr.c ****             #elif (Mantmr_UseControl)
+ 280:Generated_Source\PSoC5/Mantmr.c **** 
+ 281:Generated_Source\PSoC5/Mantmr.c ****                 #if(0 != Mantmr_CTRL_CMPMODE1_SHIFT)
+ 282:Generated_Source\PSoC5/Mantmr.c ****                     uint8 comparemode1masked = ((uint8)((uint8)comparemode << Mantmr_CTRL_CMPMODE1_
+ 283:Generated_Source\PSoC5/Mantmr.c ****                                                 Mantmr_CTRL_CMPMODE1_MASK;
+ 284:Generated_Source\PSoC5/Mantmr.c ****                 #else
+ 285:Generated_Source\PSoC5/Mantmr.c ****                     uint8 comparemode1masked = comparemode & Mantmr_CTRL_CMPMODE1_MASK;
+ 286:Generated_Source\PSoC5/Mantmr.c ****                 #endif /* (0 != Mantmr_CTRL_CMPMODE1_SHIFT) */
+ 287:Generated_Source\PSoC5/Mantmr.c **** 
+ 288:Generated_Source\PSoC5/Mantmr.c ****                 #if(0 != Mantmr_CTRL_CMPMODE2_SHIFT)
+ 289:Generated_Source\PSoC5/Mantmr.c ****                     uint8 comparemode2masked = ((uint8)((uint8)comparemode << Mantmr_CTRL_CMPMODE2_
+ 290:Generated_Source\PSoC5/Mantmr.c ****                                                Mantmr_CTRL_CMPMODE2_MASK;
+ 291:Generated_Source\PSoC5/Mantmr.c ****                 #else
+ 292:Generated_Source\PSoC5/Mantmr.c ****                     uint8 comparemode2masked = comparemode & Mantmr_CTRL_CMPMODE2_MASK;
+ 293:Generated_Source\PSoC5/Mantmr.c ****                 #endif /* (0 != Mantmr_CTRL_CMPMODE2_SHIFT) */
+ 294:Generated_Source\PSoC5/Mantmr.c **** 
+ 295:Generated_Source\PSoC5/Mantmr.c ****                 /*Clear existing mode */
+ 296:Generated_Source\PSoC5/Mantmr.c ****                 Mantmr_CONTROL &= ((uint8)(~(Mantmr_CTRL_CMPMODE1_MASK |
+ 297:Generated_Source\PSoC5/Mantmr.c ****                                             Mantmr_CTRL_CMPMODE2_MASK)));
+ 298:Generated_Source\PSoC5/Mantmr.c ****                 Mantmr_CONTROL |= (comparemode1masked | comparemode2masked);
+ 299:Generated_Source\PSoC5/Mantmr.c **** 
+ 300:Generated_Source\PSoC5/Mantmr.c ****             #else
+ 301:Generated_Source\PSoC5/Mantmr.c ****                 uint8 temp = comparemode;
+ 302:Generated_Source\PSoC5/Mantmr.c ****             #endif /* (Mantmr_UsingFixedFunction) */
+ 303:Generated_Source\PSoC5/Mantmr.c ****         }
+ 304:Generated_Source\PSoC5/Mantmr.c ****     #endif /* Mantmr_CompareMode1SW */
+ 305:Generated_Source\PSoC5/Mantmr.c **** 
+ 306:Generated_Source\PSoC5/Mantmr.c **** #else /* UseOneCompareMode */
+ 307:Generated_Source\PSoC5/Mantmr.c **** 
+ 308:Generated_Source\PSoC5/Mantmr.c ****     #if (Mantmr_CompareMode1SW)
+ 309:Generated_Source\PSoC5/Mantmr.c **** 
+ 310:Generated_Source\PSoC5/Mantmr.c **** 
+ 311:Generated_Source\PSoC5/Mantmr.c ****         /*******************************************************************************
+ 312:Generated_Source\PSoC5/Mantmr.c ****         * Function Name: Mantmr_SetCompareMode1
+ 313:Generated_Source\PSoC5/Mantmr.c ****         ********************************************************************************
+ 314:Generated_Source\PSoC5/Mantmr.c ****         *
+ 315:Generated_Source\PSoC5/Mantmr.c ****         * Summary:
+ 316:Generated_Source\PSoC5/Mantmr.c ****         *  This function writes the Compare Mode for the pwm or pwm1 output
+ 317:Generated_Source\PSoC5/Mantmr.c ****         *
+ 318:Generated_Source\PSoC5/Mantmr.c ****         * Parameters:
+ 319:Generated_Source\PSoC5/Mantmr.c ****         *  comparemode:  The new compare mode for the PWM output. Use the compare types
+ 320:Generated_Source\PSoC5/Mantmr.c ****         *                defined in the H file as input arguments.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 8
+
+
+ 321:Generated_Source\PSoC5/Mantmr.c ****         *
+ 322:Generated_Source\PSoC5/Mantmr.c ****         * Return:
+ 323:Generated_Source\PSoC5/Mantmr.c ****         *  None
+ 324:Generated_Source\PSoC5/Mantmr.c ****         *
+ 325:Generated_Source\PSoC5/Mantmr.c ****         *******************************************************************************/
+ 326:Generated_Source\PSoC5/Mantmr.c ****         void Mantmr_SetCompareMode1(uint8 comparemode) 
+ 327:Generated_Source\PSoC5/Mantmr.c ****         {
+ 328:Generated_Source\PSoC5/Mantmr.c ****             #if(0 != Mantmr_CTRL_CMPMODE1_SHIFT)
+ 329:Generated_Source\PSoC5/Mantmr.c ****                 uint8 comparemodemasked = ((uint8)((uint8)comparemode << Mantmr_CTRL_CMPMODE1_SHIFT
+ 330:Generated_Source\PSoC5/Mantmr.c ****                                            Mantmr_CTRL_CMPMODE1_MASK;
+ 331:Generated_Source\PSoC5/Mantmr.c ****             #else
+ 332:Generated_Source\PSoC5/Mantmr.c ****                 uint8 comparemodemasked = comparemode & Mantmr_CTRL_CMPMODE1_MASK;
+ 333:Generated_Source\PSoC5/Mantmr.c ****             #endif /* (0 != Mantmr_CTRL_CMPMODE1_SHIFT) */
+ 334:Generated_Source\PSoC5/Mantmr.c **** 
+ 335:Generated_Source\PSoC5/Mantmr.c ****             #if (Mantmr_UseControl)
+ 336:Generated_Source\PSoC5/Mantmr.c ****                 Mantmr_CONTROL &= ((uint8)(~Mantmr_CTRL_CMPMODE1_MASK)); /*Clear existing mode */
+ 337:Generated_Source\PSoC5/Mantmr.c ****                 Mantmr_CONTROL |= comparemodemasked;
+ 338:Generated_Source\PSoC5/Mantmr.c ****             #endif /* (Mantmr_UseControl) */
+ 339:Generated_Source\PSoC5/Mantmr.c ****         }
+ 340:Generated_Source\PSoC5/Mantmr.c ****     #endif /* Mantmr_CompareMode1SW */
+ 341:Generated_Source\PSoC5/Mantmr.c **** 
+ 342:Generated_Source\PSoC5/Mantmr.c **** #if (Mantmr_CompareMode2SW)
+ 343:Generated_Source\PSoC5/Mantmr.c **** 
+ 344:Generated_Source\PSoC5/Mantmr.c **** 
+ 345:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 346:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_SetCompareMode2
+ 347:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 348:Generated_Source\PSoC5/Mantmr.c ****     *
+ 349:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 350:Generated_Source\PSoC5/Mantmr.c ****     *  This function writes the Compare Mode for the pwm or pwm2 output
+ 351:Generated_Source\PSoC5/Mantmr.c ****     *
+ 352:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 353:Generated_Source\PSoC5/Mantmr.c ****     *  comparemode:  The new compare mode for the PWM output. Use the compare types
+ 354:Generated_Source\PSoC5/Mantmr.c ****     *                defined in the H file as input arguments.
+ 355:Generated_Source\PSoC5/Mantmr.c ****     *
+ 356:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 357:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 358:Generated_Source\PSoC5/Mantmr.c ****     *
+ 359:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 360:Generated_Source\PSoC5/Mantmr.c ****     void Mantmr_SetCompareMode2(uint8 comparemode) 
+ 361:Generated_Source\PSoC5/Mantmr.c ****     {
+ 362:Generated_Source\PSoC5/Mantmr.c **** 
+ 363:Generated_Source\PSoC5/Mantmr.c ****         #if(0 != Mantmr_CTRL_CMPMODE2_SHIFT)
+ 364:Generated_Source\PSoC5/Mantmr.c ****             uint8 comparemodemasked = ((uint8)((uint8)comparemode << Mantmr_CTRL_CMPMODE2_SHIFT)) &
+ 365:Generated_Source\PSoC5/Mantmr.c ****                                                  Mantmr_CTRL_CMPMODE2_MASK;
+ 366:Generated_Source\PSoC5/Mantmr.c ****         #else
+ 367:Generated_Source\PSoC5/Mantmr.c ****             uint8 comparemodemasked = comparemode & Mantmr_CTRL_CMPMODE2_MASK;
+ 368:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (0 != Mantmr_CTRL_CMPMODE2_SHIFT) */
+ 369:Generated_Source\PSoC5/Mantmr.c **** 
+ 370:Generated_Source\PSoC5/Mantmr.c ****         #if (Mantmr_UseControl)
+ 371:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_CONTROL &= ((uint8)(~Mantmr_CTRL_CMPMODE2_MASK)); /*Clear existing mode */
+ 372:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_CONTROL |= comparemodemasked;
+ 373:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_UseControl) */
+ 374:Generated_Source\PSoC5/Mantmr.c ****     }
+ 375:Generated_Source\PSoC5/Mantmr.c ****     #endif /*Mantmr_CompareMode2SW */
+ 376:Generated_Source\PSoC5/Mantmr.c **** 
+ 377:Generated_Source\PSoC5/Mantmr.c **** #endif /* UseOneCompareMode */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 9
+
+
+ 378:Generated_Source\PSoC5/Mantmr.c **** 
+ 379:Generated_Source\PSoC5/Mantmr.c **** 
+ 380:Generated_Source\PSoC5/Mantmr.c **** #if (!Mantmr_UsingFixedFunction)
+ 381:Generated_Source\PSoC5/Mantmr.c **** 
+ 382:Generated_Source\PSoC5/Mantmr.c **** 
+ 383:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 384:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_WriteCounter
+ 385:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 386:Generated_Source\PSoC5/Mantmr.c ****     *
+ 387:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 388:Generated_Source\PSoC5/Mantmr.c ****     *  Writes a new counter value directly to the counter register. This will be
+ 389:Generated_Source\PSoC5/Mantmr.c ****     *  implemented for that currently running period and only that period. This API
+ 390:Generated_Source\PSoC5/Mantmr.c ****     *  is valid only for UDB implementation and not available for fixed function
+ 391:Generated_Source\PSoC5/Mantmr.c ****     *  PWM implementation.
+ 392:Generated_Source\PSoC5/Mantmr.c ****     *
+ 393:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 394:Generated_Source\PSoC5/Mantmr.c ****     *  counter:  The period new period counter value.
+ 395:Generated_Source\PSoC5/Mantmr.c ****     *
+ 396:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 397:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 398:Generated_Source\PSoC5/Mantmr.c ****     *
+ 399:Generated_Source\PSoC5/Mantmr.c ****     * Side Effects:
+ 400:Generated_Source\PSoC5/Mantmr.c ****     *  The PWM Period will be reloaded when a counter value will be a zero
+ 401:Generated_Source\PSoC5/Mantmr.c ****     *
+ 402:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 403:Generated_Source\PSoC5/Mantmr.c ****     void Mantmr_WriteCounter(uint8 counter) \
+ 404:Generated_Source\PSoC5/Mantmr.c ****                                        
+ 405:Generated_Source\PSoC5/Mantmr.c ****     {
+  80              		.loc 1 405 0
+  81              		.cfi_startproc
+  82              		@ args = 0, pretend = 0, frame = 0
+  83              		@ frame_needed = 0, uses_anonymous_args = 0
+  84              		@ link register save eliminated.
+  85              	.LVL0:
+ 406:Generated_Source\PSoC5/Mantmr.c ****         CY_SET_REG8(Mantmr_COUNTER_LSB_PTR, counter);
+  86              		.loc 1 406 0
+  87 0000 014B     		ldr	r3, .L8
+  88 0002 1870     		strb	r0, [r3]
+  89 0004 7047     		bx	lr
+  90              	.L9:
+  91 0006 00BF     		.align	2
+  92              	.L8:
+  93 0008 08640040 		.word	1073767432
+  94              		.cfi_endproc
+  95              	.LFE4:
+  96              		.size	Mantmr_WriteCounter, .-Mantmr_WriteCounter
+  97              		.section	.text.Mantmr_ReadCounter,"ax",%progbits
+  98              		.align	1
+  99              		.global	Mantmr_ReadCounter
+ 100              		.thumb
+ 101              		.thumb_func
+ 102              		.type	Mantmr_ReadCounter, %function
+ 103              	Mantmr_ReadCounter:
+ 104              	.LFB5:
+ 407:Generated_Source\PSoC5/Mantmr.c ****     }
+ 408:Generated_Source\PSoC5/Mantmr.c **** 
+ 409:Generated_Source\PSoC5/Mantmr.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 10
+
+
+ 410:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 411:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_ReadCounter
+ 412:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 413:Generated_Source\PSoC5/Mantmr.c ****     *
+ 414:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 415:Generated_Source\PSoC5/Mantmr.c ****     *  This function returns the current value of the counter.  It doesn't matter
+ 416:Generated_Source\PSoC5/Mantmr.c ****     *  if the counter is enabled or running.
+ 417:Generated_Source\PSoC5/Mantmr.c ****     *
+ 418:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 419:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 420:Generated_Source\PSoC5/Mantmr.c ****     *
+ 421:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 422:Generated_Source\PSoC5/Mantmr.c ****     *  The current value of the counter.
+ 423:Generated_Source\PSoC5/Mantmr.c ****     *
+ 424:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 425:Generated_Source\PSoC5/Mantmr.c ****     uint8 Mantmr_ReadCounter(void) 
+ 426:Generated_Source\PSoC5/Mantmr.c ****     {
+ 105              		.loc 1 426 0
+ 106              		.cfi_startproc
+ 107              		@ args = 0, pretend = 0, frame = 0
+ 108              		@ frame_needed = 0, uses_anonymous_args = 0
+ 109              		@ link register save eliminated.
+ 427:Generated_Source\PSoC5/Mantmr.c ****         /* Force capture by reading Accumulator */
+ 428:Generated_Source\PSoC5/Mantmr.c ****         /* Must first do a software capture to be able to read the counter */
+ 429:Generated_Source\PSoC5/Mantmr.c ****         /* It is up to the user code to make sure there isn't already captured data in the FIFO */
+ 430:Generated_Source\PSoC5/Mantmr.c ****           (void)CY_GET_REG8(Mantmr_COUNTERCAP_LSB_PTR_8BIT);
+ 110              		.loc 1 430 0
+ 111 0000 024B     		ldr	r3, .L11
+ 112 0002 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 431:Generated_Source\PSoC5/Mantmr.c **** 
+ 432:Generated_Source\PSoC5/Mantmr.c ****         /* Read the data from the FIFO */
+ 433:Generated_Source\PSoC5/Mantmr.c ****         return (CY_GET_REG8(Mantmr_CAPTURE_LSB_PTR));
+ 113              		.loc 1 433 0
+ 114 0004 024B     		ldr	r3, .L11+4
+ 115 0006 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 434:Generated_Source\PSoC5/Mantmr.c ****     }
+ 116              		.loc 1 434 0
+ 117 0008 7047     		bx	lr
+ 118              	.L12:
+ 119 000a 00BF     		.align	2
+ 120              	.L11:
+ 121 000c 18640040 		.word	1073767448
+ 122 0010 58640040 		.word	1073767512
+ 123              		.cfi_endproc
+ 124              	.LFE5:
+ 125              		.size	Mantmr_ReadCounter, .-Mantmr_ReadCounter
+ 126              		.section	.text.Mantmr_ClearFIFO,"ax",%progbits
+ 127              		.align	1
+ 128              		.global	Mantmr_ClearFIFO
+ 129              		.thumb
+ 130              		.thumb_func
+ 131              		.type	Mantmr_ClearFIFO, %function
+ 132              	Mantmr_ClearFIFO:
+ 133              	.LFB6:
+ 435:Generated_Source\PSoC5/Mantmr.c **** 
+ 436:Generated_Source\PSoC5/Mantmr.c ****     #if (Mantmr_UseStatus)
+ 437:Generated_Source\PSoC5/Mantmr.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 11
+
+
+ 438:Generated_Source\PSoC5/Mantmr.c **** 
+ 439:Generated_Source\PSoC5/Mantmr.c ****         /*******************************************************************************
+ 440:Generated_Source\PSoC5/Mantmr.c ****         * Function Name: Mantmr_ClearFIFO
+ 441:Generated_Source\PSoC5/Mantmr.c ****         ********************************************************************************
+ 442:Generated_Source\PSoC5/Mantmr.c ****         *
+ 443:Generated_Source\PSoC5/Mantmr.c ****         * Summary:
+ 444:Generated_Source\PSoC5/Mantmr.c ****         *  This function clears all capture data from the capture FIFO
+ 445:Generated_Source\PSoC5/Mantmr.c ****         *
+ 446:Generated_Source\PSoC5/Mantmr.c ****         * Parameters:
+ 447:Generated_Source\PSoC5/Mantmr.c ****         *  None
+ 448:Generated_Source\PSoC5/Mantmr.c ****         *
+ 449:Generated_Source\PSoC5/Mantmr.c ****         * Return:
+ 450:Generated_Source\PSoC5/Mantmr.c ****         *  None
+ 451:Generated_Source\PSoC5/Mantmr.c ****         *
+ 452:Generated_Source\PSoC5/Mantmr.c ****         *******************************************************************************/
+ 453:Generated_Source\PSoC5/Mantmr.c ****         void Mantmr_ClearFIFO(void) 
+ 454:Generated_Source\PSoC5/Mantmr.c ****         {
+ 134              		.loc 1 454 0
+ 135              		.cfi_startproc
+ 136              		@ args = 0, pretend = 0, frame = 0
+ 137              		@ frame_needed = 0, uses_anonymous_args = 0
+ 138              		@ link register save eliminated.
+ 139              	.LBB14:
+ 140              	.LBB15:
+ 455:Generated_Source\PSoC5/Mantmr.c ****             while(0u != (Mantmr_ReadStatusRegister() & Mantmr_STATUS_FIFONEMPTY))
+ 456:Generated_Source\PSoC5/Mantmr.c ****             {
+ 457:Generated_Source\PSoC5/Mantmr.c ****                 (void)Mantmr_ReadCapture();
+ 458:Generated_Source\PSoC5/Mantmr.c ****             }
+ 459:Generated_Source\PSoC5/Mantmr.c ****         }
+ 460:Generated_Source\PSoC5/Mantmr.c **** 
+ 461:Generated_Source\PSoC5/Mantmr.c ****     #endif /* Mantmr_UseStatus */
+ 462:Generated_Source\PSoC5/Mantmr.c **** 
+ 463:Generated_Source\PSoC5/Mantmr.c **** #endif /* !Mantmr_UsingFixedFunction */
+ 464:Generated_Source\PSoC5/Mantmr.c **** 
+ 465:Generated_Source\PSoC5/Mantmr.c **** 
+ 466:Generated_Source\PSoC5/Mantmr.c **** /*******************************************************************************
+ 467:Generated_Source\PSoC5/Mantmr.c **** * Function Name: Mantmr_WritePeriod
+ 468:Generated_Source\PSoC5/Mantmr.c **** ********************************************************************************
+ 469:Generated_Source\PSoC5/Mantmr.c **** *
+ 470:Generated_Source\PSoC5/Mantmr.c **** * Summary:
+ 471:Generated_Source\PSoC5/Mantmr.c **** *  This function is used to change the period of the counter.  The new period
+ 472:Generated_Source\PSoC5/Mantmr.c **** *  will be loaded the next time terminal count is detected.
+ 473:Generated_Source\PSoC5/Mantmr.c **** *
+ 474:Generated_Source\PSoC5/Mantmr.c **** * Parameters:
+ 475:Generated_Source\PSoC5/Mantmr.c **** *  period:  Period value. May be between 1 and (2^Resolution)-1.  A value of 0
+ 476:Generated_Source\PSoC5/Mantmr.c **** *           will result in the counter remaining at zero.
+ 477:Generated_Source\PSoC5/Mantmr.c **** *
+ 478:Generated_Source\PSoC5/Mantmr.c **** * Return:
+ 479:Generated_Source\PSoC5/Mantmr.c **** *  None
+ 480:Generated_Source\PSoC5/Mantmr.c **** *
+ 481:Generated_Source\PSoC5/Mantmr.c **** *******************************************************************************/
+ 482:Generated_Source\PSoC5/Mantmr.c **** void Mantmr_WritePeriod(uint8 period) 
+ 483:Generated_Source\PSoC5/Mantmr.c **** {
+ 484:Generated_Source\PSoC5/Mantmr.c ****     #if(Mantmr_UsingFixedFunction)
+ 485:Generated_Source\PSoC5/Mantmr.c ****         CY_SET_REG16(Mantmr_PERIOD_LSB_PTR, (uint16)period);
+ 486:Generated_Source\PSoC5/Mantmr.c ****     #else
+ 487:Generated_Source\PSoC5/Mantmr.c ****         CY_SET_REG8(Mantmr_PERIOD_LSB_PTR, period);
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 12
+
+
+ 488:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (Mantmr_UsingFixedFunction) */
+ 489:Generated_Source\PSoC5/Mantmr.c **** }
+ 490:Generated_Source\PSoC5/Mantmr.c **** 
+ 491:Generated_Source\PSoC5/Mantmr.c **** #if (Mantmr_UseOneCompareMode)
+ 492:Generated_Source\PSoC5/Mantmr.c **** 
+ 493:Generated_Source\PSoC5/Mantmr.c **** 
+ 494:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 495:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_WriteCompare
+ 496:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 497:Generated_Source\PSoC5/Mantmr.c ****     *
+ 498:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 499:Generated_Source\PSoC5/Mantmr.c ****     *  This funtion is used to change the compare1 value when the PWM is in Dither
+ 500:Generated_Source\PSoC5/Mantmr.c ****     *  mode. The compare output will reflect the new value on the next UDB clock.
+ 501:Generated_Source\PSoC5/Mantmr.c ****     *  The compare output will be driven high when the present counter value is
+ 502:Generated_Source\PSoC5/Mantmr.c ****     *  compared to the compare value based on the compare mode defined in
+ 503:Generated_Source\PSoC5/Mantmr.c ****     *  Dither Mode.
+ 504:Generated_Source\PSoC5/Mantmr.c ****     *
+ 505:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 506:Generated_Source\PSoC5/Mantmr.c ****     *  compare:  New compare value.
+ 507:Generated_Source\PSoC5/Mantmr.c ****     *
+ 508:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 509:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 510:Generated_Source\PSoC5/Mantmr.c ****     *
+ 511:Generated_Source\PSoC5/Mantmr.c ****     * Side Effects:
+ 512:Generated_Source\PSoC5/Mantmr.c ****     *  This function is only available if the PWM mode parameter is set to
+ 513:Generated_Source\PSoC5/Mantmr.c ****     *  Dither Mode, Center Aligned Mode or One Output Mode
+ 514:Generated_Source\PSoC5/Mantmr.c ****     *
+ 515:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 516:Generated_Source\PSoC5/Mantmr.c ****     void Mantmr_WriteCompare(uint8 compare) \
+ 517:Generated_Source\PSoC5/Mantmr.c ****                                        
+ 518:Generated_Source\PSoC5/Mantmr.c ****     {
+ 519:Generated_Source\PSoC5/Mantmr.c ****         #if(Mantmr_UsingFixedFunction)
+ 520:Generated_Source\PSoC5/Mantmr.c ****             CY_SET_REG16(Mantmr_COMPARE1_LSB_PTR, (uint16)compare);
+ 521:Generated_Source\PSoC5/Mantmr.c ****         #else
+ 522:Generated_Source\PSoC5/Mantmr.c ****             CY_SET_REG8(Mantmr_COMPARE1_LSB_PTR, compare);
+ 523:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_UsingFixedFunction) */
+ 524:Generated_Source\PSoC5/Mantmr.c **** 
+ 525:Generated_Source\PSoC5/Mantmr.c ****         #if (Mantmr_PWMMode == Mantmr__B_PWM__DITHER)
+ 526:Generated_Source\PSoC5/Mantmr.c ****             #if(Mantmr_UsingFixedFunction)
+ 527:Generated_Source\PSoC5/Mantmr.c ****                 CY_SET_REG16(Mantmr_COMPARE2_LSB_PTR, (uint16)(compare + 1u));
+ 528:Generated_Source\PSoC5/Mantmr.c ****             #else
+ 529:Generated_Source\PSoC5/Mantmr.c ****                 CY_SET_REG8(Mantmr_COMPARE2_LSB_PTR, (compare + 1u));
+ 530:Generated_Source\PSoC5/Mantmr.c ****             #endif /* (Mantmr_UsingFixedFunction) */
+ 531:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_PWMMode == Mantmr__B_PWM__DITHER) */
+ 532:Generated_Source\PSoC5/Mantmr.c ****     }
+ 533:Generated_Source\PSoC5/Mantmr.c **** 
+ 534:Generated_Source\PSoC5/Mantmr.c **** 
+ 535:Generated_Source\PSoC5/Mantmr.c **** #else
+ 536:Generated_Source\PSoC5/Mantmr.c **** 
+ 537:Generated_Source\PSoC5/Mantmr.c **** 
+ 538:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 539:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_WriteCompare1
+ 540:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 541:Generated_Source\PSoC5/Mantmr.c ****     *
+ 542:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 543:Generated_Source\PSoC5/Mantmr.c ****     *  This funtion is used to change the compare1 value.  The compare output will
+ 544:Generated_Source\PSoC5/Mantmr.c ****     *  reflect the new value on the next UDB clock.  The compare output will be
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 13
+
+
+ 545:Generated_Source\PSoC5/Mantmr.c ****     *  driven high when the present counter value is less than or less than or
+ 546:Generated_Source\PSoC5/Mantmr.c ****     *  equal to the compare register, depending on the mode.
+ 547:Generated_Source\PSoC5/Mantmr.c ****     *
+ 548:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 549:Generated_Source\PSoC5/Mantmr.c ****     *  compare:  New compare value.
+ 550:Generated_Source\PSoC5/Mantmr.c ****     *
+ 551:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 552:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 553:Generated_Source\PSoC5/Mantmr.c ****     *
+ 554:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 555:Generated_Source\PSoC5/Mantmr.c ****     void Mantmr_WriteCompare1(uint8 compare) \
+ 556:Generated_Source\PSoC5/Mantmr.c ****                                         
+ 557:Generated_Source\PSoC5/Mantmr.c ****     {
+ 558:Generated_Source\PSoC5/Mantmr.c ****         #if(Mantmr_UsingFixedFunction)
+ 559:Generated_Source\PSoC5/Mantmr.c ****             CY_SET_REG16(Mantmr_COMPARE1_LSB_PTR, (uint16)compare);
+ 560:Generated_Source\PSoC5/Mantmr.c ****         #else
+ 561:Generated_Source\PSoC5/Mantmr.c ****             CY_SET_REG8(Mantmr_COMPARE1_LSB_PTR, compare);
+ 562:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_UsingFixedFunction) */
+ 563:Generated_Source\PSoC5/Mantmr.c ****     }
+ 564:Generated_Source\PSoC5/Mantmr.c **** 
+ 565:Generated_Source\PSoC5/Mantmr.c **** 
+ 566:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 567:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_WriteCompare2
+ 568:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 569:Generated_Source\PSoC5/Mantmr.c ****     *
+ 570:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 571:Generated_Source\PSoC5/Mantmr.c ****     *  This funtion is used to change the compare value, for compare1 output.
+ 572:Generated_Source\PSoC5/Mantmr.c ****     *  The compare output will reflect the new value on the next UDB clock.
+ 573:Generated_Source\PSoC5/Mantmr.c ****     *  The compare output will be driven high when the present counter value is
+ 574:Generated_Source\PSoC5/Mantmr.c ****     *  less than or less than or equal to the compare register, depending on the
+ 575:Generated_Source\PSoC5/Mantmr.c ****     *  mode.
+ 576:Generated_Source\PSoC5/Mantmr.c ****     *
+ 577:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 578:Generated_Source\PSoC5/Mantmr.c ****     *  compare:  New compare value.
+ 579:Generated_Source\PSoC5/Mantmr.c ****     *
+ 580:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 581:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 582:Generated_Source\PSoC5/Mantmr.c ****     *
+ 583:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 584:Generated_Source\PSoC5/Mantmr.c ****     void Mantmr_WriteCompare2(uint8 compare) \
+ 585:Generated_Source\PSoC5/Mantmr.c ****                                         
+ 586:Generated_Source\PSoC5/Mantmr.c ****     {
+ 587:Generated_Source\PSoC5/Mantmr.c ****         #if(Mantmr_UsingFixedFunction)
+ 588:Generated_Source\PSoC5/Mantmr.c ****             CY_SET_REG16(Mantmr_COMPARE2_LSB_PTR, compare);
+ 589:Generated_Source\PSoC5/Mantmr.c ****         #else
+ 590:Generated_Source\PSoC5/Mantmr.c ****             CY_SET_REG8(Mantmr_COMPARE2_LSB_PTR, compare);
+ 591:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_UsingFixedFunction) */
+ 592:Generated_Source\PSoC5/Mantmr.c ****     }
+ 593:Generated_Source\PSoC5/Mantmr.c **** #endif /* UseOneCompareMode */
+ 594:Generated_Source\PSoC5/Mantmr.c **** 
+ 595:Generated_Source\PSoC5/Mantmr.c **** #if (Mantmr_DeadBandUsed)
+ 596:Generated_Source\PSoC5/Mantmr.c **** 
+ 597:Generated_Source\PSoC5/Mantmr.c **** 
+ 598:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 599:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_WriteDeadTime
+ 600:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 601:Generated_Source\PSoC5/Mantmr.c ****     *
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 14
+
+
+ 602:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 603:Generated_Source\PSoC5/Mantmr.c ****     *  This function writes the dead-band counts to the corresponding register
+ 604:Generated_Source\PSoC5/Mantmr.c ****     *
+ 605:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 606:Generated_Source\PSoC5/Mantmr.c ****     *  deadtime:  Number of counts for dead time
+ 607:Generated_Source\PSoC5/Mantmr.c ****     *
+ 608:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 609:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 610:Generated_Source\PSoC5/Mantmr.c ****     *
+ 611:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 612:Generated_Source\PSoC5/Mantmr.c ****     void Mantmr_WriteDeadTime(uint8 deadtime) 
+ 613:Generated_Source\PSoC5/Mantmr.c ****     {
+ 614:Generated_Source\PSoC5/Mantmr.c ****         /* If using the Dead Band 1-255 mode then just write the register */
+ 615:Generated_Source\PSoC5/Mantmr.c ****         #if(!Mantmr_DeadBand2_4)
+ 616:Generated_Source\PSoC5/Mantmr.c ****             CY_SET_REG8(Mantmr_DEADBAND_COUNT_PTR, deadtime);
+ 617:Generated_Source\PSoC5/Mantmr.c ****         #else
+ 618:Generated_Source\PSoC5/Mantmr.c ****             /* Otherwise the data has to be masked and offset */
+ 619:Generated_Source\PSoC5/Mantmr.c ****             /* Clear existing data */
+ 620:Generated_Source\PSoC5/Mantmr.c ****             Mantmr_DEADBAND_COUNT &= ((uint8)(~Mantmr_DEADBAND_COUNT_MASK));
+ 621:Generated_Source\PSoC5/Mantmr.c **** 
+ 622:Generated_Source\PSoC5/Mantmr.c ****             /* Set new dead time */
+ 623:Generated_Source\PSoC5/Mantmr.c ****             #if(Mantmr_DEADBAND_COUNT_SHIFT)
+ 624:Generated_Source\PSoC5/Mantmr.c ****                 Mantmr_DEADBAND_COUNT |= ((uint8)((uint8)deadtime << Mantmr_DEADBAND_COUNT_SHIFT)) 
+ 625:Generated_Source\PSoC5/Mantmr.c ****                                                     Mantmr_DEADBAND_COUNT_MASK;
+ 626:Generated_Source\PSoC5/Mantmr.c ****             #else
+ 627:Generated_Source\PSoC5/Mantmr.c ****                 Mantmr_DEADBAND_COUNT |= deadtime & Mantmr_DEADBAND_COUNT_MASK;
+ 628:Generated_Source\PSoC5/Mantmr.c ****             #endif /* (Mantmr_DEADBAND_COUNT_SHIFT) */
+ 629:Generated_Source\PSoC5/Mantmr.c **** 
+ 630:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (!Mantmr_DeadBand2_4) */
+ 631:Generated_Source\PSoC5/Mantmr.c ****     }
+ 632:Generated_Source\PSoC5/Mantmr.c **** 
+ 633:Generated_Source\PSoC5/Mantmr.c **** 
+ 634:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 635:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_ReadDeadTime
+ 636:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 637:Generated_Source\PSoC5/Mantmr.c ****     *
+ 638:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 639:Generated_Source\PSoC5/Mantmr.c ****     *  This function reads the dead-band counts from the corresponding register
+ 640:Generated_Source\PSoC5/Mantmr.c ****     *
+ 641:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 642:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 643:Generated_Source\PSoC5/Mantmr.c ****     *
+ 644:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 645:Generated_Source\PSoC5/Mantmr.c ****     *  Dead Band Counts
+ 646:Generated_Source\PSoC5/Mantmr.c ****     *
+ 647:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 648:Generated_Source\PSoC5/Mantmr.c ****     uint8 Mantmr_ReadDeadTime(void) 
+ 649:Generated_Source\PSoC5/Mantmr.c ****     {
+ 650:Generated_Source\PSoC5/Mantmr.c ****         /* If using the Dead Band 1-255 mode then just read the register */
+ 651:Generated_Source\PSoC5/Mantmr.c ****         #if(!Mantmr_DeadBand2_4)
+ 652:Generated_Source\PSoC5/Mantmr.c ****             return (CY_GET_REG8(Mantmr_DEADBAND_COUNT_PTR));
+ 653:Generated_Source\PSoC5/Mantmr.c ****         #else
+ 654:Generated_Source\PSoC5/Mantmr.c **** 
+ 655:Generated_Source\PSoC5/Mantmr.c ****             /* Otherwise the data has to be masked and offset */
+ 656:Generated_Source\PSoC5/Mantmr.c ****             #if(Mantmr_DEADBAND_COUNT_SHIFT)
+ 657:Generated_Source\PSoC5/Mantmr.c ****                 return ((uint8)(((uint8)(Mantmr_DEADBAND_COUNT & Mantmr_DEADBAND_COUNT_MASK)) >>
+ 658:Generated_Source\PSoC5/Mantmr.c ****                                                                            Mantmr_DEADBAND_COUNT_SH
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 15
+
+
+ 659:Generated_Source\PSoC5/Mantmr.c ****             #else
+ 660:Generated_Source\PSoC5/Mantmr.c ****                 return (Mantmr_DEADBAND_COUNT & Mantmr_DEADBAND_COUNT_MASK);
+ 661:Generated_Source\PSoC5/Mantmr.c ****             #endif /* (Mantmr_DEADBAND_COUNT_SHIFT) */
+ 662:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (!Mantmr_DeadBand2_4) */
+ 663:Generated_Source\PSoC5/Mantmr.c ****     }
+ 664:Generated_Source\PSoC5/Mantmr.c **** #endif /* DeadBandUsed */
+ 665:Generated_Source\PSoC5/Mantmr.c **** 
+ 666:Generated_Source\PSoC5/Mantmr.c **** #if (Mantmr_UseStatus || Mantmr_UsingFixedFunction)
+ 667:Generated_Source\PSoC5/Mantmr.c **** 
+ 668:Generated_Source\PSoC5/Mantmr.c **** 
+ 669:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 670:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_SetInterruptMode
+ 671:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 672:Generated_Source\PSoC5/Mantmr.c ****     *
+ 673:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 674:Generated_Source\PSoC5/Mantmr.c ****     *  This function configures the interrupts mask control of theinterrupt
+ 675:Generated_Source\PSoC5/Mantmr.c ****     *  source status register.
+ 676:Generated_Source\PSoC5/Mantmr.c ****     *
+ 677:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 678:Generated_Source\PSoC5/Mantmr.c ****     *  uint8 interruptMode: Bit field containing the interrupt sources enabled
+ 679:Generated_Source\PSoC5/Mantmr.c ****     *
+ 680:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 681:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 682:Generated_Source\PSoC5/Mantmr.c ****     *
+ 683:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 684:Generated_Source\PSoC5/Mantmr.c ****     void Mantmr_SetInterruptMode(uint8 interruptMode) 
+ 685:Generated_Source\PSoC5/Mantmr.c ****     {
+ 686:Generated_Source\PSoC5/Mantmr.c ****         CY_SET_REG8(Mantmr_STATUS_MASK_PTR, interruptMode);
+ 687:Generated_Source\PSoC5/Mantmr.c ****     }
+ 688:Generated_Source\PSoC5/Mantmr.c **** 
+ 689:Generated_Source\PSoC5/Mantmr.c **** 
+ 690:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 691:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_ReadStatusRegister
+ 692:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 693:Generated_Source\PSoC5/Mantmr.c ****     *
+ 694:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 695:Generated_Source\PSoC5/Mantmr.c ****     *  This function returns the current state of the status register.
+ 696:Generated_Source\PSoC5/Mantmr.c ****     *
+ 697:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 698:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 699:Generated_Source\PSoC5/Mantmr.c ****     *
+ 700:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 701:Generated_Source\PSoC5/Mantmr.c ****     *  uint8 : Current status register value. The status register bits are:
+ 702:Generated_Source\PSoC5/Mantmr.c ****     *  [7:6] : Unused(0)
+ 703:Generated_Source\PSoC5/Mantmr.c ****     *  [5]   : Kill event output
+ 704:Generated_Source\PSoC5/Mantmr.c ****     *  [4]   : FIFO not empty
+ 705:Generated_Source\PSoC5/Mantmr.c ****     *  [3]   : FIFO full
+ 706:Generated_Source\PSoC5/Mantmr.c ****     *  [2]   : Terminal count
+ 707:Generated_Source\PSoC5/Mantmr.c ****     *  [1]   : Compare output 2
+ 708:Generated_Source\PSoC5/Mantmr.c ****     *  [0]   : Compare output 1
+ 709:Generated_Source\PSoC5/Mantmr.c ****     *
+ 710:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 711:Generated_Source\PSoC5/Mantmr.c ****     uint8 Mantmr_ReadStatusRegister(void) 
+ 712:Generated_Source\PSoC5/Mantmr.c ****     {
+ 713:Generated_Source\PSoC5/Mantmr.c ****         return (CY_GET_REG8(Mantmr_STATUS_PTR));
+ 141              		.loc 1 713 0
+ 142 0000 034A     		ldr	r2, .L18
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 16
+
+
+ 143              	.LBE15:
+ 144              	.LBE14:
+ 145              	.LBB17:
+ 146              	.LBB18:
+ 714:Generated_Source\PSoC5/Mantmr.c ****     }
+ 715:Generated_Source\PSoC5/Mantmr.c **** 
+ 716:Generated_Source\PSoC5/Mantmr.c **** #endif /* (Mantmr_UseStatus || Mantmr_UsingFixedFunction) */
+ 717:Generated_Source\PSoC5/Mantmr.c **** 
+ 718:Generated_Source\PSoC5/Mantmr.c **** 
+ 719:Generated_Source\PSoC5/Mantmr.c **** #if (Mantmr_UseControl)
+ 720:Generated_Source\PSoC5/Mantmr.c **** 
+ 721:Generated_Source\PSoC5/Mantmr.c **** 
+ 722:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 723:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_ReadControlRegister
+ 724:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 725:Generated_Source\PSoC5/Mantmr.c ****     *
+ 726:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 727:Generated_Source\PSoC5/Mantmr.c ****     *  Returns the current state of the control register. This API is available
+ 728:Generated_Source\PSoC5/Mantmr.c ****     *  only if the control register is not removed.
+ 729:Generated_Source\PSoC5/Mantmr.c ****     *
+ 730:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 731:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 732:Generated_Source\PSoC5/Mantmr.c ****     *
+ 733:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 734:Generated_Source\PSoC5/Mantmr.c ****     *  uint8 : Current control register value
+ 735:Generated_Source\PSoC5/Mantmr.c ****     *
+ 736:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 737:Generated_Source\PSoC5/Mantmr.c ****     uint8 Mantmr_ReadControlRegister(void) 
+ 738:Generated_Source\PSoC5/Mantmr.c ****     {
+ 739:Generated_Source\PSoC5/Mantmr.c ****         uint8 result;
+ 740:Generated_Source\PSoC5/Mantmr.c **** 
+ 741:Generated_Source\PSoC5/Mantmr.c ****         result = CY_GET_REG8(Mantmr_CONTROL_PTR);
+ 742:Generated_Source\PSoC5/Mantmr.c ****         return (result);
+ 743:Generated_Source\PSoC5/Mantmr.c ****     }
+ 744:Generated_Source\PSoC5/Mantmr.c **** 
+ 745:Generated_Source\PSoC5/Mantmr.c **** 
+ 746:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 747:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_WriteControlRegister
+ 748:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 749:Generated_Source\PSoC5/Mantmr.c ****     *
+ 750:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 751:Generated_Source\PSoC5/Mantmr.c ****     *  Sets the bit field of the control register. This API is available only if
+ 752:Generated_Source\PSoC5/Mantmr.c ****     *  the control register is not removed.
+ 753:Generated_Source\PSoC5/Mantmr.c ****     *
+ 754:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 755:Generated_Source\PSoC5/Mantmr.c ****     *  uint8 control: Control register bit field, The status register bits are:
+ 756:Generated_Source\PSoC5/Mantmr.c ****     *  [7]   : PWM Enable
+ 757:Generated_Source\PSoC5/Mantmr.c ****     *  [6]   : Reset
+ 758:Generated_Source\PSoC5/Mantmr.c ****     *  [5:3] : Compare Mode2
+ 759:Generated_Source\PSoC5/Mantmr.c ****     *  [2:0] : Compare Mode2
+ 760:Generated_Source\PSoC5/Mantmr.c ****     *
+ 761:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 762:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 763:Generated_Source\PSoC5/Mantmr.c ****     *
+ 764:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 765:Generated_Source\PSoC5/Mantmr.c ****     void Mantmr_WriteControlRegister(uint8 control) 
+ 766:Generated_Source\PSoC5/Mantmr.c ****     {
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 17
+
+
+ 767:Generated_Source\PSoC5/Mantmr.c ****         CY_SET_REG8(Mantmr_CONTROL_PTR, control);
+ 768:Generated_Source\PSoC5/Mantmr.c ****     }
+ 769:Generated_Source\PSoC5/Mantmr.c **** 
+ 770:Generated_Source\PSoC5/Mantmr.c **** #endif /* (Mantmr_UseControl) */
+ 771:Generated_Source\PSoC5/Mantmr.c **** 
+ 772:Generated_Source\PSoC5/Mantmr.c **** 
+ 773:Generated_Source\PSoC5/Mantmr.c **** #if (!Mantmr_UsingFixedFunction)
+ 774:Generated_Source\PSoC5/Mantmr.c **** 
+ 775:Generated_Source\PSoC5/Mantmr.c **** 
+ 776:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 777:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_ReadCapture
+ 778:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 779:Generated_Source\PSoC5/Mantmr.c ****     *
+ 780:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 781:Generated_Source\PSoC5/Mantmr.c ****     *  Reads the capture value from the capture FIFO.
+ 782:Generated_Source\PSoC5/Mantmr.c ****     *
+ 783:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 784:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 785:Generated_Source\PSoC5/Mantmr.c ****     *
+ 786:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 787:Generated_Source\PSoC5/Mantmr.c ****     *  uint8/uint16: The current capture value
+ 788:Generated_Source\PSoC5/Mantmr.c ****     *
+ 789:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 790:Generated_Source\PSoC5/Mantmr.c ****     uint8 Mantmr_ReadCapture(void) 
+ 791:Generated_Source\PSoC5/Mantmr.c ****     {
+ 792:Generated_Source\PSoC5/Mantmr.c ****         return (CY_GET_REG8(Mantmr_CAPTURE_LSB_PTR));
+ 147              		.loc 1 792 0
+ 148 0002 0449     		ldr	r1, .L18+4
+ 149              	.L14:
+ 150              	.LBE18:
+ 151              	.LBE17:
+ 152              	.LBB20:
+ 153              	.LBB16:
+ 713:Generated_Source\PSoC5/Mantmr.c ****     }
+ 154              		.loc 1 713 0
+ 155 0004 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 156              	.LBE16:
+ 157              	.LBE20:
+ 455:Generated_Source\PSoC5/Mantmr.c ****             while(0u != (Mantmr_ReadStatusRegister() & Mantmr_STATUS_FIFONEMPTY))
+ 158              		.loc 1 455 0
+ 159 0006 DB06     		lsls	r3, r3, #27
+ 160 0008 01D5     		bpl	.L17
+ 161              	.LBB21:
+ 162              	.LBB19:
+ 163              		.loc 1 792 0
+ 164 000a 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 165 000c FAE7     		b	.L14
+ 166              	.L17:
+ 167              	.LBE19:
+ 168              	.LBE21:
+ 459:Generated_Source\PSoC5/Mantmr.c **** 
+ 169              		.loc 1 459 0
+ 170 000e 7047     		bx	lr
+ 171              	.L19:
+ 172              		.align	2
+ 173              	.L18:
+ 174 0010 68640040 		.word	1073767528
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 18
+
+
+ 175 0014 58640040 		.word	1073767512
+ 176              		.cfi_endproc
+ 177              	.LFE6:
+ 178              		.size	Mantmr_ClearFIFO, .-Mantmr_ClearFIFO
+ 179              		.section	.text.Mantmr_Init,"ax",%progbits
+ 180              		.align	1
+ 181              		.global	Mantmr_Init
+ 182              		.thumb
+ 183              		.thumb_func
+ 184              		.type	Mantmr_Init, %function
+ 185              	Mantmr_Init:
+ 186              	.LFB1:
+  85:Generated_Source\PSoC5/Mantmr.c ****     #if (Mantmr_UsingFixedFunction || Mantmr_UseControl)
+ 187              		.loc 1 85 0
+ 188              		.cfi_startproc
+ 189              		@ args = 0, pretend = 0, frame = 0
+ 190              		@ frame_needed = 0, uses_anonymous_args = 0
+ 191 0000 10B5     		push	{r4, lr}
+ 192              		.cfi_def_cfa_offset 8
+ 193              		.cfi_offset 4, -8
+ 194              		.cfi_offset 14, -4
+ 117:Generated_Source\PSoC5/Mantmr.c ****                 ((uint8)(~Mantmr_CTRL_CMPMODE1_MASK));
+ 195              		.loc 1 117 0
+ 196 0002 104A     		ldr	r2, .L21
+ 126:Generated_Source\PSoC5/Mantmr.c ****         #else /* (Mantmr_Resolution == 16)*/
+ 197              		.loc 1 126 0
+ 198 0004 104C     		ldr	r4, .L21+4
+ 117:Generated_Source\PSoC5/Mantmr.c ****                 ((uint8)(~Mantmr_CTRL_CMPMODE1_MASK));
+ 199              		.loc 1 117 0
+ 200 0006 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 201              	.LVL1:
+ 119:Generated_Source\PSoC5/Mantmr.c ****                                    Mantmr_DEFAULT_COMPARE1_MODE;
+ 202              		.loc 1 119 0
+ 203 0008 03F0C003 		and	r3, r3, #192
+ 204              	.LVL2:
+ 205 000c 43F00803 		orr	r3, r3, #8
+ 206 0010 1370     		strb	r3, [r2]
+ 126:Generated_Source\PSoC5/Mantmr.c ****         #else /* (Mantmr_Resolution == 16)*/
+ 207              		.loc 1 126 0
+ 208 0012 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 209 0014 43F00103 		orr	r3, r3, #1
+ 210 0018 2370     		strb	r3, [r4]
+ 211              	.LVL3:
+ 212              	.LBB22:
+ 213              	.LBB23:
+ 406:Generated_Source\PSoC5/Mantmr.c ****     }
+ 214              		.loc 1 406 0
+ 215 001a 1423     		movs	r3, #20
+ 216 001c 02F8703C 		strb	r3, [r2, #-112]
+ 217              	.LVL4:
+ 218              	.LBE23:
+ 219              	.LBE22:
+ 220              	.LBB24:
+ 221              	.LBB25:
+ 487:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (Mantmr_UsingFixedFunction) */
+ 222              		.loc 1 487 0
+ 223 0020 02F8303C 		strb	r3, [r2, #-48]
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 19
+
+
+ 224              	.LVL5:
+ 225              	.LBE25:
+ 226              	.LBE24:
+ 227              	.LBB26:
+ 228              	.LBB27:
+ 522:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_UsingFixedFunction) */
+ 229              		.loc 1 522 0
+ 230 0024 0023     		movs	r3, #0
+ 231 0026 02F8503C 		strb	r3, [r2, #-80]
+ 232              	.LVL6:
+ 233              	.LBE27:
+ 234              	.LBE26:
+ 235              	.LBB28:
+ 236              	.LBB29:
+ 686:Generated_Source\PSoC5/Mantmr.c ****     }
+ 237              		.loc 1 686 0
+ 238 002a 1374     		strb	r3, [r2, #16]
+ 239              	.LVL7:
+ 240              	.LBE29:
+ 241              	.LBE28:
+ 167:Generated_Source\PSoC5/Mantmr.c ****             /* Use the interrupt output of the status register for IRQ output */
+ 242              		.loc 1 167 0
+ 243 002c FFF7FEFF 		bl	CyEnterCriticalSection
+ 244              	.LVL8:
+ 169:Generated_Source\PSoC5/Mantmr.c **** 
+ 245              		.loc 1 169 0
+ 246 0030 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 247 0032 43F01003 		orr	r3, r3, #16
+ 248 0036 2370     		strb	r3, [r4]
+ 172:Generated_Source\PSoC5/Mantmr.c **** 
+ 249              		.loc 1 172 0
+ 250 0038 FFF7FEFF 		bl	CyExitCriticalSection
+ 251              	.LVL9:
+ 179:Generated_Source\PSoC5/Mantmr.c **** 
+ 252              		.loc 1 179 0
+ 253 003c BDE81040 		pop	{r4, lr}
+ 254              		.cfi_restore 14
+ 255              		.cfi_restore 4
+ 256              		.cfi_def_cfa_offset 0
+ 176:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_UseStatus) */
+ 257              		.loc 1 176 0
+ 258 0040 FFF7FEBF 		b	Mantmr_ClearFIFO
+ 259              	.LVL10:
+ 260              	.L22:
+ 261              		.align	2
+ 262              	.L21:
+ 263 0044 78640040 		.word	1073767544
+ 264 0048 98640040 		.word	1073767576
+ 265              		.cfi_endproc
+ 266              	.LFE1:
+ 267              		.size	Mantmr_Init, .-Mantmr_Init
+ 268              		.section	.text.Mantmr_Start,"ax",%progbits
+ 269              		.align	1
+ 270              		.global	Mantmr_Start
+ 271              		.thumb
+ 272              		.thumb_func
+ 273              		.type	Mantmr_Start, %function
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 20
+
+
+ 274              	Mantmr_Start:
+ 275              	.LFB0:
+  56:Generated_Source\PSoC5/Mantmr.c ****     /* If not Initialized then initialize all required hardware and software */
+ 276              		.loc 1 56 0
+ 277              		.cfi_startproc
+ 278              		@ args = 0, pretend = 0, frame = 0
+ 279              		@ frame_needed = 0, uses_anonymous_args = 0
+ 280 0000 10B5     		push	{r4, lr}
+ 281              		.cfi_def_cfa_offset 8
+ 282              		.cfi_offset 4, -8
+ 283              		.cfi_offset 14, -4
+  58:Generated_Source\PSoC5/Mantmr.c ****     {
+ 284              		.loc 1 58 0
+ 285 0002 054C     		ldr	r4, .L25
+ 286 0004 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 287 0006 1BB9     		cbnz	r3, .L24
+  60:Generated_Source\PSoC5/Mantmr.c ****         Mantmr_initVar = 1u;
+ 288              		.loc 1 60 0
+ 289 0008 FFF7FEFF 		bl	Mantmr_Init
+ 290              	.LVL11:
+  61:Generated_Source\PSoC5/Mantmr.c ****     }
+ 291              		.loc 1 61 0
+ 292 000c 0123     		movs	r3, #1
+ 293 000e 2370     		strb	r3, [r4]
+ 294              	.L24:
+  65:Generated_Source\PSoC5/Mantmr.c **** 
+ 295              		.loc 1 65 0
+ 296 0010 BDE81040 		pop	{r4, lr}
+ 297              		.cfi_restore 14
+ 298              		.cfi_restore 4
+ 299              		.cfi_def_cfa_offset 0
+  63:Generated_Source\PSoC5/Mantmr.c **** 
+ 300              		.loc 1 63 0
+ 301 0014 FFF7FEBF 		b	Mantmr_Enable
+ 302              	.LVL12:
+ 303              	.L26:
+ 304              		.align	2
+ 305              	.L25:
+ 306 0018 00000000 		.word	.LANCHOR0
+ 307              		.cfi_endproc
+ 308              	.LFE0:
+ 309              		.size	Mantmr_Start, .-Mantmr_Start
+ 310              		.section	.text.Mantmr_WritePeriod,"ax",%progbits
+ 311              		.align	1
+ 312              		.global	Mantmr_WritePeriod
+ 313              		.thumb
+ 314              		.thumb_func
+ 315              		.type	Mantmr_WritePeriod, %function
+ 316              	Mantmr_WritePeriod:
+ 317              	.LFB7:
+ 483:Generated_Source\PSoC5/Mantmr.c ****     #if(Mantmr_UsingFixedFunction)
+ 318              		.loc 1 483 0
+ 319              		.cfi_startproc
+ 320              		@ args = 0, pretend = 0, frame = 0
+ 321              		@ frame_needed = 0, uses_anonymous_args = 0
+ 322              		@ link register save eliminated.
+ 323              	.LVL13:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 21
+
+
+ 487:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (Mantmr_UsingFixedFunction) */
+ 324              		.loc 1 487 0
+ 325 0000 014B     		ldr	r3, .L28
+ 326 0002 1870     		strb	r0, [r3]
+ 327 0004 7047     		bx	lr
+ 328              	.L29:
+ 329 0006 00BF     		.align	2
+ 330              	.L28:
+ 331 0008 48640040 		.word	1073767496
+ 332              		.cfi_endproc
+ 333              	.LFE7:
+ 334              		.size	Mantmr_WritePeriod, .-Mantmr_WritePeriod
+ 335              		.section	.text.Mantmr_WriteCompare,"ax",%progbits
+ 336              		.align	1
+ 337              		.global	Mantmr_WriteCompare
+ 338              		.thumb
+ 339              		.thumb_func
+ 340              		.type	Mantmr_WriteCompare, %function
+ 341              	Mantmr_WriteCompare:
+ 342              	.LFB8:
+ 518:Generated_Source\PSoC5/Mantmr.c ****         #if(Mantmr_UsingFixedFunction)
+ 343              		.loc 1 518 0
+ 344              		.cfi_startproc
+ 345              		@ args = 0, pretend = 0, frame = 0
+ 346              		@ frame_needed = 0, uses_anonymous_args = 0
+ 347              		@ link register save eliminated.
+ 348              	.LVL14:
+ 522:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_UsingFixedFunction) */
+ 349              		.loc 1 522 0
+ 350 0000 014B     		ldr	r3, .L31
+ 351 0002 1870     		strb	r0, [r3]
+ 352 0004 7047     		bx	lr
+ 353              	.L32:
+ 354 0006 00BF     		.align	2
+ 355              	.L31:
+ 356 0008 28640040 		.word	1073767464
+ 357              		.cfi_endproc
+ 358              	.LFE8:
+ 359              		.size	Mantmr_WriteCompare, .-Mantmr_WriteCompare
+ 360              		.section	.text.Mantmr_SetInterruptMode,"ax",%progbits
+ 361              		.align	1
+ 362              		.global	Mantmr_SetInterruptMode
+ 363              		.thumb
+ 364              		.thumb_func
+ 365              		.type	Mantmr_SetInterruptMode, %function
+ 366              	Mantmr_SetInterruptMode:
+ 367              	.LFB9:
+ 685:Generated_Source\PSoC5/Mantmr.c ****         CY_SET_REG8(Mantmr_STATUS_MASK_PTR, interruptMode);
+ 368              		.loc 1 685 0
+ 369              		.cfi_startproc
+ 370              		@ args = 0, pretend = 0, frame = 0
+ 371              		@ frame_needed = 0, uses_anonymous_args = 0
+ 372              		@ link register save eliminated.
+ 373              	.LVL15:
+ 686:Generated_Source\PSoC5/Mantmr.c ****     }
+ 374              		.loc 1 686 0
+ 375 0000 014B     		ldr	r3, .L34
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 22
+
+
+ 376 0002 1870     		strb	r0, [r3]
+ 377 0004 7047     		bx	lr
+ 378              	.L35:
+ 379 0006 00BF     		.align	2
+ 380              	.L34:
+ 381 0008 88640040 		.word	1073767560
+ 382              		.cfi_endproc
+ 383              	.LFE9:
+ 384              		.size	Mantmr_SetInterruptMode, .-Mantmr_SetInterruptMode
+ 385              		.section	.text.Mantmr_ReadStatusRegister,"ax",%progbits
+ 386              		.align	1
+ 387              		.global	Mantmr_ReadStatusRegister
+ 388              		.thumb
+ 389              		.thumb_func
+ 390              		.type	Mantmr_ReadStatusRegister, %function
+ 391              	Mantmr_ReadStatusRegister:
+ 392              	.LFB10:
+ 712:Generated_Source\PSoC5/Mantmr.c ****         return (CY_GET_REG8(Mantmr_STATUS_PTR));
+ 393              		.loc 1 712 0
+ 394              		.cfi_startproc
+ 395              		@ args = 0, pretend = 0, frame = 0
+ 396              		@ frame_needed = 0, uses_anonymous_args = 0
+ 397              		@ link register save eliminated.
+ 713:Generated_Source\PSoC5/Mantmr.c ****     }
+ 398              		.loc 1 713 0
+ 399 0000 014B     		ldr	r3, .L37
+ 400 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 714:Generated_Source\PSoC5/Mantmr.c **** 
+ 401              		.loc 1 714 0
+ 402 0004 7047     		bx	lr
+ 403              	.L38:
+ 404 0006 00BF     		.align	2
+ 405              	.L37:
+ 406 0008 68640040 		.word	1073767528
+ 407              		.cfi_endproc
+ 408              	.LFE10:
+ 409              		.size	Mantmr_ReadStatusRegister, .-Mantmr_ReadStatusRegister
+ 410              		.section	.text.Mantmr_ReadControlRegister,"ax",%progbits
+ 411              		.align	1
+ 412              		.global	Mantmr_ReadControlRegister
+ 413              		.thumb
+ 414              		.thumb_func
+ 415              		.type	Mantmr_ReadControlRegister, %function
+ 416              	Mantmr_ReadControlRegister:
+ 417              	.LFB11:
+ 738:Generated_Source\PSoC5/Mantmr.c ****         uint8 result;
+ 418              		.loc 1 738 0
+ 419              		.cfi_startproc
+ 420              		@ args = 0, pretend = 0, frame = 0
+ 421              		@ frame_needed = 0, uses_anonymous_args = 0
+ 422              		@ link register save eliminated.
+ 741:Generated_Source\PSoC5/Mantmr.c ****         return (result);
+ 423              		.loc 1 741 0
+ 424 0000 014B     		ldr	r3, .L40
+ 425 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 426              	.LVL16:
+ 743:Generated_Source\PSoC5/Mantmr.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 23
+
+
+ 427              		.loc 1 743 0
+ 428 0004 7047     		bx	lr
+ 429              	.L41:
+ 430 0006 00BF     		.align	2
+ 431              	.L40:
+ 432 0008 78640040 		.word	1073767544
+ 433              		.cfi_endproc
+ 434              	.LFE11:
+ 435              		.size	Mantmr_ReadControlRegister, .-Mantmr_ReadControlRegister
+ 436              		.section	.text.Mantmr_WriteControlRegister,"ax",%progbits
+ 437              		.align	1
+ 438              		.global	Mantmr_WriteControlRegister
+ 439              		.thumb
+ 440              		.thumb_func
+ 441              		.type	Mantmr_WriteControlRegister, %function
+ 442              	Mantmr_WriteControlRegister:
+ 443              	.LFB12:
+ 766:Generated_Source\PSoC5/Mantmr.c ****         CY_SET_REG8(Mantmr_CONTROL_PTR, control);
+ 444              		.loc 1 766 0
+ 445              		.cfi_startproc
+ 446              		@ args = 0, pretend = 0, frame = 0
+ 447              		@ frame_needed = 0, uses_anonymous_args = 0
+ 448              		@ link register save eliminated.
+ 449              	.LVL17:
+ 767:Generated_Source\PSoC5/Mantmr.c ****     }
+ 450              		.loc 1 767 0
+ 451 0000 014B     		ldr	r3, .L43
+ 452 0002 1870     		strb	r0, [r3]
+ 453 0004 7047     		bx	lr
+ 454              	.L44:
+ 455 0006 00BF     		.align	2
+ 456              	.L43:
+ 457 0008 78640040 		.word	1073767544
+ 458              		.cfi_endproc
+ 459              	.LFE12:
+ 460              		.size	Mantmr_WriteControlRegister, .-Mantmr_WriteControlRegister
+ 461              		.section	.text.Mantmr_ReadCapture,"ax",%progbits
+ 462              		.align	1
+ 463              		.global	Mantmr_ReadCapture
+ 464              		.thumb
+ 465              		.thumb_func
+ 466              		.type	Mantmr_ReadCapture, %function
+ 467              	Mantmr_ReadCapture:
+ 468              	.LFB13:
+ 791:Generated_Source\PSoC5/Mantmr.c ****         return (CY_GET_REG8(Mantmr_CAPTURE_LSB_PTR));
+ 469              		.loc 1 791 0
+ 470              		.cfi_startproc
+ 471              		@ args = 0, pretend = 0, frame = 0
+ 472              		@ frame_needed = 0, uses_anonymous_args = 0
+ 473              		@ link register save eliminated.
+ 474              		.loc 1 792 0
+ 475 0000 014B     		ldr	r3, .L46
+ 476 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 793:Generated_Source\PSoC5/Mantmr.c ****     }
+ 477              		.loc 1 793 0
+ 478 0004 7047     		bx	lr
+ 479              	.L47:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 24
+
+
+ 480 0006 00BF     		.align	2
+ 481              	.L46:
+ 482 0008 58640040 		.word	1073767512
+ 483              		.cfi_endproc
+ 484              	.LFE13:
+ 485              		.size	Mantmr_ReadCapture, .-Mantmr_ReadCapture
+ 486              		.section	.text.Mantmr_ReadCompare,"ax",%progbits
+ 487              		.align	1
+ 488              		.global	Mantmr_ReadCompare
+ 489              		.thumb
+ 490              		.thumb_func
+ 491              		.type	Mantmr_ReadCompare, %function
+ 492              	Mantmr_ReadCompare:
+ 493              	.LFB14:
+ 794:Generated_Source\PSoC5/Mantmr.c **** 
+ 795:Generated_Source\PSoC5/Mantmr.c **** #endif /* (!Mantmr_UsingFixedFunction) */
+ 796:Generated_Source\PSoC5/Mantmr.c **** 
+ 797:Generated_Source\PSoC5/Mantmr.c **** 
+ 798:Generated_Source\PSoC5/Mantmr.c **** #if (Mantmr_UseOneCompareMode)
+ 799:Generated_Source\PSoC5/Mantmr.c **** 
+ 800:Generated_Source\PSoC5/Mantmr.c **** 
+ 801:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 802:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_ReadCompare
+ 803:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 804:Generated_Source\PSoC5/Mantmr.c ****     *
+ 805:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 806:Generated_Source\PSoC5/Mantmr.c ****     *  Reads the compare value for the compare output when the PWM Mode parameter is
+ 807:Generated_Source\PSoC5/Mantmr.c ****     *  set to Dither mode, Center Aligned mode, or One Output mode.
+ 808:Generated_Source\PSoC5/Mantmr.c ****     *
+ 809:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 810:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 811:Generated_Source\PSoC5/Mantmr.c ****     *
+ 812:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 813:Generated_Source\PSoC5/Mantmr.c ****     *  uint8/uint16: Current compare value
+ 814:Generated_Source\PSoC5/Mantmr.c ****     *
+ 815:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 816:Generated_Source\PSoC5/Mantmr.c ****     uint8 Mantmr_ReadCompare(void) 
+ 817:Generated_Source\PSoC5/Mantmr.c ****     {
+ 494              		.loc 1 817 0
+ 495              		.cfi_startproc
+ 496              		@ args = 0, pretend = 0, frame = 0
+ 497              		@ frame_needed = 0, uses_anonymous_args = 0
+ 498              		@ link register save eliminated.
+ 818:Generated_Source\PSoC5/Mantmr.c ****         #if(Mantmr_UsingFixedFunction)
+ 819:Generated_Source\PSoC5/Mantmr.c ****             return ((uint8)CY_GET_REG16(Mantmr_COMPARE1_LSB_PTR));
+ 820:Generated_Source\PSoC5/Mantmr.c ****         #else
+ 821:Generated_Source\PSoC5/Mantmr.c ****             return (CY_GET_REG8(Mantmr_COMPARE1_LSB_PTR));
+ 499              		.loc 1 821 0
+ 500 0000 014B     		ldr	r3, .L49
+ 501 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 822:Generated_Source\PSoC5/Mantmr.c ****         #endif /* (Mantmr_UsingFixedFunction) */
+ 823:Generated_Source\PSoC5/Mantmr.c ****     }
+ 502              		.loc 1 823 0
+ 503 0004 7047     		bx	lr
+ 504              	.L50:
+ 505 0006 00BF     		.align	2
+ 506              	.L49:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 25
+
+
+ 507 0008 28640040 		.word	1073767464
+ 508              		.cfi_endproc
+ 509              	.LFE14:
+ 510              		.size	Mantmr_ReadCompare, .-Mantmr_ReadCompare
+ 511              		.section	.text.Mantmr_ReadPeriod,"ax",%progbits
+ 512              		.align	1
+ 513              		.global	Mantmr_ReadPeriod
+ 514              		.thumb
+ 515              		.thumb_func
+ 516              		.type	Mantmr_ReadPeriod, %function
+ 517              	Mantmr_ReadPeriod:
+ 518              	.LFB15:
+ 824:Generated_Source\PSoC5/Mantmr.c **** 
+ 825:Generated_Source\PSoC5/Mantmr.c **** #else
+ 826:Generated_Source\PSoC5/Mantmr.c **** 
+ 827:Generated_Source\PSoC5/Mantmr.c **** 
+ 828:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 829:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_ReadCompare1
+ 830:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 831:Generated_Source\PSoC5/Mantmr.c ****     *
+ 832:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 833:Generated_Source\PSoC5/Mantmr.c ****     *  Reads the compare value for the compare1 output.
+ 834:Generated_Source\PSoC5/Mantmr.c ****     *
+ 835:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 836:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 837:Generated_Source\PSoC5/Mantmr.c ****     *
+ 838:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 839:Generated_Source\PSoC5/Mantmr.c ****     *  uint8/uint16: Current compare value.
+ 840:Generated_Source\PSoC5/Mantmr.c ****     *
+ 841:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 842:Generated_Source\PSoC5/Mantmr.c ****     uint8 Mantmr_ReadCompare1(void) 
+ 843:Generated_Source\PSoC5/Mantmr.c ****     {
+ 844:Generated_Source\PSoC5/Mantmr.c ****         return (CY_GET_REG8(Mantmr_COMPARE1_LSB_PTR));
+ 845:Generated_Source\PSoC5/Mantmr.c ****     }
+ 846:Generated_Source\PSoC5/Mantmr.c **** 
+ 847:Generated_Source\PSoC5/Mantmr.c **** 
+ 848:Generated_Source\PSoC5/Mantmr.c ****     /*******************************************************************************
+ 849:Generated_Source\PSoC5/Mantmr.c ****     * Function Name: Mantmr_ReadCompare2
+ 850:Generated_Source\PSoC5/Mantmr.c ****     ********************************************************************************
+ 851:Generated_Source\PSoC5/Mantmr.c ****     *
+ 852:Generated_Source\PSoC5/Mantmr.c ****     * Summary:
+ 853:Generated_Source\PSoC5/Mantmr.c ****     *  Reads the compare value for the compare2 output.
+ 854:Generated_Source\PSoC5/Mantmr.c ****     *
+ 855:Generated_Source\PSoC5/Mantmr.c ****     * Parameters:
+ 856:Generated_Source\PSoC5/Mantmr.c ****     *  None
+ 857:Generated_Source\PSoC5/Mantmr.c ****     *
+ 858:Generated_Source\PSoC5/Mantmr.c ****     * Return:
+ 859:Generated_Source\PSoC5/Mantmr.c ****     *  uint8/uint16: Current compare value.
+ 860:Generated_Source\PSoC5/Mantmr.c ****     *
+ 861:Generated_Source\PSoC5/Mantmr.c ****     *******************************************************************************/
+ 862:Generated_Source\PSoC5/Mantmr.c ****     uint8 Mantmr_ReadCompare2(void) 
+ 863:Generated_Source\PSoC5/Mantmr.c ****     {
+ 864:Generated_Source\PSoC5/Mantmr.c ****         return (CY_GET_REG8(Mantmr_COMPARE2_LSB_PTR));
+ 865:Generated_Source\PSoC5/Mantmr.c ****     }
+ 866:Generated_Source\PSoC5/Mantmr.c **** 
+ 867:Generated_Source\PSoC5/Mantmr.c **** #endif /* (Mantmr_UseOneCompareMode) */
+ 868:Generated_Source\PSoC5/Mantmr.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 26
+
+
+ 869:Generated_Source\PSoC5/Mantmr.c **** 
+ 870:Generated_Source\PSoC5/Mantmr.c **** /*******************************************************************************
+ 871:Generated_Source\PSoC5/Mantmr.c **** * Function Name: Mantmr_ReadPeriod
+ 872:Generated_Source\PSoC5/Mantmr.c **** ********************************************************************************
+ 873:Generated_Source\PSoC5/Mantmr.c **** *
+ 874:Generated_Source\PSoC5/Mantmr.c **** * Summary:
+ 875:Generated_Source\PSoC5/Mantmr.c **** *  Reads the period value used by the PWM hardware.
+ 876:Generated_Source\PSoC5/Mantmr.c **** *
+ 877:Generated_Source\PSoC5/Mantmr.c **** * Parameters:
+ 878:Generated_Source\PSoC5/Mantmr.c **** *  None
+ 879:Generated_Source\PSoC5/Mantmr.c **** *
+ 880:Generated_Source\PSoC5/Mantmr.c **** * Return:
+ 881:Generated_Source\PSoC5/Mantmr.c **** *  uint8/16: Period value
+ 882:Generated_Source\PSoC5/Mantmr.c **** *
+ 883:Generated_Source\PSoC5/Mantmr.c **** *******************************************************************************/
+ 884:Generated_Source\PSoC5/Mantmr.c **** uint8 Mantmr_ReadPeriod(void) 
+ 885:Generated_Source\PSoC5/Mantmr.c **** {
+ 519              		.loc 1 885 0
+ 520              		.cfi_startproc
+ 521              		@ args = 0, pretend = 0, frame = 0
+ 522              		@ frame_needed = 0, uses_anonymous_args = 0
+ 523              		@ link register save eliminated.
+ 886:Generated_Source\PSoC5/Mantmr.c ****     #if(Mantmr_UsingFixedFunction)
+ 887:Generated_Source\PSoC5/Mantmr.c ****         return ((uint8)CY_GET_REG16(Mantmr_PERIOD_LSB_PTR));
+ 888:Generated_Source\PSoC5/Mantmr.c ****     #else
+ 889:Generated_Source\PSoC5/Mantmr.c ****         return (CY_GET_REG8(Mantmr_PERIOD_LSB_PTR));
+ 524              		.loc 1 889 0
+ 525 0000 014B     		ldr	r3, .L52
+ 526 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 890:Generated_Source\PSoC5/Mantmr.c ****     #endif /* (Mantmr_UsingFixedFunction) */
+ 891:Generated_Source\PSoC5/Mantmr.c **** }
+ 527              		.loc 1 891 0
+ 528 0004 7047     		bx	lr
+ 529              	.L53:
+ 530 0006 00BF     		.align	2
+ 531              	.L52:
+ 532 0008 48640040 		.word	1073767496
+ 533              		.cfi_endproc
+ 534              	.LFE15:
+ 535              		.size	Mantmr_ReadPeriod, .-Mantmr_ReadPeriod
+ 536              		.global	Mantmr_initVar
+ 537              		.bss
+ 538              		.set	.LANCHOR0,. + 0
+ 539              		.type	Mantmr_initVar, %object
+ 540              		.size	Mantmr_initVar, 1
+ 541              	Mantmr_initVar:
+ 542 0000 00       		.space	1
+ 543              		.text
+ 544              	.Letext0:
+ 545              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+ 546              		.file 3 "Generated_Source\\PSoC5\\CyLib.h"
+ 547              		.section	.debug_info,"",%progbits
+ 548              	.Ldebug_info0:
+ 549 0000 AF030000 		.4byte	0x3af
+ 550 0004 0400     		.2byte	0x4
+ 551 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 552 000a 04       		.byte	0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 27
+
+
+ 553 000b 01       		.uleb128 0x1
+ 554 000c 02010000 		.4byte	.LASF40
+ 555 0010 0C       		.byte	0xc
+ 556 0011 FB020000 		.4byte	.LASF41
+ 557 0015 76000000 		.4byte	.LASF42
+ 558 0019 30000000 		.4byte	.Ldebug_ranges0+0x30
+ 559 001d 00000000 		.4byte	0
+ 560 0021 00000000 		.4byte	.Ldebug_line0
+ 561 0025 02       		.uleb128 0x2
+ 562 0026 01       		.byte	0x1
+ 563 0027 06       		.byte	0x6
+ 564 0028 E7020000 		.4byte	.LASF0
+ 565 002c 02       		.uleb128 0x2
+ 566 002d 01       		.byte	0x1
+ 567 002e 08       		.byte	0x8
+ 568 002f E2000000 		.4byte	.LASF1
+ 569 0033 02       		.uleb128 0x2
+ 570 0034 02       		.byte	0x2
+ 571 0035 05       		.byte	0x5
+ 572 0036 D9010000 		.4byte	.LASF2
+ 573 003a 02       		.uleb128 0x2
+ 574 003b 02       		.byte	0x2
+ 575 003c 07       		.byte	0x7
+ 576 003d 41000000 		.4byte	.LASF3
+ 577 0041 02       		.uleb128 0x2
+ 578 0042 04       		.byte	0x4
+ 579 0043 05       		.byte	0x5
+ 580 0044 CD020000 		.4byte	.LASF4
+ 581 0048 02       		.uleb128 0x2
+ 582 0049 04       		.byte	0x4
+ 583 004a 07       		.byte	0x7
+ 584 004b FA010000 		.4byte	.LASF5
+ 585 004f 02       		.uleb128 0x2
+ 586 0050 08       		.byte	0x8
+ 587 0051 05       		.byte	0x5
+ 588 0052 45020000 		.4byte	.LASF6
+ 589 0056 02       		.uleb128 0x2
+ 590 0057 08       		.byte	0x8
+ 591 0058 07       		.byte	0x7
+ 592 0059 19020000 		.4byte	.LASF7
+ 593 005d 03       		.uleb128 0x3
+ 594 005e 04       		.byte	0x4
+ 595 005f 05       		.byte	0x5
+ 596 0060 696E7400 		.ascii	"int\000"
+ 597 0064 02       		.uleb128 0x2
+ 598 0065 04       		.byte	0x4
+ 599 0066 07       		.byte	0x7
+ 600 0067 0C020000 		.4byte	.LASF8
+ 601 006b 04       		.uleb128 0x4
+ 602 006c 90010000 		.4byte	.LASF12
+ 603 0070 02       		.byte	0x2
+ 604 0071 9201     		.2byte	0x192
+ 605 0073 2C000000 		.4byte	0x2c
+ 606 0077 02       		.uleb128 0x2
+ 607 0078 04       		.byte	0x4
+ 608 0079 04       		.byte	0x4
+ 609 007a D4000000 		.4byte	.LASF9
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 28
+
+
+ 610 007e 02       		.uleb128 0x2
+ 611 007f 08       		.byte	0x8
+ 612 0080 04       		.byte	0x4
+ 613 0081 6F000000 		.4byte	.LASF10
+ 614 0085 02       		.uleb128 0x2
+ 615 0086 01       		.byte	0x1
+ 616 0087 08       		.byte	0x8
+ 617 0088 D6020000 		.4byte	.LASF11
+ 618 008c 04       		.uleb128 0x4
+ 619 008d 37020000 		.4byte	.LASF13
+ 620 0091 02       		.byte	0x2
+ 621 0092 3C02     		.2byte	0x23c
+ 622 0094 98000000 		.4byte	0x98
+ 623 0098 05       		.uleb128 0x5
+ 624 0099 6B000000 		.4byte	0x6b
+ 625 009d 02       		.uleb128 0x2
+ 626 009e 08       		.byte	0x8
+ 627 009f 04       		.byte	0x4
+ 628 00a0 DB020000 		.4byte	.LASF14
+ 629 00a4 02       		.uleb128 0x2
+ 630 00a5 04       		.byte	0x4
+ 631 00a6 07       		.byte	0x7
+ 632 00a7 3C020000 		.4byte	.LASF15
+ 633 00ab 06       		.uleb128 0x6
+ 634 00ac 1B030000 		.4byte	.LASF16
+ 635 00b0 01       		.byte	0x1
+ 636 00b1 1603     		.2byte	0x316
+ 637 00b3 6B000000 		.4byte	0x6b
+ 638 00b7 01       		.byte	0x1
+ 639 00b8 06       		.uleb128 0x6
+ 640 00b9 13000000 		.4byte	.LASF17
+ 641 00bd 01       		.byte	0x1
+ 642 00be C702     		.2byte	0x2c7
+ 643 00c0 6B000000 		.4byte	0x6b
+ 644 00c4 01       		.byte	0x1
+ 645 00c5 07       		.uleb128 0x7
+ 646 00c6 9F020000 		.4byte	.LASF18
+ 647 00ca 01       		.byte	0x1
+ 648 00cb AC02     		.2byte	0x2ac
+ 649 00cd 01       		.byte	0x1
+ 650 00ce DF000000 		.4byte	0xdf
+ 651 00d2 08       		.uleb128 0x8
+ 652 00d3 53020000 		.4byte	.LASF20
+ 653 00d7 01       		.byte	0x1
+ 654 00d8 AC02     		.2byte	0x2ac
+ 655 00da 6B000000 		.4byte	0x6b
+ 656 00de 00       		.byte	0
+ 657 00df 07       		.uleb128 0x7
+ 658 00e0 33030000 		.4byte	.LASF19
+ 659 00e4 01       		.byte	0x1
+ 660 00e5 0402     		.2byte	0x204
+ 661 00e7 01       		.byte	0x1
+ 662 00e8 F9000000 		.4byte	0xf9
+ 663 00ec 08       		.uleb128 0x8
+ 664 00ed F3020000 		.4byte	.LASF21
+ 665 00f1 01       		.byte	0x1
+ 666 00f2 0402     		.2byte	0x204
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 29
+
+
+ 667 00f4 6B000000 		.4byte	0x6b
+ 668 00f8 00       		.byte	0
+ 669 00f9 07       		.uleb128 0x7
+ 670 00fa 00000000 		.4byte	.LASF22
+ 671 00fe 01       		.byte	0x1
+ 672 00ff E201     		.2byte	0x1e2
+ 673 0101 01       		.byte	0x1
+ 674 0102 13010000 		.4byte	0x113
+ 675 0106 08       		.uleb128 0x8
+ 676 0107 3A000000 		.4byte	.LASF23
+ 677 010b 01       		.byte	0x1
+ 678 010c E201     		.2byte	0x1e2
+ 679 010e 6B000000 		.4byte	0x6b
+ 680 0112 00       		.byte	0
+ 681 0113 07       		.uleb128 0x7
+ 682 0114 9B000000 		.4byte	.LASF24
+ 683 0118 01       		.byte	0x1
+ 684 0119 9301     		.2byte	0x193
+ 685 011b 01       		.byte	0x1
+ 686 011c 2D010000 		.4byte	0x12d
+ 687 0120 08       		.uleb128 0x8
+ 688 0121 DA000000 		.4byte	.LASF25
+ 689 0125 01       		.byte	0x1
+ 690 0126 9301     		.2byte	0x193
+ 691 0128 6B000000 		.4byte	0x6b
+ 692 012c 00       		.byte	0
+ 693 012d 09       		.uleb128 0x9
+ 694 012e 91020000 		.4byte	.LASF26
+ 695 0132 01       		.byte	0x1
+ 696 0133 C7       		.byte	0xc7
+ 697 0134 00000000 		.4byte	.LFB2
+ 698 0138 10000000 		.4byte	.LFE2-.LFB2
+ 699 013c 01       		.uleb128 0x1
+ 700 013d 9C       		.byte	0x9c
+ 701 013e 09       		.uleb128 0x9
+ 702 013f 85020000 		.4byte	.LASF27
+ 703 0143 01       		.byte	0x1
+ 704 0144 E9       		.byte	0xe9
+ 705 0145 00000000 		.4byte	.LFB3
+ 706 0149 10000000 		.4byte	.LFE3-.LFB3
+ 707 014d 01       		.uleb128 0x1
+ 708 014e 9C       		.byte	0x9c
+ 709 014f 0A       		.uleb128 0xa
+ 710 0150 13010000 		.4byte	0x113
+ 711 0154 00000000 		.4byte	.LFB4
+ 712 0158 0C000000 		.4byte	.LFE4-.LFB4
+ 713 015c 01       		.uleb128 0x1
+ 714 015d 9C       		.byte	0x9c
+ 715 015e 6A010000 		.4byte	0x16a
+ 716 0162 0B       		.uleb128 0xb
+ 717 0163 20010000 		.4byte	0x120
+ 718 0167 01       		.uleb128 0x1
+ 719 0168 50       		.byte	0x50
+ 720 0169 00       		.byte	0
+ 721 016a 0C       		.uleb128 0xc
+ 722 016b 61020000 		.4byte	.LASF35
+ 723 016f 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 30
+
+
+ 724 0170 A901     		.2byte	0x1a9
+ 725 0172 6B000000 		.4byte	0x6b
+ 726 0176 00000000 		.4byte	.LFB5
+ 727 017a 14000000 		.4byte	.LFE5-.LFB5
+ 728 017e 01       		.uleb128 0x1
+ 729 017f 9C       		.byte	0x9c
+ 730 0180 0D       		.uleb128 0xd
+ 731 0181 74020000 		.4byte	.LASF28
+ 732 0185 01       		.byte	0x1
+ 733 0186 C501     		.2byte	0x1c5
+ 734 0188 00000000 		.4byte	.LFB6
+ 735 018c 18000000 		.4byte	.LFE6-.LFB6
+ 736 0190 01       		.uleb128 0x1
+ 737 0191 9C       		.byte	0x9c
+ 738 0192 B7010000 		.4byte	0x1b7
+ 739 0196 0E       		.uleb128 0xe
+ 740 0197 B8000000 		.4byte	0xb8
+ 741 019b 00000000 		.4byte	.LBB14
+ 742 019f 00000000 		.4byte	.Ldebug_ranges0+0
+ 743 01a3 01       		.byte	0x1
+ 744 01a4 C701     		.2byte	0x1c7
+ 745 01a6 0E       		.uleb128 0xe
+ 746 01a7 AB000000 		.4byte	0xab
+ 747 01ab 02000000 		.4byte	.LBB17
+ 748 01af 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 749 01b3 01       		.byte	0x1
+ 750 01b4 C901     		.2byte	0x1c9
+ 751 01b6 00       		.byte	0
+ 752 01b7 0F       		.uleb128 0xf
+ 753 01b8 CD010000 		.4byte	.LASF29
+ 754 01bc 01       		.byte	0x1
+ 755 01bd 54       		.byte	0x54
+ 756 01be 00000000 		.4byte	.LFB1
+ 757 01c2 4C000000 		.4byte	.LFE1-.LFB1
+ 758 01c6 01       		.uleb128 0x1
+ 759 01c7 9C       		.byte	0x9c
+ 760 01c8 7A020000 		.4byte	0x27a
+ 761 01cc 10       		.uleb128 0x10
+ 762 01cd 2E030000 		.4byte	.LASF30
+ 763 01d1 01       		.byte	0x1
+ 764 01d2 57       		.byte	0x57
+ 765 01d3 6B000000 		.4byte	0x6b
+ 766 01d7 00000000 		.4byte	.LLST0
+ 767 01db 10       		.uleb128 0x10
+ 768 01dc BE000000 		.4byte	.LASF31
+ 769 01e0 01       		.byte	0x1
+ 770 01e1 5D       		.byte	0x5d
+ 771 01e2 6B000000 		.4byte	0x6b
+ 772 01e6 18000000 		.4byte	.LLST1
+ 773 01ea 11       		.uleb128 0x11
+ 774 01eb 13010000 		.4byte	0x113
+ 775 01ef 1A000000 		.4byte	.LBB22
+ 776 01f3 06000000 		.4byte	.LBE22-.LBB22
+ 777 01f7 01       		.byte	0x1
+ 778 01f8 85       		.byte	0x85
+ 779 01f9 07020000 		.4byte	0x207
+ 780 01fd 12       		.uleb128 0x12
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 31
+
+
+ 781 01fe 20010000 		.4byte	0x120
+ 782 0202 2B000000 		.4byte	.LLST2
+ 783 0206 00       		.byte	0
+ 784 0207 11       		.uleb128 0x11
+ 785 0208 F9000000 		.4byte	0xf9
+ 786 020c 20000000 		.4byte	.LBB24
+ 787 0210 04000000 		.4byte	.LBE24-.LBB24
+ 788 0214 01       		.byte	0x1
+ 789 0215 88       		.byte	0x88
+ 790 0216 24020000 		.4byte	0x224
+ 791 021a 12       		.uleb128 0x12
+ 792 021b 06010000 		.4byte	0x106
+ 793 021f 3F000000 		.4byte	.LLST3
+ 794 0223 00       		.byte	0
+ 795 0224 11       		.uleb128 0x11
+ 796 0225 DF000000 		.4byte	0xdf
+ 797 0229 24000000 		.4byte	.LBB26
+ 798 022d 06000000 		.4byte	.LBE26-.LBB26
+ 799 0231 01       		.byte	0x1
+ 800 0232 8B       		.byte	0x8b
+ 801 0233 41020000 		.4byte	0x241
+ 802 0237 12       		.uleb128 0x12
+ 803 0238 EC000000 		.4byte	0xec
+ 804 023c 53000000 		.4byte	.LLST4
+ 805 0240 00       		.byte	0
+ 806 0241 11       		.uleb128 0x11
+ 807 0242 C5000000 		.4byte	0xc5
+ 808 0246 2A000000 		.4byte	.LBB28
+ 809 024a 02000000 		.4byte	.LBE28-.LBB28
+ 810 024e 01       		.byte	0x1
+ 811 024f 9A       		.byte	0x9a
+ 812 0250 5E020000 		.4byte	0x25e
+ 813 0254 12       		.uleb128 0x12
+ 814 0255 D2000000 		.4byte	0xd2
+ 815 0259 67000000 		.4byte	.LLST5
+ 816 025d 00       		.byte	0
+ 817 025e 13       		.uleb128 0x13
+ 818 025f 30000000 		.4byte	.LVL8
+ 819 0263 9C030000 		.4byte	0x39c
+ 820 0267 13       		.uleb128 0x13
+ 821 0268 3C000000 		.4byte	.LVL9
+ 822 026c A7030000 		.4byte	0x3a7
+ 823 0270 14       		.uleb128 0x14
+ 824 0271 44000000 		.4byte	.LVL10
+ 825 0275 80010000 		.4byte	0x180
+ 826 0279 00       		.byte	0
+ 827 027a 0F       		.uleb128 0xf
+ 828 027b 2D000000 		.4byte	.LASF32
+ 829 027f 01       		.byte	0x1
+ 830 0280 37       		.byte	0x37
+ 831 0281 00000000 		.4byte	.LFB0
+ 832 0285 1C000000 		.4byte	.LFE0-.LFB0
+ 833 0289 01       		.uleb128 0x1
+ 834 028a 9C       		.byte	0x9c
+ 835 028b A2020000 		.4byte	0x2a2
+ 836 028f 13       		.uleb128 0x13
+ 837 0290 0C000000 		.4byte	.LVL11
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 32
+
+
+ 838 0294 B7010000 		.4byte	0x1b7
+ 839 0298 14       		.uleb128 0x14
+ 840 0299 18000000 		.4byte	.LVL12
+ 841 029d 2D010000 		.4byte	0x12d
+ 842 02a1 00       		.byte	0
+ 843 02a2 0A       		.uleb128 0xa
+ 844 02a3 F9000000 		.4byte	0xf9
+ 845 02a7 00000000 		.4byte	.LFB7
+ 846 02ab 0C000000 		.4byte	.LFE7-.LFB7
+ 847 02af 01       		.uleb128 0x1
+ 848 02b0 9C       		.byte	0x9c
+ 849 02b1 BD020000 		.4byte	0x2bd
+ 850 02b5 0B       		.uleb128 0xb
+ 851 02b6 06010000 		.4byte	0x106
+ 852 02ba 01       		.uleb128 0x1
+ 853 02bb 50       		.byte	0x50
+ 854 02bc 00       		.byte	0
+ 855 02bd 0A       		.uleb128 0xa
+ 856 02be DF000000 		.4byte	0xdf
+ 857 02c2 00000000 		.4byte	.LFB8
+ 858 02c6 0C000000 		.4byte	.LFE8-.LFB8
+ 859 02ca 01       		.uleb128 0x1
+ 860 02cb 9C       		.byte	0x9c
+ 861 02cc D8020000 		.4byte	0x2d8
+ 862 02d0 0B       		.uleb128 0xb
+ 863 02d1 EC000000 		.4byte	0xec
+ 864 02d5 01       		.uleb128 0x1
+ 865 02d6 50       		.byte	0x50
+ 866 02d7 00       		.byte	0
+ 867 02d8 0A       		.uleb128 0xa
+ 868 02d9 C5000000 		.4byte	0xc5
+ 869 02dd 00000000 		.4byte	.LFB9
+ 870 02e1 0C000000 		.4byte	.LFE9-.LFB9
+ 871 02e5 01       		.uleb128 0x1
+ 872 02e6 9C       		.byte	0x9c
+ 873 02e7 F3020000 		.4byte	0x2f3
+ 874 02eb 0B       		.uleb128 0xb
+ 875 02ec D2000000 		.4byte	0xd2
+ 876 02f0 01       		.uleb128 0x1
+ 877 02f1 50       		.byte	0x50
+ 878 02f2 00       		.byte	0
+ 879 02f3 15       		.uleb128 0x15
+ 880 02f4 B8000000 		.4byte	0xb8
+ 881 02f8 00000000 		.4byte	.LFB10
+ 882 02fc 0C000000 		.4byte	.LFE10-.LFB10
+ 883 0300 01       		.uleb128 0x1
+ 884 0301 9C       		.byte	0x9c
+ 885 0302 16       		.uleb128 0x16
+ 886 0303 54000000 		.4byte	.LASF43
+ 887 0307 01       		.byte	0x1
+ 888 0308 E102     		.2byte	0x2e1
+ 889 030a 6B000000 		.4byte	0x6b
+ 890 030e 00000000 		.4byte	.LFB11
+ 891 0312 0C000000 		.4byte	.LFE11-.LFB11
+ 892 0316 01       		.uleb128 0x1
+ 893 0317 9C       		.byte	0x9c
+ 894 0318 2B030000 		.4byte	0x32b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 33
+
+
+ 895 031c 17       		.uleb128 0x17
+ 896 031d 30020000 		.4byte	.LASF33
+ 897 0321 01       		.byte	0x1
+ 898 0322 E302     		.2byte	0x2e3
+ 899 0324 6B000000 		.4byte	0x6b
+ 900 0328 01       		.uleb128 0x1
+ 901 0329 50       		.byte	0x50
+ 902 032a 00       		.byte	0
+ 903 032b 0D       		.uleb128 0xd
+ 904 032c 9E010000 		.4byte	.LASF34
+ 905 0330 01       		.byte	0x1
+ 906 0331 FD02     		.2byte	0x2fd
+ 907 0333 00000000 		.4byte	.LFB12
+ 908 0337 0C000000 		.4byte	.LFE12-.LFB12
+ 909 033b 01       		.uleb128 0x1
+ 910 033c 9C       		.byte	0x9c
+ 911 033d 50030000 		.4byte	0x350
+ 912 0341 18       		.uleb128 0x18
+ 913 0342 96010000 		.4byte	.LASF44
+ 914 0346 01       		.byte	0x1
+ 915 0347 FD02     		.2byte	0x2fd
+ 916 0349 6B000000 		.4byte	0x6b
+ 917 034d 01       		.uleb128 0x1
+ 918 034e 50       		.byte	0x50
+ 919 034f 00       		.byte	0
+ 920 0350 15       		.uleb128 0x15
+ 921 0351 AB000000 		.4byte	0xab
+ 922 0355 00000000 		.4byte	.LFB13
+ 923 0359 0C000000 		.4byte	.LFE13-.LFB13
+ 924 035d 01       		.uleb128 0x1
+ 925 035e 9C       		.byte	0x9c
+ 926 035f 0C       		.uleb128 0xc
+ 927 0360 BA010000 		.4byte	.LASF36
+ 928 0364 01       		.byte	0x1
+ 929 0365 3003     		.2byte	0x330
+ 930 0367 6B000000 		.4byte	0x6b
+ 931 036b 00000000 		.4byte	.LFB14
+ 932 036f 0C000000 		.4byte	.LFE14-.LFB14
+ 933 0373 01       		.uleb128 0x1
+ 934 0374 9C       		.byte	0x9c
+ 935 0375 0C       		.uleb128 0xc
+ 936 0376 F0000000 		.4byte	.LASF37
+ 937 037a 01       		.byte	0x1
+ 938 037b 7403     		.2byte	0x374
+ 939 037d 6B000000 		.4byte	0x6b
+ 940 0381 00000000 		.4byte	.LFB15
+ 941 0385 0C000000 		.4byte	.LFE15-.LFB15
+ 942 0389 01       		.uleb128 0x1
+ 943 038a 9C       		.byte	0x9c
+ 944 038b 19       		.uleb128 0x19
+ 945 038c AF000000 		.4byte	.LASF45
+ 946 0390 01       		.byte	0x1
+ 947 0391 20       		.byte	0x20
+ 948 0392 6B000000 		.4byte	0x6b
+ 949 0396 05       		.uleb128 0x5
+ 950 0397 03       		.byte	0x3
+ 951 0398 00000000 		.4byte	Mantmr_initVar
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 34
+
+
+ 952 039c 1A       		.uleb128 0x1a
+ 953 039d E3010000 		.4byte	.LASF38
+ 954 03a1 E3010000 		.4byte	.LASF38
+ 955 03a5 03       		.byte	0x3
+ 956 03a6 7D       		.byte	0x7d
+ 957 03a7 1A       		.uleb128 0x1a
+ 958 03a8 B7020000 		.4byte	.LASF39
+ 959 03ac B7020000 		.4byte	.LASF39
+ 960 03b0 03       		.byte	0x3
+ 961 03b1 7E       		.byte	0x7e
+ 962 03b2 00       		.byte	0
+ 963              		.section	.debug_abbrev,"",%progbits
+ 964              	.Ldebug_abbrev0:
+ 965 0000 01       		.uleb128 0x1
+ 966 0001 11       		.uleb128 0x11
+ 967 0002 01       		.byte	0x1
+ 968 0003 25       		.uleb128 0x25
+ 969 0004 0E       		.uleb128 0xe
+ 970 0005 13       		.uleb128 0x13
+ 971 0006 0B       		.uleb128 0xb
+ 972 0007 03       		.uleb128 0x3
+ 973 0008 0E       		.uleb128 0xe
+ 974 0009 1B       		.uleb128 0x1b
+ 975 000a 0E       		.uleb128 0xe
+ 976 000b 55       		.uleb128 0x55
+ 977 000c 17       		.uleb128 0x17
+ 978 000d 11       		.uleb128 0x11
+ 979 000e 01       		.uleb128 0x1
+ 980 000f 10       		.uleb128 0x10
+ 981 0010 17       		.uleb128 0x17
+ 982 0011 00       		.byte	0
+ 983 0012 00       		.byte	0
+ 984 0013 02       		.uleb128 0x2
+ 985 0014 24       		.uleb128 0x24
+ 986 0015 00       		.byte	0
+ 987 0016 0B       		.uleb128 0xb
+ 988 0017 0B       		.uleb128 0xb
+ 989 0018 3E       		.uleb128 0x3e
+ 990 0019 0B       		.uleb128 0xb
+ 991 001a 03       		.uleb128 0x3
+ 992 001b 0E       		.uleb128 0xe
+ 993 001c 00       		.byte	0
+ 994 001d 00       		.byte	0
+ 995 001e 03       		.uleb128 0x3
+ 996 001f 24       		.uleb128 0x24
+ 997 0020 00       		.byte	0
+ 998 0021 0B       		.uleb128 0xb
+ 999 0022 0B       		.uleb128 0xb
+ 1000 0023 3E       		.uleb128 0x3e
+ 1001 0024 0B       		.uleb128 0xb
+ 1002 0025 03       		.uleb128 0x3
+ 1003 0026 08       		.uleb128 0x8
+ 1004 0027 00       		.byte	0
+ 1005 0028 00       		.byte	0
+ 1006 0029 04       		.uleb128 0x4
+ 1007 002a 16       		.uleb128 0x16
+ 1008 002b 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 35
+
+
+ 1009 002c 03       		.uleb128 0x3
+ 1010 002d 0E       		.uleb128 0xe
+ 1011 002e 3A       		.uleb128 0x3a
+ 1012 002f 0B       		.uleb128 0xb
+ 1013 0030 3B       		.uleb128 0x3b
+ 1014 0031 05       		.uleb128 0x5
+ 1015 0032 49       		.uleb128 0x49
+ 1016 0033 13       		.uleb128 0x13
+ 1017 0034 00       		.byte	0
+ 1018 0035 00       		.byte	0
+ 1019 0036 05       		.uleb128 0x5
+ 1020 0037 35       		.uleb128 0x35
+ 1021 0038 00       		.byte	0
+ 1022 0039 49       		.uleb128 0x49
+ 1023 003a 13       		.uleb128 0x13
+ 1024 003b 00       		.byte	0
+ 1025 003c 00       		.byte	0
+ 1026 003d 06       		.uleb128 0x6
+ 1027 003e 2E       		.uleb128 0x2e
+ 1028 003f 00       		.byte	0
+ 1029 0040 3F       		.uleb128 0x3f
+ 1030 0041 19       		.uleb128 0x19
+ 1031 0042 03       		.uleb128 0x3
+ 1032 0043 0E       		.uleb128 0xe
+ 1033 0044 3A       		.uleb128 0x3a
+ 1034 0045 0B       		.uleb128 0xb
+ 1035 0046 3B       		.uleb128 0x3b
+ 1036 0047 05       		.uleb128 0x5
+ 1037 0048 27       		.uleb128 0x27
+ 1038 0049 19       		.uleb128 0x19
+ 1039 004a 49       		.uleb128 0x49
+ 1040 004b 13       		.uleb128 0x13
+ 1041 004c 20       		.uleb128 0x20
+ 1042 004d 0B       		.uleb128 0xb
+ 1043 004e 00       		.byte	0
+ 1044 004f 00       		.byte	0
+ 1045 0050 07       		.uleb128 0x7
+ 1046 0051 2E       		.uleb128 0x2e
+ 1047 0052 01       		.byte	0x1
+ 1048 0053 3F       		.uleb128 0x3f
+ 1049 0054 19       		.uleb128 0x19
+ 1050 0055 03       		.uleb128 0x3
+ 1051 0056 0E       		.uleb128 0xe
+ 1052 0057 3A       		.uleb128 0x3a
+ 1053 0058 0B       		.uleb128 0xb
+ 1054 0059 3B       		.uleb128 0x3b
+ 1055 005a 05       		.uleb128 0x5
+ 1056 005b 27       		.uleb128 0x27
+ 1057 005c 19       		.uleb128 0x19
+ 1058 005d 20       		.uleb128 0x20
+ 1059 005e 0B       		.uleb128 0xb
+ 1060 005f 01       		.uleb128 0x1
+ 1061 0060 13       		.uleb128 0x13
+ 1062 0061 00       		.byte	0
+ 1063 0062 00       		.byte	0
+ 1064 0063 08       		.uleb128 0x8
+ 1065 0064 05       		.uleb128 0x5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 36
+
+
+ 1066 0065 00       		.byte	0
+ 1067 0066 03       		.uleb128 0x3
+ 1068 0067 0E       		.uleb128 0xe
+ 1069 0068 3A       		.uleb128 0x3a
+ 1070 0069 0B       		.uleb128 0xb
+ 1071 006a 3B       		.uleb128 0x3b
+ 1072 006b 05       		.uleb128 0x5
+ 1073 006c 49       		.uleb128 0x49
+ 1074 006d 13       		.uleb128 0x13
+ 1075 006e 00       		.byte	0
+ 1076 006f 00       		.byte	0
+ 1077 0070 09       		.uleb128 0x9
+ 1078 0071 2E       		.uleb128 0x2e
+ 1079 0072 00       		.byte	0
+ 1080 0073 3F       		.uleb128 0x3f
+ 1081 0074 19       		.uleb128 0x19
+ 1082 0075 03       		.uleb128 0x3
+ 1083 0076 0E       		.uleb128 0xe
+ 1084 0077 3A       		.uleb128 0x3a
+ 1085 0078 0B       		.uleb128 0xb
+ 1086 0079 3B       		.uleb128 0x3b
+ 1087 007a 0B       		.uleb128 0xb
+ 1088 007b 27       		.uleb128 0x27
+ 1089 007c 19       		.uleb128 0x19
+ 1090 007d 11       		.uleb128 0x11
+ 1091 007e 01       		.uleb128 0x1
+ 1092 007f 12       		.uleb128 0x12
+ 1093 0080 06       		.uleb128 0x6
+ 1094 0081 40       		.uleb128 0x40
+ 1095 0082 18       		.uleb128 0x18
+ 1096 0083 9742     		.uleb128 0x2117
+ 1097 0085 19       		.uleb128 0x19
+ 1098 0086 00       		.byte	0
+ 1099 0087 00       		.byte	0
+ 1100 0088 0A       		.uleb128 0xa
+ 1101 0089 2E       		.uleb128 0x2e
+ 1102 008a 01       		.byte	0x1
+ 1103 008b 31       		.uleb128 0x31
+ 1104 008c 13       		.uleb128 0x13
+ 1105 008d 11       		.uleb128 0x11
+ 1106 008e 01       		.uleb128 0x1
+ 1107 008f 12       		.uleb128 0x12
+ 1108 0090 06       		.uleb128 0x6
+ 1109 0091 40       		.uleb128 0x40
+ 1110 0092 18       		.uleb128 0x18
+ 1111 0093 9742     		.uleb128 0x2117
+ 1112 0095 19       		.uleb128 0x19
+ 1113 0096 01       		.uleb128 0x1
+ 1114 0097 13       		.uleb128 0x13
+ 1115 0098 00       		.byte	0
+ 1116 0099 00       		.byte	0
+ 1117 009a 0B       		.uleb128 0xb
+ 1118 009b 05       		.uleb128 0x5
+ 1119 009c 00       		.byte	0
+ 1120 009d 31       		.uleb128 0x31
+ 1121 009e 13       		.uleb128 0x13
+ 1122 009f 02       		.uleb128 0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 37
+
+
+ 1123 00a0 18       		.uleb128 0x18
+ 1124 00a1 00       		.byte	0
+ 1125 00a2 00       		.byte	0
+ 1126 00a3 0C       		.uleb128 0xc
+ 1127 00a4 2E       		.uleb128 0x2e
+ 1128 00a5 00       		.byte	0
+ 1129 00a6 3F       		.uleb128 0x3f
+ 1130 00a7 19       		.uleb128 0x19
+ 1131 00a8 03       		.uleb128 0x3
+ 1132 00a9 0E       		.uleb128 0xe
+ 1133 00aa 3A       		.uleb128 0x3a
+ 1134 00ab 0B       		.uleb128 0xb
+ 1135 00ac 3B       		.uleb128 0x3b
+ 1136 00ad 05       		.uleb128 0x5
+ 1137 00ae 27       		.uleb128 0x27
+ 1138 00af 19       		.uleb128 0x19
+ 1139 00b0 49       		.uleb128 0x49
+ 1140 00b1 13       		.uleb128 0x13
+ 1141 00b2 11       		.uleb128 0x11
+ 1142 00b3 01       		.uleb128 0x1
+ 1143 00b4 12       		.uleb128 0x12
+ 1144 00b5 06       		.uleb128 0x6
+ 1145 00b6 40       		.uleb128 0x40
+ 1146 00b7 18       		.uleb128 0x18
+ 1147 00b8 9742     		.uleb128 0x2117
+ 1148 00ba 19       		.uleb128 0x19
+ 1149 00bb 00       		.byte	0
+ 1150 00bc 00       		.byte	0
+ 1151 00bd 0D       		.uleb128 0xd
+ 1152 00be 2E       		.uleb128 0x2e
+ 1153 00bf 01       		.byte	0x1
+ 1154 00c0 3F       		.uleb128 0x3f
+ 1155 00c1 19       		.uleb128 0x19
+ 1156 00c2 03       		.uleb128 0x3
+ 1157 00c3 0E       		.uleb128 0xe
+ 1158 00c4 3A       		.uleb128 0x3a
+ 1159 00c5 0B       		.uleb128 0xb
+ 1160 00c6 3B       		.uleb128 0x3b
+ 1161 00c7 05       		.uleb128 0x5
+ 1162 00c8 27       		.uleb128 0x27
+ 1163 00c9 19       		.uleb128 0x19
+ 1164 00ca 11       		.uleb128 0x11
+ 1165 00cb 01       		.uleb128 0x1
+ 1166 00cc 12       		.uleb128 0x12
+ 1167 00cd 06       		.uleb128 0x6
+ 1168 00ce 40       		.uleb128 0x40
+ 1169 00cf 18       		.uleb128 0x18
+ 1170 00d0 9742     		.uleb128 0x2117
+ 1171 00d2 19       		.uleb128 0x19
+ 1172 00d3 01       		.uleb128 0x1
+ 1173 00d4 13       		.uleb128 0x13
+ 1174 00d5 00       		.byte	0
+ 1175 00d6 00       		.byte	0
+ 1176 00d7 0E       		.uleb128 0xe
+ 1177 00d8 1D       		.uleb128 0x1d
+ 1178 00d9 00       		.byte	0
+ 1179 00da 31       		.uleb128 0x31
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 38
+
+
+ 1180 00db 13       		.uleb128 0x13
+ 1181 00dc 52       		.uleb128 0x52
+ 1182 00dd 01       		.uleb128 0x1
+ 1183 00de 55       		.uleb128 0x55
+ 1184 00df 17       		.uleb128 0x17
+ 1185 00e0 58       		.uleb128 0x58
+ 1186 00e1 0B       		.uleb128 0xb
+ 1187 00e2 59       		.uleb128 0x59
+ 1188 00e3 05       		.uleb128 0x5
+ 1189 00e4 00       		.byte	0
+ 1190 00e5 00       		.byte	0
+ 1191 00e6 0F       		.uleb128 0xf
+ 1192 00e7 2E       		.uleb128 0x2e
+ 1193 00e8 01       		.byte	0x1
+ 1194 00e9 3F       		.uleb128 0x3f
+ 1195 00ea 19       		.uleb128 0x19
+ 1196 00eb 03       		.uleb128 0x3
+ 1197 00ec 0E       		.uleb128 0xe
+ 1198 00ed 3A       		.uleb128 0x3a
+ 1199 00ee 0B       		.uleb128 0xb
+ 1200 00ef 3B       		.uleb128 0x3b
+ 1201 00f0 0B       		.uleb128 0xb
+ 1202 00f1 27       		.uleb128 0x27
+ 1203 00f2 19       		.uleb128 0x19
+ 1204 00f3 11       		.uleb128 0x11
+ 1205 00f4 01       		.uleb128 0x1
+ 1206 00f5 12       		.uleb128 0x12
+ 1207 00f6 06       		.uleb128 0x6
+ 1208 00f7 40       		.uleb128 0x40
+ 1209 00f8 18       		.uleb128 0x18
+ 1210 00f9 9742     		.uleb128 0x2117
+ 1211 00fb 19       		.uleb128 0x19
+ 1212 00fc 01       		.uleb128 0x1
+ 1213 00fd 13       		.uleb128 0x13
+ 1214 00fe 00       		.byte	0
+ 1215 00ff 00       		.byte	0
+ 1216 0100 10       		.uleb128 0x10
+ 1217 0101 34       		.uleb128 0x34
+ 1218 0102 00       		.byte	0
+ 1219 0103 03       		.uleb128 0x3
+ 1220 0104 0E       		.uleb128 0xe
+ 1221 0105 3A       		.uleb128 0x3a
+ 1222 0106 0B       		.uleb128 0xb
+ 1223 0107 3B       		.uleb128 0x3b
+ 1224 0108 0B       		.uleb128 0xb
+ 1225 0109 49       		.uleb128 0x49
+ 1226 010a 13       		.uleb128 0x13
+ 1227 010b 02       		.uleb128 0x2
+ 1228 010c 17       		.uleb128 0x17
+ 1229 010d 00       		.byte	0
+ 1230 010e 00       		.byte	0
+ 1231 010f 11       		.uleb128 0x11
+ 1232 0110 1D       		.uleb128 0x1d
+ 1233 0111 01       		.byte	0x1
+ 1234 0112 31       		.uleb128 0x31
+ 1235 0113 13       		.uleb128 0x13
+ 1236 0114 11       		.uleb128 0x11
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 39
+
+
+ 1237 0115 01       		.uleb128 0x1
+ 1238 0116 12       		.uleb128 0x12
+ 1239 0117 06       		.uleb128 0x6
+ 1240 0118 58       		.uleb128 0x58
+ 1241 0119 0B       		.uleb128 0xb
+ 1242 011a 59       		.uleb128 0x59
+ 1243 011b 0B       		.uleb128 0xb
+ 1244 011c 01       		.uleb128 0x1
+ 1245 011d 13       		.uleb128 0x13
+ 1246 011e 00       		.byte	0
+ 1247 011f 00       		.byte	0
+ 1248 0120 12       		.uleb128 0x12
+ 1249 0121 05       		.uleb128 0x5
+ 1250 0122 00       		.byte	0
+ 1251 0123 31       		.uleb128 0x31
+ 1252 0124 13       		.uleb128 0x13
+ 1253 0125 02       		.uleb128 0x2
+ 1254 0126 17       		.uleb128 0x17
+ 1255 0127 00       		.byte	0
+ 1256 0128 00       		.byte	0
+ 1257 0129 13       		.uleb128 0x13
+ 1258 012a 898201   		.uleb128 0x4109
+ 1259 012d 00       		.byte	0
+ 1260 012e 11       		.uleb128 0x11
+ 1261 012f 01       		.uleb128 0x1
+ 1262 0130 31       		.uleb128 0x31
+ 1263 0131 13       		.uleb128 0x13
+ 1264 0132 00       		.byte	0
+ 1265 0133 00       		.byte	0
+ 1266 0134 14       		.uleb128 0x14
+ 1267 0135 898201   		.uleb128 0x4109
+ 1268 0138 00       		.byte	0
+ 1269 0139 11       		.uleb128 0x11
+ 1270 013a 01       		.uleb128 0x1
+ 1271 013b 9542     		.uleb128 0x2115
+ 1272 013d 19       		.uleb128 0x19
+ 1273 013e 31       		.uleb128 0x31
+ 1274 013f 13       		.uleb128 0x13
+ 1275 0140 00       		.byte	0
+ 1276 0141 00       		.byte	0
+ 1277 0142 15       		.uleb128 0x15
+ 1278 0143 2E       		.uleb128 0x2e
+ 1279 0144 00       		.byte	0
+ 1280 0145 31       		.uleb128 0x31
+ 1281 0146 13       		.uleb128 0x13
+ 1282 0147 11       		.uleb128 0x11
+ 1283 0148 01       		.uleb128 0x1
+ 1284 0149 12       		.uleb128 0x12
+ 1285 014a 06       		.uleb128 0x6
+ 1286 014b 40       		.uleb128 0x40
+ 1287 014c 18       		.uleb128 0x18
+ 1288 014d 9742     		.uleb128 0x2117
+ 1289 014f 19       		.uleb128 0x19
+ 1290 0150 00       		.byte	0
+ 1291 0151 00       		.byte	0
+ 1292 0152 16       		.uleb128 0x16
+ 1293 0153 2E       		.uleb128 0x2e
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 40
+
+
+ 1294 0154 01       		.byte	0x1
+ 1295 0155 3F       		.uleb128 0x3f
+ 1296 0156 19       		.uleb128 0x19
+ 1297 0157 03       		.uleb128 0x3
+ 1298 0158 0E       		.uleb128 0xe
+ 1299 0159 3A       		.uleb128 0x3a
+ 1300 015a 0B       		.uleb128 0xb
+ 1301 015b 3B       		.uleb128 0x3b
+ 1302 015c 05       		.uleb128 0x5
+ 1303 015d 27       		.uleb128 0x27
+ 1304 015e 19       		.uleb128 0x19
+ 1305 015f 49       		.uleb128 0x49
+ 1306 0160 13       		.uleb128 0x13
+ 1307 0161 11       		.uleb128 0x11
+ 1308 0162 01       		.uleb128 0x1
+ 1309 0163 12       		.uleb128 0x12
+ 1310 0164 06       		.uleb128 0x6
+ 1311 0165 40       		.uleb128 0x40
+ 1312 0166 18       		.uleb128 0x18
+ 1313 0167 9742     		.uleb128 0x2117
+ 1314 0169 19       		.uleb128 0x19
+ 1315 016a 01       		.uleb128 0x1
+ 1316 016b 13       		.uleb128 0x13
+ 1317 016c 00       		.byte	0
+ 1318 016d 00       		.byte	0
+ 1319 016e 17       		.uleb128 0x17
+ 1320 016f 34       		.uleb128 0x34
+ 1321 0170 00       		.byte	0
+ 1322 0171 03       		.uleb128 0x3
+ 1323 0172 0E       		.uleb128 0xe
+ 1324 0173 3A       		.uleb128 0x3a
+ 1325 0174 0B       		.uleb128 0xb
+ 1326 0175 3B       		.uleb128 0x3b
+ 1327 0176 05       		.uleb128 0x5
+ 1328 0177 49       		.uleb128 0x49
+ 1329 0178 13       		.uleb128 0x13
+ 1330 0179 02       		.uleb128 0x2
+ 1331 017a 18       		.uleb128 0x18
+ 1332 017b 00       		.byte	0
+ 1333 017c 00       		.byte	0
+ 1334 017d 18       		.uleb128 0x18
+ 1335 017e 05       		.uleb128 0x5
+ 1336 017f 00       		.byte	0
+ 1337 0180 03       		.uleb128 0x3
+ 1338 0181 0E       		.uleb128 0xe
+ 1339 0182 3A       		.uleb128 0x3a
+ 1340 0183 0B       		.uleb128 0xb
+ 1341 0184 3B       		.uleb128 0x3b
+ 1342 0185 05       		.uleb128 0x5
+ 1343 0186 49       		.uleb128 0x49
+ 1344 0187 13       		.uleb128 0x13
+ 1345 0188 02       		.uleb128 0x2
+ 1346 0189 18       		.uleb128 0x18
+ 1347 018a 00       		.byte	0
+ 1348 018b 00       		.byte	0
+ 1349 018c 19       		.uleb128 0x19
+ 1350 018d 34       		.uleb128 0x34
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 41
+
+
+ 1351 018e 00       		.byte	0
+ 1352 018f 03       		.uleb128 0x3
+ 1353 0190 0E       		.uleb128 0xe
+ 1354 0191 3A       		.uleb128 0x3a
+ 1355 0192 0B       		.uleb128 0xb
+ 1356 0193 3B       		.uleb128 0x3b
+ 1357 0194 0B       		.uleb128 0xb
+ 1358 0195 49       		.uleb128 0x49
+ 1359 0196 13       		.uleb128 0x13
+ 1360 0197 3F       		.uleb128 0x3f
+ 1361 0198 19       		.uleb128 0x19
+ 1362 0199 02       		.uleb128 0x2
+ 1363 019a 18       		.uleb128 0x18
+ 1364 019b 00       		.byte	0
+ 1365 019c 00       		.byte	0
+ 1366 019d 1A       		.uleb128 0x1a
+ 1367 019e 2E       		.uleb128 0x2e
+ 1368 019f 00       		.byte	0
+ 1369 01a0 3F       		.uleb128 0x3f
+ 1370 01a1 19       		.uleb128 0x19
+ 1371 01a2 3C       		.uleb128 0x3c
+ 1372 01a3 19       		.uleb128 0x19
+ 1373 01a4 6E       		.uleb128 0x6e
+ 1374 01a5 0E       		.uleb128 0xe
+ 1375 01a6 03       		.uleb128 0x3
+ 1376 01a7 0E       		.uleb128 0xe
+ 1377 01a8 3A       		.uleb128 0x3a
+ 1378 01a9 0B       		.uleb128 0xb
+ 1379 01aa 3B       		.uleb128 0x3b
+ 1380 01ab 0B       		.uleb128 0xb
+ 1381 01ac 00       		.byte	0
+ 1382 01ad 00       		.byte	0
+ 1383 01ae 00       		.byte	0
+ 1384              		.section	.debug_loc,"",%progbits
+ 1385              	.Ldebug_loc0:
+ 1386              	.LLST0:
+ 1387 0000 08000000 		.4byte	.LVL1
+ 1388 0004 0C000000 		.4byte	.LVL2
+ 1389 0008 0600     		.2byte	0x6
+ 1390 000a 73       		.byte	0x73
+ 1391 000b 00       		.sleb128 0
+ 1392 000c 09       		.byte	0x9
+ 1393 000d C0       		.byte	0xc0
+ 1394 000e 1A       		.byte	0x1a
+ 1395 000f 9F       		.byte	0x9f
+ 1396 0010 00000000 		.4byte	0
+ 1397 0014 00000000 		.4byte	0
+ 1398              	.LLST1:
+ 1399 0018 30000000 		.4byte	.LVL8
+ 1400 001c 3B000000 		.4byte	.LVL9-1
+ 1401 0020 0100     		.2byte	0x1
+ 1402 0022 50       		.byte	0x50
+ 1403 0023 00000000 		.4byte	0
+ 1404 0027 00000000 		.4byte	0
+ 1405              	.LLST2:
+ 1406 002b 1A000000 		.4byte	.LVL3
+ 1407 002f 20000000 		.4byte	.LVL4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 42
+
+
+ 1408 0033 0200     		.2byte	0x2
+ 1409 0035 44       		.byte	0x44
+ 1410 0036 9F       		.byte	0x9f
+ 1411 0037 00000000 		.4byte	0
+ 1412 003b 00000000 		.4byte	0
+ 1413              	.LLST3:
+ 1414 003f 20000000 		.4byte	.LVL4
+ 1415 0043 24000000 		.4byte	.LVL5
+ 1416 0047 0200     		.2byte	0x2
+ 1417 0049 44       		.byte	0x44
+ 1418 004a 9F       		.byte	0x9f
+ 1419 004b 00000000 		.4byte	0
+ 1420 004f 00000000 		.4byte	0
+ 1421              	.LLST4:
+ 1422 0053 24000000 		.4byte	.LVL5
+ 1423 0057 2A000000 		.4byte	.LVL6
+ 1424 005b 0200     		.2byte	0x2
+ 1425 005d 30       		.byte	0x30
+ 1426 005e 9F       		.byte	0x9f
+ 1427 005f 00000000 		.4byte	0
+ 1428 0063 00000000 		.4byte	0
+ 1429              	.LLST5:
+ 1430 0067 2A000000 		.4byte	.LVL6
+ 1431 006b 2C000000 		.4byte	.LVL7
+ 1432 006f 0200     		.2byte	0x2
+ 1433 0071 30       		.byte	0x30
+ 1434 0072 9F       		.byte	0x9f
+ 1435 0073 00000000 		.4byte	0
+ 1436 0077 00000000 		.4byte	0
+ 1437              		.section	.debug_aranges,"",%progbits
+ 1438 0000 94000000 		.4byte	0x94
+ 1439 0004 0200     		.2byte	0x2
+ 1440 0006 00000000 		.4byte	.Ldebug_info0
+ 1441 000a 04       		.byte	0x4
+ 1442 000b 00       		.byte	0
+ 1443 000c 0000     		.2byte	0
+ 1444 000e 0000     		.2byte	0
+ 1445 0010 00000000 		.4byte	.LFB2
+ 1446 0014 10000000 		.4byte	.LFE2-.LFB2
+ 1447 0018 00000000 		.4byte	.LFB3
+ 1448 001c 10000000 		.4byte	.LFE3-.LFB3
+ 1449 0020 00000000 		.4byte	.LFB4
+ 1450 0024 0C000000 		.4byte	.LFE4-.LFB4
+ 1451 0028 00000000 		.4byte	.LFB5
+ 1452 002c 14000000 		.4byte	.LFE5-.LFB5
+ 1453 0030 00000000 		.4byte	.LFB6
+ 1454 0034 18000000 		.4byte	.LFE6-.LFB6
+ 1455 0038 00000000 		.4byte	.LFB1
+ 1456 003c 4C000000 		.4byte	.LFE1-.LFB1
+ 1457 0040 00000000 		.4byte	.LFB0
+ 1458 0044 1C000000 		.4byte	.LFE0-.LFB0
+ 1459 0048 00000000 		.4byte	.LFB7
+ 1460 004c 0C000000 		.4byte	.LFE7-.LFB7
+ 1461 0050 00000000 		.4byte	.LFB8
+ 1462 0054 0C000000 		.4byte	.LFE8-.LFB8
+ 1463 0058 00000000 		.4byte	.LFB9
+ 1464 005c 0C000000 		.4byte	.LFE9-.LFB9
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 43
+
+
+ 1465 0060 00000000 		.4byte	.LFB10
+ 1466 0064 0C000000 		.4byte	.LFE10-.LFB10
+ 1467 0068 00000000 		.4byte	.LFB11
+ 1468 006c 0C000000 		.4byte	.LFE11-.LFB11
+ 1469 0070 00000000 		.4byte	.LFB12
+ 1470 0074 0C000000 		.4byte	.LFE12-.LFB12
+ 1471 0078 00000000 		.4byte	.LFB13
+ 1472 007c 0C000000 		.4byte	.LFE13-.LFB13
+ 1473 0080 00000000 		.4byte	.LFB14
+ 1474 0084 0C000000 		.4byte	.LFE14-.LFB14
+ 1475 0088 00000000 		.4byte	.LFB15
+ 1476 008c 0C000000 		.4byte	.LFE15-.LFB15
+ 1477 0090 00000000 		.4byte	0
+ 1478 0094 00000000 		.4byte	0
+ 1479              		.section	.debug_ranges,"",%progbits
+ 1480              	.Ldebug_ranges0:
+ 1481 0000 00000000 		.4byte	.LBB14
+ 1482 0004 02000000 		.4byte	.LBE14
+ 1483 0008 04000000 		.4byte	.LBB20
+ 1484 000c 06000000 		.4byte	.LBE20
+ 1485 0010 00000000 		.4byte	0
+ 1486 0014 00000000 		.4byte	0
+ 1487 0018 02000000 		.4byte	.LBB17
+ 1488 001c 04000000 		.4byte	.LBE17
+ 1489 0020 0A000000 		.4byte	.LBB21
+ 1490 0024 0E000000 		.4byte	.LBE21
+ 1491 0028 00000000 		.4byte	0
+ 1492 002c 00000000 		.4byte	0
+ 1493 0030 00000000 		.4byte	.LFB2
+ 1494 0034 10000000 		.4byte	.LFE2
+ 1495 0038 00000000 		.4byte	.LFB3
+ 1496 003c 10000000 		.4byte	.LFE3
+ 1497 0040 00000000 		.4byte	.LFB4
+ 1498 0044 0C000000 		.4byte	.LFE4
+ 1499 0048 00000000 		.4byte	.LFB5
+ 1500 004c 14000000 		.4byte	.LFE5
+ 1501 0050 00000000 		.4byte	.LFB6
+ 1502 0054 18000000 		.4byte	.LFE6
+ 1503 0058 00000000 		.4byte	.LFB1
+ 1504 005c 4C000000 		.4byte	.LFE1
+ 1505 0060 00000000 		.4byte	.LFB0
+ 1506 0064 1C000000 		.4byte	.LFE0
+ 1507 0068 00000000 		.4byte	.LFB7
+ 1508 006c 0C000000 		.4byte	.LFE7
+ 1509 0070 00000000 		.4byte	.LFB8
+ 1510 0074 0C000000 		.4byte	.LFE8
+ 1511 0078 00000000 		.4byte	.LFB9
+ 1512 007c 0C000000 		.4byte	.LFE9
+ 1513 0080 00000000 		.4byte	.LFB10
+ 1514 0084 0C000000 		.4byte	.LFE10
+ 1515 0088 00000000 		.4byte	.LFB11
+ 1516 008c 0C000000 		.4byte	.LFE11
+ 1517 0090 00000000 		.4byte	.LFB12
+ 1518 0094 0C000000 		.4byte	.LFE12
+ 1519 0098 00000000 		.4byte	.LFB13
+ 1520 009c 0C000000 		.4byte	.LFE13
+ 1521 00a0 00000000 		.4byte	.LFB14
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 44
+
+
+ 1522 00a4 0C000000 		.4byte	.LFE14
+ 1523 00a8 00000000 		.4byte	.LFB15
+ 1524 00ac 0C000000 		.4byte	.LFE15
+ 1525 00b0 00000000 		.4byte	0
+ 1526 00b4 00000000 		.4byte	0
+ 1527              		.section	.debug_line,"",%progbits
+ 1528              	.Ldebug_line0:
+ 1529 0000 A8010000 		.section	.debug_str,"MS",%progbits,1
+ 1529      02004E00 
+ 1529      00000201 
+ 1529      FB0E0D00 
+ 1529      01010101 
+ 1530              	.LASF22:
+ 1531 0000 4D616E74 		.ascii	"Mantmr_WritePeriod\000"
+ 1531      6D725F57 
+ 1531      72697465 
+ 1531      50657269 
+ 1531      6F6400
+ 1532              	.LASF17:
+ 1533 0013 4D616E74 		.ascii	"Mantmr_ReadStatusRegister\000"
+ 1533      6D725F52 
+ 1533      65616453 
+ 1533      74617475 
+ 1533      73526567 
+ 1534              	.LASF32:
+ 1535 002d 4D616E74 		.ascii	"Mantmr_Start\000"
+ 1535      6D725F53 
+ 1535      74617274 
+ 1535      00
+ 1536              	.LASF23:
+ 1537 003a 70657269 		.ascii	"period\000"
+ 1537      6F6400
+ 1538              	.LASF3:
+ 1539 0041 73686F72 		.ascii	"short unsigned int\000"
+ 1539      7420756E 
+ 1539      7369676E 
+ 1539      65642069 
+ 1539      6E7400
+ 1540              	.LASF43:
+ 1541 0054 4D616E74 		.ascii	"Mantmr_ReadControlRegister\000"
+ 1541      6D725F52 
+ 1541      65616443 
+ 1541      6F6E7472 
+ 1541      6F6C5265 
+ 1542              	.LASF10:
+ 1543 006f 646F7562 		.ascii	"double\000"
+ 1543      6C6500
+ 1544              	.LASF42:
+ 1545 0076 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3\\UARTldr_QFN.cydsn\000"
+ 1545      73657273 
+ 1545      5C636865 
+ 1545      6D695C55 
+ 1545      44335C55 
+ 1546              	.LASF24:
+ 1547 009b 4D616E74 		.ascii	"Mantmr_WriteCounter\000"
+ 1547      6D725F57 
+ 1547      72697465 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 45
+
+
+ 1547      436F756E 
+ 1547      74657200 
+ 1548              	.LASF45:
+ 1549 00af 4D616E74 		.ascii	"Mantmr_initVar\000"
+ 1549      6D725F69 
+ 1549      6E697456 
+ 1549      617200
+ 1550              	.LASF31:
+ 1551 00be 4D616E74 		.ascii	"Mantmr_interruptState\000"
+ 1551      6D725F69 
+ 1551      6E746572 
+ 1551      72757074 
+ 1551      53746174 
+ 1552              	.LASF9:
+ 1553 00d4 666C6F61 		.ascii	"float\000"
+ 1553      7400
+ 1554              	.LASF25:
+ 1555 00da 636F756E 		.ascii	"counter\000"
+ 1555      74657200 
+ 1556              	.LASF1:
+ 1557 00e2 756E7369 		.ascii	"unsigned char\000"
+ 1557      676E6564 
+ 1557      20636861 
+ 1557      7200
+ 1558              	.LASF37:
+ 1559 00f0 4D616E74 		.ascii	"Mantmr_ReadPeriod\000"
+ 1559      6D725F52 
+ 1559      65616450 
+ 1559      6572696F 
+ 1559      6400
+ 1560              	.LASF40:
+ 1561 0102 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1561      43313120 
+ 1561      352E342E 
+ 1561      31203230 
+ 1561      31363036 
+ 1562 0135 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1562      20726576 
+ 1562      6973696F 
+ 1562      6E203233 
+ 1562      37373135 
+ 1563 0168 73202D66 		.ascii	"s -ffunction-sections -ffat-lto-objects\000"
+ 1563      66756E63 
+ 1563      74696F6E 
+ 1563      2D736563 
+ 1563      74696F6E 
+ 1564              	.LASF12:
+ 1565 0190 75696E74 		.ascii	"uint8\000"
+ 1565      3800
+ 1566              	.LASF44:
+ 1567 0196 636F6E74 		.ascii	"control\000"
+ 1567      726F6C00 
+ 1568              	.LASF34:
+ 1569 019e 4D616E74 		.ascii	"Mantmr_WriteControlRegister\000"
+ 1569      6D725F57 
+ 1569      72697465 
+ 1569      436F6E74 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 46
+
+
+ 1569      726F6C52 
+ 1570              	.LASF36:
+ 1571 01ba 4D616E74 		.ascii	"Mantmr_ReadCompare\000"
+ 1571      6D725F52 
+ 1571      65616443 
+ 1571      6F6D7061 
+ 1571      726500
+ 1572              	.LASF29:
+ 1573 01cd 4D616E74 		.ascii	"Mantmr_Init\000"
+ 1573      6D725F49 
+ 1573      6E697400 
+ 1574              	.LASF2:
+ 1575 01d9 73686F72 		.ascii	"short int\000"
+ 1575      7420696E 
+ 1575      7400
+ 1576              	.LASF38:
+ 1577 01e3 4379456E 		.ascii	"CyEnterCriticalSection\000"
+ 1577      74657243 
+ 1577      72697469 
+ 1577      63616C53 
+ 1577      65637469 
+ 1578              	.LASF5:
+ 1579 01fa 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1579      20756E73 
+ 1579      69676E65 
+ 1579      6420696E 
+ 1579      7400
+ 1580              	.LASF8:
+ 1581 020c 756E7369 		.ascii	"unsigned int\000"
+ 1581      676E6564 
+ 1581      20696E74 
+ 1581      00
+ 1582              	.LASF7:
+ 1583 0219 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1583      206C6F6E 
+ 1583      6720756E 
+ 1583      7369676E 
+ 1583      65642069 
+ 1584              	.LASF33:
+ 1585 0230 72657375 		.ascii	"result\000"
+ 1585      6C7400
+ 1586              	.LASF13:
+ 1587 0237 72656738 		.ascii	"reg8\000"
+ 1587      00
+ 1588              	.LASF15:
+ 1589 023c 73697A65 		.ascii	"sizetype\000"
+ 1589      74797065 
+ 1589      00
+ 1590              	.LASF6:
+ 1591 0245 6C6F6E67 		.ascii	"long long int\000"
+ 1591      206C6F6E 
+ 1591      6720696E 
+ 1591      7400
+ 1592              	.LASF20:
+ 1593 0253 696E7465 		.ascii	"interruptMode\000"
+ 1593      72727570 
+ 1593      744D6F64 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 47
+
+
+ 1593      6500
+ 1594              	.LASF35:
+ 1595 0261 4D616E74 		.ascii	"Mantmr_ReadCounter\000"
+ 1595      6D725F52 
+ 1595      65616443 
+ 1595      6F756E74 
+ 1595      657200
+ 1596              	.LASF28:
+ 1597 0274 4D616E74 		.ascii	"Mantmr_ClearFIFO\000"
+ 1597      6D725F43 
+ 1597      6C656172 
+ 1597      4649464F 
+ 1597      00
+ 1598              	.LASF27:
+ 1599 0285 4D616E74 		.ascii	"Mantmr_Stop\000"
+ 1599      6D725F53 
+ 1599      746F7000 
+ 1600              	.LASF26:
+ 1601 0291 4D616E74 		.ascii	"Mantmr_Enable\000"
+ 1601      6D725F45 
+ 1601      6E61626C 
+ 1601      6500
+ 1602              	.LASF18:
+ 1603 029f 4D616E74 		.ascii	"Mantmr_SetInterruptMode\000"
+ 1603      6D725F53 
+ 1603      6574496E 
+ 1603      74657272 
+ 1603      7570744D 
+ 1604              	.LASF39:
+ 1605 02b7 43794578 		.ascii	"CyExitCriticalSection\000"
+ 1605      69744372 
+ 1605      69746963 
+ 1605      616C5365 
+ 1605      6374696F 
+ 1606              	.LASF4:
+ 1607 02cd 6C6F6E67 		.ascii	"long int\000"
+ 1607      20696E74 
+ 1607      00
+ 1608              	.LASF11:
+ 1609 02d6 63686172 		.ascii	"char\000"
+ 1609      00
+ 1610              	.LASF14:
+ 1611 02db 6C6F6E67 		.ascii	"long double\000"
+ 1611      20646F75 
+ 1611      626C6500 
+ 1612              	.LASF0:
+ 1613 02e7 7369676E 		.ascii	"signed char\000"
+ 1613      65642063 
+ 1613      68617200 
+ 1614              	.LASF21:
+ 1615 02f3 636F6D70 		.ascii	"compare\000"
+ 1615      61726500 
+ 1616              	.LASF41:
+ 1617 02fb 47656E65 		.ascii	"Generated_Source\\PSoC5\\Mantmr.c\000"
+ 1617      72617465 
+ 1617      645F536F 
+ 1617      75726365 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccTUkXtX.s 			page 48
+
+
+ 1617      5C50536F 
+ 1618              	.LASF16:
+ 1619 031b 4D616E74 		.ascii	"Mantmr_ReadCapture\000"
+ 1619      6D725F52 
+ 1619      65616443 
+ 1619      61707475 
+ 1619      726500
+ 1620              	.LASF30:
+ 1621 032e 6374726C 		.ascii	"ctrl\000"
+ 1621      00
+ 1622              	.LASF19:
+ 1623 0333 4D616E74 		.ascii	"Mantmr_WriteCompare\000"
+ 1623      6D725F57 
+ 1623      72697465 
+ 1623      436F6D70 
+ 1623      61726500 
+ 1624              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

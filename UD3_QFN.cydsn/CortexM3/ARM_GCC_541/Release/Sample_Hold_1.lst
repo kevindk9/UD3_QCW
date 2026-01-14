@@ -1,0 +1,1103 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"Sample_Hold_1.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.Sample_Hold_1_Enable,"ax",%progbits
+  20              		.align	1
+  21              		.global	Sample_Hold_1_Enable
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	Sample_Hold_1_Enable, %function
+  25              	Sample_Hold_1_Enable:
+  26              	.LFB1:
+  27              		.file 1 "Generated_Source\\PSoC5\\Sample_Hold_1.c"
+   1:Generated_Source\PSoC5/Sample_Hold_1.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/Sample_Hold_1.c **** * File Name: Sample_Hold_1.c
+   3:Generated_Source\PSoC5/Sample_Hold_1.c **** * Version 1.40
+   4:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+   5:Generated_Source\PSoC5/Sample_Hold_1.c **** * Description:
+   6:Generated_Source\PSoC5/Sample_Hold_1.c **** *  This file provides the source code to the API for the SAMPLE/TRACK AND HOLD 
+   7:Generated_Source\PSoC5/Sample_Hold_1.c **** *  component.
+   8:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+   9:Generated_Source\PSoC5/Sample_Hold_1.c **** * Note:
+  10:Generated_Source\PSoC5/Sample_Hold_1.c **** *  None
+  11:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+  12:Generated_Source\PSoC5/Sample_Hold_1.c **** ********************************************************************************
+  13:Generated_Source\PSoC5/Sample_Hold_1.c **** * Copyright 2008-2012, Cypress Semiconductor Corporation.  All rights reserved.
+  14:Generated_Source\PSoC5/Sample_Hold_1.c **** * You may use this file only in accordance with the license, terms, conditions, 
+  15:Generated_Source\PSoC5/Sample_Hold_1.c **** * disclaimers, and limitations in the end user license agreement accompanying 
+  16:Generated_Source\PSoC5/Sample_Hold_1.c **** * the software package with which this file was provided.
+  17:Generated_Source\PSoC5/Sample_Hold_1.c **** *******************************************************************************/
+  18:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+  19:Generated_Source\PSoC5/Sample_Hold_1.c **** #include "Sample_Hold_1.h"
+  20:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+  21:Generated_Source\PSoC5/Sample_Hold_1.c **** #if (!CY_PSOC5A)
+  22:Generated_Source\PSoC5/Sample_Hold_1.c ****     #if (CYDEV_VARIABLE_VDDA == 1u)
+  23:Generated_Source\PSoC5/Sample_Hold_1.c ****         #include "CyScBoostClk.h"
+  24:Generated_Source\PSoC5/Sample_Hold_1.c ****     #endif /* (CYDEV_VARIABLE_VDDA == 1u) */
+  25:Generated_Source\PSoC5/Sample_Hold_1.c **** #endif /* (!CY_PSOC5A) */
+  26:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+  27:Generated_Source\PSoC5/Sample_Hold_1.c **** uint8 Sample_Hold_1_initVar = 0u;
+  28:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+  29:Generated_Source\PSoC5/Sample_Hold_1.c **** /* static Sample_Hold_1_backupStruct  Sample_Hold_1_backup; */
+  30:Generated_Source\PSoC5/Sample_Hold_1.c **** #if (CY_PSOC5A)
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 2
+
+
+  31:Generated_Source\PSoC5/Sample_Hold_1.c ****     static Sample_Hold_1_backupStruct  Sample_Hold_1_P5backup;
+  32:Generated_Source\PSoC5/Sample_Hold_1.c **** #endif /* CY_PSOC5A */
+  33:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+  34:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+  35:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+  36:Generated_Source\PSoC5/Sample_Hold_1.c **** /*******************************************************************************   
+  37:Generated_Source\PSoC5/Sample_Hold_1.c **** * Function Name: Sample_Hold_1_Init
+  38:Generated_Source\PSoC5/Sample_Hold_1.c **** ********************************************************************************
+  39:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+  40:Generated_Source\PSoC5/Sample_Hold_1.c **** * Summary:
+  41:Generated_Source\PSoC5/Sample_Hold_1.c **** *  Initialize component's parameters to the parameters set by user in the 
+  42:Generated_Source\PSoC5/Sample_Hold_1.c **** *  customizer of the component placed onto schematic. Usually called in 
+  43:Generated_Source\PSoC5/Sample_Hold_1.c **** *  Sample_Hold_1_Start().
+  44:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+  45:Generated_Source\PSoC5/Sample_Hold_1.c **** * Parameters:
+  46:Generated_Source\PSoC5/Sample_Hold_1.c **** *  void
+  47:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+  48:Generated_Source\PSoC5/Sample_Hold_1.c **** * Return:
+  49:Generated_Source\PSoC5/Sample_Hold_1.c **** *  void
+  50:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+  51:Generated_Source\PSoC5/Sample_Hold_1.c **** *******************************************************************************/
+  52:Generated_Source\PSoC5/Sample_Hold_1.c **** void Sample_Hold_1_Init(void) 
+  53:Generated_Source\PSoC5/Sample_Hold_1.c **** {   
+  54:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* Configure SC Block based on selected Sample/Track type */
+  55:Generated_Source\PSoC5/Sample_Hold_1.c ****     #if (Sample_Hold_1_SAMPLE_TRACK_MODE == Sample_Hold_1_SAMPLEANDHOLD) /* Sample and hold mode */
+  56:Generated_Source\PSoC5/Sample_Hold_1.c ****         /* SC Block mode -  - SCxx_CR0[3:1] */
+  57:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_CR0_REG = Sample_Hold_1_MODE_SAMPLEANDHOLD;
+  58:Generated_Source\PSoC5/Sample_Hold_1.c ****         
+  59:Generated_Source\PSoC5/Sample_Hold_1.c ****         /* SC Block CR1 */ 
+  60:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_CR1_REG = (Sample_Hold_1_COMP_4P35PF  |
+  61:Generated_Source\PSoC5/Sample_Hold_1.c ****                                 Sample_Hold_1_GAIN_0DB);
+  62:Generated_Source\PSoC5/Sample_Hold_1.c ****         #if(Sample_Hold_1_SAMPLE_CLOCK_EDGE == Sample_Hold_1_EDGE_POSITIVENEGATIVE)
+  63:Generated_Source\PSoC5/Sample_Hold_1.c ****             Sample_Hold_1_CR1_REG =  Sample_Hold_1_CR1_REG  | Sample_Hold_1_DIV2_DISABLE ;
+  64:Generated_Source\PSoC5/Sample_Hold_1.c ****         #else
+  65:Generated_Source\PSoC5/Sample_Hold_1.c ****             Sample_Hold_1_CR1_REG =  Sample_Hold_1_CR1_REG  | Sample_Hold_1_DIV2_ENABLE ;
+  66:Generated_Source\PSoC5/Sample_Hold_1.c ****         #endif
+  67:Generated_Source\PSoC5/Sample_Hold_1.c ****          
+  68:Generated_Source\PSoC5/Sample_Hold_1.c ****         #if(Sample_Hold_1_VREF_TYPE == Sample_Hold_1_EXTERNAL)
+  69:Generated_Source\PSoC5/Sample_Hold_1.c ****             Sample_Hold_1_CR2_REG = Sample_Hold_1_BIAS_LOW |
+  70:Generated_Source\PSoC5/Sample_Hold_1.c ****                                        Sample_Hold_1_REDC_00 | 
+  71:Generated_Source\PSoC5/Sample_Hold_1.c ****                                        Sample_Hold_1_GNDVREF_DI;
+  72:Generated_Source\PSoC5/Sample_Hold_1.c ****         #else
+  73:Generated_Source\PSoC5/Sample_Hold_1.c ****             Sample_Hold_1_CR2_REG = Sample_Hold_1_BIAS_LOW |
+  74:Generated_Source\PSoC5/Sample_Hold_1.c ****                                        Sample_Hold_1_REDC_00 | 
+  75:Generated_Source\PSoC5/Sample_Hold_1.c ****                                        Sample_Hold_1_GNDVREF_E;
+  76:Generated_Source\PSoC5/Sample_Hold_1.c ****         #endif
+  77:Generated_Source\PSoC5/Sample_Hold_1.c ****     #else
+  78:Generated_Source\PSoC5/Sample_Hold_1.c ****         /* Track and Hold Mode */
+  79:Generated_Source\PSoC5/Sample_Hold_1.c ****         /* SC Block mode -  - SCxx_CR0[3:1] */
+  80:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_CR0_REG = Sample_Hold_1_MODE_TRACKANDHOLD; 
+  81:Generated_Source\PSoC5/Sample_Hold_1.c ****         
+  82:Generated_Source\PSoC5/Sample_Hold_1.c ****         /* SC Block CR1 */ 
+  83:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_CR1_REG = Sample_Hold_1_COMP_4P35PF  |
+  84:Generated_Source\PSoC5/Sample_Hold_1.c ****                                    Sample_Hold_1_DIV2_ENABLE |
+  85:Generated_Source\PSoC5/Sample_Hold_1.c ****                                    Sample_Hold_1_GAIN_0DB;
+  86:Generated_Source\PSoC5/Sample_Hold_1.c ****                                 
+  87:Generated_Source\PSoC5/Sample_Hold_1.c ****         /* SC Block CR2 */
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 3
+
+
+  88:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_CR2_REG = Sample_Hold_1_BIAS_LOW |
+  89:Generated_Source\PSoC5/Sample_Hold_1.c ****                                    Sample_Hold_1_REDC_00 |
+  90:Generated_Source\PSoC5/Sample_Hold_1.c ****                                    Sample_Hold_1_GNDVREF_E;
+  91:Generated_Source\PSoC5/Sample_Hold_1.c ****     #endif /* end if - Sample/Track Type */
+  92:Generated_Source\PSoC5/Sample_Hold_1.c ****     
+  93:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* Enable SC Block clocking */
+  94:Generated_Source\PSoC5/Sample_Hold_1.c ****     Sample_Hold_1_CLK_REG |= Sample_Hold_1_CLK_EN;
+  95:Generated_Source\PSoC5/Sample_Hold_1.c ****     
+  96:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* Set default power */
+  97:Generated_Source\PSoC5/Sample_Hold_1.c ****     Sample_Hold_1_SetPower(Sample_Hold_1_INIT_POWER);
+  98:Generated_Source\PSoC5/Sample_Hold_1.c **** }
+  99:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+ 100:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+ 101:Generated_Source\PSoC5/Sample_Hold_1.c **** /*******************************************************************************   
+ 102:Generated_Source\PSoC5/Sample_Hold_1.c **** * Function Name: Sample_Hold_1_Enable
+ 103:Generated_Source\PSoC5/Sample_Hold_1.c **** ********************************************************************************
+ 104:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 105:Generated_Source\PSoC5/Sample_Hold_1.c **** * Summary:
+ 106:Generated_Source\PSoC5/Sample_Hold_1.c **** *  Enables the Sample/Track and Hold block operation
+ 107:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 108:Generated_Source\PSoC5/Sample_Hold_1.c **** * Parameters:
+ 109:Generated_Source\PSoC5/Sample_Hold_1.c **** *  void
+ 110:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 111:Generated_Source\PSoC5/Sample_Hold_1.c **** * Return:
+ 112:Generated_Source\PSoC5/Sample_Hold_1.c **** *  void
+ 113:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 114:Generated_Source\PSoC5/Sample_Hold_1.c **** *******************************************************************************/
+ 115:Generated_Source\PSoC5/Sample_Hold_1.c **** void Sample_Hold_1_Enable(void) 
+ 116:Generated_Source\PSoC5/Sample_Hold_1.c **** {
+  28              		.loc 1 116 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+ 117:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* This is to restore the value of register CR1 and CR2 which is saved 
+ 118:Generated_Source\PSoC5/Sample_Hold_1.c ****       in prior to the modifications in stop() API */
+ 119:Generated_Source\PSoC5/Sample_Hold_1.c ****     #if (CY_PSOC5A)
+ 120:Generated_Source\PSoC5/Sample_Hold_1.c ****         if(Sample_Hold_1_P5backup.enableState == 1u)
+ 121:Generated_Source\PSoC5/Sample_Hold_1.c ****         {
+ 122:Generated_Source\PSoC5/Sample_Hold_1.c ****             Sample_Hold_1_CR1_REG = Sample_Hold_1_P5backup.scCR1Reg;
+ 123:Generated_Source\PSoC5/Sample_Hold_1.c ****             Sample_Hold_1_CR2_REG = Sample_Hold_1_P5backup.scCR2Reg;
+ 124:Generated_Source\PSoC5/Sample_Hold_1.c ****             Sample_Hold_1_P5backup.enableState = 0u;
+ 125:Generated_Source\PSoC5/Sample_Hold_1.c ****         }
+ 126:Generated_Source\PSoC5/Sample_Hold_1.c ****     #endif /* CY_PSOC5A */
+ 127:Generated_Source\PSoC5/Sample_Hold_1.c ****     
+ 128:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* Enable power to SC block in active mode */
+ 129:Generated_Source\PSoC5/Sample_Hold_1.c ****     Sample_Hold_1_PM_ACT_CFG_REG |= Sample_Hold_1_ACT_PWR_EN;
+  33              		.loc 1 129 0
+  34 0000 084A     		ldr	r2, .L2
+  35 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  36 0004 43F00203 		orr	r3, r3, #2
+  37 0008 1370     		strb	r3, [r2]
+ 130:Generated_Source\PSoC5/Sample_Hold_1.c ****     
+ 131:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* Enable power to SC block in Alternative active mode */
+ 132:Generated_Source\PSoC5/Sample_Hold_1.c ****     Sample_Hold_1_PM_STBY_CFG_REG |= Sample_Hold_1_STBY_PWR_EN;
+  38              		.loc 1 132 0
+  39 000a 137C     		ldrb	r3, [r2, #16]	@ zero_extendqisi2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 4
+
+
+  40 000c 43F00203 		orr	r3, r3, #2
+  41 0010 1374     		strb	r3, [r2, #16]
+ 133:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+ 134:Generated_Source\PSoC5/Sample_Hold_1.c ****     Sample_Hold_1_PUMP_CR1_REG |= Sample_Hold_1_PUMP_CR1_SC_CLKSEL;
+  42              		.loc 1 134 0
+  43 0012 02F5A652 		add	r2, r2, #5312
+  44 0016 0E32     		adds	r2, r2, #14
+  45 0018 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  46 001a 43F08003 		orr	r3, r3, #128
+  47 001e 1370     		strb	r3, [r2]
+  48 0020 7047     		bx	lr
+  49              	.L3:
+  50 0022 00BF     		.align	2
+  51              	.L2:
+  52 0024 A9430040 		.word	1073759145
+  53              		.cfi_endproc
+  54              	.LFE1:
+  55              		.size	Sample_Hold_1_Enable, .-Sample_Hold_1_Enable
+  56              		.section	.text.Sample_Hold_1_Stop,"ax",%progbits
+  57              		.align	1
+  58              		.global	Sample_Hold_1_Stop
+  59              		.thumb
+  60              		.thumb_func
+  61              		.type	Sample_Hold_1_Stop, %function
+  62              	Sample_Hold_1_Stop:
+  63              	.LFB3:
+ 135:Generated_Source\PSoC5/Sample_Hold_1.c ****     
+ 136:Generated_Source\PSoC5/Sample_Hold_1.c ****     #if (!CY_PSOC5A)
+ 137:Generated_Source\PSoC5/Sample_Hold_1.c ****         #if (CYDEV_VARIABLE_VDDA == 1u)
+ 138:Generated_Source\PSoC5/Sample_Hold_1.c ****             if(CyScPumpEnabled == 1u)
+ 139:Generated_Source\PSoC5/Sample_Hold_1.c ****             {
+ 140:Generated_Source\PSoC5/Sample_Hold_1.c ****                 Sample_Hold_1_BSTCLK_REG &= (uint8)(~Sample_Hold_1_BST_CLK_INDEX_MASK);
+ 141:Generated_Source\PSoC5/Sample_Hold_1.c ****                 Sample_Hold_1_BSTCLK_REG |= Sample_Hold_1_BST_CLK_EN | CyScBoostClk__INDEX;
+ 142:Generated_Source\PSoC5/Sample_Hold_1.c ****                 Sample_Hold_1_SC_MISC_REG |= Sample_Hold_1_PUMP_FORCE;
+ 143:Generated_Source\PSoC5/Sample_Hold_1.c ****                 CyScBoostClk_Start();
+ 144:Generated_Source\PSoC5/Sample_Hold_1.c ****             }
+ 145:Generated_Source\PSoC5/Sample_Hold_1.c ****             else
+ 146:Generated_Source\PSoC5/Sample_Hold_1.c ****             {
+ 147:Generated_Source\PSoC5/Sample_Hold_1.c ****                 Sample_Hold_1_BSTCLK_REG &= (uint8)(~Sample_Hold_1_BST_CLK_EN);
+ 148:Generated_Source\PSoC5/Sample_Hold_1.c ****                 Sample_Hold_1_SC_MISC_REG &= (uint8)(~Sample_Hold_1_PUMP_FORCE);
+ 149:Generated_Source\PSoC5/Sample_Hold_1.c ****             }
+ 150:Generated_Source\PSoC5/Sample_Hold_1.c ****         #endif /* (CYDEV_VARIABLE_VDDA == 1u) */
+ 151:Generated_Source\PSoC5/Sample_Hold_1.c ****     #endif /* (!CY_PSOC5A) */
+ 152:Generated_Source\PSoC5/Sample_Hold_1.c **** }
+ 153:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+ 154:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+ 155:Generated_Source\PSoC5/Sample_Hold_1.c **** /*******************************************************************************
+ 156:Generated_Source\PSoC5/Sample_Hold_1.c **** * Function Name: Sample_Hold_1_Start
+ 157:Generated_Source\PSoC5/Sample_Hold_1.c **** ********************************************************************************
+ 158:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 159:Generated_Source\PSoC5/Sample_Hold_1.c **** * Summary:
+ 160:Generated_Source\PSoC5/Sample_Hold_1.c **** *  The start function initializes the Sample and Hold with the default values, 
+ 161:Generated_Source\PSoC5/Sample_Hold_1.c **** *  and sets the power to the given level.  A power level of 0, is the same as 
+ 162:Generated_Source\PSoC5/Sample_Hold_1.c **** *  executing the stop function.
+ 163:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 164:Generated_Source\PSoC5/Sample_Hold_1.c **** * Parameters:
+ 165:Generated_Source\PSoC5/Sample_Hold_1.c **** *  void
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 5
+
+
+ 166:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 167:Generated_Source\PSoC5/Sample_Hold_1.c **** * Return:
+ 168:Generated_Source\PSoC5/Sample_Hold_1.c **** *  void
+ 169:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 170:Generated_Source\PSoC5/Sample_Hold_1.c **** *******************************************************************************/
+ 171:Generated_Source\PSoC5/Sample_Hold_1.c **** void Sample_Hold_1_Start(void) 
+ 172:Generated_Source\PSoC5/Sample_Hold_1.c **** {
+ 173:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* If not Initialized then initialize all required hardware and software */
+ 174:Generated_Source\PSoC5/Sample_Hold_1.c ****     if(Sample_Hold_1_initVar == 0u)
+ 175:Generated_Source\PSoC5/Sample_Hold_1.c ****     {
+ 176:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_Init();
+ 177:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_initVar = 1u;
+ 178:Generated_Source\PSoC5/Sample_Hold_1.c ****     }
+ 179:Generated_Source\PSoC5/Sample_Hold_1.c ****     Sample_Hold_1_Enable();
+ 180:Generated_Source\PSoC5/Sample_Hold_1.c **** }
+ 181:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+ 182:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+ 183:Generated_Source\PSoC5/Sample_Hold_1.c **** /*******************************************************************************
+ 184:Generated_Source\PSoC5/Sample_Hold_1.c **** * Function Name: Sample_Hold_1_Stop
+ 185:Generated_Source\PSoC5/Sample_Hold_1.c **** ********************************************************************************
+ 186:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 187:Generated_Source\PSoC5/Sample_Hold_1.c **** * Summary:
+ 188:Generated_Source\PSoC5/Sample_Hold_1.c **** *  Powers down amplifier to lowest power state.
+ 189:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 190:Generated_Source\PSoC5/Sample_Hold_1.c **** * Parameters:
+ 191:Generated_Source\PSoC5/Sample_Hold_1.c **** *  void
+ 192:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 193:Generated_Source\PSoC5/Sample_Hold_1.c **** * Return:
+ 194:Generated_Source\PSoC5/Sample_Hold_1.c **** *  void
+ 195:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 196:Generated_Source\PSoC5/Sample_Hold_1.c **** *******************************************************************************/
+ 197:Generated_Source\PSoC5/Sample_Hold_1.c **** void Sample_Hold_1_Stop(void) 
+ 198:Generated_Source\PSoC5/Sample_Hold_1.c **** {   
+  64              		.loc 1 198 0
+  65              		.cfi_startproc
+  66              		@ args = 0, pretend = 0, frame = 0
+  67              		@ frame_needed = 0, uses_anonymous_args = 0
+  68              		@ link register save eliminated.
+ 199:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* Disble power to the Amp in Active mode template */
+ 200:Generated_Source\PSoC5/Sample_Hold_1.c ****     Sample_Hold_1_PM_ACT_CFG_REG &= (uint8)(~Sample_Hold_1_ACT_PWR_EN);
+  69              		.loc 1 200 0
+  70 0000 044A     		ldr	r2, .L5
+  71 0002 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+  72 0004 03F0FD03 		and	r3, r3, #253
+  73 0008 1370     		strb	r3, [r2]
+ 201:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+ 202:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* Disble power to the Amp in Alternative Active mode template */
+ 203:Generated_Source\PSoC5/Sample_Hold_1.c ****     Sample_Hold_1_PM_STBY_CFG_REG &= (uint8)(~Sample_Hold_1_STBY_PWR_EN);
+  74              		.loc 1 203 0
+  75 000a 137C     		ldrb	r3, [r2, #16]	@ zero_extendqisi2
+  76 000c 03F0FD03 		and	r3, r3, #253
+  77 0010 1374     		strb	r3, [r2, #16]
+  78 0012 7047     		bx	lr
+  79              	.L6:
+  80              		.align	2
+  81              	.L5:
+  82 0014 A9430040 		.word	1073759145
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 6
+
+
+  83              		.cfi_endproc
+  84              	.LFE3:
+  85              		.size	Sample_Hold_1_Stop, .-Sample_Hold_1_Stop
+  86              		.section	.text.Sample_Hold_1_SetPower,"ax",%progbits
+  87              		.align	1
+  88              		.global	Sample_Hold_1_SetPower
+  89              		.thumb
+  90              		.thumb_func
+  91              		.type	Sample_Hold_1_SetPower, %function
+  92              	Sample_Hold_1_SetPower:
+  93              	.LFB4:
+ 204:Generated_Source\PSoC5/Sample_Hold_1.c ****     
+ 205:Generated_Source\PSoC5/Sample_Hold_1.c ****     #if (!CY_PSOC5A)
+ 206:Generated_Source\PSoC5/Sample_Hold_1.c ****         #if (CYDEV_VARIABLE_VDDA == 1u)
+ 207:Generated_Source\PSoC5/Sample_Hold_1.c ****             Sample_Hold_1_BSTCLK_REG &= (uint8)(~Sample_Hold_1_BST_CLK_EN);
+ 208:Generated_Source\PSoC5/Sample_Hold_1.c ****             /* Disable pumps only if there aren't any SC block in use */
+ 209:Generated_Source\PSoC5/Sample_Hold_1.c ****             if ((Sample_Hold_1_PM_ACT_CFG_REG & Sample_Hold_1_PM_ACT_CFG_MASK) == 0u)
+ 210:Generated_Source\PSoC5/Sample_Hold_1.c ****             {
+ 211:Generated_Source\PSoC5/Sample_Hold_1.c ****                 Sample_Hold_1_SC_MISC_REG &= (uint8)(~Sample_Hold_1_PUMP_FORCE);
+ 212:Generated_Source\PSoC5/Sample_Hold_1.c ****                 Sample_Hold_1_PUMP_CR1_REG &= (uint8)(~Sample_Hold_1_PUMP_CR1_SC_CLKSEL);
+ 213:Generated_Source\PSoC5/Sample_Hold_1.c ****                 CyScBoostClk_Stop();
+ 214:Generated_Source\PSoC5/Sample_Hold_1.c ****             }
+ 215:Generated_Source\PSoC5/Sample_Hold_1.c ****         #endif /* CYDEV_VARIABLE_VDDA == 1u */
+ 216:Generated_Source\PSoC5/Sample_Hold_1.c ****     #endif /* (CY_PSOC3 || CY_PSOC5LP) */
+ 217:Generated_Source\PSoC5/Sample_Hold_1.c ****  
+ 218:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* This sets Sample and hold in zero current mode and output routes are valid */
+ 219:Generated_Source\PSoC5/Sample_Hold_1.c ****     #if (CY_PSOC5A)
+ 220:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_P5backup.scCR1Reg = Sample_Hold_1_CR1_REG;
+ 221:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_P5backup.scCR2Reg = Sample_Hold_1_CR2_REG;
+ 222:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_CR1_REG = 0x00u;
+ 223:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_CR2_REG = 0x00u;
+ 224:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_P5backup.enableState = 1u;
+ 225:Generated_Source\PSoC5/Sample_Hold_1.c ****     #endif /* CY_PSOC5A */
+ 226:Generated_Source\PSoC5/Sample_Hold_1.c **** }
+ 227:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+ 228:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+ 229:Generated_Source\PSoC5/Sample_Hold_1.c **** /*******************************************************************************
+ 230:Generated_Source\PSoC5/Sample_Hold_1.c **** * Function Name: Sample_Hold_1_SetPower
+ 231:Generated_Source\PSoC5/Sample_Hold_1.c **** ********************************************************************************
+ 232:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 233:Generated_Source\PSoC5/Sample_Hold_1.c **** * Summary:
+ 234:Generated_Source\PSoC5/Sample_Hold_1.c **** *  Set the power of the Sample/Track and Hold.
+ 235:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 236:Generated_Source\PSoC5/Sample_Hold_1.c **** * Parameters:
+ 237:Generated_Source\PSoC5/Sample_Hold_1.c **** *  power: Sets power level between (0) and (3) high power
+ 238:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 239:Generated_Source\PSoC5/Sample_Hold_1.c **** * Return:
+ 240:Generated_Source\PSoC5/Sample_Hold_1.c **** *  void
+ 241:Generated_Source\PSoC5/Sample_Hold_1.c **** *
+ 242:Generated_Source\PSoC5/Sample_Hold_1.c **** *******************************************************************************/
+ 243:Generated_Source\PSoC5/Sample_Hold_1.c **** void Sample_Hold_1_SetPower(uint8 power) 
+ 244:Generated_Source\PSoC5/Sample_Hold_1.c **** {
+  94              		.loc 1 244 0
+  95              		.cfi_startproc
+  96              		@ args = 0, pretend = 0, frame = 0
+  97              		@ frame_needed = 0, uses_anonymous_args = 0
+  98              		@ link register save eliminated.
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 7
+
+
+  99              	.LVL0:
+ 245:Generated_Source\PSoC5/Sample_Hold_1.c ****     uint8 tmpCR;
+ 246:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+ 247:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* Sets drive bits in SC Block Control Register 1:  SCxx_CR[1:0] */
+ 248:Generated_Source\PSoC5/Sample_Hold_1.c ****     tmpCR = Sample_Hold_1_CR1_REG & (uint8)(~Sample_Hold_1_DRIVE_MASK);
+ 100              		.loc 1 248 0
+ 101 0000 044A     		ldr	r2, .L8
+ 249:Generated_Source\PSoC5/Sample_Hold_1.c ****     tmpCR |= (power & Sample_Hold_1_DRIVE_MASK);
+ 102              		.loc 1 249 0
+ 103 0002 00F00300 		and	r0, r0, #3
+ 104              	.LVL1:
+ 248:Generated_Source\PSoC5/Sample_Hold_1.c ****     tmpCR |= (power & Sample_Hold_1_DRIVE_MASK);
+ 105              		.loc 1 248 0
+ 106 0006 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 107 0008 03F0FC03 		and	r3, r3, #252
+ 108              	.LVL2:
+ 109              		.loc 1 249 0
+ 110 000c 1843     		orrs	r0, r0, r3
+ 111              	.LVL3:
+ 250:Generated_Source\PSoC5/Sample_Hold_1.c ****     Sample_Hold_1_CR1_REG = tmpCR;
+ 112              		.loc 1 250 0
+ 113 000e 1070     		strb	r0, [r2]
+ 114 0010 7047     		bx	lr
+ 115              	.L9:
+ 116 0012 00BF     		.align	2
+ 117              	.L8:
+ 118 0014 05580040 		.word	1073764357
+ 119              		.cfi_endproc
+ 120              	.LFE4:
+ 121              		.size	Sample_Hold_1_SetPower, .-Sample_Hold_1_SetPower
+ 122              		.section	.text.Sample_Hold_1_Init,"ax",%progbits
+ 123              		.align	1
+ 124              		.global	Sample_Hold_1_Init
+ 125              		.thumb
+ 126              		.thumb_func
+ 127              		.type	Sample_Hold_1_Init, %function
+ 128              	Sample_Hold_1_Init:
+ 129              	.LFB0:
+  53:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* Configure SC Block based on selected Sample/Track type */
+ 130              		.loc 1 53 0
+ 131              		.cfi_startproc
+ 132              		@ args = 0, pretend = 0, frame = 0
+ 133              		@ frame_needed = 0, uses_anonymous_args = 0
+ 134              		@ link register save eliminated.
+  80:Generated_Source\PSoC5/Sample_Hold_1.c ****         
+ 135              		.loc 1 80 0
+ 136 0000 074B     		ldr	r3, .L11
+ 137 0002 0E22     		movs	r2, #14
+ 138 0004 1A70     		strb	r2, [r3]
+  83:Generated_Source\PSoC5/Sample_Hold_1.c ****                                    Sample_Hold_1_DIV2_ENABLE |
+ 139              		.loc 1 83 0
+ 140 0006 1822     		movs	r2, #24
+ 141 0008 5A70     		strb	r2, [r3, #1]
+  88:Generated_Source\PSoC5/Sample_Hold_1.c ****                                    Sample_Hold_1_REDC_00 |
+ 142              		.loc 1 88 0
+ 143 000a 8122     		movs	r2, #129
+ 144 000c 9A70     		strb	r2, [r3, #2]
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 8
+
+
+  94:Generated_Source\PSoC5/Sample_Hold_1.c ****     
+ 145              		.loc 1 94 0
+ 146 000e 054A     		ldr	r2, .L11+4
+  97:Generated_Source\PSoC5/Sample_Hold_1.c **** }
+ 147              		.loc 1 97 0
+ 148 0010 0320     		movs	r0, #3
+  94:Generated_Source\PSoC5/Sample_Hold_1.c ****     
+ 149              		.loc 1 94 0
+ 150 0012 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 151 0014 43F00803 		orr	r3, r3, #8
+ 152 0018 1370     		strb	r3, [r2]
+  97:Generated_Source\PSoC5/Sample_Hold_1.c **** }
+ 153              		.loc 1 97 0
+ 154 001a FFF7FEBF 		b	Sample_Hold_1_SetPower
+ 155              	.LVL4:
+ 156              	.L12:
+ 157 001e 00BF     		.align	2
+ 158              	.L11:
+ 159 0020 04580040 		.word	1073764356
+ 160 0024 1B5A0040 		.word	1073764891
+ 161              		.cfi_endproc
+ 162              	.LFE0:
+ 163              		.size	Sample_Hold_1_Init, .-Sample_Hold_1_Init
+ 164              		.section	.text.Sample_Hold_1_Start,"ax",%progbits
+ 165              		.align	1
+ 166              		.global	Sample_Hold_1_Start
+ 167              		.thumb
+ 168              		.thumb_func
+ 169              		.type	Sample_Hold_1_Start, %function
+ 170              	Sample_Hold_1_Start:
+ 171              	.LFB2:
+ 172:Generated_Source\PSoC5/Sample_Hold_1.c ****     /* If not Initialized then initialize all required hardware and software */
+ 172              		.loc 1 172 0
+ 173              		.cfi_startproc
+ 174              		@ args = 0, pretend = 0, frame = 0
+ 175              		@ frame_needed = 0, uses_anonymous_args = 0
+ 176 0000 08B5     		push	{r3, lr}
+ 177              		.cfi_def_cfa_offset 8
+ 178              		.cfi_offset 3, -8
+ 179              		.cfi_offset 14, -4
+ 174:Generated_Source\PSoC5/Sample_Hold_1.c ****     {
+ 180              		.loc 1 174 0
+ 181 0002 0549     		ldr	r1, .L16
+ 182 0004 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 183 0006 1BB9     		cbnz	r3, .L14
+ 176:Generated_Source\PSoC5/Sample_Hold_1.c ****         Sample_Hold_1_initVar = 1u;
+ 184              		.loc 1 176 0
+ 185 0008 FFF7FEFF 		bl	Sample_Hold_1_Init
+ 186              	.LVL5:
+ 177:Generated_Source\PSoC5/Sample_Hold_1.c ****     }
+ 187              		.loc 1 177 0
+ 188 000c 0123     		movs	r3, #1
+ 189 000e 0B70     		strb	r3, [r1]
+ 190              	.L14:
+ 180:Generated_Source\PSoC5/Sample_Hold_1.c **** 
+ 191              		.loc 1 180 0
+ 192 0010 BDE80840 		pop	{r3, lr}
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 9
+
+
+ 193              		.cfi_restore 14
+ 194              		.cfi_restore 3
+ 195              		.cfi_def_cfa_offset 0
+ 179:Generated_Source\PSoC5/Sample_Hold_1.c **** }
+ 196              		.loc 1 179 0
+ 197 0014 FFF7FEBF 		b	Sample_Hold_1_Enable
+ 198              	.LVL6:
+ 199              	.L17:
+ 200              		.align	2
+ 201              	.L16:
+ 202 0018 00000000 		.word	.LANCHOR0
+ 203              		.cfi_endproc
+ 204              	.LFE2:
+ 205              		.size	Sample_Hold_1_Start, .-Sample_Hold_1_Start
+ 206              		.global	Sample_Hold_1_initVar
+ 207              		.bss
+ 208              		.set	.LANCHOR0,. + 0
+ 209              		.type	Sample_Hold_1_initVar, %object
+ 210              		.size	Sample_Hold_1_initVar, 1
+ 211              	Sample_Hold_1_initVar:
+ 212 0000 00       		.space	1
+ 213              		.text
+ 214              	.Letext0:
+ 215              		.file 2 "Generated_Source\\PSoC5\\cytypes.h"
+ 216              		.section	.debug_info,"",%progbits
+ 217              	.Ldebug_info0:
+ 218 0000 55010000 		.4byte	0x155
+ 219 0004 0400     		.2byte	0x4
+ 220 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 221 000a 04       		.byte	0x4
+ 222 000b 01       		.uleb128 0x1
+ 223 000c 44000000 		.4byte	.LASF20
+ 224 0010 0C       		.byte	0xc
+ 225 0011 27010000 		.4byte	.LASF21
+ 226 0015 61010000 		.4byte	.LASF22
+ 227 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 228 001d 00000000 		.4byte	0
+ 229 0021 00000000 		.4byte	.Ldebug_line0
+ 230 0025 02       		.uleb128 0x2
+ 231 0026 01       		.byte	0x1
+ 232 0027 06       		.byte	0x6
+ 233 0028 D0010000 		.4byte	.LASF0
+ 234 002c 02       		.uleb128 0x2
+ 235 002d 01       		.byte	0x1
+ 236 002e 08       		.byte	0x8
+ 237 002f 4E010000 		.4byte	.LASF1
+ 238 0033 02       		.uleb128 0x2
+ 239 0034 02       		.byte	0x2
+ 240 0035 05       		.byte	0x5
+ 241 0036 E5010000 		.4byte	.LASF2
+ 242 003a 02       		.uleb128 0x2
+ 243 003b 02       		.byte	0x2
+ 244 003c 07       		.byte	0x7
+ 245 003d BD010000 		.4byte	.LASF3
+ 246 0041 02       		.uleb128 0x2
+ 247 0042 04       		.byte	0x4
+ 248 0043 05       		.byte	0x5
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 10
+
+
+ 249 0044 86010000 		.4byte	.LASF4
+ 250 0048 02       		.uleb128 0x2
+ 251 0049 04       		.byte	0x4
+ 252 004a 07       		.byte	0x7
+ 253 004b F8000000 		.4byte	.LASF5
+ 254 004f 02       		.uleb128 0x2
+ 255 0050 08       		.byte	0x8
+ 256 0051 05       		.byte	0x5
+ 257 0052 00000000 		.4byte	.LASF6
+ 258 0056 02       		.uleb128 0x2
+ 259 0057 08       		.byte	0x8
+ 260 0058 07       		.byte	0x7
+ 261 0059 0A010000 		.4byte	.LASF7
+ 262 005d 03       		.uleb128 0x3
+ 263 005e 04       		.byte	0x4
+ 264 005f 05       		.byte	0x5
+ 265 0060 696E7400 		.ascii	"int\000"
+ 266 0064 02       		.uleb128 0x2
+ 267 0065 04       		.byte	0x4
+ 268 0066 07       		.byte	0x7
+ 269 0067 0E000000 		.4byte	.LASF8
+ 270 006b 04       		.uleb128 0x4
+ 271 006c F2000000 		.4byte	.LASF12
+ 272 0070 02       		.byte	0x2
+ 273 0071 9201     		.2byte	0x192
+ 274 0073 2C000000 		.4byte	0x2c
+ 275 0077 02       		.uleb128 0x2
+ 276 0078 04       		.byte	0x4
+ 277 0079 04       		.byte	0x4
+ 278 007a 21010000 		.4byte	.LASF9
+ 279 007e 02       		.uleb128 0x2
+ 280 007f 08       		.byte	0x8
+ 281 0080 04       		.byte	0x4
+ 282 0081 8F010000 		.4byte	.LASF10
+ 283 0085 02       		.uleb128 0x2
+ 284 0086 01       		.byte	0x1
+ 285 0087 08       		.byte	0x8
+ 286 0088 5C010000 		.4byte	.LASF11
+ 287 008c 04       		.uleb128 0x4
+ 288 008d EF010000 		.4byte	.LASF13
+ 289 0091 02       		.byte	0x2
+ 290 0092 3C02     		.2byte	0x23c
+ 291 0094 98000000 		.4byte	0x98
+ 292 0098 05       		.uleb128 0x5
+ 293 0099 6B000000 		.4byte	0x6b
+ 294 009d 02       		.uleb128 0x2
+ 295 009e 04       		.byte	0x4
+ 296 009f 07       		.byte	0x7
+ 297 00a0 DC010000 		.4byte	.LASF14
+ 298 00a4 06       		.uleb128 0x6
+ 299 00a5 DD000000 		.4byte	.LASF15
+ 300 00a9 01       		.byte	0x1
+ 301 00aa 73       		.byte	0x73
+ 302 00ab 00000000 		.4byte	.LFB1
+ 303 00af 28000000 		.4byte	.LFE1-.LFB1
+ 304 00b3 01       		.uleb128 0x1
+ 305 00b4 9C       		.byte	0x9c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 11
+
+
+ 306 00b5 06       		.uleb128 0x6
+ 307 00b6 1B000000 		.4byte	.LASF16
+ 308 00ba 01       		.byte	0x1
+ 309 00bb C5       		.byte	0xc5
+ 310 00bc 00000000 		.4byte	.LFB3
+ 311 00c0 18000000 		.4byte	.LFE3-.LFB3
+ 312 00c4 01       		.uleb128 0x1
+ 313 00c5 9C       		.byte	0x9c
+ 314 00c6 07       		.uleb128 0x7
+ 315 00c7 F4010000 		.4byte	.LASF17
+ 316 00cb 01       		.byte	0x1
+ 317 00cc F3       		.byte	0xf3
+ 318 00cd 00000000 		.4byte	.LFB4
+ 319 00d1 18000000 		.4byte	.LFE4-.LFB4
+ 320 00d5 01       		.uleb128 0x1
+ 321 00d6 9C       		.byte	0x9c
+ 322 00d7 FA000000 		.4byte	0xfa
+ 323 00db 08       		.uleb128 0x8
+ 324 00dc 11020000 		.4byte	.LASF23
+ 325 00e0 01       		.byte	0x1
+ 326 00e1 F3       		.byte	0xf3
+ 327 00e2 6B000000 		.4byte	0x6b
+ 328 00e6 00000000 		.4byte	.LLST0
+ 329 00ea 09       		.uleb128 0x9
+ 330 00eb 0B020000 		.4byte	.LASF24
+ 331 00ef 01       		.byte	0x1
+ 332 00f0 F5       		.byte	0xf5
+ 333 00f1 6B000000 		.4byte	0x6b
+ 334 00f5 21000000 		.4byte	.LLST1
+ 335 00f9 00       		.byte	0
+ 336 00fa 07       		.uleb128 0x7
+ 337 00fb 96010000 		.4byte	.LASF18
+ 338 00ff 01       		.byte	0x1
+ 339 0100 34       		.byte	0x34
+ 340 0101 00000000 		.4byte	.LFB0
+ 341 0105 28000000 		.4byte	.LFE0-.LFB0
+ 342 0109 01       		.uleb128 0x1
+ 343 010a 9C       		.byte	0x9c
+ 344 010b 1F010000 		.4byte	0x11f
+ 345 010f 0A       		.uleb128 0xa
+ 346 0110 1E000000 		.4byte	.LVL4
+ 347 0114 C6000000 		.4byte	0xc6
+ 348 0118 0B       		.uleb128 0xb
+ 349 0119 01       		.uleb128 0x1
+ 350 011a 50       		.byte	0x50
+ 351 011b 01       		.uleb128 0x1
+ 352 011c 33       		.byte	0x33
+ 353 011d 00       		.byte	0
+ 354 011e 00       		.byte	0
+ 355 011f 07       		.uleb128 0x7
+ 356 0120 A9010000 		.4byte	.LASF19
+ 357 0124 01       		.byte	0x1
+ 358 0125 AB       		.byte	0xab
+ 359 0126 00000000 		.4byte	.LFB2
+ 360 012a 1C000000 		.4byte	.LFE2-.LFB2
+ 361 012e 01       		.uleb128 0x1
+ 362 012f 9C       		.byte	0x9c
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 12
+
+
+ 363 0130 47010000 		.4byte	0x147
+ 364 0134 0C       		.uleb128 0xc
+ 365 0135 0C000000 		.4byte	.LVL5
+ 366 0139 FA000000 		.4byte	0xfa
+ 367 013d 0D       		.uleb128 0xd
+ 368 013e 18000000 		.4byte	.LVL6
+ 369 0142 A4000000 		.4byte	0xa4
+ 370 0146 00       		.byte	0
+ 371 0147 0E       		.uleb128 0xe
+ 372 0148 2E000000 		.4byte	.LASF25
+ 373 014c 01       		.byte	0x1
+ 374 014d 1B       		.byte	0x1b
+ 375 014e 6B000000 		.4byte	0x6b
+ 376 0152 05       		.uleb128 0x5
+ 377 0153 03       		.byte	0x3
+ 378 0154 00000000 		.4byte	Sample_Hold_1_initVar
+ 379 0158 00       		.byte	0
+ 380              		.section	.debug_abbrev,"",%progbits
+ 381              	.Ldebug_abbrev0:
+ 382 0000 01       		.uleb128 0x1
+ 383 0001 11       		.uleb128 0x11
+ 384 0002 01       		.byte	0x1
+ 385 0003 25       		.uleb128 0x25
+ 386 0004 0E       		.uleb128 0xe
+ 387 0005 13       		.uleb128 0x13
+ 388 0006 0B       		.uleb128 0xb
+ 389 0007 03       		.uleb128 0x3
+ 390 0008 0E       		.uleb128 0xe
+ 391 0009 1B       		.uleb128 0x1b
+ 392 000a 0E       		.uleb128 0xe
+ 393 000b 55       		.uleb128 0x55
+ 394 000c 17       		.uleb128 0x17
+ 395 000d 11       		.uleb128 0x11
+ 396 000e 01       		.uleb128 0x1
+ 397 000f 10       		.uleb128 0x10
+ 398 0010 17       		.uleb128 0x17
+ 399 0011 00       		.byte	0
+ 400 0012 00       		.byte	0
+ 401 0013 02       		.uleb128 0x2
+ 402 0014 24       		.uleb128 0x24
+ 403 0015 00       		.byte	0
+ 404 0016 0B       		.uleb128 0xb
+ 405 0017 0B       		.uleb128 0xb
+ 406 0018 3E       		.uleb128 0x3e
+ 407 0019 0B       		.uleb128 0xb
+ 408 001a 03       		.uleb128 0x3
+ 409 001b 0E       		.uleb128 0xe
+ 410 001c 00       		.byte	0
+ 411 001d 00       		.byte	0
+ 412 001e 03       		.uleb128 0x3
+ 413 001f 24       		.uleb128 0x24
+ 414 0020 00       		.byte	0
+ 415 0021 0B       		.uleb128 0xb
+ 416 0022 0B       		.uleb128 0xb
+ 417 0023 3E       		.uleb128 0x3e
+ 418 0024 0B       		.uleb128 0xb
+ 419 0025 03       		.uleb128 0x3
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 13
+
+
+ 420 0026 08       		.uleb128 0x8
+ 421 0027 00       		.byte	0
+ 422 0028 00       		.byte	0
+ 423 0029 04       		.uleb128 0x4
+ 424 002a 16       		.uleb128 0x16
+ 425 002b 00       		.byte	0
+ 426 002c 03       		.uleb128 0x3
+ 427 002d 0E       		.uleb128 0xe
+ 428 002e 3A       		.uleb128 0x3a
+ 429 002f 0B       		.uleb128 0xb
+ 430 0030 3B       		.uleb128 0x3b
+ 431 0031 05       		.uleb128 0x5
+ 432 0032 49       		.uleb128 0x49
+ 433 0033 13       		.uleb128 0x13
+ 434 0034 00       		.byte	0
+ 435 0035 00       		.byte	0
+ 436 0036 05       		.uleb128 0x5
+ 437 0037 35       		.uleb128 0x35
+ 438 0038 00       		.byte	0
+ 439 0039 49       		.uleb128 0x49
+ 440 003a 13       		.uleb128 0x13
+ 441 003b 00       		.byte	0
+ 442 003c 00       		.byte	0
+ 443 003d 06       		.uleb128 0x6
+ 444 003e 2E       		.uleb128 0x2e
+ 445 003f 00       		.byte	0
+ 446 0040 3F       		.uleb128 0x3f
+ 447 0041 19       		.uleb128 0x19
+ 448 0042 03       		.uleb128 0x3
+ 449 0043 0E       		.uleb128 0xe
+ 450 0044 3A       		.uleb128 0x3a
+ 451 0045 0B       		.uleb128 0xb
+ 452 0046 3B       		.uleb128 0x3b
+ 453 0047 0B       		.uleb128 0xb
+ 454 0048 27       		.uleb128 0x27
+ 455 0049 19       		.uleb128 0x19
+ 456 004a 11       		.uleb128 0x11
+ 457 004b 01       		.uleb128 0x1
+ 458 004c 12       		.uleb128 0x12
+ 459 004d 06       		.uleb128 0x6
+ 460 004e 40       		.uleb128 0x40
+ 461 004f 18       		.uleb128 0x18
+ 462 0050 9742     		.uleb128 0x2117
+ 463 0052 19       		.uleb128 0x19
+ 464 0053 00       		.byte	0
+ 465 0054 00       		.byte	0
+ 466 0055 07       		.uleb128 0x7
+ 467 0056 2E       		.uleb128 0x2e
+ 468 0057 01       		.byte	0x1
+ 469 0058 3F       		.uleb128 0x3f
+ 470 0059 19       		.uleb128 0x19
+ 471 005a 03       		.uleb128 0x3
+ 472 005b 0E       		.uleb128 0xe
+ 473 005c 3A       		.uleb128 0x3a
+ 474 005d 0B       		.uleb128 0xb
+ 475 005e 3B       		.uleb128 0x3b
+ 476 005f 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 14
+
+
+ 477 0060 27       		.uleb128 0x27
+ 478 0061 19       		.uleb128 0x19
+ 479 0062 11       		.uleb128 0x11
+ 480 0063 01       		.uleb128 0x1
+ 481 0064 12       		.uleb128 0x12
+ 482 0065 06       		.uleb128 0x6
+ 483 0066 40       		.uleb128 0x40
+ 484 0067 18       		.uleb128 0x18
+ 485 0068 9742     		.uleb128 0x2117
+ 486 006a 19       		.uleb128 0x19
+ 487 006b 01       		.uleb128 0x1
+ 488 006c 13       		.uleb128 0x13
+ 489 006d 00       		.byte	0
+ 490 006e 00       		.byte	0
+ 491 006f 08       		.uleb128 0x8
+ 492 0070 05       		.uleb128 0x5
+ 493 0071 00       		.byte	0
+ 494 0072 03       		.uleb128 0x3
+ 495 0073 0E       		.uleb128 0xe
+ 496 0074 3A       		.uleb128 0x3a
+ 497 0075 0B       		.uleb128 0xb
+ 498 0076 3B       		.uleb128 0x3b
+ 499 0077 0B       		.uleb128 0xb
+ 500 0078 49       		.uleb128 0x49
+ 501 0079 13       		.uleb128 0x13
+ 502 007a 02       		.uleb128 0x2
+ 503 007b 17       		.uleb128 0x17
+ 504 007c 00       		.byte	0
+ 505 007d 00       		.byte	0
+ 506 007e 09       		.uleb128 0x9
+ 507 007f 34       		.uleb128 0x34
+ 508 0080 00       		.byte	0
+ 509 0081 03       		.uleb128 0x3
+ 510 0082 0E       		.uleb128 0xe
+ 511 0083 3A       		.uleb128 0x3a
+ 512 0084 0B       		.uleb128 0xb
+ 513 0085 3B       		.uleb128 0x3b
+ 514 0086 0B       		.uleb128 0xb
+ 515 0087 49       		.uleb128 0x49
+ 516 0088 13       		.uleb128 0x13
+ 517 0089 02       		.uleb128 0x2
+ 518 008a 17       		.uleb128 0x17
+ 519 008b 00       		.byte	0
+ 520 008c 00       		.byte	0
+ 521 008d 0A       		.uleb128 0xa
+ 522 008e 898201   		.uleb128 0x4109
+ 523 0091 01       		.byte	0x1
+ 524 0092 11       		.uleb128 0x11
+ 525 0093 01       		.uleb128 0x1
+ 526 0094 9542     		.uleb128 0x2115
+ 527 0096 19       		.uleb128 0x19
+ 528 0097 31       		.uleb128 0x31
+ 529 0098 13       		.uleb128 0x13
+ 530 0099 00       		.byte	0
+ 531 009a 00       		.byte	0
+ 532 009b 0B       		.uleb128 0xb
+ 533 009c 8A8201   		.uleb128 0x410a
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 15
+
+
+ 534 009f 00       		.byte	0
+ 535 00a0 02       		.uleb128 0x2
+ 536 00a1 18       		.uleb128 0x18
+ 537 00a2 9142     		.uleb128 0x2111
+ 538 00a4 18       		.uleb128 0x18
+ 539 00a5 00       		.byte	0
+ 540 00a6 00       		.byte	0
+ 541 00a7 0C       		.uleb128 0xc
+ 542 00a8 898201   		.uleb128 0x4109
+ 543 00ab 00       		.byte	0
+ 544 00ac 11       		.uleb128 0x11
+ 545 00ad 01       		.uleb128 0x1
+ 546 00ae 31       		.uleb128 0x31
+ 547 00af 13       		.uleb128 0x13
+ 548 00b0 00       		.byte	0
+ 549 00b1 00       		.byte	0
+ 550 00b2 0D       		.uleb128 0xd
+ 551 00b3 898201   		.uleb128 0x4109
+ 552 00b6 00       		.byte	0
+ 553 00b7 11       		.uleb128 0x11
+ 554 00b8 01       		.uleb128 0x1
+ 555 00b9 9542     		.uleb128 0x2115
+ 556 00bb 19       		.uleb128 0x19
+ 557 00bc 31       		.uleb128 0x31
+ 558 00bd 13       		.uleb128 0x13
+ 559 00be 00       		.byte	0
+ 560 00bf 00       		.byte	0
+ 561 00c0 0E       		.uleb128 0xe
+ 562 00c1 34       		.uleb128 0x34
+ 563 00c2 00       		.byte	0
+ 564 00c3 03       		.uleb128 0x3
+ 565 00c4 0E       		.uleb128 0xe
+ 566 00c5 3A       		.uleb128 0x3a
+ 567 00c6 0B       		.uleb128 0xb
+ 568 00c7 3B       		.uleb128 0x3b
+ 569 00c8 0B       		.uleb128 0xb
+ 570 00c9 49       		.uleb128 0x49
+ 571 00ca 13       		.uleb128 0x13
+ 572 00cb 3F       		.uleb128 0x3f
+ 573 00cc 19       		.uleb128 0x19
+ 574 00cd 02       		.uleb128 0x2
+ 575 00ce 18       		.uleb128 0x18
+ 576 00cf 00       		.byte	0
+ 577 00d0 00       		.byte	0
+ 578 00d1 00       		.byte	0
+ 579              		.section	.debug_loc,"",%progbits
+ 580              	.Ldebug_loc0:
+ 581              	.LLST0:
+ 582 0000 00000000 		.4byte	.LVL0
+ 583 0004 06000000 		.4byte	.LVL1
+ 584 0008 0100     		.2byte	0x1
+ 585 000a 50       		.byte	0x50
+ 586 000b 06000000 		.4byte	.LVL1
+ 587 000f 18000000 		.4byte	.LFE4
+ 588 0013 0400     		.2byte	0x4
+ 589 0015 F3       		.byte	0xf3
+ 590 0016 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 16
+
+
+ 591 0017 50       		.byte	0x50
+ 592 0018 9F       		.byte	0x9f
+ 593 0019 00000000 		.4byte	0
+ 594 001d 00000000 		.4byte	0
+ 595              	.LLST1:
+ 596 0021 0C000000 		.4byte	.LVL2
+ 597 0025 0E000000 		.4byte	.LVL3
+ 598 0029 0100     		.2byte	0x1
+ 599 002b 53       		.byte	0x53
+ 600 002c 0E000000 		.4byte	.LVL3
+ 601 0030 18000000 		.4byte	.LFE4
+ 602 0034 0100     		.2byte	0x1
+ 603 0036 50       		.byte	0x50
+ 604 0037 00000000 		.4byte	0
+ 605 003b 00000000 		.4byte	0
+ 606              		.section	.debug_aranges,"",%progbits
+ 607 0000 3C000000 		.4byte	0x3c
+ 608 0004 0200     		.2byte	0x2
+ 609 0006 00000000 		.4byte	.Ldebug_info0
+ 610 000a 04       		.byte	0x4
+ 611 000b 00       		.byte	0
+ 612 000c 0000     		.2byte	0
+ 613 000e 0000     		.2byte	0
+ 614 0010 00000000 		.4byte	.LFB1
+ 615 0014 28000000 		.4byte	.LFE1-.LFB1
+ 616 0018 00000000 		.4byte	.LFB3
+ 617 001c 18000000 		.4byte	.LFE3-.LFB3
+ 618 0020 00000000 		.4byte	.LFB4
+ 619 0024 18000000 		.4byte	.LFE4-.LFB4
+ 620 0028 00000000 		.4byte	.LFB0
+ 621 002c 28000000 		.4byte	.LFE0-.LFB0
+ 622 0030 00000000 		.4byte	.LFB2
+ 623 0034 1C000000 		.4byte	.LFE2-.LFB2
+ 624 0038 00000000 		.4byte	0
+ 625 003c 00000000 		.4byte	0
+ 626              		.section	.debug_ranges,"",%progbits
+ 627              	.Ldebug_ranges0:
+ 628 0000 00000000 		.4byte	.LFB1
+ 629 0004 28000000 		.4byte	.LFE1
+ 630 0008 00000000 		.4byte	.LFB3
+ 631 000c 18000000 		.4byte	.LFE3
+ 632 0010 00000000 		.4byte	.LFB4
+ 633 0014 18000000 		.4byte	.LFE4
+ 634 0018 00000000 		.4byte	.LFB0
+ 635 001c 28000000 		.4byte	.LFE0
+ 636 0020 00000000 		.4byte	.LFB2
+ 637 0024 1C000000 		.4byte	.LFE2
+ 638 0028 00000000 		.4byte	0
+ 639 002c 00000000 		.4byte	0
+ 640              		.section	.debug_line,"",%progbits
+ 641              	.Ldebug_line0:
+ 642 0000 B9000000 		.section	.debug_str,"MS",%progbits,1
+ 642      02004A00 
+ 642      00000201 
+ 642      FB0E0D00 
+ 642      01010101 
+ 643              	.LASF6:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 17
+
+
+ 644 0000 6C6F6E67 		.ascii	"long long int\000"
+ 644      206C6F6E 
+ 644      6720696E 
+ 644      7400
+ 645              	.LASF8:
+ 646 000e 756E7369 		.ascii	"unsigned int\000"
+ 646      676E6564 
+ 646      20696E74 
+ 646      00
+ 647              	.LASF16:
+ 648 001b 53616D70 		.ascii	"Sample_Hold_1_Stop\000"
+ 648      6C655F48 
+ 648      6F6C645F 
+ 648      315F5374 
+ 648      6F7000
+ 649              	.LASF25:
+ 650 002e 53616D70 		.ascii	"Sample_Hold_1_initVar\000"
+ 650      6C655F48 
+ 650      6F6C645F 
+ 650      315F696E 
+ 650      69745661 
+ 651              	.LASF20:
+ 652 0044 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 652      43393920 
+ 652      352E342E 
+ 652      31203230 
+ 652      31363036 
+ 653 0077 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 653      20726576 
+ 653      6973696F 
+ 653      6E203233 
+ 653      37373135 
+ 654 00aa 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 654      74643D67 
+ 654      6E753939 
+ 654      202D6666 
+ 654      756E6374 
+ 655              	.LASF15:
+ 656 00dd 53616D70 		.ascii	"Sample_Hold_1_Enable\000"
+ 656      6C655F48 
+ 656      6F6C645F 
+ 656      315F456E 
+ 656      61626C65 
+ 657              	.LASF12:
+ 658 00f2 75696E74 		.ascii	"uint8\000"
+ 658      3800
+ 659              	.LASF5:
+ 660 00f8 6C6F6E67 		.ascii	"long unsigned int\000"
+ 660      20756E73 
+ 660      69676E65 
+ 660      6420696E 
+ 660      7400
+ 661              	.LASF7:
+ 662 010a 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 662      206C6F6E 
+ 662      6720756E 
+ 662      7369676E 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 18
+
+
+ 662      65642069 
+ 663              	.LASF9:
+ 664 0121 666C6F61 		.ascii	"float\000"
+ 664      7400
+ 665              	.LASF21:
+ 666 0127 47656E65 		.ascii	"Generated_Source\\PSoC5\\Sample_Hold_1.c\000"
+ 666      72617465 
+ 666      645F536F 
+ 666      75726365 
+ 666      5C50536F 
+ 667              	.LASF1:
+ 668 014e 756E7369 		.ascii	"unsigned char\000"
+ 668      676E6564 
+ 668      20636861 
+ 668      7200
+ 669              	.LASF11:
+ 670 015c 63686172 		.ascii	"char\000"
+ 670      00
+ 671              	.LASF22:
+ 672 0161 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 672      73657273 
+ 672      5C636865 
+ 672      6D695C55 
+ 672      44335F51 
+ 673              	.LASF4:
+ 674 0186 6C6F6E67 		.ascii	"long int\000"
+ 674      20696E74 
+ 674      00
+ 675              	.LASF10:
+ 676 018f 646F7562 		.ascii	"double\000"
+ 676      6C6500
+ 677              	.LASF18:
+ 678 0196 53616D70 		.ascii	"Sample_Hold_1_Init\000"
+ 678      6C655F48 
+ 678      6F6C645F 
+ 678      315F496E 
+ 678      697400
+ 679              	.LASF19:
+ 680 01a9 53616D70 		.ascii	"Sample_Hold_1_Start\000"
+ 680      6C655F48 
+ 680      6F6C645F 
+ 680      315F5374 
+ 680      61727400 
+ 681              	.LASF3:
+ 682 01bd 73686F72 		.ascii	"short unsigned int\000"
+ 682      7420756E 
+ 682      7369676E 
+ 682      65642069 
+ 682      6E7400
+ 683              	.LASF0:
+ 684 01d0 7369676E 		.ascii	"signed char\000"
+ 684      65642063 
+ 684      68617200 
+ 685              	.LASF14:
+ 686 01dc 73697A65 		.ascii	"sizetype\000"
+ 686      74797065 
+ 686      00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\cc9aswBM.s 			page 19
+
+
+ 687              	.LASF2:
+ 688 01e5 73686F72 		.ascii	"short int\000"
+ 688      7420696E 
+ 688      7400
+ 689              	.LASF13:
+ 690 01ef 72656738 		.ascii	"reg8\000"
+ 690      00
+ 691              	.LASF17:
+ 692 01f4 53616D70 		.ascii	"Sample_Hold_1_SetPower\000"
+ 692      6C655F48 
+ 692      6F6C645F 
+ 692      315F5365 
+ 692      74506F77 
+ 693              	.LASF24:
+ 694 020b 746D7043 		.ascii	"tmpCR\000"
+ 694      5200
+ 695              	.LASF23:
+ 696 0211 706F7765 		.ascii	"power\000"
+ 696      7200
+ 697              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

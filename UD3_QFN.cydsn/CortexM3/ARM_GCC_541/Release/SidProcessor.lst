@@ -1,0 +1,2589 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"SidProcessor.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.SidProcessor_resetSid,"ax",%progbits
+  20              		.align	1
+  21              		.global	SidProcessor_resetSid
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	SidProcessor_resetSid, %function
+  25              	SidProcessor_resetSid:
+  26              	.LFB68:
+  27              		.file 1 "..\\common\\vms\\SidProcessor.c"
+   1:..\common\vms/SidProcessor.c **** #include "SidProcessor.h"
+   2:..\common\vms/SidProcessor.c **** #include <device.h>
+   3:..\common\vms/SidProcessor.c **** #include <stdint.h>
+   4:..\common\vms/SidProcessor.c **** #include "queue.h"
+   5:..\common\vms/SidProcessor.c **** #include "telemetry.h"
+   6:..\common\vms/SidProcessor.c **** #include "clock.h"
+   7:..\common\vms/SidProcessor.c **** #include "qcw.h"
+   8:..\common\vms/SidProcessor.c **** #include "tasks/tsk_sid.h"
+   9:..\common\vms/SidProcessor.c **** #include "SidFilter.h"
+  10:..\common\vms/SidProcessor.c **** #include <stdlib.h>
+  11:..\common\vms/SidProcessor.c **** 
+  12:..\common\vms/SidProcessor.c **** static const uint32_t ADSR_speedLut_A[] = {65535, 16384, 8192, 5459, 3449, 2341, 1928, 1638, 1311, 
+  13:..\common\vms/SidProcessor.c **** static const uint32_t ADSR_speedLut_DR[] = {39779, 57846, 61571, 62865, 63836, 64378, 64581, 64723,
+  14:..\common\vms/SidProcessor.c **** 	
+  15:..\common\vms/SidProcessor.c **** static SIDChannelData_t channelData[N_SIDCHANNEL];
+  16:..\common\vms/SidProcessor.c **** 
+  17:..\common\vms/SidProcessor.c **** void SidProcessor_resetSid(){
+  28              		.loc 1 17 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 70B5     		push	{r4, r5, r6, lr}
+  34              		.cfi_def_cfa_offset 16
+  35              		.cfi_offset 4, -16
+  36              		.cfi_offset 5, -12
+  37              		.cfi_offset 6, -8
+  38              		.cfi_offset 14, -4
+  39              	.LBB2:
+  18:..\common\vms/SidProcessor.c ****     //flush frame buffer
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 2
+
+
+  19:..\common\vms/SidProcessor.c ****     //TODO figure out why this doesn't work :(
+  20:..\common\vms/SidProcessor.c ****     //xQueueReset(qSID);
+  21:..\common\vms/SidProcessor.c ****     
+  22:..\common\vms/SidProcessor.c ****     //and reset all channels
+  23:..\common\vms/SidProcessor.c ****     for(uint32_t i = 0; i < N_SIDCHANNEL; i ++){
+  40              		.loc 1 23 0
+  41 0002 0024     		movs	r4, #0
+  24:..\common\vms/SidProcessor.c ****         channelData[i].flags = 0;
+  42              		.loc 1 24 0
+  43 0004 2646     		mov	r6, r4
+  44 0006 064D     		ldr	r5, .L5
+  45              	.LVL1:
+  46              	.L2:
+  25:..\common\vms/SidProcessor.c ****         
+  26:..\common\vms/SidProcessor.c ****         channelData[i].frequency_dHz = 0;
+  27:..\common\vms/SidProcessor.c ****         
+  28:..\common\vms/SidProcessor.c ****         SidFilter_updateVoice(i, &channelData[i]);
+  47              		.loc 1 28 0 discriminator 3
+  48 0008 2946     		mov	r1, r5
+  49 000a 2046     		mov	r0, r4
+  23:..\common\vms/SidProcessor.c ****         channelData[i].flags = 0;
+  50              		.loc 1 23 0 discriminator 3
+  51 000c 0134     		adds	r4, r4, #1
+  52              	.LVL2:
+  24:..\common\vms/SidProcessor.c ****         channelData[i].flags = 0;
+  53              		.loc 1 24 0 discriminator 3
+  54 000e 6E60     		str	r6, [r5, #4]
+  26:..\common\vms/SidProcessor.c ****         
+  55              		.loc 1 26 0 discriminator 3
+  56 0010 2E61     		str	r6, [r5, #16]
+  57              		.loc 1 28 0 discriminator 3
+  58 0012 FFF7FEFF 		bl	SidFilter_updateVoice
+  59              	.LVL3:
+  23:..\common\vms/SidProcessor.c ****         channelData[i].flags = 0;
+  60              		.loc 1 23 0 discriminator 3
+  61 0016 032C     		cmp	r4, #3
+  62 0018 05F12405 		add	r5, r5, #36
+  63 001c F4D1     		bne	.L2
+  64              	.LBE2:
+  29:..\common\vms/SidProcessor.c ****     }
+  30:..\common\vms/SidProcessor.c **** }
+  65              		.loc 1 30 0
+  66 001e 70BD     		pop	{r4, r5, r6, pc}
+  67              	.LVL4:
+  68              	.L6:
+  69              		.align	2
+  70              	.L5:
+  71 0020 00000000 		.word	.LANCHOR0
+  72              		.cfi_endproc
+  73              	.LFE68:
+  74              		.size	SidProcessor_resetSid, .-SidProcessor_resetSid
+  75              		.section	.text.SID_getChannelData,"ax",%progbits
+  76              		.align	1
+  77              		.global	SID_getChannelData
+  78              		.thumb
+  79              		.thumb_func
+  80              		.type	SID_getChannelData, %function
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 3
+
+
+  81              	SID_getChannelData:
+  82              	.LFB69:
+  31:..\common\vms/SidProcessor.c **** 
+  32:..\common\vms/SidProcessor.c **** SIDChannelData_t * SID_getChannelData(){
+  83              		.loc 1 32 0
+  84              		.cfi_startproc
+  85              		@ args = 0, pretend = 0, frame = 0
+  86              		@ frame_needed = 0, uses_anonymous_args = 0
+  87              		@ link register save eliminated.
+  33:..\common\vms/SidProcessor.c ****     return channelData;
+  34:..\common\vms/SidProcessor.c **** }
+  88              		.loc 1 34 0
+  89 0000 0048     		ldr	r0, .L8
+  90 0002 7047     		bx	lr
+  91              	.L9:
+  92              		.align	2
+  93              	.L8:
+  94 0004 00000000 		.word	.LANCHOR0
+  95              		.cfi_endproc
+  96              	.LFE69:
+  97              		.size	SID_getChannelData, .-SID_getChannelData
+  98              		.section	.text.SID_getWaveName,"ax",%progbits
+  99              		.align	1
+ 100              		.global	SID_getWaveName
+ 101              		.thumb
+ 102              		.thumb_func
+ 103              		.type	SID_getWaveName, %function
+ 104              	SID_getWaveName:
+ 105              	.LFB70:
+  35:..\common\vms/SidProcessor.c **** 
+  36:..\common\vms/SidProcessor.c **** const char * SID_getWaveName(SIDChannelData_t * data){
+ 106              		.loc 1 36 0
+ 107              		.cfi_startproc
+ 108              		@ args = 0, pretend = 0, frame = 0
+ 109              		@ frame_needed = 0, uses_anonymous_args = 0
+ 110              		@ link register save eliminated.
+ 111              	.LVL5:
+  37:..\common\vms/SidProcessor.c ****     if(data->flags & SID_FRAME_FLAG_NOISE) return "NOISE";
+ 112              		.loc 1 37 0
+ 113 0000 4368     		ldr	r3, [r0, #4]
+ 114 0002 D807     		lsls	r0, r3, #31
+ 115              	.LVL6:
+ 116 0004 0AD4     		bmi	.L12
+  38:..\common\vms/SidProcessor.c ****     if(data->flags & SID_FRAME_FLAG_SQUARE) return "SQUARE";
+ 117              		.loc 1 38 0
+ 118 0006 9907     		lsls	r1, r3, #30
+ 119 0008 0AD4     		bmi	.L13
+  39:..\common\vms/SidProcessor.c ****     if(data->flags & SID_FRAME_FLAG_SAWTOOTH) return "SAWTOOTH";
+ 120              		.loc 1 39 0
+ 121 000a 5A07     		lsls	r2, r3, #29
+ 122 000c 0AD4     		bmi	.L14
+  40:..\common\vms/SidProcessor.c ****     if(data->flags & SID_FRAME_FLAG_TRIANGLE) return "TRIANGLE";
+ 123              		.loc 1 40 0
+ 124 000e 13F0080F 		tst	r3, #8
+  41:..\common\vms/SidProcessor.c ****     
+  42:..\common\vms/SidProcessor.c ****     return "?";
+ 125              		.loc 1 42 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 4
+
+
+ 126 0012 054B     		ldr	r3, .L16
+ 127 0014 0548     		ldr	r0, .L16+4
+ 128 0016 18BF     		it	ne
+ 129 0018 1846     		movne	r0, r3
+ 130 001a 7047     		bx	lr
+ 131              	.L12:
+  37:..\common\vms/SidProcessor.c ****     if(data->flags & SID_FRAME_FLAG_SQUARE) return "SQUARE";
+ 132              		.loc 1 37 0
+ 133 001c 0448     		ldr	r0, .L16+8
+ 134 001e 7047     		bx	lr
+ 135              	.L13:
+  38:..\common\vms/SidProcessor.c ****     if(data->flags & SID_FRAME_FLAG_SAWTOOTH) return "SAWTOOTH";
+ 136              		.loc 1 38 0
+ 137 0020 0448     		ldr	r0, .L16+12
+ 138 0022 7047     		bx	lr
+ 139              	.L14:
+  39:..\common\vms/SidProcessor.c ****     if(data->flags & SID_FRAME_FLAG_TRIANGLE) return "TRIANGLE";
+ 140              		.loc 1 39 0
+ 141 0024 0448     		ldr	r0, .L16+16
+  43:..\common\vms/SidProcessor.c **** }
+ 142              		.loc 1 43 0
+ 143 0026 7047     		bx	lr
+ 144              	.L17:
+ 145              		.align	2
+ 146              	.L16:
+ 147 0028 16000000 		.word	.LC3
+ 148 002c 1F000000 		.word	.LC4
+ 149 0030 00000000 		.word	.LC0
+ 150 0034 06000000 		.word	.LC1
+ 151 0038 0D000000 		.word	.LC2
+ 152              		.cfi_endproc
+ 153              	.LFE70:
+ 154              		.size	SID_getWaveName, .-SID_getWaveName
+ 155              		.section	.text.SidProcessor_handleFrame,"ax",%progbits
+ 156              		.align	1
+ 157              		.global	SidProcessor_handleFrame
+ 158              		.thumb
+ 159              		.thumb_func
+ 160              		.type	SidProcessor_handleFrame, %function
+ 161              	SidProcessor_handleFrame:
+ 162              	.LFB71:
+  44:..\common\vms/SidProcessor.c **** 
+  45:..\common\vms/SidProcessor.c **** void SidProcessor_handleFrame(SIDFrame_t * frame){
+ 163              		.loc 1 45 0
+ 164              		.cfi_startproc
+ 165              		@ args = 0, pretend = 0, frame = 0
+ 166              		@ frame_needed = 0, uses_anonymous_args = 0
+ 167              	.LVL7:
+ 168 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 169              		.cfi_def_cfa_offset 24
+ 170              		.cfi_offset 4, -24
+ 171              		.cfi_offset 5, -20
+ 172              		.cfi_offset 6, -16
+ 173              		.cfi_offset 7, -12
+ 174              		.cfi_offset 8, -8
+ 175              		.cfi_offset 14, -4
+  46:..\common\vms/SidProcessor.c ****     //is the frame NULL? if that is the case then a timeout occured and we need to KILL EVERYTHING
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 5
+
+
+  47:..\common\vms/SidProcessor.c ****     
+  48:..\common\vms/SidProcessor.c ****     if(frame == NULL){
+ 176              		.loc 1 48 0
+ 177 0004 18B9     		cbnz	r0, .L19
+  49:..\common\vms/SidProcessor.c ****         //reset all sid stuff
+  50:..\common\vms/SidProcessor.c ****         SidProcessor_resetSid();
+  51:..\common\vms/SidProcessor.c ****         
+  52:..\common\vms/SidProcessor.c ****         return;
+  53:..\common\vms/SidProcessor.c ****     }
+  54:..\common\vms/SidProcessor.c ****     
+  55:..\common\vms/SidProcessor.c ****     //we got a sid frame. Process it and update the voice.
+  56:..\common\vms/SidProcessor.c ****     for(uint32_t i = 0; i < N_SIDCHANNEL; i ++){
+  57:..\common\vms/SidProcessor.c ****         channelData[i].flags = frame->flags[i];
+  58:..\common\vms/SidProcessor.c ****     
+  59:..\common\vms/SidProcessor.c ****         channelData[i].attack = frame->attack[i];
+  60:..\common\vms/SidProcessor.c ****         channelData[i].decay = frame->decay[i];
+  61:..\common\vms/SidProcessor.c ****         channelData[i].sustainVolume = frame->sustain[i] * 2184;   //scale sustain volume into the 
+  62:..\common\vms/SidProcessor.c ****         channelData[i].release = frame->release[i];
+  63:..\common\vms/SidProcessor.c ****         
+  64:..\common\vms/SidProcessor.c ****         channelData[i].frequency_dHz = frame->frequency_dHz[i];
+  65:..\common\vms/SidProcessor.c ****         channelData[i].pulsewidth = frame->pulsewidth[i];
+  66:..\common\vms/SidProcessor.c ****         
+  67:..\common\vms/SidProcessor.c ****         //why only update the voice after we received a new register frame? well thats because we c
+  68:..\common\vms/SidProcessor.c ****         //is still plenty for updating interrupter parameters
+  69:..\common\vms/SidProcessor.c ****         SidFilter_updateVoice(i, &channelData[i]);
+  70:..\common\vms/SidProcessor.c ****     }
+  71:..\common\vms/SidProcessor.c **** }
+ 178              		.loc 1 71 0
+ 179 0006 BDE8F041 		pop	{r4, r5, r6, r7, r8, lr}
+ 180              		.cfi_remember_state
+ 181              		.cfi_restore 14
+ 182              		.cfi_restore 8
+ 183              		.cfi_restore 7
+ 184              		.cfi_restore 6
+ 185              		.cfi_restore 5
+ 186              		.cfi_restore 4
+ 187              		.cfi_def_cfa_offset 0
+  50:..\common\vms/SidProcessor.c ****         
+ 188              		.loc 1 50 0
+ 189 000a FFF7FEBF 		b	SidProcessor_resetSid
+ 190              	.LVL8:
+ 191              	.L19:
+ 192              		.cfi_restore_state
+ 193 000e 0446     		mov	r4, r0
+ 194 0010 144D     		ldr	r5, .L22
+ 195 0012 00F11C08 		add	r8, r0, #28
+ 196 0016 00F12807 		add	r7, r0, #40
+  48:..\common\vms/SidProcessor.c ****         //reset all sid stuff
+ 197              		.loc 1 48 0
+ 198 001a 0026     		movs	r6, #0
+ 199              	.LVL9:
+ 200              	.L20:
+ 201              	.LBB3:
+  57:..\common\vms/SidProcessor.c ****     
+ 202              		.loc 1 57 0 discriminator 3
+ 203 001c 2388     		ldrh	r3, [r4]
+  69:..\common\vms/SidProcessor.c ****     }
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 6
+
+
+ 204              		.loc 1 69 0 discriminator 3
+ 205 001e 2946     		mov	r1, r5
+  57:..\common\vms/SidProcessor.c ****     
+ 206              		.loc 1 57 0 discriminator 3
+ 207 0020 6B60     		str	r3, [r5, #4]
+  59:..\common\vms/SidProcessor.c ****         channelData[i].decay = frame->decay[i];
+ 208              		.loc 1 59 0 discriminator 3
+ 209 0022 E388     		ldrh	r3, [r4, #6]
+  69:..\common\vms/SidProcessor.c ****     }
+ 210              		.loc 1 69 0 discriminator 3
+ 211 0024 3046     		mov	r0, r6
+  59:..\common\vms/SidProcessor.c ****         channelData[i].decay = frame->decay[i];
+ 212              		.loc 1 59 0 discriminator 3
+ 213 0026 2B81     		strh	r3, [r5, #8]	@ movhi
+  60:..\common\vms/SidProcessor.c ****         channelData[i].sustainVolume = frame->sustain[i] * 2184;   //scale sustain volume into the 
+ 214              		.loc 1 60 0 discriminator 3
+ 215 0028 A389     		ldrh	r3, [r4, #12]
+  56:..\common\vms/SidProcessor.c ****         channelData[i].flags = frame->flags[i];
+ 216              		.loc 1 56 0 discriminator 3
+ 217 002a 0136     		adds	r6, r6, #1
+ 218              	.LVL10:
+  60:..\common\vms/SidProcessor.c ****         channelData[i].sustainVolume = frame->sustain[i] * 2184;   //scale sustain volume into the 
+ 219              		.loc 1 60 0 discriminator 3
+ 220 002c 6B81     		strh	r3, [r5, #10]	@ movhi
+  61:..\common\vms/SidProcessor.c ****         channelData[i].release = frame->release[i];
+ 221              		.loc 1 61 0 discriminator 3
+ 222 002e 638A     		ldrh	r3, [r4, #18]
+ 223 0030 2435     		adds	r5, r5, #36
+ 224 0032 03EB0312 		add	r2, r3, r3, lsl #4
+ 225 0036 03EB0213 		add	r3, r3, r2, lsl #4
+ 226 003a DB00     		lsls	r3, r3, #3
+ 227 003c 25F8183C 		strh	r3, [r5, #-24]	@ movhi
+  62:..\common\vms/SidProcessor.c ****         
+ 228              		.loc 1 62 0 discriminator 3
+ 229 0040 238B     		ldrh	r3, [r4, #24]
+ 230 0042 0234     		adds	r4, r4, #2
+ 231 0044 25F8163C 		strh	r3, [r5, #-22]	@ movhi
+  64:..\common\vms/SidProcessor.c ****         channelData[i].pulsewidth = frame->pulsewidth[i];
+ 232              		.loc 1 64 0 discriminator 3
+ 233 0048 58F8043F 		ldr	r3, [r8, #4]!
+ 234 004c 45F8143C 		str	r3, [r5, #-20]
+  65:..\common\vms/SidProcessor.c ****         
+ 235              		.loc 1 65 0 discriminator 3
+ 236 0050 57F8043F 		ldr	r3, [r7, #4]!
+ 237 0054 45F8103C 		str	r3, [r5, #-16]
+  69:..\common\vms/SidProcessor.c ****     }
+ 238              		.loc 1 69 0 discriminator 3
+ 239 0058 FFF7FEFF 		bl	SidFilter_updateVoice
+ 240              	.LVL11:
+  56:..\common\vms/SidProcessor.c ****         channelData[i].flags = frame->flags[i];
+ 241              		.loc 1 56 0 discriminator 3
+ 242 005c 032E     		cmp	r6, #3
+ 243 005e DDD1     		bne	.L20
+ 244              	.LBE3:
+ 245              		.loc 1 71 0
+ 246 0060 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 247              	.LVL12:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 7
+
+
+ 248              	.L23:
+ 249              		.align	2
+ 250              	.L22:
+ 251 0064 00000000 		.word	.LANCHOR0
+ 252              		.cfi_endproc
+ 253              	.LFE71:
+ 254              		.size	SidProcessor_handleFrame, .-SidProcessor_handleFrame
+ 255              		.section	.text.SidProcessor_runADSR,"ax",%progbits
+ 256              		.align	1
+ 257              		.global	SidProcessor_runADSR
+ 258              		.thumb
+ 259              		.thumb_func
+ 260              		.type	SidProcessor_runADSR, %function
+ 261              	SidProcessor_runADSR:
+ 262              	.LFB72:
+  72:..\common\vms/SidProcessor.c **** 
+  73:..\common\vms/SidProcessor.c **** //run through all channels and calculate ADSR. This is currently designed to run every millisecond
+  74:..\common\vms/SidProcessor.c **** //TODO maybe make this slower?
+  75:..\common\vms/SidProcessor.c **** void SidProcessor_runADSR(){
+ 263              		.loc 1 75 0
+ 264              		.cfi_startproc
+ 265              		@ args = 0, pretend = 0, frame = 0
+ 266              		@ frame_needed = 0, uses_anonymous_args = 0
+ 267              	.LVL13:
+ 268 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 269              		.cfi_def_cfa_offset 36
+ 270              		.cfi_offset 4, -36
+ 271              		.cfi_offset 5, -32
+ 272              		.cfi_offset 6, -28
+ 273              		.cfi_offset 7, -24
+ 274              		.cfi_offset 8, -20
+ 275              		.cfi_offset 9, -16
+ 276              		.cfi_offset 10, -12
+ 277              		.cfi_offset 11, -8
+ 278              		.cfi_offset 14, -4
+ 279              	.LBB4:
+  76:..\common\vms/SidProcessor.c ****     for(uint32_t currentChannel = 0; currentChannel < N_SIDCHANNEL; currentChannel++){
+  77:..\common\vms/SidProcessor.c ****         
+  78:..\common\vms/SidProcessor.c ****         //what state are we in?
+  79:..\common\vms/SidProcessor.c ****         switch(channelData[currentChannel].adsrState) {
+  80:..\common\vms/SidProcessor.c ****             //ADSR IDLE / channel off => check if the gate was just turned on
+  81:..\common\vms/SidProcessor.c ****         	case ADSR_IDLE:
+  82:..\common\vms/SidProcessor.c ****         		if(channelData[currentChannel].flags & SID_FRAME_FLAG_GATE) channelData[currentChannel].a
+  83:..\common\vms/SidProcessor.c ****         		channelData[currentChannel].currentEnvelopeVolume = 0;
+  84:..\common\vms/SidProcessor.c ****         		break;
+  85:..\common\vms/SidProcessor.c ****         		
+  86:..\common\vms/SidProcessor.c ****             //Attack => linearly increase volume until we reach either MAX_VOL if a decay would hap
+  87:..\common\vms/SidProcessor.c ****         	case ADSR_ATTACK:
+  88:..\common\vms/SidProcessor.c ****                 //is the channel still active?
+  89:..\common\vms/SidProcessor.c ****                 if(!(channelData[currentChannel].flags & SID_FRAME_FLAG_GATE)) { 
+  90:..\common\vms/SidProcessor.c ****                     //no actually :( Switch to release mode and make sure to remember what volume w
+  91:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].adsrState = ADSR_RELEASE;
+  92:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeStartValue = channelData[currentChannel].curr
+  93:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeFactor = MAX_VOL;
+  94:..\common\vms/SidProcessor.c ****         			break;
+  95:..\common\vms/SidProcessor.c ****         		}
+  96:..\common\vms/SidProcessor.c ****                 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 8
+
+
+  97:..\common\vms/SidProcessor.c ****                 //increase current volume. Speed is given by attack parameter
+  98:..\common\vms/SidProcessor.c ****         		channelData[currentChannel].currentEnvelopeVolume += ADSR_speedLut_A[channelData[currentC
+  99:..\common\vms/SidProcessor.c ****                 
+ 100:..\common\vms/SidProcessor.c ****                 //what threshold do we need to compare against? If we reached or exceeded it set to
+ 101:..\common\vms/SidProcessor.c ****         		if(channelData[currentChannel].decay > 0) {
+ 102:..\common\vms/SidProcessor.c ****                     //decay is enabled => we must reach 100% volume 
+ 103:..\common\vms/SidProcessor.c ****         			if(channelData[currentChannel].currentEnvelopeVolume >= MAX_VOL) {
+ 104:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].adsrState = ADSR_DECAY;
+ 105:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].currentEnvelopeFactor = MAX_VOL;
+ 106:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].currentEnvelopeVolume = MAX_VOL;
+ 107:..\common\vms/SidProcessor.c ****         			}
+ 108:..\common\vms/SidProcessor.c ****         		}else {
+ 109:..\common\vms/SidProcessor.c ****                     //decay is enabled => we only need to reach the sustain level
+ 110:..\common\vms/SidProcessor.c ****         			if(channelData[currentChannel].currentEnvelopeVolume >= channelData[currentChannel].sust
+ 111:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].adsrState = ADSR_SUSTAIN;
+ 112:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].currentEnvelopeFactor = MAX_VOL;
+ 113:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].currentEnvelopeVolume = channelData[currentChannel].sustain
+ 114:..\common\vms/SidProcessor.c ****         			}
+ 115:..\common\vms/SidProcessor.c ****         		}
+ 116:..\common\vms/SidProcessor.c ****         		break;
+ 117:..\common\vms/SidProcessor.c ****         		
+ 118:..\common\vms/SidProcessor.c ****             //decay => exponentially reduce volume from max_vol (attack target) to the sustain valu
+ 119:..\common\vms/SidProcessor.c ****         	case ADSR_DECAY:
+ 120:..\common\vms/SidProcessor.c ****                 //is the channel still active?
+ 121:..\common\vms/SidProcessor.c ****         		if(!(channelData[currentChannel].flags & SID_FRAME_FLAG_GATE)){ 
+ 122:..\common\vms/SidProcessor.c ****                     //no actually :( Switch to release mode and make sure to remember what volume w
+ 123:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].adsrState = ADSR_RELEASE;
+ 124:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeStartValue = channelData[currentChannel].curr
+ 125:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeFactor = MAX_VOL;
+ 126:..\common\vms/SidProcessor.c ****         			break;
+ 127:..\common\vms/SidProcessor.c ****         		}
+ 128:..\common\vms/SidProcessor.c ****                 
+ 129:..\common\vms/SidProcessor.c ****                 //exponentially decrease volume at speed given by the decay parameter
+ 130:..\common\vms/SidProcessor.c ****         		channelData[currentChannel].currentEnvelopeFactor = (channelData[currentChannel].currentE
+ 131:..\common\vms/SidProcessor.c ****                 
+ 132:..\common\vms/SidProcessor.c ****                 //check if we reached the target
+ 133:..\common\vms/SidProcessor.c ****         		if(channelData[currentChannel].currentEnvelopeFactor <= 3500) {
+ 134:..\common\vms/SidProcessor.c ****                     //yes sustain volume reached => go to next state
+ 135:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].adsrState = ADSR_SUSTAIN;
+ 136:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeVolume = channelData[currentChannel].sustainV
+ 137:..\common\vms/SidProcessor.c ****         		}else{
+ 138:..\common\vms/SidProcessor.c ****                     //no not yet => update adsr volume
+ 139:..\common\vms/SidProcessor.c ****                     //This is equal to the exponential start volume (MAX_VOL in this case) minus th
+ 140:..\common\vms/SidProcessor.c ****             		channelData[currentChannel].currentEnvelopeVolume = channelData[currentChannel].susta
+ 141:..\common\vms/SidProcessor.c ****                 }
+ 142:..\common\vms/SidProcessor.c ****         		break;
+ 143:..\common\vms/SidProcessor.c ****         		
+ 144:..\common\vms/SidProcessor.c ****         	case ADSR_SUSTAIN:
+ 145:..\common\vms/SidProcessor.c ****                 //is the channel still active?
+ 146:..\common\vms/SidProcessor.c ****         		if(!(channelData[currentChannel].flags & SID_FRAME_FLAG_GATE)){ 
+ 147:..\common\vms/SidProcessor.c ****                     //no. Switch to release mode and make sure to remember what volume we reached
+ 148:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].adsrState = ADSR_RELEASE;
+ 149:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeStartValue = channelData[currentChannel].curr
+ 150:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeFactor = MAX_VOL;
+ 151:..\common\vms/SidProcessor.c ****         		}
+ 152:..\common\vms/SidProcessor.c ****         		break;
+ 153:..\common\vms/SidProcessor.c ****         		
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 9
+
+
+ 154:..\common\vms/SidProcessor.c ****         	case ADSR_RELEASE:
+ 155:..\common\vms/SidProcessor.c ****                 //is the channel still inactive?
+ 156:..\common\vms/SidProcessor.c ****         		if(channelData[currentChannel].flags & SID_FRAME_FLAG_GATE) { 
+ 157:..\common\vms/SidProcessor.c ****                     //no, note turned on again. Restart adsr with the attack state
+ 158:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].adsrState = ADSR_ATTACK;
+ 159:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeStartValue = channelData[currentChannel].curr
+ 160:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeFactor = MAX_VOL;
+ 280              		.loc 1 160 0
+ 281 0004 47F6FF71 		movw	r1, #32767
+ 103:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].adsrState = ADSR_DECAY;
+ 282              		.loc 1 103 0
+ 283 0008 47F6FE79 		movw	r9, #32766
+ 284 000c 414B     		ldr	r3, .L50
+ 161:..\common\vms/SidProcessor.c ****         			break;
+ 162:..\common\vms/SidProcessor.c ****         		}
+ 163:..\common\vms/SidProcessor.c ****                 
+ 164:..\common\vms/SidProcessor.c ****                 //exponentially decrease volume at speed given by the release parameter
+ 165:..\common\vms/SidProcessor.c ****         		channelData[currentChannel].currentEnvelopeFactor = (channelData[currentChannel].currentE
+ 285              		.loc 1 165 0
+ 286 000e 424C     		ldr	r4, .L50+4
+ 287 0010 03F16C0A 		add	r10, r3, #108
+ 158:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeStartValue = channelData[currentChannel].curr
+ 288              		.loc 1 158 0
+ 289 0014 0127     		movs	r7, #1
+ 148:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeStartValue = channelData[currentChannel].curr
+ 290              		.loc 1 148 0
+ 291 0016 0425     		movs	r5, #4
+ 135:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeVolume = channelData[currentChannel].sustainV
+ 292              		.loc 1 135 0
+ 293 0018 4FF0030E 		mov	lr, #3
+ 104:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].currentEnvelopeFactor = MAX_VOL;
+ 294              		.loc 1 104 0
+ 295 001c 4FF00208 		mov	r8, #2
+  83:..\common\vms/SidProcessor.c ****         		break;
+ 296              		.loc 1 83 0
+ 297 0020 4FF0000C 		mov	ip, #0
+ 298              	.LVL14:
+ 299              	.L41:
+  79:..\common\vms/SidProcessor.c ****             //ADSR IDLE / channel off => check if the gate was just turned on
+ 300              		.loc 1 79 0
+ 301 0024 13F8082C 		ldrb	r2, [r3, #-8]	@ zero_extendqisi2
+ 302 0028 042A     		cmp	r2, #4
+ 303 002a 6ED8     		bhi	.L25
+ 304 002c DFE802F0 		tbb	[pc, r2]
+ 305              	.L27:
+ 306 0030 03       		.byte	(.L26-.L27)/2
+ 307 0031 0C       		.byte	(.L28-.L27)/2
+ 308 0032 2A       		.byte	(.L29-.L27)/2
+ 309 0033 48       		.byte	(.L30-.L27)/2
+ 310 0034 4F       		.byte	(.L31-.L27)/2
+ 311 0035 00       		.p2align 1
+ 312              	.L26:
+  82:..\common\vms/SidProcessor.c ****         		channelData[currentChannel].currentEnvelopeVolume = 0;
+ 313              		.loc 1 82 0
+ 314 0036 53F8042C 		ldr	r2, [r3, #-4]
+  83:..\common\vms/SidProcessor.c ****         		break;
+ 315              		.loc 1 83 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 10
+
+
+ 316 003a C3F818C0 		str	ip, [r3, #24]
+  82:..\common\vms/SidProcessor.c ****         		channelData[currentChannel].currentEnvelopeVolume = 0;
+ 317              		.loc 1 82 0
+ 318 003e 1606     		lsls	r6, r2, #24
+ 319 0040 48BF     		it	mi
+ 320 0042 03F8087C 		strbmi	r7, [r3, #-8]
+  84:..\common\vms/SidProcessor.c ****         		
+ 321              		.loc 1 84 0
+ 322 0046 60E0     		b	.L25
+ 323              	.L28:
+  89:..\common\vms/SidProcessor.c ****                     //no actually :( Switch to release mode and make sure to remember what volume w
+ 324              		.loc 1 89 0
+ 325 0048 53F8042C 		ldr	r2, [r3, #-4]
+ 326 004c 12F0800F 		tst	r2, #128
+ 327 0050 9A69     		ldr	r2, [r3, #24]
+ 328 0052 02D1     		bne	.L33
+  91:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeStartValue = channelData[currentChannel].curr
+ 329              		.loc 1 91 0
+ 330 0054 03F8085C 		strb	r5, [r3, #-8]
+ 331 0058 41E0     		b	.L48
+ 332              	.L33:
+  98:..\common\vms/SidProcessor.c ****                 
+ 333              		.loc 1 98 0
+ 334 005a 1888     		ldrh	r0, [r3]
+ 335 005c 54F82000 		ldr	r0, [r4, r0, lsl #2]
+ 336 0060 0244     		add	r2, r2, r0
+ 101:..\common\vms/SidProcessor.c ****                     //decay is enabled => we must reach 100% volume 
+ 337              		.loc 1 101 0
+ 338 0062 5888     		ldrh	r0, [r3, #2]
+  98:..\common\vms/SidProcessor.c ****                 
+ 339              		.loc 1 98 0
+ 340 0064 9A61     		str	r2, [r3, #24]
+ 101:..\common\vms/SidProcessor.c ****                     //decay is enabled => we must reach 100% volume 
+ 341              		.loc 1 101 0
+ 342 0066 30B1     		cbz	r0, .L34
+ 103:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].adsrState = ADSR_DECAY;
+ 343              		.loc 1 103 0
+ 344 0068 4A45     		cmp	r2, r9
+ 345 006a 4ED9     		bls	.L25
+ 104:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].currentEnvelopeFactor = MAX_VOL;
+ 346              		.loc 1 104 0
+ 347 006c 03F8088C 		strb	r8, [r3, #-8]
+ 105:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].currentEnvelopeVolume = MAX_VOL;
+ 348              		.loc 1 105 0
+ 349 0070 1961     		str	r1, [r3, #16]
+ 106:..\common\vms/SidProcessor.c ****         			}
+ 350              		.loc 1 106 0
+ 351 0072 9961     		str	r1, [r3, #24]
+ 352 0074 49E0     		b	.L25
+ 353              	.L34:
+ 110:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].adsrState = ADSR_SUSTAIN;
+ 354              		.loc 1 110 0
+ 355 0076 9888     		ldrh	r0, [r3, #4]
+ 356 0078 8242     		cmp	r2, r0
+ 357 007a 46D3     		bcc	.L25
+ 111:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].currentEnvelopeFactor = MAX_VOL;
+ 358              		.loc 1 111 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 11
+
+
+ 359 007c 03F808EC 		strb	lr, [r3, #-8]
+ 112:..\common\vms/SidProcessor.c ****         				channelData[currentChannel].currentEnvelopeVolume = channelData[currentChannel].sustain
+ 360              		.loc 1 112 0
+ 361 0080 1961     		str	r1, [r3, #16]
+ 362 0082 41E0     		b	.L46
+ 363              	.L29:
+ 121:..\common\vms/SidProcessor.c ****                     //no actually :( Switch to release mode and make sure to remember what volume w
+ 364              		.loc 1 121 0
+ 365 0084 53F8042C 		ldr	r2, [r3, #-4]
+ 366 0088 1006     		lsls	r0, r2, #24
+ 367 008a 1DD5     		bpl	.L49
+ 130:..\common\vms/SidProcessor.c ****                 
+ 368              		.loc 1 130 0
+ 369 008c 5A88     		ldrh	r2, [r3, #2]
+ 370 008e 04EB8202 		add	r2, r4, r2, lsl #2
+ 371 0092 106C     		ldr	r0, [r2, #64]
+ 372 0094 1A69     		ldr	r2, [r3, #16]
+ 373 0096 4243     		muls	r2, r0, r2
+ 133:..\common\vms/SidProcessor.c ****                     //yes sustain volume reached => go to next state
+ 374              		.loc 1 133 0
+ 375 0098 40F6AC50 		movw	r0, #3500
+ 130:..\common\vms/SidProcessor.c ****                 
+ 376              		.loc 1 130 0
+ 377 009c 120C     		lsrs	r2, r2, #16
+ 133:..\common\vms/SidProcessor.c ****                     //yes sustain volume reached => go to next state
+ 378              		.loc 1 133 0
+ 379 009e 8242     		cmp	r2, r0
+ 130:..\common\vms/SidProcessor.c ****                 
+ 380              		.loc 1 130 0
+ 381 00a0 1A61     		str	r2, [r3, #16]
+ 382 00a2 9888     		ldrh	r0, [r3, #4]
+ 133:..\common\vms/SidProcessor.c ****                     //yes sustain volume reached => go to next state
+ 383              		.loc 1 133 0
+ 384 00a4 02D8     		bhi	.L38
+ 135:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeVolume = channelData[currentChannel].sustainV
+ 385              		.loc 1 135 0
+ 386 00a6 03F808EC 		strb	lr, [r3, #-8]
+ 387 00aa 2DE0     		b	.L46
+ 388              	.L38:
+ 140:..\common\vms/SidProcessor.c ****                 }
+ 389              		.loc 1 140 0
+ 390 00ac C0F5FF4B 		rsb	fp, r0, #32640
+ 391 00b0 0BF17F0B 		add	fp, fp, #127
+ 392 00b4 02FB0BF2 		mul	r2, r2, fp
+ 393 00b8 00EBD232 		add	r2, r0, r2, lsr #15
+ 394 00bc 9A61     		str	r2, [r3, #24]
+ 395 00be 24E0     		b	.L25
+ 396              	.L30:
+ 146:..\common\vms/SidProcessor.c ****                     //no. Switch to release mode and make sure to remember what volume we reached
+ 397              		.loc 1 146 0
+ 398 00c0 53F8042C 		ldr	r2, [r3, #-4]
+ 399 00c4 1206     		lsls	r2, r2, #24
+ 400 00c6 20D4     		bmi	.L25
+ 401              	.L49:
+ 148:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeStartValue = channelData[currentChannel].curr
+ 402              		.loc 1 148 0
+ 403 00c8 03F8085C 		strb	r5, [r3, #-8]
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 12
+
+
+ 404 00cc 06E0     		b	.L47
+ 405              	.L31:
+ 156:..\common\vms/SidProcessor.c ****                     //no, note turned on again. Restart adsr with the attack state
+ 406              		.loc 1 156 0
+ 407 00ce 53F8042C 		ldr	r2, [r3, #-4]
+ 408 00d2 12F08000 		ands	r0, r2, #128
+ 409 00d6 05D0     		beq	.L39
+ 158:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeStartValue = channelData[currentChannel].curr
+ 410              		.loc 1 158 0
+ 411 00d8 03F8087C 		strb	r7, [r3, #-8]
+ 412              	.L47:
+ 159:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeFactor = MAX_VOL;
+ 413              		.loc 1 159 0
+ 414 00dc 9A69     		ldr	r2, [r3, #24]
+ 415              	.L48:
+ 416 00de 5A61     		str	r2, [r3, #20]
+ 160:..\common\vms/SidProcessor.c ****         			break;
+ 417              		.loc 1 160 0
+ 418 00e0 1961     		str	r1, [r3, #16]
+ 161:..\common\vms/SidProcessor.c ****         		}
+ 419              		.loc 1 161 0
+ 420 00e2 12E0     		b	.L25
+ 421              	.L39:
+ 422              		.loc 1 165 0
+ 423 00e4 DA88     		ldrh	r2, [r3, #6]
+ 424 00e6 1E69     		ldr	r6, [r3, #16]
+ 425 00e8 04EB8202 		add	r2, r4, r2, lsl #2
+ 426 00ec 126C     		ldr	r2, [r2, #64]
+ 427 00ee 7243     		muls	r2, r6, r2
+ 166:..\common\vms/SidProcessor.c ****                 
+ 167:..\common\vms/SidProcessor.c ****                 //check if we reached the target
+ 168:..\common\vms/SidProcessor.c ****         		if(channelData[currentChannel].currentEnvelopeFactor <= 3500) {
+ 428              		.loc 1 168 0
+ 429 00f0 40F6AC56 		movw	r6, #3500
+ 165:..\common\vms/SidProcessor.c ****                 
+ 430              		.loc 1 165 0
+ 431 00f4 120C     		lsrs	r2, r2, #16
+ 432              		.loc 1 168 0
+ 433 00f6 B242     		cmp	r2, r6
+ 169:..\common\vms/SidProcessor.c ****                     //yes => go to idle mode
+ 170:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].adsrState = ADSR_IDLE;
+ 171:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeVolume = 0;
+ 172:..\common\vms/SidProcessor.c ****         		}else{
+ 173:..\common\vms/SidProcessor.c ****                     //no => update volume
+ 174:..\common\vms/SidProcessor.c ****                     //equal to a exponential decay down to zero from currentEnvelopeStartValue
+ 175:..\common\vms/SidProcessor.c ****                     channelData[currentChannel].currentEnvelopeVolume = (channelData[currentChannel
+ 434              		.loc 1 175 0
+ 435 00f8 88BF     		it	hi
+ 436 00fa 5869     		ldrhi	r0, [r3, #20]
+ 165:..\common\vms/SidProcessor.c ****                 
+ 437              		.loc 1 165 0
+ 438 00fc 1A61     		str	r2, [r3, #16]
+ 439              		.loc 1 175 0
+ 440 00fe 8ABF     		itet	hi
+ 441 0100 5043     		mulhi	r0, r0, r2
+ 170:..\common\vms/SidProcessor.c ****         			channelData[currentChannel].currentEnvelopeVolume = 0;
+ 442              		.loc 1 170 0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 13
+
+
+ 443 0102 03F8080C 		strbls	r0, [r3, #-8]
+ 444              		.loc 1 175 0
+ 445 0106 C00B     		lsrhi	r0, r0, #15
+ 446              	.L46:
+ 447 0108 9861     		str	r0, [r3, #24]
+ 448              	.L25:
+ 449 010a 2433     		adds	r3, r3, #36
+  76:..\common\vms/SidProcessor.c ****         
+ 450              		.loc 1 76 0 discriminator 2
+ 451 010c 5345     		cmp	r3, r10
+ 452 010e 89D1     		bne	.L41
+ 453              	.LBE4:
+ 176:..\common\vms/SidProcessor.c ****                 }
+ 177:..\common\vms/SidProcessor.c ****         		break;
+ 178:..\common\vms/SidProcessor.c ****     	}
+ 179:..\common\vms/SidProcessor.c ****     }
+ 180:..\common\vms/SidProcessor.c **** }...
+ 454              		.loc 1 180 0
+ 455 0110 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 456              	.L51:
+ 457              		.align	2
+ 458              	.L50:
+ 459 0114 08000000 		.word	.LANCHOR0+8
+ 460 0118 00000000 		.word	.LANCHOR1
+ 461              		.cfi_endproc
+ 462              	.LFE72:
+ 463              		.size	SidProcessor_runADSR, .-SidProcessor_runADSR
+ 464              		.comm	ramp,406,2
+ 465              		.comm	interrupter,12,4
+ 466              		.section	.rodata
+ 467              		.align	2
+ 468              		.set	.LANCHOR1,. + 0
+ 469              		.type	ADSR_speedLut_A, %object
+ 470              		.size	ADSR_speedLut_A, 64
+ 471              	ADSR_speedLut_A:
+ 472 0000 FFFF0000 		.word	65535
+ 473 0004 00400000 		.word	16384
+ 474 0008 00200000 		.word	8192
+ 475 000c 53150000 		.word	5459
+ 476 0010 790D0000 		.word	3449
+ 477 0014 25090000 		.word	2341
+ 478 0018 88070000 		.word	1928
+ 479 001c 66060000 		.word	1638
+ 480 0020 1F050000 		.word	1311
+ 481 0024 0C020000 		.word	524
+ 482 0028 06010000 		.word	262
+ 483 002c A4000000 		.word	164
+ 484 0030 83000000 		.word	131
+ 485 0034 2C000000 		.word	44
+ 486 0038 1A000000 		.word	26
+ 487 003c 10000000 		.word	16
+ 488              		.type	ADSR_speedLut_DR, %object
+ 489              		.size	ADSR_speedLut_DR, 64
+ 490              	ADSR_speedLut_DR:
+ 491 0040 639B0000 		.word	39779
+ 492 0044 F6E10000 		.word	57846
+ 493 0048 83F00000 		.word	61571
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 14
+
+
+ 494 004c 91F50000 		.word	62865
+ 495 0050 5CF90000 		.word	63836
+ 496 0054 7AFB0000 		.word	64378
+ 497 0058 45FC0000 		.word	64581
+ 498 005c D3FC0000 		.word	64723
+ 499 0060 75FD0000 		.word	64885
+ 500 0064 FBFE0000 		.word	65275
+ 501 0068 7DFF0000 		.word	65405
+ 502 006c AEFF0000 		.word	65454
+ 503 0070 BFFF0000 		.word	65471
+ 504 0074 EAFF0000 		.word	65514
+ 505 0078 F3FF0000 		.word	65523
+ 506 007c F8FF0000 		.word	65528
+ 507              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 508              	.LC0:
+ 509 0000 4E4F4953 		.ascii	"NOISE\000"
+ 509      4500
+ 510              	.LC1:
+ 511 0006 53515541 		.ascii	"SQUARE\000"
+ 511      524500
+ 512              	.LC2:
+ 513 000d 53415754 		.ascii	"SAWTOOTH\000"
+ 513      4F4F5448 
+ 513      00
+ 514              	.LC3:
+ 515 0016 54524941 		.ascii	"TRIANGLE\000"
+ 515      4E474C45 
+ 515      00
+ 516              	.LC4:
+ 517 001f 3F00     		.ascii	"?\000"
+ 518              		.bss
+ 519              		.align	2
+ 520              		.set	.LANCHOR0,. + 0
+ 521              		.type	channelData, %object
+ 522              		.size	channelData, 108
+ 523              	channelData:
+ 524 0000 00000000 		.space	108
+ 524      00000000 
+ 524      00000000 
+ 524      00000000 
+ 524      00000000 
+ 525              		.text
+ 526              	.Letext0:
+ 527              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 528              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 529              		.file 4 "..\\common\\ud3core/tasks/tsk_sid.h"
+ 530              		.file 5 "..\\common\\rtos\\include/timers.h"
+ 531              		.file 6 "..\\common\\ud3core/interrupter.h"
+ 532              		.file 7 "..\\common\\ud3core/qcw.h"
+ 533              		.file 8 "Generated_Source\\PSoC5/core_cm3.h"
+ 534              		.file 9 "..\\common\\vms\\SidFilter.h"
+ 535              		.section	.debug_info,"",%progbits
+ 536              	.Ldebug_info0:
+ 537 0000 56050000 		.4byte	0x556
+ 538 0004 0400     		.2byte	0x4
+ 539 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 540 000a 04       		.byte	0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 15
+
+
+ 541 000b 01       		.uleb128 0x1
+ 542 000c BE000000 		.4byte	.LASF76
+ 543 0010 0C       		.byte	0xc
+ 544 0011 F8010000 		.4byte	.LASF77
+ 545 0015 AC040000 		.4byte	.LASF78
+ 546 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 547 001d 00000000 		.4byte	0
+ 548 0021 00000000 		.4byte	.Ldebug_line0
+ 549 0025 02       		.uleb128 0x2
+ 550 0026 01       		.byte	0x1
+ 551 0027 06       		.byte	0x6
+ 552 0028 F5020000 		.4byte	.LASF0
+ 553 002c 03       		.uleb128 0x3
+ 554 002d 52020000 		.4byte	.LASF3
+ 555 0031 02       		.byte	0x2
+ 556 0032 1D       		.byte	0x1d
+ 557 0033 37000000 		.4byte	0x37
+ 558 0037 02       		.uleb128 0x2
+ 559 0038 01       		.byte	0x1
+ 560 0039 08       		.byte	0x8
+ 561 003a B2020000 		.4byte	.LASF1
+ 562 003e 02       		.uleb128 0x2
+ 563 003f 02       		.byte	0x2
+ 564 0040 05       		.byte	0x5
+ 565 0041 54000000 		.4byte	.LASF2
+ 566 0045 03       		.uleb128 0x3
+ 567 0046 74010000 		.4byte	.LASF4
+ 568 004a 02       		.byte	0x2
+ 569 004b 2B       		.byte	0x2b
+ 570 004c 50000000 		.4byte	0x50
+ 571 0050 02       		.uleb128 0x2
+ 572 0051 02       		.byte	0x2
+ 573 0052 07       		.byte	0x7
+ 574 0053 BC030000 		.4byte	.LASF5
+ 575 0057 03       		.uleb128 0x3
+ 576 0058 55040000 		.4byte	.LASF6
+ 577 005c 02       		.byte	0x2
+ 578 005d 3F       		.byte	0x3f
+ 579 005e 62000000 		.4byte	0x62
+ 580 0062 02       		.uleb128 0x2
+ 581 0063 04       		.byte	0x4
+ 582 0064 05       		.byte	0x5
+ 583 0065 29020000 		.4byte	.LASF7
+ 584 0069 03       		.uleb128 0x3
+ 585 006a B3000000 		.4byte	.LASF8
+ 586 006e 02       		.byte	0x2
+ 587 006f 41       		.byte	0x41
+ 588 0070 74000000 		.4byte	0x74
+ 589 0074 02       		.uleb128 0x2
+ 590 0075 04       		.byte	0x4
+ 591 0076 07       		.byte	0x7
+ 592 0077 FB030000 		.4byte	.LASF9
+ 593 007b 02       		.uleb128 0x2
+ 594 007c 08       		.byte	0x8
+ 595 007d 05       		.byte	0x5
+ 596 007e A5000000 		.4byte	.LASF10
+ 597 0082 02       		.uleb128 0x2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 16
+
+
+ 598 0083 08       		.byte	0x8
+ 599 0084 07       		.byte	0x7
+ 600 0085 83000000 		.4byte	.LASF11
+ 601 0089 04       		.uleb128 0x4
+ 602 008a 04       		.byte	0x4
+ 603 008b 05       		.byte	0x5
+ 604 008c 696E7400 		.ascii	"int\000"
+ 605 0090 02       		.uleb128 0x2
+ 606 0091 04       		.byte	0x4
+ 607 0092 07       		.byte	0x7
+ 608 0093 1E030000 		.4byte	.LASF12
+ 609 0097 03       		.uleb128 0x3
+ 610 0098 BA010000 		.4byte	.LASF13
+ 611 009c 03       		.byte	0x3
+ 612 009d 18       		.byte	0x18
+ 613 009e 2C000000 		.4byte	0x2c
+ 614 00a2 03       		.uleb128 0x3
+ 615 00a3 42030000 		.4byte	.LASF14
+ 616 00a7 03       		.byte	0x3
+ 617 00a8 24       		.byte	0x24
+ 618 00a9 45000000 		.4byte	0x45
+ 619 00ad 03       		.uleb128 0x3
+ 620 00ae A1030000 		.4byte	.LASF15
+ 621 00b2 03       		.byte	0x3
+ 622 00b3 2C       		.byte	0x2c
+ 623 00b4 57000000 		.4byte	0x57
+ 624 00b8 03       		.uleb128 0x3
+ 625 00b9 15030000 		.4byte	.LASF16
+ 626 00bd 03       		.byte	0x3
+ 627 00be 30       		.byte	0x30
+ 628 00bf 69000000 		.4byte	0x69
+ 629 00c3 02       		.uleb128 0x2
+ 630 00c4 04       		.byte	0x4
+ 631 00c5 04       		.byte	0x4
+ 632 00c6 F2010000 		.4byte	.LASF17
+ 633 00ca 02       		.uleb128 0x2
+ 634 00cb 08       		.byte	0x8
+ 635 00cc 04       		.byte	0x4
+ 636 00cd 98040000 		.4byte	.LASF18
+ 637 00d1 02       		.uleb128 0x2
+ 638 00d2 01       		.byte	0x1
+ 639 00d3 08       		.byte	0x8
+ 640 00d4 9C030000 		.4byte	.LASF19
+ 641 00d8 02       		.uleb128 0x2
+ 642 00d9 04       		.byte	0x4
+ 643 00da 07       		.byte	0x7
+ 644 00db 6A000000 		.4byte	.LASF20
+ 645 00df 05       		.uleb128 0x5
+ 646 00e0 04       		.byte	0x4
+ 647 00e1 E5000000 		.4byte	0xe5
+ 648 00e5 06       		.uleb128 0x6
+ 649 00e6 D1000000 		.4byte	0xd1
+ 650 00ea 07       		.uleb128 0x7
+ 651 00eb AD000000 		.4byte	0xad
+ 652 00ef 08       		.uleb128 0x8
+ 653 00f0 01       		.byte	0x1
+ 654 00f1 37000000 		.4byte	0x37
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 17
+
+
+ 655 00f5 04       		.byte	0x4
+ 656 00f6 40       		.byte	0x40
+ 657 00f7 1A010000 		.4byte	0x11a
+ 658 00fb 09       		.uleb128 0x9
+ 659 00fc B0010000 		.4byte	.LASF21
+ 660 0100 00       		.byte	0
+ 661 0101 09       		.uleb128 0x9
+ 662 0102 90030000 		.4byte	.LASF22
+ 663 0106 01       		.byte	0x1
+ 664 0107 09       		.uleb128 0x9
+ 665 0108 15020000 		.4byte	.LASF23
+ 666 010c 02       		.byte	0x2
+ 667 010d 09       		.uleb128 0x9
+ 668 010e E5010000 		.4byte	.LASF24
+ 669 0112 03       		.byte	0x3
+ 670 0113 09       		.uleb128 0x9
+ 671 0114 6D040000 		.4byte	.LASF25
+ 672 0118 04       		.byte	0x4
+ 673 0119 00       		.byte	0
+ 674 011a 03       		.uleb128 0x3
+ 675 011b 2D040000 		.4byte	.LASF26
+ 676 011f 04       		.byte	0x4
+ 677 0120 40       		.byte	0x40
+ 678 0121 EF000000 		.4byte	0xef
+ 679 0125 0A       		.uleb128 0xa
+ 680 0126 3C       		.byte	0x3c
+ 681 0127 04       		.byte	0x4
+ 682 0128 43       		.byte	0x43
+ 683 0129 8E010000 		.4byte	0x18e
+ 684 012d 0B       		.uleb128 0xb
+ 685 012e 01030000 		.4byte	.LASF27
+ 686 0132 04       		.byte	0x4
+ 687 0133 44       		.byte	0x44
+ 688 0134 8E010000 		.4byte	0x18e
+ 689 0138 00       		.byte	0
+ 690 0139 0B       		.uleb128 0xb
+ 691 013a 00000000 		.4byte	.LASF28
+ 692 013e 04       		.byte	0x4
+ 693 013f 46       		.byte	0x46
+ 694 0140 8E010000 		.4byte	0x18e
+ 695 0144 06       		.byte	0x6
+ 696 0145 0B       		.uleb128 0xb
+ 697 0146 AA010000 		.4byte	.LASF29
+ 698 014a 04       		.byte	0x4
+ 699 014b 47       		.byte	0x47
+ 700 014c 8E010000 		.4byte	0x18e
+ 701 0150 0C       		.byte	0xc
+ 702 0151 0B       		.uleb128 0xb
+ 703 0152 F3030000 		.4byte	.LASF30
+ 704 0156 04       		.byte	0x4
+ 705 0157 48       		.byte	0x48
+ 706 0158 8E010000 		.4byte	0x18e
+ 707 015c 12       		.byte	0x12
+ 708 015d 0B       		.uleb128 0xb
+ 709 015e 25040000 		.4byte	.LASF31
+ 710 0162 04       		.byte	0x4
+ 711 0163 49       		.byte	0x49
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 18
+
+
+ 712 0164 8E010000 		.4byte	0x18e
+ 713 0168 18       		.byte	0x18
+ 714 0169 0B       		.uleb128 0xb
+ 715 016a A4020000 		.4byte	.LASF32
+ 716 016e 04       		.byte	0x4
+ 717 016f 4B       		.byte	0x4b
+ 718 0170 9E010000 		.4byte	0x19e
+ 719 0174 20       		.byte	0x20
+ 720 0175 0B       		.uleb128 0xb
+ 721 0176 D1040000 		.4byte	.LASF33
+ 722 017a 04       		.byte	0x4
+ 723 017b 4C       		.byte	0x4c
+ 724 017c 9E010000 		.4byte	0x19e
+ 725 0180 2C       		.byte	0x2c
+ 726 0181 0B       		.uleb128 0xb
+ 727 0182 9A000000 		.4byte	.LASF34
+ 728 0186 04       		.byte	0x4
+ 729 0187 51       		.byte	0x51
+ 730 0188 B8000000 		.4byte	0xb8
+ 731 018c 38       		.byte	0x38
+ 732 018d 00       		.byte	0
+ 733 018e 0C       		.uleb128 0xc
+ 734 018f A2000000 		.4byte	0xa2
+ 735 0193 9E010000 		.4byte	0x19e
+ 736 0197 0D       		.uleb128 0xd
+ 737 0198 D8000000 		.4byte	0xd8
+ 738 019c 02       		.byte	0x2
+ 739 019d 00       		.byte	0
+ 740 019e 0C       		.uleb128 0xc
+ 741 019f B8000000 		.4byte	0xb8
+ 742 01a3 AE010000 		.4byte	0x1ae
+ 743 01a7 0D       		.uleb128 0xd
+ 744 01a8 D8000000 		.4byte	0xd8
+ 745 01ac 02       		.byte	0x2
+ 746 01ad 00       		.byte	0
+ 747 01ae 03       		.uleb128 0x3
+ 748 01af E8030000 		.4byte	.LASF35
+ 749 01b3 04       		.byte	0x4
+ 750 01b4 52       		.byte	0x52
+ 751 01b5 25010000 		.4byte	0x125
+ 752 01b9 0A       		.uleb128 0xa
+ 753 01ba 24       		.byte	0x24
+ 754 01bb 04       		.byte	0x4
+ 755 01bc 55       		.byte	0x55
+ 756 01bd 46020000 		.4byte	0x246
+ 757 01c1 0B       		.uleb128 0xb
+ 758 01c2 48020000 		.4byte	.LASF36
+ 759 01c6 04       		.byte	0x4
+ 760 01c7 56       		.byte	0x56
+ 761 01c8 1A010000 		.4byte	0x11a
+ 762 01cc 00       		.byte	0
+ 763 01cd 0B       		.uleb128 0xb
+ 764 01ce 01030000 		.4byte	.LASF27
+ 765 01d2 04       		.byte	0x4
+ 766 01d3 58       		.byte	0x58
+ 767 01d4 B8000000 		.4byte	0xb8
+ 768 01d8 04       		.byte	0x4
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 19
+
+
+ 769 01d9 0B       		.uleb128 0xb
+ 770 01da 00000000 		.4byte	.LASF28
+ 771 01de 04       		.byte	0x4
+ 772 01df 5A       		.byte	0x5a
+ 773 01e0 A2000000 		.4byte	0xa2
+ 774 01e4 08       		.byte	0x8
+ 775 01e5 0B       		.uleb128 0xb
+ 776 01e6 AA010000 		.4byte	.LASF29
+ 777 01ea 04       		.byte	0x4
+ 778 01eb 5B       		.byte	0x5b
+ 779 01ec A2000000 		.4byte	0xa2
+ 780 01f0 0A       		.byte	0xa
+ 781 01f1 0B       		.uleb128 0xb
+ 782 01f2 5F040000 		.4byte	.LASF37
+ 783 01f6 04       		.byte	0x4
+ 784 01f7 5C       		.byte	0x5c
+ 785 01f8 A2000000 		.4byte	0xa2
+ 786 01fc 0C       		.byte	0xc
+ 787 01fd 0B       		.uleb128 0xb
+ 788 01fe 25040000 		.4byte	.LASF31
+ 789 0202 04       		.byte	0x4
+ 790 0203 5D       		.byte	0x5d
+ 791 0204 A2000000 		.4byte	0xa2
+ 792 0208 0E       		.byte	0xe
+ 793 0209 0B       		.uleb128 0xb
+ 794 020a A4020000 		.4byte	.LASF32
+ 795 020e 04       		.byte	0x4
+ 796 020f 5F       		.byte	0x5f
+ 797 0210 B8000000 		.4byte	0xb8
+ 798 0214 10       		.byte	0x10
+ 799 0215 0B       		.uleb128 0xb
+ 800 0216 D1040000 		.4byte	.LASF33
+ 801 021a 04       		.byte	0x4
+ 802 021b 60       		.byte	0x60
+ 803 021c B8000000 		.4byte	0xb8
+ 804 0220 14       		.byte	0x14
+ 805 0221 0B       		.uleb128 0xb
+ 806 0222 4B030000 		.4byte	.LASF38
+ 807 0226 04       		.byte	0x4
+ 808 0227 62       		.byte	0x62
+ 809 0228 B8000000 		.4byte	0xb8
+ 810 022c 18       		.byte	0x18
+ 811 022d 0B       		.uleb128 0xb
+ 812 022e 5C020000 		.4byte	.LASF39
+ 813 0232 04       		.byte	0x4
+ 814 0233 63       		.byte	0x63
+ 815 0234 B8000000 		.4byte	0xb8
+ 816 0238 1C       		.byte	0x1c
+ 817 0239 0B       		.uleb128 0xb
+ 818 023a 86020000 		.4byte	.LASF40
+ 819 023e 04       		.byte	0x4
+ 820 023f 64       		.byte	0x64
+ 821 0240 B8000000 		.4byte	0xb8
+ 822 0244 20       		.byte	0x20
+ 823 0245 00       		.byte	0
+ 824 0246 03       		.uleb128 0x3
+ 825 0247 E4020000 		.4byte	.LASF41
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 20
+
+
+ 826 024b 04       		.byte	0x4
+ 827 024c 65       		.byte	0x65
+ 828 024d B9010000 		.4byte	0x1b9
+ 829 0251 03       		.uleb128 0x3
+ 830 0252 46000000 		.4byte	.LASF42
+ 831 0256 05       		.byte	0x5
+ 832 0257 4E       		.byte	0x4e
+ 833 0258 5C020000 		.4byte	0x25c
+ 834 025c 05       		.uleb128 0x5
+ 835 025d 04       		.byte	0x4
+ 836 025e 62020000 		.4byte	0x262
+ 837 0262 0E       		.uleb128 0xe
+ 838 0263 45040000 		.4byte	.LASF79
+ 839 0267 0F       		.uleb128 0xf
+ 840 0268 7F010000 		.4byte	.LASF45
+ 841 026c 01       		.byte	0x1
+ 842 026d 37000000 		.4byte	0x37
+ 843 0271 06       		.byte	0x6
+ 844 0272 38       		.byte	0x38
+ 845 0273 84020000 		.4byte	0x284
+ 846 0277 09       		.uleb128 0x9
+ 847 0278 39040000 		.4byte	.LASF43
+ 848 027c 00       		.byte	0
+ 849 027d 09       		.uleb128 0x9
+ 850 027e DC040000 		.4byte	.LASF44
+ 851 0282 01       		.byte	0x1
+ 852 0283 00       		.byte	0
+ 853 0284 0F       		.uleb128 0xf
+ 854 0285 D4010000 		.4byte	.LASF46
+ 855 0289 01       		.byte	0x1
+ 856 028a 37000000 		.4byte	0x37
+ 857 028e 06       		.byte	0x6
+ 858 028f 3D       		.byte	0x3d
+ 859 0290 A7020000 		.4byte	0x2a7
+ 860 0294 09       		.uleb128 0x9
+ 861 0295 07030000 		.4byte	.LASF47
+ 862 0299 00       		.byte	0
+ 863 029a 09       		.uleb128 0x9
+ 864 029b 33000000 		.4byte	.LASF48
+ 865 029f 01       		.byte	0x1
+ 866 02a0 09       		.uleb128 0x9
+ 867 02a1 98010000 		.4byte	.LASF49
+ 868 02a5 02       		.byte	0x2
+ 869 02a6 00       		.byte	0
+ 870 02a7 0F       		.uleb128 0xf
+ 871 02a8 C2010000 		.4byte	.LASF50
+ 872 02ac 01       		.byte	0x1
+ 873 02ad 37000000 		.4byte	0x37
+ 874 02b1 06       		.byte	0x6
+ 875 02b2 43       		.byte	0x43
+ 876 02b3 C4020000 		.4byte	0x2c4
+ 877 02b7 09       		.uleb128 0x9
+ 878 02b8 8F010000 		.4byte	.LASF51
+ 879 02bc 00       		.byte	0
+ 880 02bd 09       		.uleb128 0x9
+ 881 02be 07000000 		.4byte	.LASF52
+ 882 02c2 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 21
+
+
+ 883 02c3 00       		.byte	0
+ 884 02c4 0F       		.uleb128 0xf
+ 885 02c5 2B030000 		.4byte	.LASF53
+ 886 02c9 01       		.byte	0x1
+ 887 02ca 37000000 		.4byte	0x37
+ 888 02ce 06       		.byte	0x6
+ 889 02cf 49       		.byte	0x49
+ 890 02d0 E1020000 		.4byte	0x2e1
+ 891 02d4 09       		.uleb128 0x9
+ 892 02d5 0D040000 		.4byte	.LASF54
+ 893 02d9 00       		.byte	0
+ 894 02da 09       		.uleb128 0x9
+ 895 02db 21000000 		.4byte	.LASF55
+ 896 02df 01       		.byte	0x1
+ 897 02e0 00       		.byte	0
+ 898 02e1 0A       		.uleb128 0xa
+ 899 02e2 0C       		.byte	0xc
+ 900 02e3 06       		.byte	0x6
+ 901 02e4 4E       		.byte	0x4e
+ 902 02e5 3D030000 		.4byte	0x33d
+ 903 02e9 10       		.uleb128 0x10
+ 904 02ea 707700   		.ascii	"pw\000"
+ 905 02ed 06       		.byte	0x6
+ 906 02ee 50       		.byte	0x50
+ 907 02ef A2000000 		.4byte	0xa2
+ 908 02f3 00       		.byte	0
+ 909 02f4 10       		.uleb128 0x10
+ 910 02f5 70726400 		.ascii	"prd\000"
+ 911 02f9 06       		.byte	0x6
+ 912 02fa 51       		.byte	0x51
+ 913 02fb A2000000 		.4byte	0xa2
+ 914 02ff 02       		.byte	0x2
+ 915 0300 0B       		.uleb128 0xb
+ 916 0301 57010000 		.4byte	.LASF56
+ 917 0305 06       		.byte	0x6
+ 918 0306 52       		.byte	0x52
+ 919 0307 84020000 		.4byte	0x284
+ 920 030b 04       		.byte	0x4
+ 921 030c 0B       		.uleb128 0xb
+ 922 030d 5E000000 		.4byte	.LASF57
+ 923 0311 06       		.byte	0x6
+ 924 0312 53       		.byte	0x53
+ 925 0313 A7020000 		.4byte	0x2a7
+ 926 0317 05       		.byte	0x5
+ 927 0318 10       		.uleb128 0x10
+ 928 0319 6D6F6400 		.ascii	"mod\000"
+ 929 031d 06       		.byte	0x6
+ 930 031e 54       		.byte	0x54
+ 931 031f C4020000 		.4byte	0x2c4
+ 932 0323 06       		.byte	0x6
+ 933 0324 0B       		.uleb128 0xb
+ 934 0325 20020000 		.4byte	.LASF58
+ 935 0329 06       		.byte	0x6
+ 936 032a 55       		.byte	0x55
+ 937 032b 67020000 		.4byte	0x267
+ 938 032f 07       		.byte	0x7
+ 939 0330 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 22
+
+
+ 940 0331 8B040000 		.4byte	.LASF59
+ 941 0335 06       		.byte	0x6
+ 942 0336 56       		.byte	0x56
+ 943 0337 51020000 		.4byte	0x251
+ 944 033b 08       		.byte	0x8
+ 945 033c 00       		.byte	0
+ 946 033d 03       		.uleb128 0x3
+ 947 033e 77030000 		.4byte	.LASF60
+ 948 0342 06       		.byte	0x6
+ 949 0343 57       		.byte	0x57
+ 950 0344 E1020000 		.4byte	0x2e1
+ 951 0348 11       		.uleb128 0x11
+ 952 0349 9601     		.2byte	0x196
+ 953 034b 07       		.byte	0x7
+ 954 034c 22       		.byte	0x22
+ 955 034d 82030000 		.4byte	0x382
+ 956 0351 0B       		.uleb128 0xb
+ 957 0352 9C020000 		.4byte	.LASF61
+ 958 0356 07       		.byte	0x7
+ 959 0357 24       		.byte	0x24
+ 960 0358 97000000 		.4byte	0x97
+ 961 035c 00       		.byte	0
+ 962 035d 0B       		.uleb128 0xb
+ 963 035e 40000000 		.4byte	.LASF62
+ 964 0362 07       		.byte	0x7
+ 965 0363 25       		.byte	0x25
+ 966 0364 A2000000 		.4byte	0xa2
+ 967 0368 02       		.byte	0x2
+ 968 0369 0B       		.uleb128 0xb
+ 969 036a 16000000 		.4byte	.LASF63
+ 970 036e 07       		.byte	0x7
+ 971 036f 26       		.byte	0x26
+ 972 0370 A2000000 		.4byte	0xa2
+ 973 0374 04       		.byte	0x4
+ 974 0375 0B       		.uleb128 0xb
+ 975 0376 2E000000 		.4byte	.LASF64
+ 976 037a 07       		.byte	0x7
+ 977 037b 27       		.byte	0x27
+ 978 037c 82030000 		.4byte	0x382
+ 979 0380 06       		.byte	0x6
+ 980 0381 00       		.byte	0
+ 981 0382 0C       		.uleb128 0xc
+ 982 0383 97000000 		.4byte	0x97
+ 983 0387 93030000 		.4byte	0x393
+ 984 038b 12       		.uleb128 0x12
+ 985 038c D8000000 		.4byte	0xd8
+ 986 0390 8F01     		.2byte	0x18f
+ 987 0392 00       		.byte	0
+ 988 0393 03       		.uleb128 0x3
+ 989 0394 5C010000 		.4byte	.LASF65
+ 990 0398 07       		.byte	0x7
+ 991 0399 28       		.byte	0x28
+ 992 039a 48030000 		.4byte	0x348
+ 993 039e 13       		.uleb128 0x13
+ 994 039f 32020000 		.4byte	.LASF67
+ 995 03a3 01       		.byte	0x1
+ 996 03a4 11       		.byte	0x11
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 23
+
+
+ 997 03a5 00000000 		.4byte	.LFB68
+ 998 03a9 24000000 		.4byte	.LFE68-.LFB68
+ 999 03ad 01       		.uleb128 0x1
+ 1000 03ae 9C       		.byte	0x9c
+ 1001 03af E1030000 		.4byte	0x3e1
+ 1002 03b3 14       		.uleb128 0x14
+ 1003 03b4 02000000 		.4byte	.LBB2
+ 1004 03b8 1C000000 		.4byte	.LBE2-.LBB2
+ 1005 03bc 15       		.uleb128 0x15
+ 1006 03bd 6900     		.ascii	"i\000"
+ 1007 03bf 01       		.byte	0x1
+ 1008 03c0 17       		.byte	0x17
+ 1009 03c1 B8000000 		.4byte	0xb8
+ 1010 03c5 00000000 		.4byte	.LLST0
+ 1011 03c9 16       		.uleb128 0x16
+ 1012 03ca 16000000 		.4byte	.LVL3
+ 1013 03ce 4E050000 		.4byte	0x54e
+ 1014 03d2 17       		.uleb128 0x17
+ 1015 03d3 01       		.uleb128 0x1
+ 1016 03d4 50       		.byte	0x50
+ 1017 03d5 02       		.uleb128 0x2
+ 1018 03d6 74       		.byte	0x74
+ 1019 03d7 7F       		.sleb128 -1
+ 1020 03d8 17       		.uleb128 0x17
+ 1021 03d9 01       		.uleb128 0x1
+ 1022 03da 51       		.byte	0x51
+ 1023 03db 02       		.uleb128 0x2
+ 1024 03dc 75       		.byte	0x75
+ 1025 03dd 00       		.sleb128 0
+ 1026 03de 00       		.byte	0
+ 1027 03df 00       		.byte	0
+ 1028 03e0 00       		.byte	0
+ 1029 03e1 18       		.uleb128 0x18
+ 1030 03e2 A9030000 		.4byte	.LASF80
+ 1031 03e6 01       		.byte	0x1
+ 1032 03e7 20       		.byte	0x20
+ 1033 03e8 F6030000 		.4byte	0x3f6
+ 1034 03ec 00000000 		.4byte	.LFB69
+ 1035 03f0 08000000 		.4byte	.LFE69-.LFB69
+ 1036 03f4 01       		.uleb128 0x1
+ 1037 03f5 9C       		.byte	0x9c
+ 1038 03f6 05       		.uleb128 0x5
+ 1039 03f7 04       		.byte	0x4
+ 1040 03f8 46020000 		.4byte	0x246
+ 1041 03fc 19       		.uleb128 0x19
+ 1042 03fd 73000000 		.4byte	.LASF81
+ 1043 0401 01       		.byte	0x1
+ 1044 0402 24       		.byte	0x24
+ 1045 0403 DF000000 		.4byte	0xdf
+ 1046 0407 00000000 		.4byte	.LFB70
+ 1047 040b 3C000000 		.4byte	.LFE70-.LFB70
+ 1048 040f 01       		.uleb128 0x1
+ 1049 0410 9C       		.byte	0x9c
+ 1050 0411 25040000 		.4byte	0x425
+ 1051 0415 1A       		.uleb128 0x1a
+ 1052 0416 2E000000 		.4byte	.LASF64
+ 1053 041a 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 24
+
+
+ 1054 041b 24       		.byte	0x24
+ 1055 041c F6030000 		.4byte	0x3f6
+ 1056 0420 42000000 		.4byte	.LLST1
+ 1057 0424 00       		.byte	0
+ 1058 0425 1B       		.uleb128 0x1b
+ 1059 0426 CF030000 		.4byte	.LASF82
+ 1060 042a 01       		.byte	0x1
+ 1061 042b 2D       		.byte	0x2d
+ 1062 042c 00000000 		.4byte	.LFB71
+ 1063 0430 68000000 		.4byte	.LFE71-.LFB71
+ 1064 0434 01       		.uleb128 0x1
+ 1065 0435 9C       		.byte	0x9c
+ 1066 0436 84040000 		.4byte	0x484
+ 1067 043a 1A       		.uleb128 0x1a
+ 1068 043b 8A030000 		.4byte	.LASF66
+ 1069 043f 01       		.byte	0x1
+ 1070 0440 2D       		.byte	0x2d
+ 1071 0441 84040000 		.4byte	0x484
+ 1072 0445 63000000 		.4byte	.LLST2
+ 1073 0449 1C       		.uleb128 0x1c
+ 1074 044a 1C000000 		.4byte	.LBB3
+ 1075 044e 44000000 		.4byte	.LBE3-.LBB3
+ 1076 0452 7A040000 		.4byte	0x47a
+ 1077 0456 15       		.uleb128 0x15
+ 1078 0457 6900     		.ascii	"i\000"
+ 1079 0459 01       		.byte	0x1
+ 1080 045a 38       		.byte	0x38
+ 1081 045b B8000000 		.4byte	0xb8
+ 1082 045f 9D000000 		.4byte	.LLST3
+ 1083 0463 16       		.uleb128 0x16
+ 1084 0464 5C000000 		.4byte	.LVL11
+ 1085 0468 4E050000 		.4byte	0x54e
+ 1086 046c 17       		.uleb128 0x17
+ 1087 046d 01       		.uleb128 0x1
+ 1088 046e 50       		.byte	0x50
+ 1089 046f 02       		.uleb128 0x2
+ 1090 0470 76       		.byte	0x76
+ 1091 0471 7F       		.sleb128 -1
+ 1092 0472 17       		.uleb128 0x17
+ 1093 0473 01       		.uleb128 0x1
+ 1094 0474 51       		.byte	0x51
+ 1095 0475 02       		.uleb128 0x2
+ 1096 0476 75       		.byte	0x75
+ 1097 0477 5C       		.sleb128 -36
+ 1098 0478 00       		.byte	0
+ 1099 0479 00       		.byte	0
+ 1100 047a 1D       		.uleb128 0x1d
+ 1101 047b 0E000000 		.4byte	.LVL8
+ 1102 047f 9E030000 		.4byte	0x39e
+ 1103 0483 00       		.byte	0
+ 1104 0484 05       		.uleb128 0x5
+ 1105 0485 04       		.byte	0x4
+ 1106 0486 AE010000 		.4byte	0x1ae
+ 1107 048a 13       		.uleb128 0x13
+ 1108 048b CF020000 		.4byte	.LASF68
+ 1109 048f 01       		.byte	0x1
+ 1110 0490 4B       		.byte	0x4b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 25
+
+
+ 1111 0491 00000000 		.4byte	.LFB72
+ 1112 0495 1C010000 		.4byte	.LFE72-.LFB72
+ 1113 0499 01       		.uleb128 0x1
+ 1114 049a 9C       		.byte	0x9c
+ 1115 049b B9040000 		.4byte	0x4b9
+ 1116 049f 14       		.uleb128 0x14
+ 1117 04a0 04000000 		.4byte	.LBB4
+ 1118 04a4 0C010000 		.4byte	.LBE4-.LBB4
+ 1119 04a8 1E       		.uleb128 0x1e
+ 1120 04a9 C0020000 		.4byte	.LASF69
+ 1121 04ad 01       		.byte	0x1
+ 1122 04ae 4C       		.byte	0x4c
+ 1123 04af B8000000 		.4byte	0xb8
+ 1124 04b3 D3000000 		.4byte	.LLST4
+ 1125 04b7 00       		.byte	0
+ 1126 04b8 00       		.byte	0
+ 1127 04b9 0C       		.uleb128 0xc
+ 1128 04ba C9040000 		.4byte	0x4c9
+ 1129 04be C9040000 		.4byte	0x4c9
+ 1130 04c2 0D       		.uleb128 0xd
+ 1131 04c3 D8000000 		.4byte	0xd8
+ 1132 04c7 0F       		.byte	0xf
+ 1133 04c8 00       		.byte	0
+ 1134 04c9 06       		.uleb128 0x6
+ 1135 04ca B8000000 		.4byte	0xb8
+ 1136 04ce 1F       		.uleb128 0x1f
+ 1137 04cf 76020000 		.4byte	.LASF70
+ 1138 04d3 01       		.byte	0x1
+ 1139 04d4 0C       		.byte	0xc
+ 1140 04d5 DF040000 		.4byte	0x4df
+ 1141 04d9 05       		.uleb128 0x5
+ 1142 04da 03       		.byte	0x3
+ 1143 04db 00000000 		.4byte	ADSR_speedLut_A
+ 1144 04df 06       		.uleb128 0x6
+ 1145 04e0 B9040000 		.4byte	0x4b9
+ 1146 04e4 1F       		.uleb128 0x1f
+ 1147 04e5 7A040000 		.4byte	.LASF71
+ 1148 04e9 01       		.byte	0x1
+ 1149 04ea 0D       		.byte	0xd
+ 1150 04eb F5040000 		.4byte	0x4f5
+ 1151 04ef 05       		.uleb128 0x5
+ 1152 04f0 03       		.byte	0x3
+ 1153 04f1 40000000 		.4byte	ADSR_speedLut_DR
+ 1154 04f5 06       		.uleb128 0x6
+ 1155 04f6 B9040000 		.4byte	0x4b9
+ 1156 04fa 0C       		.uleb128 0xc
+ 1157 04fb 46020000 		.4byte	0x246
+ 1158 04ff 0A050000 		.4byte	0x50a
+ 1159 0503 0D       		.uleb128 0xd
+ 1160 0504 D8000000 		.4byte	0xd8
+ 1161 0508 02       		.byte	0x2
+ 1162 0509 00       		.byte	0
+ 1163 050a 1F       		.uleb128 0x1f
+ 1164 050b 19040000 		.4byte	.LASF72
+ 1165 050f 01       		.byte	0x1
+ 1166 0510 0F       		.byte	0xf
+ 1167 0511 FA040000 		.4byte	0x4fa
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 26
+
+
+ 1168 0515 05       		.uleb128 0x5
+ 1169 0516 03       		.byte	0x3
+ 1170 0517 00000000 		.4byte	channelData
+ 1171 051b 20       		.uleb128 0x20
+ 1172 051c 9F040000 		.4byte	.LASF73
+ 1173 0520 08       		.byte	0x8
+ 1174 0521 1207     		.2byte	0x712
+ 1175 0523 EA000000 		.4byte	0xea
+ 1176 0527 21       		.uleb128 0x21
+ 1177 0528 68010000 		.4byte	.LASF74
+ 1178 052c 06       		.byte	0x6
+ 1179 052d 59       		.byte	0x59
+ 1180 052e 3D030000 		.4byte	0x33d
+ 1181 0532 05       		.uleb128 0x5
+ 1182 0533 03       		.byte	0x3
+ 1183 0534 00000000 		.4byte	interrupter
+ 1184 0538 21       		.uleb128 0x21
+ 1185 0539 11000000 		.4byte	.LASF75
+ 1186 053d 07       		.byte	0x7
+ 1187 053e 2A       		.byte	0x2a
+ 1188 053f 49050000 		.4byte	0x549
+ 1189 0543 05       		.uleb128 0x5
+ 1190 0544 03       		.byte	0x3
+ 1191 0545 00000000 		.4byte	ramp
+ 1192 0549 07       		.uleb128 0x7
+ 1193 054a 93030000 		.4byte	0x393
+ 1194 054e 22       		.uleb128 0x22
+ 1195 054f 61030000 		.4byte	.LASF83
+ 1196 0553 61030000 		.4byte	.LASF83
+ 1197 0557 09       		.byte	0x9
+ 1198 0558 09       		.byte	0x9
+ 1199 0559 00       		.byte	0
+ 1200              		.section	.debug_abbrev,"",%progbits
+ 1201              	.Ldebug_abbrev0:
+ 1202 0000 01       		.uleb128 0x1
+ 1203 0001 11       		.uleb128 0x11
+ 1204 0002 01       		.byte	0x1
+ 1205 0003 25       		.uleb128 0x25
+ 1206 0004 0E       		.uleb128 0xe
+ 1207 0005 13       		.uleb128 0x13
+ 1208 0006 0B       		.uleb128 0xb
+ 1209 0007 03       		.uleb128 0x3
+ 1210 0008 0E       		.uleb128 0xe
+ 1211 0009 1B       		.uleb128 0x1b
+ 1212 000a 0E       		.uleb128 0xe
+ 1213 000b 55       		.uleb128 0x55
+ 1214 000c 17       		.uleb128 0x17
+ 1215 000d 11       		.uleb128 0x11
+ 1216 000e 01       		.uleb128 0x1
+ 1217 000f 10       		.uleb128 0x10
+ 1218 0010 17       		.uleb128 0x17
+ 1219 0011 00       		.byte	0
+ 1220 0012 00       		.byte	0
+ 1221 0013 02       		.uleb128 0x2
+ 1222 0014 24       		.uleb128 0x24
+ 1223 0015 00       		.byte	0
+ 1224 0016 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 27
+
+
+ 1225 0017 0B       		.uleb128 0xb
+ 1226 0018 3E       		.uleb128 0x3e
+ 1227 0019 0B       		.uleb128 0xb
+ 1228 001a 03       		.uleb128 0x3
+ 1229 001b 0E       		.uleb128 0xe
+ 1230 001c 00       		.byte	0
+ 1231 001d 00       		.byte	0
+ 1232 001e 03       		.uleb128 0x3
+ 1233 001f 16       		.uleb128 0x16
+ 1234 0020 00       		.byte	0
+ 1235 0021 03       		.uleb128 0x3
+ 1236 0022 0E       		.uleb128 0xe
+ 1237 0023 3A       		.uleb128 0x3a
+ 1238 0024 0B       		.uleb128 0xb
+ 1239 0025 3B       		.uleb128 0x3b
+ 1240 0026 0B       		.uleb128 0xb
+ 1241 0027 49       		.uleb128 0x49
+ 1242 0028 13       		.uleb128 0x13
+ 1243 0029 00       		.byte	0
+ 1244 002a 00       		.byte	0
+ 1245 002b 04       		.uleb128 0x4
+ 1246 002c 24       		.uleb128 0x24
+ 1247 002d 00       		.byte	0
+ 1248 002e 0B       		.uleb128 0xb
+ 1249 002f 0B       		.uleb128 0xb
+ 1250 0030 3E       		.uleb128 0x3e
+ 1251 0031 0B       		.uleb128 0xb
+ 1252 0032 03       		.uleb128 0x3
+ 1253 0033 08       		.uleb128 0x8
+ 1254 0034 00       		.byte	0
+ 1255 0035 00       		.byte	0
+ 1256 0036 05       		.uleb128 0x5
+ 1257 0037 0F       		.uleb128 0xf
+ 1258 0038 00       		.byte	0
+ 1259 0039 0B       		.uleb128 0xb
+ 1260 003a 0B       		.uleb128 0xb
+ 1261 003b 49       		.uleb128 0x49
+ 1262 003c 13       		.uleb128 0x13
+ 1263 003d 00       		.byte	0
+ 1264 003e 00       		.byte	0
+ 1265 003f 06       		.uleb128 0x6
+ 1266 0040 26       		.uleb128 0x26
+ 1267 0041 00       		.byte	0
+ 1268 0042 49       		.uleb128 0x49
+ 1269 0043 13       		.uleb128 0x13
+ 1270 0044 00       		.byte	0
+ 1271 0045 00       		.byte	0
+ 1272 0046 07       		.uleb128 0x7
+ 1273 0047 35       		.uleb128 0x35
+ 1274 0048 00       		.byte	0
+ 1275 0049 49       		.uleb128 0x49
+ 1276 004a 13       		.uleb128 0x13
+ 1277 004b 00       		.byte	0
+ 1278 004c 00       		.byte	0
+ 1279 004d 08       		.uleb128 0x8
+ 1280 004e 04       		.uleb128 0x4
+ 1281 004f 01       		.byte	0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 28
+
+
+ 1282 0050 0B       		.uleb128 0xb
+ 1283 0051 0B       		.uleb128 0xb
+ 1284 0052 49       		.uleb128 0x49
+ 1285 0053 13       		.uleb128 0x13
+ 1286 0054 3A       		.uleb128 0x3a
+ 1287 0055 0B       		.uleb128 0xb
+ 1288 0056 3B       		.uleb128 0x3b
+ 1289 0057 0B       		.uleb128 0xb
+ 1290 0058 01       		.uleb128 0x1
+ 1291 0059 13       		.uleb128 0x13
+ 1292 005a 00       		.byte	0
+ 1293 005b 00       		.byte	0
+ 1294 005c 09       		.uleb128 0x9
+ 1295 005d 28       		.uleb128 0x28
+ 1296 005e 00       		.byte	0
+ 1297 005f 03       		.uleb128 0x3
+ 1298 0060 0E       		.uleb128 0xe
+ 1299 0061 1C       		.uleb128 0x1c
+ 1300 0062 0B       		.uleb128 0xb
+ 1301 0063 00       		.byte	0
+ 1302 0064 00       		.byte	0
+ 1303 0065 0A       		.uleb128 0xa
+ 1304 0066 13       		.uleb128 0x13
+ 1305 0067 01       		.byte	0x1
+ 1306 0068 0B       		.uleb128 0xb
+ 1307 0069 0B       		.uleb128 0xb
+ 1308 006a 3A       		.uleb128 0x3a
+ 1309 006b 0B       		.uleb128 0xb
+ 1310 006c 3B       		.uleb128 0x3b
+ 1311 006d 0B       		.uleb128 0xb
+ 1312 006e 01       		.uleb128 0x1
+ 1313 006f 13       		.uleb128 0x13
+ 1314 0070 00       		.byte	0
+ 1315 0071 00       		.byte	0
+ 1316 0072 0B       		.uleb128 0xb
+ 1317 0073 0D       		.uleb128 0xd
+ 1318 0074 00       		.byte	0
+ 1319 0075 03       		.uleb128 0x3
+ 1320 0076 0E       		.uleb128 0xe
+ 1321 0077 3A       		.uleb128 0x3a
+ 1322 0078 0B       		.uleb128 0xb
+ 1323 0079 3B       		.uleb128 0x3b
+ 1324 007a 0B       		.uleb128 0xb
+ 1325 007b 49       		.uleb128 0x49
+ 1326 007c 13       		.uleb128 0x13
+ 1327 007d 38       		.uleb128 0x38
+ 1328 007e 0B       		.uleb128 0xb
+ 1329 007f 00       		.byte	0
+ 1330 0080 00       		.byte	0
+ 1331 0081 0C       		.uleb128 0xc
+ 1332 0082 01       		.uleb128 0x1
+ 1333 0083 01       		.byte	0x1
+ 1334 0084 49       		.uleb128 0x49
+ 1335 0085 13       		.uleb128 0x13
+ 1336 0086 01       		.uleb128 0x1
+ 1337 0087 13       		.uleb128 0x13
+ 1338 0088 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 29
+
+
+ 1339 0089 00       		.byte	0
+ 1340 008a 0D       		.uleb128 0xd
+ 1341 008b 21       		.uleb128 0x21
+ 1342 008c 00       		.byte	0
+ 1343 008d 49       		.uleb128 0x49
+ 1344 008e 13       		.uleb128 0x13
+ 1345 008f 2F       		.uleb128 0x2f
+ 1346 0090 0B       		.uleb128 0xb
+ 1347 0091 00       		.byte	0
+ 1348 0092 00       		.byte	0
+ 1349 0093 0E       		.uleb128 0xe
+ 1350 0094 13       		.uleb128 0x13
+ 1351 0095 00       		.byte	0
+ 1352 0096 03       		.uleb128 0x3
+ 1353 0097 0E       		.uleb128 0xe
+ 1354 0098 3C       		.uleb128 0x3c
+ 1355 0099 19       		.uleb128 0x19
+ 1356 009a 00       		.byte	0
+ 1357 009b 00       		.byte	0
+ 1358 009c 0F       		.uleb128 0xf
+ 1359 009d 04       		.uleb128 0x4
+ 1360 009e 01       		.byte	0x1
+ 1361 009f 03       		.uleb128 0x3
+ 1362 00a0 0E       		.uleb128 0xe
+ 1363 00a1 0B       		.uleb128 0xb
+ 1364 00a2 0B       		.uleb128 0xb
+ 1365 00a3 49       		.uleb128 0x49
+ 1366 00a4 13       		.uleb128 0x13
+ 1367 00a5 3A       		.uleb128 0x3a
+ 1368 00a6 0B       		.uleb128 0xb
+ 1369 00a7 3B       		.uleb128 0x3b
+ 1370 00a8 0B       		.uleb128 0xb
+ 1371 00a9 01       		.uleb128 0x1
+ 1372 00aa 13       		.uleb128 0x13
+ 1373 00ab 00       		.byte	0
+ 1374 00ac 00       		.byte	0
+ 1375 00ad 10       		.uleb128 0x10
+ 1376 00ae 0D       		.uleb128 0xd
+ 1377 00af 00       		.byte	0
+ 1378 00b0 03       		.uleb128 0x3
+ 1379 00b1 08       		.uleb128 0x8
+ 1380 00b2 3A       		.uleb128 0x3a
+ 1381 00b3 0B       		.uleb128 0xb
+ 1382 00b4 3B       		.uleb128 0x3b
+ 1383 00b5 0B       		.uleb128 0xb
+ 1384 00b6 49       		.uleb128 0x49
+ 1385 00b7 13       		.uleb128 0x13
+ 1386 00b8 38       		.uleb128 0x38
+ 1387 00b9 0B       		.uleb128 0xb
+ 1388 00ba 00       		.byte	0
+ 1389 00bb 00       		.byte	0
+ 1390 00bc 11       		.uleb128 0x11
+ 1391 00bd 13       		.uleb128 0x13
+ 1392 00be 01       		.byte	0x1
+ 1393 00bf 0B       		.uleb128 0xb
+ 1394 00c0 05       		.uleb128 0x5
+ 1395 00c1 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 30
+
+
+ 1396 00c2 0B       		.uleb128 0xb
+ 1397 00c3 3B       		.uleb128 0x3b
+ 1398 00c4 0B       		.uleb128 0xb
+ 1399 00c5 01       		.uleb128 0x1
+ 1400 00c6 13       		.uleb128 0x13
+ 1401 00c7 00       		.byte	0
+ 1402 00c8 00       		.byte	0
+ 1403 00c9 12       		.uleb128 0x12
+ 1404 00ca 21       		.uleb128 0x21
+ 1405 00cb 00       		.byte	0
+ 1406 00cc 49       		.uleb128 0x49
+ 1407 00cd 13       		.uleb128 0x13
+ 1408 00ce 2F       		.uleb128 0x2f
+ 1409 00cf 05       		.uleb128 0x5
+ 1410 00d0 00       		.byte	0
+ 1411 00d1 00       		.byte	0
+ 1412 00d2 13       		.uleb128 0x13
+ 1413 00d3 2E       		.uleb128 0x2e
+ 1414 00d4 01       		.byte	0x1
+ 1415 00d5 3F       		.uleb128 0x3f
+ 1416 00d6 19       		.uleb128 0x19
+ 1417 00d7 03       		.uleb128 0x3
+ 1418 00d8 0E       		.uleb128 0xe
+ 1419 00d9 3A       		.uleb128 0x3a
+ 1420 00da 0B       		.uleb128 0xb
+ 1421 00db 3B       		.uleb128 0x3b
+ 1422 00dc 0B       		.uleb128 0xb
+ 1423 00dd 11       		.uleb128 0x11
+ 1424 00de 01       		.uleb128 0x1
+ 1425 00df 12       		.uleb128 0x12
+ 1426 00e0 06       		.uleb128 0x6
+ 1427 00e1 40       		.uleb128 0x40
+ 1428 00e2 18       		.uleb128 0x18
+ 1429 00e3 9742     		.uleb128 0x2117
+ 1430 00e5 19       		.uleb128 0x19
+ 1431 00e6 01       		.uleb128 0x1
+ 1432 00e7 13       		.uleb128 0x13
+ 1433 00e8 00       		.byte	0
+ 1434 00e9 00       		.byte	0
+ 1435 00ea 14       		.uleb128 0x14
+ 1436 00eb 0B       		.uleb128 0xb
+ 1437 00ec 01       		.byte	0x1
+ 1438 00ed 11       		.uleb128 0x11
+ 1439 00ee 01       		.uleb128 0x1
+ 1440 00ef 12       		.uleb128 0x12
+ 1441 00f0 06       		.uleb128 0x6
+ 1442 00f1 00       		.byte	0
+ 1443 00f2 00       		.byte	0
+ 1444 00f3 15       		.uleb128 0x15
+ 1445 00f4 34       		.uleb128 0x34
+ 1446 00f5 00       		.byte	0
+ 1447 00f6 03       		.uleb128 0x3
+ 1448 00f7 08       		.uleb128 0x8
+ 1449 00f8 3A       		.uleb128 0x3a
+ 1450 00f9 0B       		.uleb128 0xb
+ 1451 00fa 3B       		.uleb128 0x3b
+ 1452 00fb 0B       		.uleb128 0xb
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 31
+
+
+ 1453 00fc 49       		.uleb128 0x49
+ 1454 00fd 13       		.uleb128 0x13
+ 1455 00fe 02       		.uleb128 0x2
+ 1456 00ff 17       		.uleb128 0x17
+ 1457 0100 00       		.byte	0
+ 1458 0101 00       		.byte	0
+ 1459 0102 16       		.uleb128 0x16
+ 1460 0103 898201   		.uleb128 0x4109
+ 1461 0106 01       		.byte	0x1
+ 1462 0107 11       		.uleb128 0x11
+ 1463 0108 01       		.uleb128 0x1
+ 1464 0109 31       		.uleb128 0x31
+ 1465 010a 13       		.uleb128 0x13
+ 1466 010b 00       		.byte	0
+ 1467 010c 00       		.byte	0
+ 1468 010d 17       		.uleb128 0x17
+ 1469 010e 8A8201   		.uleb128 0x410a
+ 1470 0111 00       		.byte	0
+ 1471 0112 02       		.uleb128 0x2
+ 1472 0113 18       		.uleb128 0x18
+ 1473 0114 9142     		.uleb128 0x2111
+ 1474 0116 18       		.uleb128 0x18
+ 1475 0117 00       		.byte	0
+ 1476 0118 00       		.byte	0
+ 1477 0119 18       		.uleb128 0x18
+ 1478 011a 2E       		.uleb128 0x2e
+ 1479 011b 00       		.byte	0
+ 1480 011c 3F       		.uleb128 0x3f
+ 1481 011d 19       		.uleb128 0x19
+ 1482 011e 03       		.uleb128 0x3
+ 1483 011f 0E       		.uleb128 0xe
+ 1484 0120 3A       		.uleb128 0x3a
+ 1485 0121 0B       		.uleb128 0xb
+ 1486 0122 3B       		.uleb128 0x3b
+ 1487 0123 0B       		.uleb128 0xb
+ 1488 0124 49       		.uleb128 0x49
+ 1489 0125 13       		.uleb128 0x13
+ 1490 0126 11       		.uleb128 0x11
+ 1491 0127 01       		.uleb128 0x1
+ 1492 0128 12       		.uleb128 0x12
+ 1493 0129 06       		.uleb128 0x6
+ 1494 012a 40       		.uleb128 0x40
+ 1495 012b 18       		.uleb128 0x18
+ 1496 012c 9742     		.uleb128 0x2117
+ 1497 012e 19       		.uleb128 0x19
+ 1498 012f 00       		.byte	0
+ 1499 0130 00       		.byte	0
+ 1500 0131 19       		.uleb128 0x19
+ 1501 0132 2E       		.uleb128 0x2e
+ 1502 0133 01       		.byte	0x1
+ 1503 0134 3F       		.uleb128 0x3f
+ 1504 0135 19       		.uleb128 0x19
+ 1505 0136 03       		.uleb128 0x3
+ 1506 0137 0E       		.uleb128 0xe
+ 1507 0138 3A       		.uleb128 0x3a
+ 1508 0139 0B       		.uleb128 0xb
+ 1509 013a 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 32
+
+
+ 1510 013b 0B       		.uleb128 0xb
+ 1511 013c 27       		.uleb128 0x27
+ 1512 013d 19       		.uleb128 0x19
+ 1513 013e 49       		.uleb128 0x49
+ 1514 013f 13       		.uleb128 0x13
+ 1515 0140 11       		.uleb128 0x11
+ 1516 0141 01       		.uleb128 0x1
+ 1517 0142 12       		.uleb128 0x12
+ 1518 0143 06       		.uleb128 0x6
+ 1519 0144 40       		.uleb128 0x40
+ 1520 0145 18       		.uleb128 0x18
+ 1521 0146 9742     		.uleb128 0x2117
+ 1522 0148 19       		.uleb128 0x19
+ 1523 0149 01       		.uleb128 0x1
+ 1524 014a 13       		.uleb128 0x13
+ 1525 014b 00       		.byte	0
+ 1526 014c 00       		.byte	0
+ 1527 014d 1A       		.uleb128 0x1a
+ 1528 014e 05       		.uleb128 0x5
+ 1529 014f 00       		.byte	0
+ 1530 0150 03       		.uleb128 0x3
+ 1531 0151 0E       		.uleb128 0xe
+ 1532 0152 3A       		.uleb128 0x3a
+ 1533 0153 0B       		.uleb128 0xb
+ 1534 0154 3B       		.uleb128 0x3b
+ 1535 0155 0B       		.uleb128 0xb
+ 1536 0156 49       		.uleb128 0x49
+ 1537 0157 13       		.uleb128 0x13
+ 1538 0158 02       		.uleb128 0x2
+ 1539 0159 17       		.uleb128 0x17
+ 1540 015a 00       		.byte	0
+ 1541 015b 00       		.byte	0
+ 1542 015c 1B       		.uleb128 0x1b
+ 1543 015d 2E       		.uleb128 0x2e
+ 1544 015e 01       		.byte	0x1
+ 1545 015f 3F       		.uleb128 0x3f
+ 1546 0160 19       		.uleb128 0x19
+ 1547 0161 03       		.uleb128 0x3
+ 1548 0162 0E       		.uleb128 0xe
+ 1549 0163 3A       		.uleb128 0x3a
+ 1550 0164 0B       		.uleb128 0xb
+ 1551 0165 3B       		.uleb128 0x3b
+ 1552 0166 0B       		.uleb128 0xb
+ 1553 0167 27       		.uleb128 0x27
+ 1554 0168 19       		.uleb128 0x19
+ 1555 0169 11       		.uleb128 0x11
+ 1556 016a 01       		.uleb128 0x1
+ 1557 016b 12       		.uleb128 0x12
+ 1558 016c 06       		.uleb128 0x6
+ 1559 016d 40       		.uleb128 0x40
+ 1560 016e 18       		.uleb128 0x18
+ 1561 016f 9742     		.uleb128 0x2117
+ 1562 0171 19       		.uleb128 0x19
+ 1563 0172 01       		.uleb128 0x1
+ 1564 0173 13       		.uleb128 0x13
+ 1565 0174 00       		.byte	0
+ 1566 0175 00       		.byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 33
+
+
+ 1567 0176 1C       		.uleb128 0x1c
+ 1568 0177 0B       		.uleb128 0xb
+ 1569 0178 01       		.byte	0x1
+ 1570 0179 11       		.uleb128 0x11
+ 1571 017a 01       		.uleb128 0x1
+ 1572 017b 12       		.uleb128 0x12
+ 1573 017c 06       		.uleb128 0x6
+ 1574 017d 01       		.uleb128 0x1
+ 1575 017e 13       		.uleb128 0x13
+ 1576 017f 00       		.byte	0
+ 1577 0180 00       		.byte	0
+ 1578 0181 1D       		.uleb128 0x1d
+ 1579 0182 898201   		.uleb128 0x4109
+ 1580 0185 00       		.byte	0
+ 1581 0186 11       		.uleb128 0x11
+ 1582 0187 01       		.uleb128 0x1
+ 1583 0188 9542     		.uleb128 0x2115
+ 1584 018a 19       		.uleb128 0x19
+ 1585 018b 31       		.uleb128 0x31
+ 1586 018c 13       		.uleb128 0x13
+ 1587 018d 00       		.byte	0
+ 1588 018e 00       		.byte	0
+ 1589 018f 1E       		.uleb128 0x1e
+ 1590 0190 34       		.uleb128 0x34
+ 1591 0191 00       		.byte	0
+ 1592 0192 03       		.uleb128 0x3
+ 1593 0193 0E       		.uleb128 0xe
+ 1594 0194 3A       		.uleb128 0x3a
+ 1595 0195 0B       		.uleb128 0xb
+ 1596 0196 3B       		.uleb128 0x3b
+ 1597 0197 0B       		.uleb128 0xb
+ 1598 0198 49       		.uleb128 0x49
+ 1599 0199 13       		.uleb128 0x13
+ 1600 019a 02       		.uleb128 0x2
+ 1601 019b 17       		.uleb128 0x17
+ 1602 019c 00       		.byte	0
+ 1603 019d 00       		.byte	0
+ 1604 019e 1F       		.uleb128 0x1f
+ 1605 019f 34       		.uleb128 0x34
+ 1606 01a0 00       		.byte	0
+ 1607 01a1 03       		.uleb128 0x3
+ 1608 01a2 0E       		.uleb128 0xe
+ 1609 01a3 3A       		.uleb128 0x3a
+ 1610 01a4 0B       		.uleb128 0xb
+ 1611 01a5 3B       		.uleb128 0x3b
+ 1612 01a6 0B       		.uleb128 0xb
+ 1613 01a7 49       		.uleb128 0x49
+ 1614 01a8 13       		.uleb128 0x13
+ 1615 01a9 02       		.uleb128 0x2
+ 1616 01aa 18       		.uleb128 0x18
+ 1617 01ab 00       		.byte	0
+ 1618 01ac 00       		.byte	0
+ 1619 01ad 20       		.uleb128 0x20
+ 1620 01ae 34       		.uleb128 0x34
+ 1621 01af 00       		.byte	0
+ 1622 01b0 03       		.uleb128 0x3
+ 1623 01b1 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 34
+
+
+ 1624 01b2 3A       		.uleb128 0x3a
+ 1625 01b3 0B       		.uleb128 0xb
+ 1626 01b4 3B       		.uleb128 0x3b
+ 1627 01b5 05       		.uleb128 0x5
+ 1628 01b6 49       		.uleb128 0x49
+ 1629 01b7 13       		.uleb128 0x13
+ 1630 01b8 3F       		.uleb128 0x3f
+ 1631 01b9 19       		.uleb128 0x19
+ 1632 01ba 3C       		.uleb128 0x3c
+ 1633 01bb 19       		.uleb128 0x19
+ 1634 01bc 00       		.byte	0
+ 1635 01bd 00       		.byte	0
+ 1636 01be 21       		.uleb128 0x21
+ 1637 01bf 34       		.uleb128 0x34
+ 1638 01c0 00       		.byte	0
+ 1639 01c1 03       		.uleb128 0x3
+ 1640 01c2 0E       		.uleb128 0xe
+ 1641 01c3 3A       		.uleb128 0x3a
+ 1642 01c4 0B       		.uleb128 0xb
+ 1643 01c5 3B       		.uleb128 0x3b
+ 1644 01c6 0B       		.uleb128 0xb
+ 1645 01c7 49       		.uleb128 0x49
+ 1646 01c8 13       		.uleb128 0x13
+ 1647 01c9 3F       		.uleb128 0x3f
+ 1648 01ca 19       		.uleb128 0x19
+ 1649 01cb 02       		.uleb128 0x2
+ 1650 01cc 18       		.uleb128 0x18
+ 1651 01cd 00       		.byte	0
+ 1652 01ce 00       		.byte	0
+ 1653 01cf 22       		.uleb128 0x22
+ 1654 01d0 2E       		.uleb128 0x2e
+ 1655 01d1 00       		.byte	0
+ 1656 01d2 3F       		.uleb128 0x3f
+ 1657 01d3 19       		.uleb128 0x19
+ 1658 01d4 3C       		.uleb128 0x3c
+ 1659 01d5 19       		.uleb128 0x19
+ 1660 01d6 6E       		.uleb128 0x6e
+ 1661 01d7 0E       		.uleb128 0xe
+ 1662 01d8 03       		.uleb128 0x3
+ 1663 01d9 0E       		.uleb128 0xe
+ 1664 01da 3A       		.uleb128 0x3a
+ 1665 01db 0B       		.uleb128 0xb
+ 1666 01dc 3B       		.uleb128 0x3b
+ 1667 01dd 0B       		.uleb128 0xb
+ 1668 01de 00       		.byte	0
+ 1669 01df 00       		.byte	0
+ 1670 01e0 00       		.byte	0
+ 1671              		.section	.debug_loc,"",%progbits
+ 1672              	.Ldebug_loc0:
+ 1673              	.LLST0:
+ 1674 0000 00000000 		.4byte	.LVL0
+ 1675 0004 08000000 		.4byte	.LVL1
+ 1676 0008 0200     		.2byte	0x2
+ 1677 000a 30       		.byte	0x30
+ 1678 000b 9F       		.byte	0x9f
+ 1679 000c 08000000 		.4byte	.LVL1
+ 1680 0010 0E000000 		.4byte	.LVL2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 35
+
+
+ 1681 0014 0100     		.2byte	0x1
+ 1682 0016 54       		.byte	0x54
+ 1683 0017 0E000000 		.4byte	.LVL2
+ 1684 001b 15000000 		.4byte	.LVL3-1
+ 1685 001f 0100     		.2byte	0x1
+ 1686 0021 50       		.byte	0x50
+ 1687 0022 15000000 		.4byte	.LVL3-1
+ 1688 0026 16000000 		.4byte	.LVL3
+ 1689 002a 0300     		.2byte	0x3
+ 1690 002c 74       		.byte	0x74
+ 1691 002d 7F       		.sleb128 -1
+ 1692 002e 9F       		.byte	0x9f
+ 1693 002f 16000000 		.4byte	.LVL3
+ 1694 0033 20000000 		.4byte	.LVL4
+ 1695 0037 0100     		.2byte	0x1
+ 1696 0039 54       		.byte	0x54
+ 1697 003a 00000000 		.4byte	0
+ 1698 003e 00000000 		.4byte	0
+ 1699              	.LLST1:
+ 1700 0042 00000000 		.4byte	.LVL5
+ 1701 0046 04000000 		.4byte	.LVL6
+ 1702 004a 0100     		.2byte	0x1
+ 1703 004c 50       		.byte	0x50
+ 1704 004d 04000000 		.4byte	.LVL6
+ 1705 0051 3C000000 		.4byte	.LFE70
+ 1706 0055 0400     		.2byte	0x4
+ 1707 0057 F3       		.byte	0xf3
+ 1708 0058 01       		.uleb128 0x1
+ 1709 0059 50       		.byte	0x50
+ 1710 005a 9F       		.byte	0x9f
+ 1711 005b 00000000 		.4byte	0
+ 1712 005f 00000000 		.4byte	0
+ 1713              	.LLST2:
+ 1714 0063 00000000 		.4byte	.LVL7
+ 1715 0067 0D000000 		.4byte	.LVL8-1
+ 1716 006b 0100     		.2byte	0x1
+ 1717 006d 50       		.byte	0x50
+ 1718 006e 0D000000 		.4byte	.LVL8-1
+ 1719 0072 0E000000 		.4byte	.LVL8
+ 1720 0076 0400     		.2byte	0x4
+ 1721 0078 F3       		.byte	0xf3
+ 1722 0079 01       		.uleb128 0x1
+ 1723 007a 50       		.byte	0x50
+ 1724 007b 9F       		.byte	0x9f
+ 1725 007c 0E000000 		.4byte	.LVL8
+ 1726 0080 1C000000 		.4byte	.LVL9
+ 1727 0084 0100     		.2byte	0x1
+ 1728 0086 50       		.byte	0x50
+ 1729 0087 1C000000 		.4byte	.LVL9
+ 1730 008b 68000000 		.4byte	.LFE71
+ 1731 008f 0400     		.2byte	0x4
+ 1732 0091 F3       		.byte	0xf3
+ 1733 0092 01       		.uleb128 0x1
+ 1734 0093 50       		.byte	0x50
+ 1735 0094 9F       		.byte	0x9f
+ 1736 0095 00000000 		.4byte	0
+ 1737 0099 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 36
+
+
+ 1738              	.LLST3:
+ 1739 009d 1C000000 		.4byte	.LVL9
+ 1740 00a1 2C000000 		.4byte	.LVL10
+ 1741 00a5 0100     		.2byte	0x1
+ 1742 00a7 56       		.byte	0x56
+ 1743 00a8 2C000000 		.4byte	.LVL10
+ 1744 00ac 5B000000 		.4byte	.LVL11-1
+ 1745 00b0 0100     		.2byte	0x1
+ 1746 00b2 50       		.byte	0x50
+ 1747 00b3 5B000000 		.4byte	.LVL11-1
+ 1748 00b7 5C000000 		.4byte	.LVL11
+ 1749 00bb 0300     		.2byte	0x3
+ 1750 00bd 76       		.byte	0x76
+ 1751 00be 7F       		.sleb128 -1
+ 1752 00bf 9F       		.byte	0x9f
+ 1753 00c0 5C000000 		.4byte	.LVL11
+ 1754 00c4 64000000 		.4byte	.LVL12
+ 1755 00c8 0100     		.2byte	0x1
+ 1756 00ca 56       		.byte	0x56
+ 1757 00cb 00000000 		.4byte	0
+ 1758 00cf 00000000 		.4byte	0
+ 1759              	.LLST4:
+ 1760 00d3 00000000 		.4byte	.LVL13
+ 1761 00d7 24000000 		.4byte	.LVL14
+ 1762 00db 0200     		.2byte	0x2
+ 1763 00dd 30       		.byte	0x30
+ 1764 00de 9F       		.byte	0x9f
+ 1765 00df 00000000 		.4byte	0
+ 1766 00e3 00000000 		.4byte	0
+ 1767              		.section	.debug_aranges,"",%progbits
+ 1768 0000 3C000000 		.4byte	0x3c
+ 1769 0004 0200     		.2byte	0x2
+ 1770 0006 00000000 		.4byte	.Ldebug_info0
+ 1771 000a 04       		.byte	0x4
+ 1772 000b 00       		.byte	0
+ 1773 000c 0000     		.2byte	0
+ 1774 000e 0000     		.2byte	0
+ 1775 0010 00000000 		.4byte	.LFB68
+ 1776 0014 24000000 		.4byte	.LFE68-.LFB68
+ 1777 0018 00000000 		.4byte	.LFB69
+ 1778 001c 08000000 		.4byte	.LFE69-.LFB69
+ 1779 0020 00000000 		.4byte	.LFB70
+ 1780 0024 3C000000 		.4byte	.LFE70-.LFB70
+ 1781 0028 00000000 		.4byte	.LFB71
+ 1782 002c 68000000 		.4byte	.LFE71-.LFB71
+ 1783 0030 00000000 		.4byte	.LFB72
+ 1784 0034 1C010000 		.4byte	.LFE72-.LFB72
+ 1785 0038 00000000 		.4byte	0
+ 1786 003c 00000000 		.4byte	0
+ 1787              		.section	.debug_ranges,"",%progbits
+ 1788              	.Ldebug_ranges0:
+ 1789 0000 00000000 		.4byte	.LFB68
+ 1790 0004 24000000 		.4byte	.LFE68
+ 1791 0008 00000000 		.4byte	.LFB69
+ 1792 000c 08000000 		.4byte	.LFE69
+ 1793 0010 00000000 		.4byte	.LFB70
+ 1794 0014 3C000000 		.4byte	.LFE70
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 37
+
+
+ 1795 0018 00000000 		.4byte	.LFB71
+ 1796 001c 68000000 		.4byte	.LFE71
+ 1797 0020 00000000 		.4byte	.LFB72
+ 1798 0024 1C010000 		.4byte	.LFE72
+ 1799 0028 00000000 		.4byte	0
+ 1800 002c 00000000 		.4byte	0
+ 1801              		.section	.debug_line,"",%progbits
+ 1802              	.Ldebug_line0:
+ 1803 0000 0F030000 		.section	.debug_str,"MS",%progbits,1
+ 1803      0200D801 
+ 1803      00000201 
+ 1803      FB0E0D00 
+ 1803      01010101 
+ 1804              	.LASF28:
+ 1805 0000 61747461 		.ascii	"attack\000"
+ 1805      636B00
+ 1806              	.LASF52:
+ 1807 0007 42555253 		.ascii	"BURST_OFF\000"
+ 1807      545F4F46 
+ 1807      4600
+ 1808              	.LASF75:
+ 1809 0011 72616D70 		.ascii	"ramp\000"
+ 1809      00
+ 1810              	.LASF63:
+ 1811 0016 73746F70 		.ascii	"stop_index\000"
+ 1811      5F696E64 
+ 1811      657800
+ 1812              	.LASF55:
+ 1813 0021 494E5452 		.ascii	"INTR_MOD_CUR\000"
+ 1813      5F4D4F44 
+ 1813      5F435552 
+ 1813      00
+ 1814              	.LASF64:
+ 1815 002e 64617461 		.ascii	"data\000"
+ 1815      00
+ 1816              	.LASF48:
+ 1817 0033 494E5452 		.ascii	"INTR_MODE_TR\000"
+ 1817      5F4D4F44 
+ 1817      455F5452 
+ 1817      00
+ 1818              	.LASF62:
+ 1819 0040 696E6465 		.ascii	"index\000"
+ 1819      7800
+ 1820              	.LASF42:
+ 1821 0046 54696D65 		.ascii	"TimerHandle_t\000"
+ 1821      7248616E 
+ 1821      646C655F 
+ 1821      7400
+ 1822              	.LASF2:
+ 1823 0054 73686F72 		.ascii	"short int\000"
+ 1823      7420696E 
+ 1823      7400
+ 1824              	.LASF57:
+ 1825 005e 62757273 		.ascii	"burst_state\000"
+ 1825      745F7374 
+ 1825      61746500 
+ 1826              	.LASF20:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 38
+
+
+ 1827 006a 73697A65 		.ascii	"sizetype\000"
+ 1827      74797065 
+ 1827      00
+ 1828              	.LASF81:
+ 1829 0073 5349445F 		.ascii	"SID_getWaveName\000"
+ 1829      67657457 
+ 1829      6176654E 
+ 1829      616D6500 
+ 1830              	.LASF11:
+ 1831 0083 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1831      206C6F6E 
+ 1831      6720756E 
+ 1831      7369676E 
+ 1831      65642069 
+ 1832              	.LASF34:
+ 1833 009a 6E657874 		.ascii	"next_frame\000"
+ 1833      5F667261 
+ 1833      6D6500
+ 1834              	.LASF10:
+ 1835 00a5 6C6F6E67 		.ascii	"long long int\000"
+ 1835      206C6F6E 
+ 1835      6720696E 
+ 1835      7400
+ 1836              	.LASF8:
+ 1837 00b3 5F5F7569 		.ascii	"__uint32_t\000"
+ 1837      6E743332 
+ 1837      5F7400
+ 1838              	.LASF76:
+ 1839 00be 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1839      43393920 
+ 1839      352E342E 
+ 1839      31203230 
+ 1839      31363036 
+ 1840 00f1 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1840      20726576 
+ 1840      6973696F 
+ 1840      6E203233 
+ 1840      37373135 
+ 1841 0124 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 1841      74643D67 
+ 1841      6E753939 
+ 1841      202D6666 
+ 1841      756E6374 
+ 1842              	.LASF56:
+ 1843 0157 6D6F6465 		.ascii	"mode\000"
+ 1843      00
+ 1844              	.LASF65:
+ 1845 015c 72616D70 		.ascii	"ramp_params\000"
+ 1845      5F706172 
+ 1845      616D7300 
+ 1846              	.LASF74:
+ 1847 0168 696E7465 		.ascii	"interrupter\000"
+ 1847      72727570 
+ 1847      74657200 
+ 1848              	.LASF4:
+ 1849 0174 5F5F7569 		.ascii	"__uint16_t\000"
+ 1849      6E743136 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 39
+
+
+ 1849      5F7400
+ 1850              	.LASF45:
+ 1851 017f 696E7465 		.ascii	"interrupter_DMA\000"
+ 1851      72727570 
+ 1851      7465725F 
+ 1851      444D4100 
+ 1852              	.LASF51:
+ 1853 018f 42555253 		.ascii	"BURST_ON\000"
+ 1853      545F4F4E 
+ 1853      00
+ 1854              	.LASF49:
+ 1855 0198 494E5452 		.ascii	"INTR_MODE_BLOCKED\000"
+ 1855      5F4D4F44 
+ 1855      455F424C 
+ 1855      4F434B45 
+ 1855      4400
+ 1856              	.LASF29:
+ 1857 01aa 64656361 		.ascii	"decay\000"
+ 1857      7900
+ 1858              	.LASF21:
+ 1859 01b0 41445352 		.ascii	"ADSR_IDLE\000"
+ 1859      5F49444C 
+ 1859      4500
+ 1860              	.LASF13:
+ 1861 01ba 75696E74 		.ascii	"uint8_t\000"
+ 1861      385F7400 
+ 1862              	.LASF50:
+ 1863 01c2 696E7465 		.ascii	"interrupter_burst\000"
+ 1863      72727570 
+ 1863      7465725F 
+ 1863      62757273 
+ 1863      7400
+ 1864              	.LASF46:
+ 1865 01d4 696E7465 		.ascii	"interrupter_mode\000"
+ 1865      72727570 
+ 1865      7465725F 
+ 1865      6D6F6465 
+ 1865      00
+ 1866              	.LASF24:
+ 1867 01e5 41445352 		.ascii	"ADSR_SUSTAIN\000"
+ 1867      5F535553 
+ 1867      5441494E 
+ 1867      00
+ 1868              	.LASF17:
+ 1869 01f2 666C6F61 		.ascii	"float\000"
+ 1869      7400
+ 1870              	.LASF77:
+ 1871 01f8 2E2E5C63 		.ascii	"..\\common\\vms\\SidProcessor.c\000"
+ 1871      6F6D6D6F 
+ 1871      6E5C766D 
+ 1871      735C5369 
+ 1871      6450726F 
+ 1872              	.LASF23:
+ 1873 0215 41445352 		.ascii	"ADSR_DECAY\000"
+ 1873      5F444543 
+ 1873      415900
+ 1874              	.LASF58:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 40
+
+
+ 1875 0220 646D615F 		.ascii	"dma_mode\000"
+ 1875      6D6F6465 
+ 1875      00
+ 1876              	.LASF7:
+ 1877 0229 6C6F6E67 		.ascii	"long int\000"
+ 1877      20696E74 
+ 1877      00
+ 1878              	.LASF67:
+ 1879 0232 53696450 		.ascii	"SidProcessor_resetSid\000"
+ 1879      726F6365 
+ 1879      73736F72 
+ 1879      5F726573 
+ 1879      65745369 
+ 1880              	.LASF36:
+ 1881 0248 61647372 		.ascii	"adsrState\000"
+ 1881      53746174 
+ 1881      6500
+ 1882              	.LASF3:
+ 1883 0252 5F5F7569 		.ascii	"__uint8_t\000"
+ 1883      6E74385F 
+ 1883      7400
+ 1884              	.LASF39:
+ 1885 025c 63757272 		.ascii	"currentEnvelopeStartValue\000"
+ 1885      656E7445 
+ 1885      6E76656C 
+ 1885      6F706553 
+ 1885      74617274 
+ 1886              	.LASF70:
+ 1887 0276 41445352 		.ascii	"ADSR_speedLut_A\000"
+ 1887      5F737065 
+ 1887      65644C75 
+ 1887      745F4100 
+ 1888              	.LASF40:
+ 1889 0286 63757272 		.ascii	"currentEnvelopeVolume\000"
+ 1889      656E7445 
+ 1889      6E76656C 
+ 1889      6F706556 
+ 1889      6F6C756D 
+ 1890              	.LASF61:
+ 1891 029c 6368616E 		.ascii	"changed\000"
+ 1891      67656400 
+ 1892              	.LASF32:
+ 1893 02a4 66726571 		.ascii	"frequency_dHz\000"
+ 1893      75656E63 
+ 1893      795F6448 
+ 1893      7A00
+ 1894              	.LASF1:
+ 1895 02b2 756E7369 		.ascii	"unsigned char\000"
+ 1895      676E6564 
+ 1895      20636861 
+ 1895      7200
+ 1896              	.LASF69:
+ 1897 02c0 63757272 		.ascii	"currentChannel\000"
+ 1897      656E7443 
+ 1897      68616E6E 
+ 1897      656C00
+ 1898              	.LASF68:
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 41
+
+
+ 1899 02cf 53696450 		.ascii	"SidProcessor_runADSR\000"
+ 1899      726F6365 
+ 1899      73736F72 
+ 1899      5F72756E 
+ 1899      41445352 
+ 1900              	.LASF41:
+ 1901 02e4 53494443 		.ascii	"SIDChannelData_t\000"
+ 1901      68616E6E 
+ 1901      656C4461 
+ 1901      74615F74 
+ 1901      00
+ 1902              	.LASF0:
+ 1903 02f5 7369676E 		.ascii	"signed char\000"
+ 1903      65642063 
+ 1903      68617200 
+ 1904              	.LASF27:
+ 1905 0301 666C6167 		.ascii	"flags\000"
+ 1905      7300
+ 1906              	.LASF47:
+ 1907 0307 494E5452 		.ascii	"INTR_MODE_OFF\000"
+ 1907      5F4D4F44 
+ 1907      455F4F46 
+ 1907      4600
+ 1908              	.LASF16:
+ 1909 0315 75696E74 		.ascii	"uint32_t\000"
+ 1909      33325F74 
+ 1909      00
+ 1910              	.LASF12:
+ 1911 031e 756E7369 		.ascii	"unsigned int\000"
+ 1911      676E6564 
+ 1911      20696E74 
+ 1911      00
+ 1912              	.LASF53:
+ 1913 032b 696E7465 		.ascii	"interrupter_modulation\000"
+ 1913      72727570 
+ 1913      7465725F 
+ 1913      6D6F6475 
+ 1913      6C617469 
+ 1914              	.LASF14:
+ 1915 0342 75696E74 		.ascii	"uint16_t\000"
+ 1915      31365F74 
+ 1915      00
+ 1916              	.LASF38:
+ 1917 034b 63757272 		.ascii	"currentEnvelopeFactor\000"
+ 1917      656E7445 
+ 1917      6E76656C 
+ 1917      6F706546 
+ 1917      6163746F 
+ 1918              	.LASF83:
+ 1919 0361 53696446 		.ascii	"SidFilter_updateVoice\000"
+ 1919      696C7465 
+ 1919      725F7570 
+ 1919      64617465 
+ 1919      566F6963 
+ 1920              	.LASF60:
+ 1921 0377 696E7465 		.ascii	"interrupter_params\000"
+ 1921      72727570 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 42
+
+
+ 1921      7465725F 
+ 1921      70617261 
+ 1921      6D7300
+ 1922              	.LASF66:
+ 1923 038a 6672616D 		.ascii	"frame\000"
+ 1923      6500
+ 1924              	.LASF22:
+ 1925 0390 41445352 		.ascii	"ADSR_ATTACK\000"
+ 1925      5F415454 
+ 1925      41434B00 
+ 1926              	.LASF19:
+ 1927 039c 63686172 		.ascii	"char\000"
+ 1927      00
+ 1928              	.LASF15:
+ 1929 03a1 696E7433 		.ascii	"int32_t\000"
+ 1929      325F7400 
+ 1930              	.LASF80:
+ 1931 03a9 5349445F 		.ascii	"SID_getChannelData\000"
+ 1931      67657443 
+ 1931      68616E6E 
+ 1931      656C4461 
+ 1931      746100
+ 1932              	.LASF5:
+ 1933 03bc 73686F72 		.ascii	"short unsigned int\000"
+ 1933      7420756E 
+ 1933      7369676E 
+ 1933      65642069 
+ 1933      6E7400
+ 1934              	.LASF82:
+ 1935 03cf 53696450 		.ascii	"SidProcessor_handleFrame\000"
+ 1935      726F6365 
+ 1935      73736F72 
+ 1935      5F68616E 
+ 1935      646C6546 
+ 1936              	.LASF35:
+ 1937 03e8 53494446 		.ascii	"SIDFrame_t\000"
+ 1937      72616D65 
+ 1937      5F7400
+ 1938              	.LASF30:
+ 1939 03f3 73757374 		.ascii	"sustain\000"
+ 1939      61696E00 
+ 1940              	.LASF9:
+ 1941 03fb 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1941      20756E73 
+ 1941      69676E65 
+ 1941      6420696E 
+ 1941      7400
+ 1942              	.LASF54:
+ 1943 040d 494E5452 		.ascii	"INTR_MOD_PW\000"
+ 1943      5F4D4F44 
+ 1943      5F505700 
+ 1944              	.LASF72:
+ 1945 0419 6368616E 		.ascii	"channelData\000"
+ 1945      6E656C44 
+ 1945      61746100 
+ 1946              	.LASF31:
+ 1947 0425 72656C65 		.ascii	"release\000"
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 43
+
+
+ 1947      61736500 
+ 1948              	.LASF26:
+ 1949 042d 41445352 		.ascii	"ADSRState_t\000"
+ 1949      53746174 
+ 1949      655F7400 
+ 1950              	.LASF43:
+ 1951 0439 494E5452 		.ascii	"INTR_DMA_TR\000"
+ 1951      5F444D41 
+ 1951      5F545200 
+ 1952              	.LASF79:
+ 1953 0445 746D7254 		.ascii	"tmrTimerControl\000"
+ 1953      696D6572 
+ 1953      436F6E74 
+ 1953      726F6C00 
+ 1954              	.LASF6:
+ 1955 0455 5F5F696E 		.ascii	"__int32_t\000"
+ 1955      7433325F 
+ 1955      7400
+ 1956              	.LASF37:
+ 1957 045f 73757374 		.ascii	"sustainVolume\000"
+ 1957      61696E56 
+ 1957      6F6C756D 
+ 1957      6500
+ 1958              	.LASF25:
+ 1959 046d 41445352 		.ascii	"ADSR_RELEASE\000"
+ 1959      5F52454C 
+ 1959      45415345 
+ 1959      00
+ 1960              	.LASF71:
+ 1961 047a 41445352 		.ascii	"ADSR_speedLut_DR\000"
+ 1961      5F737065 
+ 1961      65644C75 
+ 1961      745F4452 
+ 1961      00
+ 1962              	.LASF59:
+ 1963 048b 78427572 		.ascii	"xBurst_Timer\000"
+ 1963      73745F54 
+ 1963      696D6572 
+ 1963      00
+ 1964              	.LASF18:
+ 1965 0498 646F7562 		.ascii	"double\000"
+ 1965      6C6500
+ 1966              	.LASF73:
+ 1967 049f 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1967      52784275 
+ 1967      66666572 
+ 1967      00
+ 1968              	.LASF78:
+ 1969 04ac 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 1969      73657273 
+ 1969      5C636865 
+ 1969      6D695C55 
+ 1969      44335F51 
+ 1970              	.LASF33:
+ 1971 04d1 70756C73 		.ascii	"pulsewidth\000"
+ 1971      65776964 
+ 1971      746800
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccctKiRT.s 			page 44
+
+
+ 1972              	.LASF44:
+ 1973 04dc 494E5452 		.ascii	"INTR_DMA_DDS\000"
+ 1973      5F444D41 
+ 1973      5F444453 
+ 1973      00
+ 1974              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

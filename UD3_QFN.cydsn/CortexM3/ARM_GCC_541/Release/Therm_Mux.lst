@@ -1,0 +1,933 @@
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"Therm_Mux.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.Therm_Mux_Start,"ax",%progbits
+  20              		.align	1
+  21              		.global	Therm_Mux_Start
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	Therm_Mux_Start, %function
+  25              	Therm_Mux_Start:
+  26              	.LFB0:
+  27              		.file 1 "Generated_Source\\PSoC5\\Therm_Mux.c"
+   1:Generated_Source\PSoC5/Therm_Mux.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/Therm_Mux.c **** * File Name: Therm_Mux.c
+   3:Generated_Source\PSoC5/Therm_Mux.c **** * Version 1.80
+   4:Generated_Source\PSoC5/Therm_Mux.c **** *
+   5:Generated_Source\PSoC5/Therm_Mux.c **** *  Description:
+   6:Generated_Source\PSoC5/Therm_Mux.c **** *    This file contains all functions required for the analog multiplexer
+   7:Generated_Source\PSoC5/Therm_Mux.c **** *    AMux User Module.
+   8:Generated_Source\PSoC5/Therm_Mux.c **** *
+   9:Generated_Source\PSoC5/Therm_Mux.c **** *   Note:
+  10:Generated_Source\PSoC5/Therm_Mux.c **** *
+  11:Generated_Source\PSoC5/Therm_Mux.c **** *******************************************************************************
+  12:Generated_Source\PSoC5/Therm_Mux.c **** * Copyright 2008-2010, Cypress Semiconductor Corporation.  All rights reserved.
+  13:Generated_Source\PSoC5/Therm_Mux.c **** * You may use this file only in accordance with the license, terms, conditions, 
+  14:Generated_Source\PSoC5/Therm_Mux.c **** * disclaimers, and limitations in the end user license agreement accompanying 
+  15:Generated_Source\PSoC5/Therm_Mux.c **** * the software package with which this file was provided.
+  16:Generated_Source\PSoC5/Therm_Mux.c **** ********************************************************************************/
+  17:Generated_Source\PSoC5/Therm_Mux.c **** 
+  18:Generated_Source\PSoC5/Therm_Mux.c **** #include "Therm_Mux.h"
+  19:Generated_Source\PSoC5/Therm_Mux.c **** 
+  20:Generated_Source\PSoC5/Therm_Mux.c **** static uint8 Therm_Mux_lastChannel = Therm_Mux_NULL_CHANNEL;
+  21:Generated_Source\PSoC5/Therm_Mux.c **** 
+  22:Generated_Source\PSoC5/Therm_Mux.c **** 
+  23:Generated_Source\PSoC5/Therm_Mux.c **** /*******************************************************************************
+  24:Generated_Source\PSoC5/Therm_Mux.c **** * Function Name: Therm_Mux_Start
+  25:Generated_Source\PSoC5/Therm_Mux.c **** ********************************************************************************
+  26:Generated_Source\PSoC5/Therm_Mux.c **** * Summary:
+  27:Generated_Source\PSoC5/Therm_Mux.c **** *  Disconnect all channels.
+  28:Generated_Source\PSoC5/Therm_Mux.c **** *
+  29:Generated_Source\PSoC5/Therm_Mux.c **** * Parameters:
+  30:Generated_Source\PSoC5/Therm_Mux.c **** *  void
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 2
+
+
+  31:Generated_Source\PSoC5/Therm_Mux.c **** *
+  32:Generated_Source\PSoC5/Therm_Mux.c **** * Return:
+  33:Generated_Source\PSoC5/Therm_Mux.c **** *  void
+  34:Generated_Source\PSoC5/Therm_Mux.c **** *
+  35:Generated_Source\PSoC5/Therm_Mux.c **** *******************************************************************************/
+  36:Generated_Source\PSoC5/Therm_Mux.c **** void Therm_Mux_Start(void) 
+  37:Generated_Source\PSoC5/Therm_Mux.c **** {
+  28              		.loc 1 37 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 08B5     		push	{r3, lr}
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 3, -8
+  36              		.cfi_offset 14, -4
+  38:Generated_Source\PSoC5/Therm_Mux.c ****     uint8 chan;
+  39:Generated_Source\PSoC5/Therm_Mux.c **** 
+  40:Generated_Source\PSoC5/Therm_Mux.c ****     for(chan = 0u; chan < Therm_Mux_CHANNELS ; chan++)
+  41:Generated_Source\PSoC5/Therm_Mux.c ****     {
+  42:Generated_Source\PSoC5/Therm_Mux.c **** #if (Therm_Mux_MUXTYPE == Therm_Mux_MUX_SINGLE)
+  43:Generated_Source\PSoC5/Therm_Mux.c ****         Therm_Mux_Unset(chan);
+  37              		.loc 1 43 0
+  38 0002 0020     		movs	r0, #0
+  39 0004 FFF7FEFF 		bl	Therm_Mux_Unset
+  40              	.LVL1:
+  41 0008 0120     		movs	r0, #1
+  42 000a FFF7FEFF 		bl	Therm_Mux_Unset
+  43              	.LVL2:
+  44 000e 0220     		movs	r0, #2
+  45 0010 FFF7FEFF 		bl	Therm_Mux_Unset
+  46              	.LVL3:
+  44:Generated_Source\PSoC5/Therm_Mux.c **** #else
+  45:Generated_Source\PSoC5/Therm_Mux.c ****         Therm_Mux_CYAMUXSIDE_A_Unset(chan);
+  46:Generated_Source\PSoC5/Therm_Mux.c ****         Therm_Mux_CYAMUXSIDE_B_Unset(chan);
+  47:Generated_Source\PSoC5/Therm_Mux.c **** #endif
+  48:Generated_Source\PSoC5/Therm_Mux.c ****     }
+  49:Generated_Source\PSoC5/Therm_Mux.c **** 
+  50:Generated_Source\PSoC5/Therm_Mux.c ****     Therm_Mux_lastChannel = Therm_Mux_NULL_CHANNEL;
+  47              		.loc 1 50 0
+  48 0014 014B     		ldr	r3, .L2
+  49 0016 FF22     		movs	r2, #255
+  50 0018 1A70     		strb	r2, [r3]
+  51 001a 08BD     		pop	{r3, pc}
+  52              	.L3:
+  53              		.align	2
+  54              	.L2:
+  55 001c 00000000 		.word	.LANCHOR0
+  56              		.cfi_endproc
+  57              	.LFE0:
+  58              		.size	Therm_Mux_Start, .-Therm_Mux_Start
+  59              		.section	.text.Therm_Mux_FastSelect,"ax",%progbits
+  60              		.align	1
+  61              		.global	Therm_Mux_FastSelect
+  62              		.thumb
+  63              		.thumb_func
+  64              		.type	Therm_Mux_FastSelect, %function
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 3
+
+
+  65              	Therm_Mux_FastSelect:
+  66              	.LFB1:
+  51:Generated_Source\PSoC5/Therm_Mux.c **** }
+  52:Generated_Source\PSoC5/Therm_Mux.c **** 
+  53:Generated_Source\PSoC5/Therm_Mux.c **** 
+  54:Generated_Source\PSoC5/Therm_Mux.c **** #if (!Therm_Mux_ATMOSTONE)
+  55:Generated_Source\PSoC5/Therm_Mux.c **** /*******************************************************************************
+  56:Generated_Source\PSoC5/Therm_Mux.c **** * Function Name: Therm_Mux_Select
+  57:Generated_Source\PSoC5/Therm_Mux.c **** ********************************************************************************
+  58:Generated_Source\PSoC5/Therm_Mux.c **** * Summary:
+  59:Generated_Source\PSoC5/Therm_Mux.c **** *  This functions first disconnects all channels then connects the given
+  60:Generated_Source\PSoC5/Therm_Mux.c **** *  channel.
+  61:Generated_Source\PSoC5/Therm_Mux.c **** *
+  62:Generated_Source\PSoC5/Therm_Mux.c **** * Parameters:
+  63:Generated_Source\PSoC5/Therm_Mux.c **** *  channel:  The channel to connect to the common terminal.
+  64:Generated_Source\PSoC5/Therm_Mux.c **** *
+  65:Generated_Source\PSoC5/Therm_Mux.c **** * Return:
+  66:Generated_Source\PSoC5/Therm_Mux.c **** *  void
+  67:Generated_Source\PSoC5/Therm_Mux.c **** *
+  68:Generated_Source\PSoC5/Therm_Mux.c **** *******************************************************************************/
+  69:Generated_Source\PSoC5/Therm_Mux.c **** void Therm_Mux_Select(uint8 channel) 
+  70:Generated_Source\PSoC5/Therm_Mux.c **** {
+  71:Generated_Source\PSoC5/Therm_Mux.c ****     Therm_Mux_DisconnectAll();        /* Disconnect all previous connections */
+  72:Generated_Source\PSoC5/Therm_Mux.c ****     Therm_Mux_Connect(channel);       /* Make the given selection */
+  73:Generated_Source\PSoC5/Therm_Mux.c ****     Therm_Mux_lastChannel = channel;  /* Update last channel */
+  74:Generated_Source\PSoC5/Therm_Mux.c **** }
+  75:Generated_Source\PSoC5/Therm_Mux.c **** #endif
+  76:Generated_Source\PSoC5/Therm_Mux.c **** 
+  77:Generated_Source\PSoC5/Therm_Mux.c **** 
+  78:Generated_Source\PSoC5/Therm_Mux.c **** /*******************************************************************************
+  79:Generated_Source\PSoC5/Therm_Mux.c **** * Function Name: Therm_Mux_FastSelect
+  80:Generated_Source\PSoC5/Therm_Mux.c **** ********************************************************************************
+  81:Generated_Source\PSoC5/Therm_Mux.c **** * Summary:
+  82:Generated_Source\PSoC5/Therm_Mux.c **** *  This function first disconnects the last connection made with FastSelect or
+  83:Generated_Source\PSoC5/Therm_Mux.c **** *  Select, then connects the given channel. The FastSelect function is similar
+  84:Generated_Source\PSoC5/Therm_Mux.c **** *  to the Select function, except it is faster since it only disconnects the
+  85:Generated_Source\PSoC5/Therm_Mux.c **** *  last channel selected rather than all channels.
+  86:Generated_Source\PSoC5/Therm_Mux.c **** *
+  87:Generated_Source\PSoC5/Therm_Mux.c **** * Parameters:
+  88:Generated_Source\PSoC5/Therm_Mux.c **** *  channel:  The channel to connect to the common terminal.
+  89:Generated_Source\PSoC5/Therm_Mux.c **** *
+  90:Generated_Source\PSoC5/Therm_Mux.c **** * Return:
+  91:Generated_Source\PSoC5/Therm_Mux.c **** *  void
+  92:Generated_Source\PSoC5/Therm_Mux.c **** *
+  93:Generated_Source\PSoC5/Therm_Mux.c **** *******************************************************************************/
+  94:Generated_Source\PSoC5/Therm_Mux.c **** void Therm_Mux_FastSelect(uint8 channel) 
+  95:Generated_Source\PSoC5/Therm_Mux.c **** {
+  67              		.loc 1 95 0
+  68              		.cfi_startproc
+  69              		@ args = 0, pretend = 0, frame = 0
+  70              		@ frame_needed = 0, uses_anonymous_args = 0
+  71              	.LVL4:
+  72 0000 38B5     		push	{r3, r4, r5, lr}
+  73              		.cfi_def_cfa_offset 16
+  74              		.cfi_offset 3, -16
+  75              		.cfi_offset 4, -12
+  76              		.cfi_offset 5, -8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 4
+
+
+  77              		.cfi_offset 14, -4
+  96:Generated_Source\PSoC5/Therm_Mux.c ****     /* Disconnect the last valid channel */
+  97:Generated_Source\PSoC5/Therm_Mux.c ****     if( Therm_Mux_lastChannel != Therm_Mux_NULL_CHANNEL)
+  78              		.loc 1 97 0
+  79 0002 064B     		ldr	r3, .L10
+  95:Generated_Source\PSoC5/Therm_Mux.c ****     /* Disconnect the last valid channel */
+  80              		.loc 1 95 0
+  81 0004 0546     		mov	r5, r0
+  82              		.loc 1 97 0
+  83 0006 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+  84              	.LVL5:
+  85 0008 1C46     		mov	r4, r3
+  86 000a FF28     		cmp	r0, #255
+  87 000c 01D0     		beq	.L5
+  98:Generated_Source\PSoC5/Therm_Mux.c ****     {
+  99:Generated_Source\PSoC5/Therm_Mux.c ****         Therm_Mux_Disconnect(Therm_Mux_lastChannel);
+  88              		.loc 1 99 0
+  89 000e FFF7FEFF 		bl	Therm_Mux_Unset
+  90              	.LVL6:
+  91              	.L5:
+ 100:Generated_Source\PSoC5/Therm_Mux.c ****     }
+ 101:Generated_Source\PSoC5/Therm_Mux.c **** 
+ 102:Generated_Source\PSoC5/Therm_Mux.c ****     /* Make the new channel connection */
+ 103:Generated_Source\PSoC5/Therm_Mux.c **** #if (Therm_Mux_MUXTYPE == Therm_Mux_MUX_SINGLE)
+ 104:Generated_Source\PSoC5/Therm_Mux.c ****     Therm_Mux_Set(channel);
+  92              		.loc 1 104 0
+  93 0012 2846     		mov	r0, r5
+  94 0014 FFF7FEFF 		bl	Therm_Mux_Set
+  95              	.LVL7:
+ 105:Generated_Source\PSoC5/Therm_Mux.c **** #else
+ 106:Generated_Source\PSoC5/Therm_Mux.c ****     Therm_Mux_CYAMUXSIDE_A_Set(channel);
+ 107:Generated_Source\PSoC5/Therm_Mux.c ****     Therm_Mux_CYAMUXSIDE_B_Set(channel);
+ 108:Generated_Source\PSoC5/Therm_Mux.c **** #endif
+ 109:Generated_Source\PSoC5/Therm_Mux.c **** 
+ 110:Generated_Source\PSoC5/Therm_Mux.c **** 
+ 111:Generated_Source\PSoC5/Therm_Mux.c ****     Therm_Mux_lastChannel = channel;   /* Update last channel */
+  96              		.loc 1 111 0
+  97 0018 2570     		strb	r5, [r4]
+  98 001a 38BD     		pop	{r3, r4, r5, pc}
+  99              	.L11:
+ 100              		.align	2
+ 101              	.L10:
+ 102 001c 00000000 		.word	.LANCHOR0
+ 103              		.cfi_endproc
+ 104              	.LFE1:
+ 105              		.size	Therm_Mux_FastSelect, .-Therm_Mux_FastSelect
+ 106              		.section	.text.Therm_Mux_DisconnectAll,"ax",%progbits
+ 107              		.align	1
+ 108              		.global	Therm_Mux_DisconnectAll
+ 109              		.thumb
+ 110              		.thumb_func
+ 111              		.type	Therm_Mux_DisconnectAll, %function
+ 112              	Therm_Mux_DisconnectAll:
+ 113              	.LFB2:
+ 112:Generated_Source\PSoC5/Therm_Mux.c **** }
+ 113:Generated_Source\PSoC5/Therm_Mux.c **** 
+ 114:Generated_Source\PSoC5/Therm_Mux.c **** 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 5
+
+
+ 115:Generated_Source\PSoC5/Therm_Mux.c **** #if (Therm_Mux_MUXTYPE == Therm_Mux_MUX_DIFF)
+ 116:Generated_Source\PSoC5/Therm_Mux.c **** #if (!Therm_Mux_ATMOSTONE)
+ 117:Generated_Source\PSoC5/Therm_Mux.c **** /*******************************************************************************
+ 118:Generated_Source\PSoC5/Therm_Mux.c **** * Function Name: Therm_Mux_Connect
+ 119:Generated_Source\PSoC5/Therm_Mux.c **** ********************************************************************************
+ 120:Generated_Source\PSoC5/Therm_Mux.c **** * Summary:
+ 121:Generated_Source\PSoC5/Therm_Mux.c **** *  This function connects the given channel without affecting other connections.
+ 122:Generated_Source\PSoC5/Therm_Mux.c **** *
+ 123:Generated_Source\PSoC5/Therm_Mux.c **** * Parameters:
+ 124:Generated_Source\PSoC5/Therm_Mux.c **** *  channel:  The channel to connect to the common terminal.
+ 125:Generated_Source\PSoC5/Therm_Mux.c **** *
+ 126:Generated_Source\PSoC5/Therm_Mux.c **** * Return:
+ 127:Generated_Source\PSoC5/Therm_Mux.c **** *  void
+ 128:Generated_Source\PSoC5/Therm_Mux.c **** *
+ 129:Generated_Source\PSoC5/Therm_Mux.c **** *******************************************************************************/
+ 130:Generated_Source\PSoC5/Therm_Mux.c **** void Therm_Mux_Connect(uint8 channel) 
+ 131:Generated_Source\PSoC5/Therm_Mux.c **** {
+ 132:Generated_Source\PSoC5/Therm_Mux.c ****     Therm_Mux_CYAMUXSIDE_A_Set(channel);
+ 133:Generated_Source\PSoC5/Therm_Mux.c ****     Therm_Mux_CYAMUXSIDE_B_Set(channel);
+ 134:Generated_Source\PSoC5/Therm_Mux.c **** }
+ 135:Generated_Source\PSoC5/Therm_Mux.c **** #endif
+ 136:Generated_Source\PSoC5/Therm_Mux.c **** 
+ 137:Generated_Source\PSoC5/Therm_Mux.c **** /*******************************************************************************
+ 138:Generated_Source\PSoC5/Therm_Mux.c **** * Function Name: Therm_Mux_Disconnect
+ 139:Generated_Source\PSoC5/Therm_Mux.c **** ********************************************************************************
+ 140:Generated_Source\PSoC5/Therm_Mux.c **** * Summary:
+ 141:Generated_Source\PSoC5/Therm_Mux.c **** *  This function disconnects the given channel from the common or output
+ 142:Generated_Source\PSoC5/Therm_Mux.c **** *  terminal without affecting other connections.
+ 143:Generated_Source\PSoC5/Therm_Mux.c **** *
+ 144:Generated_Source\PSoC5/Therm_Mux.c **** * Parameters:
+ 145:Generated_Source\PSoC5/Therm_Mux.c **** *  channel:  The channel to disconnect from the common terminal.
+ 146:Generated_Source\PSoC5/Therm_Mux.c **** *
+ 147:Generated_Source\PSoC5/Therm_Mux.c **** * Return:
+ 148:Generated_Source\PSoC5/Therm_Mux.c **** *  void
+ 149:Generated_Source\PSoC5/Therm_Mux.c **** *
+ 150:Generated_Source\PSoC5/Therm_Mux.c **** *******************************************************************************/
+ 151:Generated_Source\PSoC5/Therm_Mux.c **** void Therm_Mux_Disconnect(uint8 channel) 
+ 152:Generated_Source\PSoC5/Therm_Mux.c **** {
+ 153:Generated_Source\PSoC5/Therm_Mux.c ****     Therm_Mux_CYAMUXSIDE_A_Unset(channel);
+ 154:Generated_Source\PSoC5/Therm_Mux.c ****     Therm_Mux_CYAMUXSIDE_B_Unset(channel);
+ 155:Generated_Source\PSoC5/Therm_Mux.c **** }
+ 156:Generated_Source\PSoC5/Therm_Mux.c **** #endif
+ 157:Generated_Source\PSoC5/Therm_Mux.c **** 
+ 158:Generated_Source\PSoC5/Therm_Mux.c **** #if (Therm_Mux_ATMOSTONE)
+ 159:Generated_Source\PSoC5/Therm_Mux.c **** /*******************************************************************************
+ 160:Generated_Source\PSoC5/Therm_Mux.c **** * Function Name: Therm_Mux_DisconnectAll
+ 161:Generated_Source\PSoC5/Therm_Mux.c **** ********************************************************************************
+ 162:Generated_Source\PSoC5/Therm_Mux.c **** * Summary:
+ 163:Generated_Source\PSoC5/Therm_Mux.c **** *  This function disconnects all channels.
+ 164:Generated_Source\PSoC5/Therm_Mux.c **** *
+ 165:Generated_Source\PSoC5/Therm_Mux.c **** * Parameters:
+ 166:Generated_Source\PSoC5/Therm_Mux.c **** *  void
+ 167:Generated_Source\PSoC5/Therm_Mux.c **** *
+ 168:Generated_Source\PSoC5/Therm_Mux.c **** * Return:
+ 169:Generated_Source\PSoC5/Therm_Mux.c **** *  void
+ 170:Generated_Source\PSoC5/Therm_Mux.c **** *
+ 171:Generated_Source\PSoC5/Therm_Mux.c **** *******************************************************************************/
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 6
+
+
+ 172:Generated_Source\PSoC5/Therm_Mux.c **** void Therm_Mux_DisconnectAll(void) 
+ 173:Generated_Source\PSoC5/Therm_Mux.c **** {
+ 114              		.loc 1 173 0
+ 115              		.cfi_startproc
+ 116              		@ args = 0, pretend = 0, frame = 0
+ 117              		@ frame_needed = 0, uses_anonymous_args = 0
+ 118 0000 10B5     		push	{r4, lr}
+ 119              		.cfi_def_cfa_offset 8
+ 120              		.cfi_offset 4, -8
+ 121              		.cfi_offset 14, -4
+ 174:Generated_Source\PSoC5/Therm_Mux.c ****     if(Therm_Mux_lastChannel != Therm_Mux_NULL_CHANNEL) 
+ 122              		.loc 1 174 0
+ 123 0002 044C     		ldr	r4, .L17
+ 124 0004 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+ 125 0006 FF28     		cmp	r0, #255
+ 126 0008 03D0     		beq	.L12
+ 175:Generated_Source\PSoC5/Therm_Mux.c ****     {
+ 176:Generated_Source\PSoC5/Therm_Mux.c ****         Therm_Mux_Disconnect(Therm_Mux_lastChannel);
+ 127              		.loc 1 176 0
+ 128 000a FFF7FEFF 		bl	Therm_Mux_Unset
+ 129              	.LVL8:
+ 177:Generated_Source\PSoC5/Therm_Mux.c ****         Therm_Mux_lastChannel = Therm_Mux_NULL_CHANNEL;
+ 130              		.loc 1 177 0
+ 131 000e FF23     		movs	r3, #255
+ 132 0010 2370     		strb	r3, [r4]
+ 133              	.L12:
+ 134 0012 10BD     		pop	{r4, pc}
+ 135              	.L18:
+ 136              		.align	2
+ 137              	.L17:
+ 138 0014 00000000 		.word	.LANCHOR0
+ 139              		.cfi_endproc
+ 140              	.LFE2:
+ 141              		.size	Therm_Mux_DisconnectAll, .-Therm_Mux_DisconnectAll
+ 142              		.data
+ 143              		.set	.LANCHOR0,. + 0
+ 144              		.type	Therm_Mux_lastChannel, %object
+ 145              		.size	Therm_Mux_lastChannel, 1
+ 146              	Therm_Mux_lastChannel:
+ 147 0000 FF       		.byte	-1
+ 148              		.text
+ 149              	.Letext0:
+ 150              		.file 2 "Generated_Source\\PSoC5\\cyfitter_cfg.h"
+ 151              		.file 3 "Generated_Source\\PSoC5\\cytypes.h"
+ 152              		.section	.debug_info,"",%progbits
+ 153              	.Ldebug_info0:
+ 154 0000 67010000 		.4byte	0x167
+ 155 0004 0400     		.2byte	0x4
+ 156 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 157 000a 04       		.byte	0x4
+ 158 000b 01       		.uleb128 0x1
+ 159 000c 79000000 		.4byte	.LASF19
+ 160 0010 0C       		.byte	0xc
+ 161 0011 25010000 		.4byte	.LASF20
+ 162 0015 C1010000 		.4byte	.LASF21
+ 163 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 164 001d 00000000 		.4byte	0
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 7
+
+
+ 165 0021 00000000 		.4byte	.Ldebug_line0
+ 166 0025 02       		.uleb128 0x2
+ 167 0026 01       		.byte	0x1
+ 168 0027 06       		.byte	0x6
+ 169 0028 EF010000 		.4byte	.LASF0
+ 170 002c 02       		.uleb128 0x2
+ 171 002d 01       		.byte	0x1
+ 172 002e 08       		.byte	0x8
+ 173 002f 59000000 		.4byte	.LASF1
+ 174 0033 02       		.uleb128 0x2
+ 175 0034 02       		.byte	0x2
+ 176 0035 05       		.byte	0x5
+ 177 0036 B1010000 		.4byte	.LASF2
+ 178 003a 02       		.uleb128 0x2
+ 179 003b 02       		.byte	0x2
+ 180 003c 07       		.byte	0x7
+ 181 003d 12010000 		.4byte	.LASF3
+ 182 0041 02       		.uleb128 0x2
+ 183 0042 04       		.byte	0x4
+ 184 0043 05       		.byte	0x5
+ 185 0044 E6010000 		.4byte	.LASF4
+ 186 0048 02       		.uleb128 0x2
+ 187 0049 04       		.byte	0x4
+ 188 004a 07       		.byte	0x7
+ 189 004b 67000000 		.4byte	.LASF5
+ 190 004f 02       		.uleb128 0x2
+ 191 0050 08       		.byte	0x8
+ 192 0051 05       		.byte	0x5
+ 193 0052 9E010000 		.4byte	.LASF6
+ 194 0056 02       		.uleb128 0x2
+ 195 0057 08       		.byte	0x8
+ 196 0058 07       		.byte	0x7
+ 197 0059 82010000 		.4byte	.LASF7
+ 198 005d 03       		.uleb128 0x3
+ 199 005e 04       		.byte	0x4
+ 200 005f 05       		.byte	0x5
+ 201 0060 696E7400 		.ascii	"int\000"
+ 202 0064 02       		.uleb128 0x2
+ 203 0065 04       		.byte	0x4
+ 204 0066 07       		.byte	0x7
+ 205 0067 75010000 		.4byte	.LASF8
+ 206 006b 04       		.uleb128 0x4
+ 207 006c BB010000 		.4byte	.LASF22
+ 208 0070 03       		.byte	0x3
+ 209 0071 9201     		.2byte	0x192
+ 210 0073 2C000000 		.4byte	0x2c
+ 211 0077 02       		.uleb128 0x2
+ 212 0078 04       		.byte	0x4
+ 213 0079 04       		.byte	0x4
+ 214 007a 26000000 		.4byte	.LASF9
+ 215 007e 02       		.uleb128 0x2
+ 216 007f 08       		.byte	0x8
+ 217 0080 04       		.byte	0x4
+ 218 0081 6E010000 		.4byte	.LASF10
+ 219 0085 02       		.uleb128 0x2
+ 220 0086 01       		.byte	0x1
+ 221 0087 08       		.byte	0x8
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 8
+
+
+ 222 0088 AC010000 		.4byte	.LASF11
+ 223 008c 05       		.uleb128 0x5
+ 224 008d 16000000 		.4byte	.LASF12
+ 225 0091 01       		.byte	0x1
+ 226 0092 24       		.byte	0x24
+ 227 0093 00000000 		.4byte	.LFB0
+ 228 0097 20000000 		.4byte	.LFE0-.LFB0
+ 229 009b 01       		.uleb128 0x1
+ 230 009c 9C       		.byte	0x9c
+ 231 009d E6000000 		.4byte	0xe6
+ 232 00a1 06       		.uleb128 0x6
+ 233 00a2 99010000 		.4byte	.LASF15
+ 234 00a6 01       		.byte	0x1
+ 235 00a7 26       		.byte	0x26
+ 236 00a8 6B000000 		.4byte	0x6b
+ 237 00ac 00000000 		.4byte	.LLST0
+ 238 00b0 07       		.uleb128 0x7
+ 239 00b1 08000000 		.4byte	.LVL1
+ 240 00b5 54010000 		.4byte	0x154
+ 241 00b9 C3000000 		.4byte	0xc3
+ 242 00bd 08       		.uleb128 0x8
+ 243 00be 01       		.uleb128 0x1
+ 244 00bf 50       		.byte	0x50
+ 245 00c0 01       		.uleb128 0x1
+ 246 00c1 30       		.byte	0x30
+ 247 00c2 00       		.byte	0
+ 248 00c3 07       		.uleb128 0x7
+ 249 00c4 0E000000 		.4byte	.LVL2
+ 250 00c8 54010000 		.4byte	0x154
+ 251 00cc D6000000 		.4byte	0xd6
+ 252 00d0 08       		.uleb128 0x8
+ 253 00d1 01       		.uleb128 0x1
+ 254 00d2 50       		.byte	0x50
+ 255 00d3 01       		.uleb128 0x1
+ 256 00d4 31       		.byte	0x31
+ 257 00d5 00       		.byte	0
+ 258 00d6 09       		.uleb128 0x9
+ 259 00d7 14000000 		.4byte	.LVL3
+ 260 00db 54010000 		.4byte	0x154
+ 261 00df 08       		.uleb128 0x8
+ 262 00e0 01       		.uleb128 0x1
+ 263 00e1 50       		.byte	0x50
+ 264 00e2 01       		.uleb128 0x1
+ 265 00e3 32       		.byte	0x32
+ 266 00e4 00       		.byte	0
+ 267 00e5 00       		.byte	0
+ 268 00e6 05       		.uleb128 0x5
+ 269 00e7 44000000 		.4byte	.LASF13
+ 270 00eb 01       		.byte	0x1
+ 271 00ec 5E       		.byte	0x5e
+ 272 00ed 00000000 		.4byte	.LFB1
+ 273 00f1 20000000 		.4byte	.LFE1-.LFB1
+ 274 00f5 01       		.uleb128 0x1
+ 275 00f6 9C       		.byte	0x9c
+ 276 00f7 24010000 		.4byte	0x124
+ 277 00fb 0A       		.uleb128 0xa
+ 278 00fc 00000000 		.4byte	.LASF23
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 9
+
+
+ 279 0100 01       		.byte	0x1
+ 280 0101 5E       		.byte	0x5e
+ 281 0102 6B000000 		.4byte	0x6b
+ 282 0106 38000000 		.4byte	.LLST1
+ 283 010a 0B       		.uleb128 0xb
+ 284 010b 12000000 		.4byte	.LVL6
+ 285 010f 54010000 		.4byte	0x154
+ 286 0113 09       		.uleb128 0x9
+ 287 0114 18000000 		.4byte	.LVL7
+ 288 0118 5F010000 		.4byte	0x15f
+ 289 011c 08       		.uleb128 0x8
+ 290 011d 01       		.uleb128 0x1
+ 291 011e 50       		.byte	0x50
+ 292 011f 02       		.uleb128 0x2
+ 293 0120 75       		.byte	0x75
+ 294 0121 00       		.sleb128 0
+ 295 0122 00       		.byte	0
+ 296 0123 00       		.byte	0
+ 297 0124 05       		.uleb128 0x5
+ 298 0125 2C000000 		.4byte	.LASF14
+ 299 0129 01       		.byte	0x1
+ 300 012a AC       		.byte	0xac
+ 301 012b 00000000 		.4byte	.LFB2
+ 302 012f 18000000 		.4byte	.LFE2-.LFB2
+ 303 0133 01       		.uleb128 0x1
+ 304 0134 9C       		.byte	0x9c
+ 305 0135 43010000 		.4byte	0x143
+ 306 0139 0B       		.uleb128 0xb
+ 307 013a 0E000000 		.4byte	.LVL8
+ 308 013e 54010000 		.4byte	0x154
+ 309 0142 00       		.byte	0
+ 310 0143 0C       		.uleb128 0xc
+ 311 0144 58010000 		.4byte	.LASF16
+ 312 0148 01       		.byte	0x1
+ 313 0149 14       		.byte	0x14
+ 314 014a 6B000000 		.4byte	0x6b
+ 315 014e 05       		.uleb128 0x5
+ 316 014f 03       		.byte	0x3
+ 317 0150 00000000 		.4byte	Therm_Mux_lastChannel
+ 318 0154 0D       		.uleb128 0xd
+ 319 0155 48010000 		.4byte	.LASF17
+ 320 0159 48010000 		.4byte	.LASF17
+ 321 015d 02       		.byte	0x2
+ 322 015e 1B       		.byte	0x1b
+ 323 015f 0D       		.uleb128 0xd
+ 324 0160 08000000 		.4byte	.LASF18
+ 325 0164 08000000 		.4byte	.LASF18
+ 326 0168 02       		.byte	0x2
+ 327 0169 1A       		.byte	0x1a
+ 328 016a 00       		.byte	0
+ 329              		.section	.debug_abbrev,"",%progbits
+ 330              	.Ldebug_abbrev0:
+ 331 0000 01       		.uleb128 0x1
+ 332 0001 11       		.uleb128 0x11
+ 333 0002 01       		.byte	0x1
+ 334 0003 25       		.uleb128 0x25
+ 335 0004 0E       		.uleb128 0xe
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 10
+
+
+ 336 0005 13       		.uleb128 0x13
+ 337 0006 0B       		.uleb128 0xb
+ 338 0007 03       		.uleb128 0x3
+ 339 0008 0E       		.uleb128 0xe
+ 340 0009 1B       		.uleb128 0x1b
+ 341 000a 0E       		.uleb128 0xe
+ 342 000b 55       		.uleb128 0x55
+ 343 000c 17       		.uleb128 0x17
+ 344 000d 11       		.uleb128 0x11
+ 345 000e 01       		.uleb128 0x1
+ 346 000f 10       		.uleb128 0x10
+ 347 0010 17       		.uleb128 0x17
+ 348 0011 00       		.byte	0
+ 349 0012 00       		.byte	0
+ 350 0013 02       		.uleb128 0x2
+ 351 0014 24       		.uleb128 0x24
+ 352 0015 00       		.byte	0
+ 353 0016 0B       		.uleb128 0xb
+ 354 0017 0B       		.uleb128 0xb
+ 355 0018 3E       		.uleb128 0x3e
+ 356 0019 0B       		.uleb128 0xb
+ 357 001a 03       		.uleb128 0x3
+ 358 001b 0E       		.uleb128 0xe
+ 359 001c 00       		.byte	0
+ 360 001d 00       		.byte	0
+ 361 001e 03       		.uleb128 0x3
+ 362 001f 24       		.uleb128 0x24
+ 363 0020 00       		.byte	0
+ 364 0021 0B       		.uleb128 0xb
+ 365 0022 0B       		.uleb128 0xb
+ 366 0023 3E       		.uleb128 0x3e
+ 367 0024 0B       		.uleb128 0xb
+ 368 0025 03       		.uleb128 0x3
+ 369 0026 08       		.uleb128 0x8
+ 370 0027 00       		.byte	0
+ 371 0028 00       		.byte	0
+ 372 0029 04       		.uleb128 0x4
+ 373 002a 16       		.uleb128 0x16
+ 374 002b 00       		.byte	0
+ 375 002c 03       		.uleb128 0x3
+ 376 002d 0E       		.uleb128 0xe
+ 377 002e 3A       		.uleb128 0x3a
+ 378 002f 0B       		.uleb128 0xb
+ 379 0030 3B       		.uleb128 0x3b
+ 380 0031 05       		.uleb128 0x5
+ 381 0032 49       		.uleb128 0x49
+ 382 0033 13       		.uleb128 0x13
+ 383 0034 00       		.byte	0
+ 384 0035 00       		.byte	0
+ 385 0036 05       		.uleb128 0x5
+ 386 0037 2E       		.uleb128 0x2e
+ 387 0038 01       		.byte	0x1
+ 388 0039 3F       		.uleb128 0x3f
+ 389 003a 19       		.uleb128 0x19
+ 390 003b 03       		.uleb128 0x3
+ 391 003c 0E       		.uleb128 0xe
+ 392 003d 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 11
+
+
+ 393 003e 0B       		.uleb128 0xb
+ 394 003f 3B       		.uleb128 0x3b
+ 395 0040 0B       		.uleb128 0xb
+ 396 0041 27       		.uleb128 0x27
+ 397 0042 19       		.uleb128 0x19
+ 398 0043 11       		.uleb128 0x11
+ 399 0044 01       		.uleb128 0x1
+ 400 0045 12       		.uleb128 0x12
+ 401 0046 06       		.uleb128 0x6
+ 402 0047 40       		.uleb128 0x40
+ 403 0048 18       		.uleb128 0x18
+ 404 0049 9742     		.uleb128 0x2117
+ 405 004b 19       		.uleb128 0x19
+ 406 004c 01       		.uleb128 0x1
+ 407 004d 13       		.uleb128 0x13
+ 408 004e 00       		.byte	0
+ 409 004f 00       		.byte	0
+ 410 0050 06       		.uleb128 0x6
+ 411 0051 34       		.uleb128 0x34
+ 412 0052 00       		.byte	0
+ 413 0053 03       		.uleb128 0x3
+ 414 0054 0E       		.uleb128 0xe
+ 415 0055 3A       		.uleb128 0x3a
+ 416 0056 0B       		.uleb128 0xb
+ 417 0057 3B       		.uleb128 0x3b
+ 418 0058 0B       		.uleb128 0xb
+ 419 0059 49       		.uleb128 0x49
+ 420 005a 13       		.uleb128 0x13
+ 421 005b 02       		.uleb128 0x2
+ 422 005c 17       		.uleb128 0x17
+ 423 005d 00       		.byte	0
+ 424 005e 00       		.byte	0
+ 425 005f 07       		.uleb128 0x7
+ 426 0060 898201   		.uleb128 0x4109
+ 427 0063 01       		.byte	0x1
+ 428 0064 11       		.uleb128 0x11
+ 429 0065 01       		.uleb128 0x1
+ 430 0066 31       		.uleb128 0x31
+ 431 0067 13       		.uleb128 0x13
+ 432 0068 01       		.uleb128 0x1
+ 433 0069 13       		.uleb128 0x13
+ 434 006a 00       		.byte	0
+ 435 006b 00       		.byte	0
+ 436 006c 08       		.uleb128 0x8
+ 437 006d 8A8201   		.uleb128 0x410a
+ 438 0070 00       		.byte	0
+ 439 0071 02       		.uleb128 0x2
+ 440 0072 18       		.uleb128 0x18
+ 441 0073 9142     		.uleb128 0x2111
+ 442 0075 18       		.uleb128 0x18
+ 443 0076 00       		.byte	0
+ 444 0077 00       		.byte	0
+ 445 0078 09       		.uleb128 0x9
+ 446 0079 898201   		.uleb128 0x4109
+ 447 007c 01       		.byte	0x1
+ 448 007d 11       		.uleb128 0x11
+ 449 007e 01       		.uleb128 0x1
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 12
+
+
+ 450 007f 31       		.uleb128 0x31
+ 451 0080 13       		.uleb128 0x13
+ 452 0081 00       		.byte	0
+ 453 0082 00       		.byte	0
+ 454 0083 0A       		.uleb128 0xa
+ 455 0084 05       		.uleb128 0x5
+ 456 0085 00       		.byte	0
+ 457 0086 03       		.uleb128 0x3
+ 458 0087 0E       		.uleb128 0xe
+ 459 0088 3A       		.uleb128 0x3a
+ 460 0089 0B       		.uleb128 0xb
+ 461 008a 3B       		.uleb128 0x3b
+ 462 008b 0B       		.uleb128 0xb
+ 463 008c 49       		.uleb128 0x49
+ 464 008d 13       		.uleb128 0x13
+ 465 008e 02       		.uleb128 0x2
+ 466 008f 17       		.uleb128 0x17
+ 467 0090 00       		.byte	0
+ 468 0091 00       		.byte	0
+ 469 0092 0B       		.uleb128 0xb
+ 470 0093 898201   		.uleb128 0x4109
+ 471 0096 00       		.byte	0
+ 472 0097 11       		.uleb128 0x11
+ 473 0098 01       		.uleb128 0x1
+ 474 0099 31       		.uleb128 0x31
+ 475 009a 13       		.uleb128 0x13
+ 476 009b 00       		.byte	0
+ 477 009c 00       		.byte	0
+ 478 009d 0C       		.uleb128 0xc
+ 479 009e 34       		.uleb128 0x34
+ 480 009f 00       		.byte	0
+ 481 00a0 03       		.uleb128 0x3
+ 482 00a1 0E       		.uleb128 0xe
+ 483 00a2 3A       		.uleb128 0x3a
+ 484 00a3 0B       		.uleb128 0xb
+ 485 00a4 3B       		.uleb128 0x3b
+ 486 00a5 0B       		.uleb128 0xb
+ 487 00a6 49       		.uleb128 0x49
+ 488 00a7 13       		.uleb128 0x13
+ 489 00a8 02       		.uleb128 0x2
+ 490 00a9 18       		.uleb128 0x18
+ 491 00aa 00       		.byte	0
+ 492 00ab 00       		.byte	0
+ 493 00ac 0D       		.uleb128 0xd
+ 494 00ad 2E       		.uleb128 0x2e
+ 495 00ae 00       		.byte	0
+ 496 00af 3F       		.uleb128 0x3f
+ 497 00b0 19       		.uleb128 0x19
+ 498 00b1 3C       		.uleb128 0x3c
+ 499 00b2 19       		.uleb128 0x19
+ 500 00b3 6E       		.uleb128 0x6e
+ 501 00b4 0E       		.uleb128 0xe
+ 502 00b5 03       		.uleb128 0x3
+ 503 00b6 0E       		.uleb128 0xe
+ 504 00b7 3A       		.uleb128 0x3a
+ 505 00b8 0B       		.uleb128 0xb
+ 506 00b9 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 13
+
+
+ 507 00ba 0B       		.uleb128 0xb
+ 508 00bb 00       		.byte	0
+ 509 00bc 00       		.byte	0
+ 510 00bd 00       		.byte	0
+ 511              		.section	.debug_loc,"",%progbits
+ 512              	.Ldebug_loc0:
+ 513              	.LLST0:
+ 514 0000 00000000 		.4byte	.LVL0
+ 515 0004 08000000 		.4byte	.LVL1
+ 516 0008 0200     		.2byte	0x2
+ 517 000a 30       		.byte	0x30
+ 518 000b 9F       		.byte	0x9f
+ 519 000c 08000000 		.4byte	.LVL1
+ 520 0010 0E000000 		.4byte	.LVL2
+ 521 0014 0200     		.2byte	0x2
+ 522 0016 31       		.byte	0x31
+ 523 0017 9F       		.byte	0x9f
+ 524 0018 0E000000 		.4byte	.LVL2
+ 525 001c 14000000 		.4byte	.LVL3
+ 526 0020 0200     		.2byte	0x2
+ 527 0022 32       		.byte	0x32
+ 528 0023 9F       		.byte	0x9f
+ 529 0024 14000000 		.4byte	.LVL3
+ 530 0028 20000000 		.4byte	.LFE0
+ 531 002c 0200     		.2byte	0x2
+ 532 002e 33       		.byte	0x33
+ 533 002f 9F       		.byte	0x9f
+ 534 0030 00000000 		.4byte	0
+ 535 0034 00000000 		.4byte	0
+ 536              	.LLST1:
+ 537 0038 00000000 		.4byte	.LVL4
+ 538 003c 08000000 		.4byte	.LVL5
+ 539 0040 0100     		.2byte	0x1
+ 540 0042 50       		.byte	0x50
+ 541 0043 08000000 		.4byte	.LVL5
+ 542 0047 20000000 		.4byte	.LFE1
+ 543 004b 0400     		.2byte	0x4
+ 544 004d F3       		.byte	0xf3
+ 545 004e 01       		.uleb128 0x1
+ 546 004f 50       		.byte	0x50
+ 547 0050 9F       		.byte	0x9f
+ 548 0051 00000000 		.4byte	0
+ 549 0055 00000000 		.4byte	0
+ 550              		.section	.debug_aranges,"",%progbits
+ 551 0000 2C000000 		.4byte	0x2c
+ 552 0004 0200     		.2byte	0x2
+ 553 0006 00000000 		.4byte	.Ldebug_info0
+ 554 000a 04       		.byte	0x4
+ 555 000b 00       		.byte	0
+ 556 000c 0000     		.2byte	0
+ 557 000e 0000     		.2byte	0
+ 558 0010 00000000 		.4byte	.LFB0
+ 559 0014 20000000 		.4byte	.LFE0-.LFB0
+ 560 0018 00000000 		.4byte	.LFB1
+ 561 001c 20000000 		.4byte	.LFE1-.LFB1
+ 562 0020 00000000 		.4byte	.LFB2
+ 563 0024 18000000 		.4byte	.LFE2-.LFB2
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 14
+
+
+ 564 0028 00000000 		.4byte	0
+ 565 002c 00000000 		.4byte	0
+ 566              		.section	.debug_ranges,"",%progbits
+ 567              	.Ldebug_ranges0:
+ 568 0000 00000000 		.4byte	.LFB0
+ 569 0004 20000000 		.4byte	.LFE0
+ 570 0008 00000000 		.4byte	.LFB1
+ 571 000c 20000000 		.4byte	.LFE1
+ 572 0010 00000000 		.4byte	.LFB2
+ 573 0014 18000000 		.4byte	.LFE2
+ 574 0018 00000000 		.4byte	0
+ 575 001c 00000000 		.4byte	0
+ 576              		.section	.debug_line,"",%progbits
+ 577              	.Ldebug_line0:
+ 578 0000 98000000 		.section	.debug_str,"MS",%progbits,1
+ 578      02005800 
+ 578      00000201 
+ 578      FB0E0D00 
+ 578      01010101 
+ 579              	.LASF23:
+ 580 0000 6368616E 		.ascii	"channel\000"
+ 580      6E656C00 
+ 581              	.LASF18:
+ 582 0008 54686572 		.ascii	"Therm_Mux_Set\000"
+ 582      6D5F4D75 
+ 582      785F5365 
+ 582      7400
+ 583              	.LASF12:
+ 584 0016 54686572 		.ascii	"Therm_Mux_Start\000"
+ 584      6D5F4D75 
+ 584      785F5374 
+ 584      61727400 
+ 585              	.LASF9:
+ 586 0026 666C6F61 		.ascii	"float\000"
+ 586      7400
+ 587              	.LASF14:
+ 588 002c 54686572 		.ascii	"Therm_Mux_DisconnectAll\000"
+ 588      6D5F4D75 
+ 588      785F4469 
+ 588      73636F6E 
+ 588      6E656374 
+ 589              	.LASF13:
+ 590 0044 54686572 		.ascii	"Therm_Mux_FastSelect\000"
+ 590      6D5F4D75 
+ 590      785F4661 
+ 590      73745365 
+ 590      6C656374 
+ 591              	.LASF1:
+ 592 0059 756E7369 		.ascii	"unsigned char\000"
+ 592      676E6564 
+ 592      20636861 
+ 592      7200
+ 593              	.LASF5:
+ 594 0067 6C6F6E67 		.ascii	"long unsigned int\000"
+ 594      20756E73 
+ 594      69676E65 
+ 594      6420696E 
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 15
+
+
+ 594      7400
+ 595              	.LASF19:
+ 596 0079 474E5520 		.ascii	"GNU C99 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 596      43393920 
+ 596      352E342E 
+ 596      31203230 
+ 596      31363036 
+ 597 00ac 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 597      20726576 
+ 597      6973696F 
+ 597      6E203233 
+ 597      37373135 
+ 598 00df 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 598      74643D67 
+ 598      6E753939 
+ 598      202D6666 
+ 598      756E6374 
+ 599              	.LASF3:
+ 600 0112 73686F72 		.ascii	"short unsigned int\000"
+ 600      7420756E 
+ 600      7369676E 
+ 600      65642069 
+ 600      6E7400
+ 601              	.LASF20:
+ 602 0125 47656E65 		.ascii	"Generated_Source\\PSoC5\\Therm_Mux.c\000"
+ 602      72617465 
+ 602      645F536F 
+ 602      75726365 
+ 602      5C50536F 
+ 603              	.LASF17:
+ 604 0148 54686572 		.ascii	"Therm_Mux_Unset\000"
+ 604      6D5F4D75 
+ 604      785F556E 
+ 604      73657400 
+ 605              	.LASF16:
+ 606 0158 54686572 		.ascii	"Therm_Mux_lastChannel\000"
+ 606      6D5F4D75 
+ 606      785F6C61 
+ 606      73744368 
+ 606      616E6E65 
+ 607              	.LASF10:
+ 608 016e 646F7562 		.ascii	"double\000"
+ 608      6C6500
+ 609              	.LASF8:
+ 610 0175 756E7369 		.ascii	"unsigned int\000"
+ 610      676E6564 
+ 610      20696E74 
+ 610      00
+ 611              	.LASF7:
+ 612 0182 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 612      206C6F6E 
+ 612      6720756E 
+ 612      7369676E 
+ 612      65642069 
+ 613              	.LASF15:
+ 614 0199 6368616E 		.ascii	"chan\000"
+ 614      00
+ARM GAS  C:\Users\chemi\AppData\Local\Temp\ccRrTjI3.s 			page 16
+
+
+ 615              	.LASF6:
+ 616 019e 6C6F6E67 		.ascii	"long long int\000"
+ 616      206C6F6E 
+ 616      6720696E 
+ 616      7400
+ 617              	.LASF11:
+ 618 01ac 63686172 		.ascii	"char\000"
+ 618      00
+ 619              	.LASF2:
+ 620 01b1 73686F72 		.ascii	"short int\000"
+ 620      7420696E 
+ 620      7400
+ 621              	.LASF22:
+ 622 01bb 75696E74 		.ascii	"uint8\000"
+ 622      3800
+ 623              	.LASF21:
+ 624 01c1 433A5C55 		.ascii	"C:\\Users\\chemi\\UD3_QCW\\UD3_QFN.cydsn\000"
+ 624      73657273 
+ 624      5C636865 
+ 624      6D695C55 
+ 624      44335F51 
+ 625              	.LASF4:
+ 626 01e6 6C6F6E67 		.ascii	"long int\000"
+ 626      20696E74 
+ 626      00
+ 627              	.LASF0:
+ 628 01ef 7369676E 		.ascii	"signed char\000"
+ 628      65642063 
+ 628      68617200 
+ 629              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
